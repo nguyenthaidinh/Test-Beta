@@ -113,8 +113,10 @@ public class ServerManager {
             new Thread(The23rdMartialArtCongressManager.gI(), "Update DHVT23").start();
             new Thread(DeathOrAliveArenaManager.gI(), "Update Võ Đài Sinh Tử").start();
             new Thread(WorldMartialArtsTournamentManager.gI(), "Update WMAT").start();
+
             AutoMaintenance.AutoMaintenance = true;
             new Thread(AutoMaintenance.gI(), "Update Bao Tri Tu Dong").start();
+
             new Thread(ShenronEventManager.gI(), "Update Shenron").start();
 
             BossManager.gI().loadBoss();
@@ -181,7 +183,7 @@ public class ServerManager {
                 Manager.Topsukien1 = Manager.realTop(Manager.queryTopsukien1, con);
             }
             if (Manager.isTopSukien2Changed) {
-                Manager.Topsukien2 = Manager.realTop(Manager.queryTopSukien2, con);
+                Manager.Topsukien2 = Manager.realTop(Manager.queryTopsukien2, con);
             }
             if (Manager.isTopWhisChanged) {
                 Manager.Topwhis = Manager.realTop(Manager.queryTopwhis, con);
@@ -292,23 +294,35 @@ public class ServerManager {
 
     private static void activeCommandLine() {
         Scanner sc = new Scanner(System.in);
-        while (sc.hasNextLine()) {
-            String line = sc.nextLine();
-            switch (line) {
-                case "bt":
-                    Maintenance.gI().startSeconds(5);
-                    break;
-                case "bat":
-                    AutoMaintenance.AutoMaintenance = true;
-                    System.out.println("Da bat che do bao tri tu dong.");
-                    break;
-                case "tat":
-                    AutoMaintenance.AutoMaintenance = false;
-                    System.out.println("Da tat che do bao tri tu dong.");
-                    break;
-                default:
-                    System.out.println("Lenh khong hop le.");
-                    break;
+
+        while (true) {
+            try {
+                if (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                    switch (line) {
+                        case "bt":
+                            Maintenance.gI().startSeconds(5);
+                            break;
+                        case "bat":
+                            AutoMaintenance.AutoMaintenance = true;
+                            System.out.println("Da bat che do bao tri tu dong.");
+                            break;
+                        case "tat":
+                            AutoMaintenance.AutoMaintenance = false;
+                            System.out.println("Da tat che do bao tri tu dong.");
+                            break;
+                        default:
+                            System.out.println("Lenh khong hop le.");
+                            break;
+                    }
+                } else {
+                    Thread.sleep(1000);
+                }
+            } catch (Exception e) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
             }
         }
     }
