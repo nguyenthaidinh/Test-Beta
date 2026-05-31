@@ -78,7 +78,7 @@ public abstract class Yardart extends Boss {
     }
 
     protected void init() {
-        rewardRatio = 5;
+        rewardRatio = 1; // 100% rơi bí kíp (gốc = 5, tức 20%)
     }
 
     @Override

@@ -58,6 +58,14 @@ public class Command {
         adminCommands.put("getitem", player -> Input.gI().createFormGetItem(player));
         adminCommands.put("hs", player -> Service.gI().releaseCooldownSkill(player));
         adminCommands.put("d", player -> Service.gI().setPos(player, player.location.x, player.location.y + 10));
+        adminCommands.put("reloadgc", player -> {
+            int count = GiftCodeManager.gI().reloadGiftCodes();
+            if (count >= 0) {
+                Service.gI().sendThongBao(player, "Đã reload " + count + " giftcode từ database!");
+            } else {
+                Service.gI().sendThongBao(player, "Lỗi reload giftcode!");
+            }
+        });
         adminCommands.put("a", player -> NpcService.gI().createMenuConMeo(player, ConstNpc.MENU_ADMIN, -1,
                 "|0|Time start: " + ServerManager.timeStart
                 + "\nClients: " + Client.gI().getPlayers().size()

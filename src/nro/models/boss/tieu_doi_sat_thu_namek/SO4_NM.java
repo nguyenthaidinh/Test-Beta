@@ -41,12 +41,12 @@ public class SO4_NM extends Boss {
         for (int i = 1; i < Util.nextInt(3, 3) + 1; i++) {
             Service.gI().dropItemMap(this.zone, new ItemMap(zone, 77, Util.nextInt(1, 5), this.location.x - i * 10, this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id));
         }
-        short itTemp = 429;
-        short nr6s = 19;
-        short nr7s = 20;
+        short itTemp = 429; // Cải trang Số 4
+        short nr1 = (short) Util.nextInt(16, 20); // Random NR 3-7 sao, chia đều
+        short nr2 = (short) Util.nextInt(16, 20); // Random NR 3-7 sao, chia đều
         ItemMap it = new ItemMap(zone, itTemp, 1, this.location.x + Util.nextInt(-50, 50), this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id);
-        ItemMap it1 = new ItemMap(zone, nr6s, 1, this.location.x + Util.nextInt(-50, 50), this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id);
-        ItemMap it2 = new ItemMap(zone, nr7s, 1, this.location.x + Util.nextInt(-50, 50), this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id);
+        ItemMap it1 = new ItemMap(zone, nr1, 1, this.location.x + Util.nextInt(-50, 50), this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id);
+        ItemMap it2 = new ItemMap(zone, nr2, 1, this.location.x + Util.nextInt(-50, 50), this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id);
 
         List<Item.ItemOption> ops = ItemService.gI().getListOptionItemShop(itTemp);
         if (!ops.isEmpty()) {

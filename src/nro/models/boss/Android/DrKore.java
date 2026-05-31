@@ -4,6 +4,7 @@ import nro.models.boss.BossID;
 import nro.models.boss.BossesData;
 import java.util.Random;
 import nro.models.map.ItemMap;
+import nro.models.services.ItemService;
 import nro.models.player.Player;
 import nro.models.skill.Skill;
 import nro.models.services.PlayerService;
@@ -23,8 +24,16 @@ public class DrKore extends Boss {
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
-        Service.gI().dropItemMap(this.zone, new ItemMap(this.zone, 190, Util.nextInt(20000, 30001),
-          this.location.x, this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id));
+        int x = this.location.x;
+        int y = this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24);
+        Service.gI().dropItemMap(this.zone, new ItemMap(this.zone, 190, Util.nextInt(20000, 30001), x, y, plKill.id));
+        // 10% rơi đồ thần linh
+        if (Util.isTrue(10, 100)) {
+            ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
+            if (it != null) {
+                Service.gI().dropItemMap(this.zone, it);
+            }
+        }
         if (Util.isTrue(80, 100)) {
             int[] items = Util.isTrue(50, 100) ? new int[]{18, 19, 20} : new int[]{18,19,20};
             int randomItem = items[new Random().nextInt(items.length)];

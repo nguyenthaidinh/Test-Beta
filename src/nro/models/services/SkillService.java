@@ -397,11 +397,11 @@ public class SkillService {
         }
         switch (player.playerSkill.skillSelect.template.id) {
             case Skill.KAIOKEN:
-                int hpUse = player.nPoint.hpMax / 100 * 10;
+                int hpUse = player.nPoint.hpMax / 100 * 5; // Giảm từ 10% → 5%
                 if (player.setClothes.thanVuTruKaio == 4) {
-                    hpUse = player.nPoint.hpMax / 100 * 5;
+                    hpUse = player.nPoint.hpMax / 100 * 2; // Giảm từ 5% → 2%
                 } else if (player.setClothes.thanVuTruKaio == 5) {
-                    hpUse = player.nPoint.hpMax / 100 * 3;
+                    hpUse = 0; // Full set: miễn phí
                 }
                 if (player.nPoint.hp <= hpUse) {
                     break;

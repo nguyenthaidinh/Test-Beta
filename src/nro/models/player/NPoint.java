@@ -230,16 +230,7 @@ public class NPoint {
         if (this.player.rewardBlackBall.timeOutOfDateReward[2] > System.currentTimeMillis()) {
             tlHutHp += RewardBlackBall.R3S_1;
         }
-        if (this.player.rewardBlackBall.timeOutOfDateReward[3] > System.currentTimeMillis()) {
-            tlPST += RewardBlackBall.R4S_2;
-        }
-        if (this.player.rewardBlackBall.timeOutOfDateReward[4] > System.currentTimeMillis()) {
-            tlDameCrit.add(RewardBlackBall.R5S_1);
-            tlSDCM += RewardBlackBall.R5S_1;
-        }
-        if (this.player.rewardBlackBall.timeOutOfDateReward[6] > System.currentTimeMillis()) {
-            tlNeDon += RewardBlackBall.R7S_1;
-        }
+        // 4s, 5s, 6s, 7s sao đen giờ cho item, không còn buff
         // Lấy tất cả option danh hiệu
         List<Item.ItemOption> options = BagesTemplate.sendListItemOption(player);
 
@@ -939,9 +930,9 @@ public class NPoint {
             mpMax += (mpMax * 15L / 100L);
         }
 
-        // Xử lý ngọc rồng đen 6 sao
-        if (this.player.rewardBlackBall.timeOutOfDateReward[5] > System.currentTimeMillis()) {
-            mpMax += (mpMax * RewardBlackBall.R6S_1 / 100L);
+        // Xử lý ngọc rồng đen 2 sao - KI +15%
+        if (this.player.rewardBlackBall.timeOutOfDateReward[1] > System.currentTimeMillis()) {
+            mpMax += (mpMax * RewardBlackBall.R2S_KI / 100L);
         }
 
         // Xử lý set worldcup
@@ -1923,7 +1914,7 @@ public class NPoint {
             }
         }
         if (type == 4) {
-            tiemNangUse = 50000000L;
+            tiemNangUse = 2500000L; // giảm 20 lần (gốc 50000000L)
             for (int i = 0; i < this.critg; i++) {
                 tiemNangUse *= 5L;
             }

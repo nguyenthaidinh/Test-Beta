@@ -1,5 +1,9 @@
 package nro.models.player;
 
+import nro.models.item.Item;
+import nro.models.services.InventoryService;
+import nro.models.services.ItemService;
+import nro.models.services.PlayerService;
 import nro.models.services.Service;
 import nro.models.utils.TimeUtil;
 import nro.models.utils.Util;
@@ -15,8 +19,9 @@ public class RewardBlackBall {
     private static final int TIME_REWARD = 79200000;
 
     public static final int R1S_1 = 20;
-    public static final int R1S_2 = 21;
-    public static final int R2S_1 = 35;
+    public static final int R1S_2 = 10; // Giảm từ 21% → 10% sức đánh
+    public static final int R2S_1 = 15; // Giảm từ 35% → 15% HP
+    public static final int R2S_KI = 15; // Thêm +15% KI cho 2 sao đen
     public static final int R2S_2 = 20;
     public static final int R3S_1 = 35;
     public static final int R3S_2 = 10;
@@ -70,15 +75,54 @@ public class RewardBlackBall {
     private void getReward(int star) {
         if (timeOutOfDateReward[star - 1] > System.currentTimeMillis()
                 && Util.canDoWithTime(lastTimeGetReward[star - 1], TIME_WAIT)) {
+            lastTimeGetReward[star - 1] = System.currentTimeMillis();
             switch (star) {
                 case 1:
                 case 2:
                 case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
                     Service.gI().sendThongBao(player, "Chỉ Số Tự Cộng Khi Nhặt xong");
+                    break;
+                case 4: // Ngọc rồng random 3-7 sao
+                    if (InventoryService.gI().getCountEmptyBag(player) > 0) {
+                        short nrId = (short) Util.nextInt(16, 20); // NR 3-7 sao
+                        Item nr = ItemService.gI().createNewItem(nrId);
+                        nr.quantity = 1;
+                        InventoryService.gI().addItemBag(player, nr);
+                        InventoryService.gI().sendItemBags(player);
+                        Service.gI().sendThongBao(player, "Bạn nhận được " + nr.template.name);
+                    } else {
+                        Service.gI().sendThongBao(player, "Hành trang đầy");
+                    }
+                    break;
+                case 5: // x10 đá nâng cấp các loại
+                    if (InventoryService.gI().getCountEmptyBag(player) >= 5) {
+                        short[] stones = {220, 221, 222, 223, 224}; // Lục Bảo, Saphia, Ruby, Titan, Thạch Anh Tím
+                        for (short stoneId : stones) {
+                            Item stone = ItemService.gI().createNewItem(stoneId);
+                            stone.quantity = 10;
+                            InventoryService.gI().addItemBag(player, stone);
+                        }
+                        InventoryService.gI().sendItemBags(player);
+                        Service.gI().sendThongBao(player, "Bạn nhận được x10 mỗi loại đá nâng cấp");
+                    } else {
+                        Service.gI().sendThongBao(player, "Cần ít nhất 5 ô hành trang trống");
+                    }
+                    break;
+                case 6: // 10x đá ngũ sắc
+                    if (InventoryService.gI().getCountEmptyBag(player) > 0) {
+                        Item daNguSac = ItemService.gI().createNewItem((short) 674); // Đá Ngũ Sắc
+                        daNguSac.quantity = 10;
+                        InventoryService.gI().addItemBag(player, daNguSac);
+                        InventoryService.gI().sendItemBags(player);
+                        Service.gI().sendThongBao(player, "Bạn nhận được 10 Đá Ngũ Sắc");
+                    } else {
+                        Service.gI().sendThongBao(player, "Hành trang đầy");
+                    }
+                    break;
+                case 7: // 20 ngọc
+                    player.inventory.gem += 20;
+                    PlayerService.gI().sendInfoHpMpMoney(player);
+                    Service.gI().sendThongBao(player, "Bạn nhận được 20 ngọc");
                     break;
             }
         } else {

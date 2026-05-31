@@ -63,25 +63,26 @@ public class PhaLeHoaTrangBi {
     }
 
     public static float getRatio(int star) {
+        // Tỉ lệ thực = tỉ lệ hiển thị
         switch (star) {
             case 0:
-                return 50f;
+                return 80f;
             case 1:
-                return 20f;
+                return 40f;
             case 2:
-                return 10f;
+                return 30f;
             case 3:
-                return 5f;
+                return 20f;
             case 4:
-                return 1f;
+                return 10f;
             case 5:
-                return 0.7f;
+                return 5f;
             case 6:
-                return 0.5f;
+                return 3f;
             case 7:
-                return 0.1f;
+                return 2f;
             case 8:
-                return 0.1f;
+                return 1f;
         }
 
         return 0;

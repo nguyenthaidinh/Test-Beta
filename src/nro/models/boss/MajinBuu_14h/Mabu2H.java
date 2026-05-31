@@ -14,6 +14,9 @@ import nro.models.player.Player;
 import nro.models.services.EffectSkillService;
 import nro.models.services.Service;
 import nro.models.utils.Util;
+import nro.models.item.Item;
+import nro.models.map.ItemMap;
+import nro.models.services.ItemService;
 
 import nro.models.server.ServerNotify;
 import nro.models.services.ItemTimeService;
@@ -120,6 +123,33 @@ public class Mabu2H extends Boss {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
+        int x = this.location.x;
+        int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
+
+        // 100% rơi vàng 20-30k
+        int goldQty = Util.nextInt(20000, 30000);
+        ItemMap goldDrop = new ItemMap(this.zone, 190, goldQty, x, y, plKill.id);
+        Service.gI().dropItemMap(zone, goldDrop);
+
+        // 40% rơi Quần Thần (60% Namec, 30% TD, 10% XD)
+        if (Util.isTrue(40, 100)) {
+            int rand = Util.nextInt(1, 100);
+            short quanId;
+            if (rand <= 60) {
+                quanId = 558; // Quần Thần Namec
+            } else if (rand <= 90) {
+                quanId = 556; // Quần Thần Linh (TD)
+            } else {
+                quanId = 560; // Quần Thần Xayda
+            }
+            ItemMap quanDrop = new ItemMap(this.zone, quanId, 1, x + Util.nextInt(-50, 50), y, plKill.id);
+            java.util.List<Item.ItemOption> ops = ItemService.gI().getListOptionItemShop(quanId);
+            if (!ops.isEmpty()) {
+                quanDrop.options.addAll(ops);
+            }
+            Service.gI().dropItemMap(zone, quanDrop);
+        }
+
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
     }
 

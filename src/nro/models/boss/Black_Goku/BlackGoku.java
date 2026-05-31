@@ -34,7 +34,7 @@ public class BlackGoku extends Boss {
         int drop = 190; // 100% rơi item ID 190
         int quantity = Util.nextInt(20000, 30000);
         // Tạo itemMap cho item ID 190
-        if (Util.isTrue(5, 100)) {
+        if (Util.isTrue(30, 100)) { // 30% rơi đồ thần linh
             ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
             if (it != null) {
                 Service.gI().dropItemMap(zone, it);
@@ -44,7 +44,7 @@ public class BlackGoku extends Boss {
         Item item = ItemService.gI().createNewItem((short) drop);
         Service.gI().dropItemMap(zone, itemMap);
         // 30% xác suất để rơi đồ
-        if (Util.isTrue(5, 100)) {
+        if (Util.isTrue(50, 100)) { // 50% rơi trang bị
             int group = Util.nextInt(1, 100) <= 70 ? 0 : 1;  // 70% chọn Áo Quần Giày (group = 0), 30% chọn Găng Rada (group = 1)
 
             // Các vật phẩm rơi từ nhóm Áo Quần Giày và Găng Rada
