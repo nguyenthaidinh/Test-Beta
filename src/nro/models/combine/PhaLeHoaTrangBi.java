@@ -76,40 +76,40 @@ public class PhaLeHoaTrangBi {
             case 4:
                 return 10f;
             case 5:
-                return 5f;
-            case 6:
-                return 3f;
-            case 7:
-                return 2f;
-            case 8:
                 return 1f;
+            case 6:
+                return 0.6f;
+            case 7:
+                return 0.4f;
+            case 8:
+                return 0.2f;
         }
 
         return 0;
     }
 
-    private static int getFakeRatio(int star) {
+    private static float getFakeRatio(int star) {
         return switch (star) {
             case 0 ->
-                80;
+                80f;
             case 1 ->
-                40;
+                40f;
             case 2 ->
-                30;
+                30f;
             case 3 ->
-                20;
+                20f;
             case 4 ->
-                10;
+                10f;
             case 5 ->
-                5;
+                1f;
             case 6 ->
-                3;
+                0.6f;
             case 7 ->
-                2;
+                0.4f;
             case 8 ->
-                1;
+                0.2f;
             default ->
-                0;
+                0f;
         };
     }
 

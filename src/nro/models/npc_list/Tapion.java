@@ -33,10 +33,10 @@ public class Tapion extends Npc {
                     if (mapId == 19) {
                         Calendar calendar = Calendar.getInstance();
                         int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                        if (hour >= 1 && hour < 23) {
+                        if (hour >= 21 && hour < 23) {
                             ChangeMapService.gI().changeMapNonSpaceship(player, 126, 200 + Util.nextInt(-100, 100), 360);
                         }else{
-                            Service.gI().sendThongBao(player, "Vui lòng quay lại vào lúc 22h");
+                            Service.gI().sendThongBao(player, "Hirudegarn chỉ xuất hiện từ 21h - 23h");
                         }
                     } else if (mapId == 126) {
                         ChangeMapService.gI().changeMapNonSpaceship(player, 19, 1000 + Util.nextInt(-100, 100), 360);

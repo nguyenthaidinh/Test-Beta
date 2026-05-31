@@ -25,7 +25,7 @@ public class NangCapBongTai {
     private static final int ITEM_OPTION_ID_CAP = 72;
     private static final int ITEM_OPTION_VALUE_CAP_2 = 2;
     private static final int ITEM_PARAM_INDEX = 31;
-    private static final int REQUIRED_MANH_VO_FULL = 9999;
+    private static final int REQUIRED_MANH_VO_FULL = 1000;
     private static final int REQUIRED_MANH_VO_FAIL = 99;
 
     public static void showInfoCombine(Player player) {

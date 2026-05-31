@@ -1030,6 +1030,13 @@ public class Mob {
                 ItemMap it = new ItemMap(zone, 19 + rand, 1, x, yEnd, player.id);
                 list.add(it);
             }
+            //========================Đá Nâng Cấp Map Thường========================
+            if (Util.isTrue(10, 100)) {
+                int rand = Util.nextInt(0, 4);
+                ItemMap it = new ItemMap(zone, 220 + rand, 1, x, yEnd, player.id);
+                it.options.add(new Item.ItemOption(71 - rand, 0));
+                list.add(it);
+            }
         }
         if (player.setClothes.checkSetDes() && MapService.gI().isMapNgucTu(mapid)) {
             if ((player.isActive() && Util.isTrue(2, 555)) || Util.isTrue(10, 100)) {
