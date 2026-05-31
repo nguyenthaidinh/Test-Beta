@@ -76,7 +76,7 @@ public class PhaLeHoaTrangBi {
             case 4:
                 return 10f;
             case 5:
-                return 1f;
+                return 5f;
             case 6:
                 return 0.6f;
             case 7:
@@ -101,7 +101,7 @@ public class PhaLeHoaTrangBi {
             case 4 ->
                 10f;
             case 5 ->
-                1f;
+                5f;
             case 6 ->
                 0.6f;
             case 7 ->

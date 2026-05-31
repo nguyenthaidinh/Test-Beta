@@ -297,17 +297,17 @@ public class CombineSystem {
             case 1:
                 return 50;
             case 2:
-                return 20;
+                return 35;
             case 3:
-                return 10;
+                return 20;
             case 4:
                 return 7;
             case 5:
                 return 5;
             case 6:
-                return 1;
+                return 5;
             case 7: // 7 sao
-                return 0.3;
+                return 2;
             case 8:
                 return 5;
             case 9:

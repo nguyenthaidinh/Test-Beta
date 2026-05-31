@@ -397,17 +397,19 @@ public class SkillService {
         }
         switch (player.playerSkill.skillSelect.template.id) {
             case Skill.KAIOKEN:
-                int hpUse = player.nPoint.hpMax / 100 * 5; // Giảm từ 10% → 5%
+                int hpUse = player.nPoint.hpMax / 100 * 5; // Giảm 5% HP
+                int kiUse = 10000; // Giảm 10k KI mỗi đấm
                 if (player.setClothes.thanVuTruKaio == 4) {
-                    hpUse = player.nPoint.hpMax / 100 * 2; // Giảm từ 5% → 2%
+                    hpUse = player.nPoint.hpMax / 100 * 2; // Set 4 món: 2% HP
                 } else if (player.setClothes.thanVuTruKaio == 5) {
-                    hpUse = 0; // Full set: miễn phí
+                    hpUse = 0; // Full set: miễn phí HP
                 }
-                if (player.nPoint.hp <= hpUse) {
+                if (player.nPoint.hp <= hpUse || player.nPoint.mp < kiUse) {
                     break;
                 } else {
                     Service.gI().sendEffAllPlayer(player, 1027, 1, -1, 20);
                     player.nPoint.setHp(player.nPoint.hp - hpUse);
+                    player.nPoint.setMP(player.nPoint.mp - kiUse);
                     PlayerService.gI().sendInfoHpMpMoney(player);
                     Service.gI().Send_Info_NV(player);
                 }
@@ -1041,11 +1043,13 @@ public class SkillService {
     public boolean canUseSkillWithMana(Player player) {
         if (player.playerSkill.skillSelect != null) {
             if (player.playerSkill.skillSelect.template.id == Skill.KAIOKEN) {
-                long hpUse = player.nPoint.hpMax / 100 * 10;
+                long hpUse = player.nPoint.hpMax / 100 * 5; // Đồng bộ: check 5% HP
+                int kiUse = 10000; // Check 10k KI
                 if (player.isBoss && player instanceof Rival) {
                     hpUse = 0;
+                    kiUse = 0;
                 }
-                if (player.nPoint.hp <= hpUse) {
+                if (player.nPoint.hp <= hpUse || player.nPoint.mp < kiUse) {
                     return false;
                 }
             }
