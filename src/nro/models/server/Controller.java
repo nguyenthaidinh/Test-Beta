@@ -118,7 +118,12 @@ public class Controller implements IMessageHandler {
                             idItem = _msg.reader().readShort();
                             _msg.reader().readByte();
                             _msg.reader().readInt();
-                            ConsignShopService.gI().buyItem(player, idItem);
+                            // Thử mua từ ConsignShop trước, nếu không tìm thấy thì thử LioShop
+                            if (ConsignShopService.gI().getItemBuy(idItem) != null) {
+                                ConsignShopService.gI().buyItem(player, idItem);
+                            } else {
+                                nro.models.shop_lio.LioShopService.gI().buyItem(player, idItem);
+                            }
                             break;
                         case 4:
                             moneyType = _msg.reader().readByte();

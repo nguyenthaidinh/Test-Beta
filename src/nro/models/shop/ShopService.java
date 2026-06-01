@@ -881,6 +881,24 @@ public class ShopService {
             item = ItemService.gI().createNewItem((short) 521);
             item.itemOptions.addAll(is.options);
         }
+        // Mảnh vỡ/Hồn bông tai: giới hạn 100 mảnh/ngày + cần option 31 để tích lũy đúng
+        if (item.template.id == 933 || item.template.id == 934 || item.template.id == 935) {
+            // Reset counter nếu qua ngày mới
+            if (Util.isAfterMidnight(player.lastTimeFragmentBought)) {
+                player.dailyFragmentBought = 0;
+            }
+            if (player.dailyFragmentBought >= 100) {
+                Service.gI().sendThongBao(player, "Bạn đã mua đủ 100 mảnh hôm nay, vui lòng quay lại ngày mai!");
+                return;
+            }
+            player.dailyFragmentBought++;
+            player.lastTimeFragmentBought = System.currentTimeMillis();
+            boolean hasOpt31 = item.itemOptions.stream()
+                    .anyMatch(io -> io.optionTemplate.id == 31);
+            if (!hasOpt31) {
+                item.itemOptions.add(new Item.ItemOption(31, 1));
+            }
+        }
         InventoryService.gI().addItemBag(player, item);
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendThongBao(player, "Mua thành công " + is.temp.name);

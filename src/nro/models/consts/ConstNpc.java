@@ -153,6 +153,7 @@ public class ConstNpc {
     public static final byte RUONG_SUU_TAM = 82;
     public static final byte DR_MYUU = 83;
     public static final byte XE_NUOC_MIA = 84;
+    public static final byte LIO_DEP_TRAI = 85;
     //----------------------index menu------------------------------------------
     //menu o len tang map mabu
     public static final int GO_UPSTAIRS_MENU = 10000;
@@ -164,6 +165,10 @@ public class ConstNpc {
 
     public static final int ORTHER_MENU1 = 23505;
     public static final int ORTHER_MENU2 = 53906;
+
+    //index menu lio dep trai
+    public static final int MENU_SHOP_LIO_BAN = 700;
+    public static final int MENU_SHOP_LIO_CONFIRM_BAN = 701;
 
     //index quy lão kamê
     public static final int MENU_OPEN_DBKB = 500;

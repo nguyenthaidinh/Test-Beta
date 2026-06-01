@@ -10,6 +10,8 @@ import nro.models.npc.Npc;
 import nro.models.map.service.NpcManager;
 import nro.models.combine.PhanRaTrangBiKichHoat.PhanRaTrangBi;
 import nro.models.services.InventoryService;
+import nro.models.shop_lio.LioShopManager;
+import nro.models.shop_lio.LioShopService;
 
 /**
  *
@@ -56,14 +58,18 @@ public class CombineService {
     public static final int NANG_CHI_SO_BONG_TAI = 517;
     public static final int NANG_CAP_BONG_TAI3 = 455;
     public static final int NANG_CHI_SO_BONG_TAI3 = 457;
+    public static final int HIEN_TE_THAN_LINH = 998;
+    public static final int BAN_DO_THAN_LINH_LIO = 999;
     private static CombineService instance;
     
     public final Npc baHatMit;
     public final Npc whis;
+    public Npc lioDepTrai;
     
     private CombineService() {
         this.baHatMit = NpcManager.getNpc(ConstNpc.BA_HAT_MIT);
         this.whis = NpcManager.getNpc(ConstNpc.WHIS);
+        this.lioDepTrai = NpcManager.getNpc(ConstNpc.LIO_DEP_TRAI);
     }
     
     public static CombineService gI() {
@@ -107,6 +113,12 @@ public class CombineService {
                 break;
             case TAI_TAO_CAPSULE_KH:
                 TaiTaoCapsuleKichHoat.showInfoCombine(player);
+                break;
+            case HIEN_TE_THAN_LINH:
+                HienTeTrangBiThanLinh.showInfoCombine(player);
+                break;
+            case BAN_DO_THAN_LINH_LIO:
+                showInfoBanDoThanLinh(player);
                 break;
             case NHAP_NGOC_RONG:
                 NhapNgocRong.showInfoCombine(player);
@@ -189,6 +201,12 @@ public class CombineService {
                 break;
             case TAI_TAO_CAPSULE_KH:
                 TaiTaoCapsuleKichHoat.thucHienTaiTao(player);
+                break;
+            case HIEN_TE_THAN_LINH:
+                HienTeTrangBiThanLinh.thucHienHienTe(player);
+                break;
+            case BAN_DO_THAN_LINH_LIO:
+                thucHienBanDoThanLinh(player);
                 break;
             case NHAP_NGOC_RONG:
                 NhapNgocRong.nhapNgocRong(player);
@@ -617,6 +635,10 @@ public class CombineService {
                 return "Ta sẽ phù phép\nphân rã thành\nkhoáng tái chế cho ngươi";
             case TAI_TAO_CAPSULE_KH:
                 return "Ta sẽ phù phép\ntái tạo thành 1 viên\nCapsule kích hoạt tự chọn";
+            case HIEN_TE_THAN_LINH:
+                return "Ta sẽ phù phép\nhiến tế trang bị Thần Linh\nthành trang bị Kích Hoạt";
+            case BAN_DO_THAN_LINH_LIO:
+                return "Đặt đồ Thần Linh\nvào đây để bán\nNhận 25 thỏi vàng";
             case NHAP_NGOC_RONG:
                 return "Ta sẽ phù phép\ncho 7 viên Ngọc Rồng\nthành 1 viên Ngọc Rồng cấp cao";
             case NANG_CAP_VAT_PHAM:
@@ -675,6 +697,10 @@ public class CombineService {
                 return "Vào hành trang\nChọn hay nhiều\nTrang bị kích hoạt cần rã\nSau đó chọn 'Phân rã'";
             case TAI_TAO_CAPSULE_KH:
                 return "Vào hành trang\nChọn 3 khoáng tái chế\nChọn 1 Capsule vỡ\nSau đó chọn 'Tái tạo'";
+            case HIEN_TE_THAN_LINH:
+                return "Vào hành trang\nChọn 1 trang bị Thần Linh\n(Áo, Quần, Găng, Giày hoặc Nhẫn)\nSau đó chọn 'Hiến tế'";
+            case BAN_DO_THAN_LINH_LIO:
+                return "Vào hành trang\nChọn 1 trang bị Thần Linh\n(Áo, Quần, Găng, Giày hoặc Nhẫn)\nSau đó chọn 'Bán'";
             case CHUYEN_HOA_TRANG_BI_NGOC:
             case CHUYEN_HOA_TRANG_BI_VANG:
                 return "Vào hành trang\nChọn trang bị gốc\n(Áo,quần,găng,giày hoặc rada)\ntừ cấp[+4] trở lên\nChọn tiếp trang bị mới\nchưa nâng cấp cần nhập thể\nsau đó chọn 'Nâng cấp'";
@@ -733,5 +759,60 @@ public class CombineService {
             default:
                 return "";
         }
+    }
+
+    private void showInfoBanDoThanLinh(Player player) {
+        if (player.combineNew.itemsCombine.size() != 1) {
+            if (lioDepTrai != null) {
+                lioDepTrai.createOtherMenu(player, ConstNpc.IGNORE_MENU,
+                        "Cần đặt đúng 1 trang bị Thần Linh!", "Đóng");
+            }
+            return;
+        }
+
+        Item item = player.combineNew.itemsCombine.get(0);
+
+        if (item.template.id < 555 || item.template.id > 567) {
+            if (lioDepTrai != null) {
+                lioDepTrai.createOtherMenu(player, ConstNpc.IGNORE_MENU,
+                        "Vật phẩm phải là trang bị Thần Linh!\n(Áo, Quần, Găng, Giày hoặc Nhẫn Thần Linh)", "Đóng");
+            }
+            return;
+        }
+
+        if (LioShopManager.gI().getAvailableCount() >= LioShopManager.MAX_ITEMS) {
+            if (lioDepTrai != null) {
+                lioDepTrai.createOtherMenu(player, ConstNpc.IGNORE_MENU,
+                        "Shop đã đầy (" + LioShopManager.MAX_ITEMS + " món), vui lòng quay lại sau!", "Đóng");
+            }
+            return;
+        }
+
+        player.combineNew.goldCombine = 0;
+        player.combineNew.ratioCombine = 100;
+
+        String npcSay = "|2|Bán: " + item.template.name + "\n"
+                + "|1|→ Nhận " + LioShopManager.PRICE_BUY_IN + " thỏi vàng\n"
+                + "|7|Đồ sẽ được bày bán với giá " + LioShopManager.PRICE_SELL_OUT + " thỏi vàng\n";
+
+        if (lioDepTrai != null) {
+            lioDepTrai.createOtherMenu(player, ConstNpc.MENU_START_COMBINE, npcSay,
+                    "Xác nhận\nBán", "Từ chối");
+        }
+    }
+
+    private void thucHienBanDoThanLinh(Player player) {
+        if (player.combineNew.itemsCombine.size() != 1) {
+            return;
+        }
+
+        Item item = player.combineNew.itemsCombine.get(0);
+
+        if (item.template.id < 555 || item.template.id > 567) {
+            return;
+        }
+
+        LioShopService.gI().sellItem(player, item);
+        player.combineNew.clearCombine();
     }
 }

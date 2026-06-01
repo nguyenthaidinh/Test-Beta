@@ -354,6 +354,8 @@ public class Player implements Runnable {
     public long lastChallengeGauTuongCuopTime;
     public long lastChallengeGauTuopCuopTime;
     public LocalDateTime lastCheckIn;
+    public int dailyFragmentBought;
+    public long lastTimeFragmentBought;
 
     public Player() {
         LearnSkill = new LearnSkill();

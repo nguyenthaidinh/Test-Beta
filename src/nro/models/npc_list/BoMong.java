@@ -77,15 +77,13 @@ public class BoMong extends Npc {
                                 }
                             }
                             player.lastCheckIn = LocalDateTime.now();
-                            player.inventory.gem += 10000;
                             Item item457 = ItemService.gI().createNewItem((short) 457);
-                            item457.quantity = 100;
+                            item457.quantity = 10;
                             item457.itemOptions.add(new Item.ItemOption(30, 0));
                             InventoryService.gI().addItemBag(player, item457);
-                            PlayerService.gI().sendInfoHpMpMoney(player);
                             InventoryService.gI().sendItemBags(player);
 
-                            Service.gI().sendThongBao(player, "Điểm danh thành công! Bạn nhận được 10.000 ngọc và 100 thỏi vàng.");
+                            Service.gI().sendThongBao(player, "Điểm danh thành công! Bạn nhận được 10 thỏi vàng.");
                         }
 
                     }

@@ -737,6 +737,32 @@ public final class Manager {
             }
             Logger.success(Logger.RED + "Successfully loaded Consign Item (" + ConsignShopManager.gI().listItem.size() + ")\n");
 
+            //Load shop lio dep trai
+            ps = ConnectionDatabase.prepareStatement("SELECT * FROM shop_lio WHERE isSold = 0");
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                int i = rs.getInt("id");
+                int idPl = rs.getInt("player_id");
+                String sellerName = rs.getString("seller_name");
+                short itemId = rs.getShort("item_id");
+                int price = rs.getInt("price");
+                int quantity = rs.getInt("quantity");
+                boolean isSold = rs.getByte("isSold") == 1;
+                List<Item.ItemOption> op = new ArrayList<>();
+                JSONArray jsa3 = (JSONArray) JSONValue.parse(rs.getString("itemOption"));
+                if (jsa3 != null) {
+                    for (int j = 0; j < jsa3.size(); ++j) {
+                        JSONObject jso3 = (JSONObject) jsa3.get(j);
+                        int idOptions = Integer.parseInt(jso3.get("id").toString());
+                        int param = Integer.parseInt(jso3.get("param").toString());
+                        op.add(new Item.ItemOption(idOptions, param));
+                    }
+                }
+                nro.models.shop_lio.LioShopManager.gI().listItem.add(
+                        new nro.models.shop_lio.LioShopItem(i, itemId, idPl, sellerName, price, quantity, op, isSold));
+            }
+            Logger.success(Logger.RED + "Successfully loaded Shop Lio (" + nro.models.shop_lio.LioShopManager.gI().listItem.size() + ")\n");
+
             //load mob template
             ps = ConnectionDatabase.prepareStatement("select * from mob_template");
             rs = ps.executeQuery();

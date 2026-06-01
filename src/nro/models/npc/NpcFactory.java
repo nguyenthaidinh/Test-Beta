@@ -89,6 +89,7 @@ import nro.models.event.XeNuocMia;
 import nro.models.npc_list.ChiChi;
 import nro.models.npc_list.DrMyuu;
 import nro.models.npc_list.DuaHau;
+import nro.models.npc_list.LioDepTrai;
 import nro.models.npc_list.ToriBot;
 import nro.models.services.shenron.SummonDragon;
 import static nro.models.services.shenron.SummonDragon.SHENRON_1_STAR_WISHES_1;
@@ -229,6 +230,8 @@ public class NpcFactory {
                     new XeNuocMia(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.BARDOCK ->
                     new Bardock(mapId, status, cx, cy, tempId, avatar);
+                case ConstNpc.LIO_DEP_TRAI ->
+                    new LioDepTrai(mapId, status, cx, cy, tempId, avatar);
                 default ->
                     new Npc(mapId, status, cx, cy, tempId, avatar) {
                         @Override

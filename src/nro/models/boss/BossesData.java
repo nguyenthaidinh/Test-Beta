@@ -40,6 +40,7 @@ public class BossesData {
     private static final int REST_10_M = 600;
     private static final int REST_15_M = 900;
     private static final int REST_30_M = 1800;
+    private static final int REST_1_H = 3600;
     private static final int REST_24_H = 86400000;
 
     // **************************************************************************
@@ -953,7 +954,7 @@ public class BossesData {
                     "|-1|Được thôi, nếu muốn chết đến vậy, ta rất vui lòng!!"
             }, // text chat 2
             new String[] { "|-1|Biến hình! Super Saiyan SSJ" }, // text chat 3
-            REST_5_M // second rest
+            REST_1_H // second rest
     );
 
     public static final BossData SUPER_CUMBER = new BossData(
@@ -2235,7 +2236,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 320, 321, 322, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             50000, // dame
-            new int[] { 500000000 }, // hp
+            new int[] { 800000000 }, // hp
             new int[] { 110 }, // map join
             new int[][] {
                     { Skill.GALICK, 1, 2000 },

@@ -44,7 +44,7 @@ public class Mabu extends Boss {
         int drop = 190; // 100% rơi item ID 190
         int quantity = Util.nextInt(20000, 30000);
         // Tạo itemMap cho item ID 190
-        if (Util.isTrue(20, 100)) { // Đồ Thần Linh 20%
+        if (Util.isTrue(50, 100)) { // Đồ Thần Linh 50%
         ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
         if (it != null) {
         Service.gI().dropItemMap(zone, it);
@@ -54,7 +54,7 @@ public class Mabu extends Boss {
         Item item = ItemService.gI().createNewItem((short) drop);
         Service.gI().dropItemMap(zone, itemMap);
         // 30% xác suất để rơi đồ
-        if (Util.isTrue(30, 100)) { // Trang bị 30%
+        if (true) { // Trang bị 100%
             int group = Util.nextInt(1, 100) <= 70 ? 0 : 1;  // 70% chọn Áo Quần Giày (group = 0), 30% chọn Găng Rada (group = 1)
 
             // Các vật phẩm rơi từ nhóm Áo Quần Giày và Găng Rada
@@ -95,6 +95,16 @@ public class Mabu extends Boss {
         }
         plKill.fightMabu.changePoint((byte) 25);
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
+        // Đẩy tất cả player trong map về nhà sau khi giết Mabu
+        if (this.zone != null) {
+            for (Player pl : this.zone.getNotBosses()) {
+                if (pl.isPl() && !pl.goHome) {
+                    pl.goHome = true;
+                    pl.timeGohome = 30;
+                    pl.lastUpdateGohomeTime = System.currentTimeMillis();
+                }
+            }
+        }
     }
     @Override
     public void joinMap() {

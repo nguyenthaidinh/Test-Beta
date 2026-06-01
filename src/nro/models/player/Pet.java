@@ -362,7 +362,7 @@ public class Pet extends Player {
 
                         playerAttack = findPlayerAttack();
                         if (playerAttack != null) {
-                            if ((this.typePet == 2 || this.typePet == 4 || this.typePet == 5)
+                            if ((this.typePet == 2 || this.typePet == 3 || this.typePet == 4 || this.typePet == 5)
                                     && Util.isTrue(1, 5)
                                     && playerAttack.nPoint.hp < 1_000_000_000
                                     && !playerAttack.nPoint.islinhthuydanhbac
@@ -974,7 +974,7 @@ public class Pet extends Player {
     private boolean cantAttack(Player player) {
         return player == null || player.location == null || player.isDie() || Util.getDistance(this, player) > 500
                 || this.equals(player)
-                || (player.equals(master) || this.typePet != 5 && this.typePet != 2 && this.typePet != 4)
+                || (player.equals(master) || this.typePet != 5 && this.typePet != 2 && this.typePet != 3 && this.typePet != 4)
                 || (!temporaryEnemies.contains(player) && !master.temporaryEnemies.contains(player))
                 || (!SkillService.gI().canAttackPlayer(this, player));
     }
@@ -1138,7 +1138,7 @@ public class Pet extends Player {
             Service.gI().Send_Caitrang(this);
             Service.gI().chat(this, "Tao là thần");
         }
-        if (this.typePet == 2) {
+        if (this.typePet == 3) {
             this.isTransform = !this.isTransform;
             Service.gI().Send_Caitrang(this);
             Service.gI().chat(this, "Chúng mày quỳ xuống");
