@@ -37,7 +37,11 @@ public class Combine {
         this.ratioCombine = 0;
         this.countDaNangCap = 0;
         this.countDaBaoVe = 0;
+    }
 
+    public void clearCombine() {
+        clearItemCombine();
+        clearParamCombine();
     }
 
     public void dispose() {
