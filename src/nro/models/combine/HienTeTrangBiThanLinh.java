@@ -146,18 +146,14 @@ public class HienTeTrangBiThanLinh {
         player.combineNew.ratioCombine = RATIO_HIEN_TE;
 
         String raceName = getRaceName(item, player);
-        String npcSay = "|2|Hiến tế: " + item.template.name + "\n"
-                + "|1|→ Nhận 1 trang bị Set Kích Hoạt " + raceName + "\n"
-                + "|1|  (Áo/Quần/Găng/Giày/Rada ngẫu nhiên)\n"
-                + "|2|Tỉ lệ ra đồ theo bậc:\n"
-                + "|0|  Thường: " + TIER_1_RATE + "% | Chiến Binh: " + TIER_2_RATE + "%\n"
-                + "|0|  Kaio: " + TIER_3_RATE + "% | Zelot+: " + TIER_4_RATE + "%\n"
-                + "|2|Tỉ lệ thành công: " + RATIO_HIEN_TE + "%\n"
-                + "|7|Thất bại: Mất trang bị Thần Linh\n"
-                + "|2|Cần: " + Util.numberToMoney(GOLD_HIEN_TE) + " vàng\n";
+        String npcSay = "Hiến tế: " + item.template.name + "\n"
+                + "Cần: 1 món đồ Thần Linh + 1 Tỷ vàng\n"
+                + "Nhận: 1 trang bị Set Kích Hoạt ngẫu nhiên\n"
+                + "Tỉ lệ thành công: " + RATIO_HIEN_TE + "%\n"
+                + "Thất bại sẽ mất trang bị Thần Linh";
 
         if (player.inventory.gold < GOLD_HIEN_TE) {
-            npcSay += "|7|Còn thiếu " + Util.powerToString(GOLD_HIEN_TE - player.inventory.gold) + " vàng\n";
+            npcSay += "\nCòn thiếu " + Util.powerToString(GOLD_HIEN_TE - player.inventory.gold) + " vàng";
             CombineService.gI().baHatMit.createOtherMenu(player, ConstNpc.IGNORE_MENU, npcSay, "Đóng");
         } else {
             CombineService.gI().baHatMit.createOtherMenu(player, ConstNpc.MENU_START_COMBINE, npcSay,
@@ -166,65 +162,67 @@ public class HienTeTrangBiThanLinh {
     }
 
     public static void thucHienHienTe(Player player) {
-        if (player.combineNew.itemsCombine.size() != 1) {
-            Service.gI().sendThongBao(player, "Cần đặt đúng 1 trang bị Thần Linh!");
-            return;
-        }
-
-        Item item = player.combineNew.itemsCombine.get(0);
-
-        if (!isDoThanLinh(item)) {
-            Service.gI().sendThongBao(player, "Vật phẩm không phải trang bị Thần Linh!");
-            return;
-        }
-
-        if (player.inventory.gold < GOLD_HIEN_TE) {
-            Service.gI().sendThongBao(player, "Không đủ vàng để thực hiện!");
-            return;
-        }
-
-        if (InventoryService.gI().getCountEmptyBag(player) <= 0) {
-            Service.gI().sendThongBao(player, "Hành trang không còn chỗ trống!");
-            return;
-        }
-
-        // Trừ vàng
-        player.inventory.gold -= GOLD_HIEN_TE;
-
-        // Xóa đồ Thần Linh
-        InventoryService.gI().subQuantityItemsBag(player, item, 1);
-
-        if (Util.isTrue(RATIO_HIEN_TE, 100)) {
-            // Thành công - tạo đồ SKH
-            // Xác định race từ đồ Thần Linh (nhẫn dùng race của player)
-            int gender = getGenderFromItem(item, player);
-
-            // Random LOẠI trang bị BẤT KỲ (0=Áo, 1=Quần, 2=Găng, 3=Giày, 4=Rada)
-            int type = Util.nextInt(5);
-
-            // Random item SKH theo TỈ LỆ PHÂN BẬC (đồ cao = hiếm hơn)
-            int itemId = randomItemByTier(type, gender);
-
-            // Random option set CÙNG RACE
-            int skhOptionId = OPTION_IDS[gender][Util.nextInt(OPTION_IDS[gender].length)];
-
-            // Tạo item SKH
-            Item newItem = ItemService.gI().createItemSKH(itemId, skhOptionId);
-
-            if (newItem != null) {
-                InventoryService.gI().addItemBag(player, newItem);
-                CombineService.gI().sendEffectSuccessCombine(player);
-                Service.gI().sendThongBao(player, "Hiến tế thành công! Nhận được " + newItem.template.name + " Set Kích Hoạt!");
+        try {
+            if (player.combineNew.itemsCombine.size() != 1) {
+                Service.gI().sendThongBao(player, "Cần đặt đúng 1 trang bị Thần Linh!");
+                return;
             }
-        } else {
-            // Thất bại
-            CombineService.gI().sendEffectFailCombine(player);
-            Service.gI().sendThongBao(player, "Hiến tế thất bại! Mất trang bị Thần Linh!");
-        }
 
-        InventoryService.gI().sendItemBags(player);
-        Service.gI().sendMoney(player);
-        CombineService.gI().reOpenItemCombine(player);
+            Item item = player.combineNew.itemsCombine.get(0);
+
+            if (!isDoThanLinh(item)) {
+                Service.gI().sendThongBao(player, "Vật phẩm không phải trang bị Thần Linh!");
+                return;
+            }
+
+            if (player.inventory.gold < GOLD_HIEN_TE) {
+                Service.gI().sendThongBao(player, "Không đủ vàng để thực hiện!");
+                return;
+            }
+
+            if (InventoryService.gI().getCountEmptyBag(player) <= 0) {
+                Service.gI().sendThongBao(player, "Hành trang không còn chỗ trống!");
+                return;
+            }
+
+            // Trừ vàng
+            player.inventory.gold -= GOLD_HIEN_TE;
+
+            // Xóa đồ Thần Linh
+            InventoryService.gI().subQuantityItemsBag(player, item, 1);
+
+            if (Util.isTrue(RATIO_HIEN_TE, 100)) {
+                // Thành công - tạo đồ SKH
+                int gender = getGenderFromItem(item, player);
+                int type = Util.nextInt(5);
+                int itemId = randomItemByTier(type, gender);
+                int skhOptionId = OPTION_IDS[gender][Util.nextInt(OPTION_IDS[gender].length)];
+
+                Item newItem = ItemService.gI().createItemSKH(itemId, skhOptionId);
+
+                if (newItem != null) {
+                    InventoryService.gI().addItemBag(player, newItem);
+                    CombineService.gI().sendEffectSuccessCombine(player);
+                    Service.gI().sendThongBao(player, "Hiến tế thành công! Nhận được " + newItem.template.name);
+                } else {
+                    // createItemSKH trả null → hoàn lại vàng
+                    player.inventory.gold += GOLD_HIEN_TE;
+                    CombineService.gI().sendEffectFailCombine(player);
+                    Service.gI().sendThongBao(player, "Lỗi tạo vật phẩm, vui lòng thử lại!");
+                }
+            } else {
+                // Thất bại
+                CombineService.gI().sendEffectFailCombine(player);
+                Service.gI().sendThongBao(player, "Hiến tế thất bại! Mất trang bị Thần Linh!");
+            }
+
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendMoney(player);
+            CombineService.gI().reOpenItemCombine(player);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Service.gI().sendThongBao(player, "Lỗi hệ thống hiến tế, vui lòng thử lại!");
+        }
     }
 
     /**
