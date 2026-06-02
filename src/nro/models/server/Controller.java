@@ -584,9 +584,14 @@ public class Controller implements IMessageHandler {
                     break;
                 case 32:
                     if (player != null) {
-                        int npcId = _msg.reader().readShort();
-                        int select = _msg.reader().readByte();
-                        MenuController.gI().doSelectMenu(player, npcId, select);
+                        try {
+                            int npcId = _msg.reader().readShort();
+                            int select = _msg.reader().readByte();
+                            MenuController.gI().doSelectMenu(player, npcId, select);
+                        } catch (Exception e) {
+                            Service.gI().sendThongBao(player, "Có lỗi xảy ra, vui lòng thử lại!");
+                            Logger.logException(Controller.class, e);
+                        }
                     }
                     break;
                 case 33:

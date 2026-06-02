@@ -28,11 +28,11 @@ public class LioShopManager {
     // Giới hạn tối đa 50 món trong shop
     public static final int MAX_ITEMS = 50;
 
-    // Giá mua vào (player bán cho NPC) = 25 thỏi vàng
-    public static final int PRICE_BUY_IN = 25;
+    // Giá mua vào (player bán cho NPC) = 15 thỏi vàng
+    public static final int PRICE_BUY_IN = 15;
 
-    // Giá bán ra (player mua từ NPC) = 15 thỏi vàng
-    public static final int PRICE_SELL_OUT = 15;
+    // Giá bán ra (player mua từ NPC) = 100 thỏi vàng
+    public static final int PRICE_SELL_OUT = 100;
 
     public List<LioShopItem> listItem = new ArrayList<>();
 

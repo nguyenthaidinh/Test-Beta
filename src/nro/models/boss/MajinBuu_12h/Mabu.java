@@ -2,6 +2,7 @@ package nro.models.boss.MajinBuu_12h;
 
 
 import nro.models.boss.Boss;
+import nro.models.boss.Boss;
 import nro.models.boss.BossID;
 import nro.models.consts.BossStatus;
 import nro.models.boss.BossesData;
@@ -95,13 +96,22 @@ public class Mabu extends Boss {
         }
         plKill.fightMabu.changePoint((byte) 25);
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
-        // Đẩy tất cả player trong map về nhà sau khi giết Mabu
+        // Kicked all players home after Mabu final death
         if (this.zone != null) {
-            for (Player pl : this.zone.getNotBosses()) {
-                if (pl.isPl() && !pl.goHome) {
-                    pl.goHome = true;
-                    pl.timeGohome = 30;
-                    pl.lastUpdateGohomeTime = System.currentTimeMillis();
+            boolean hasAliveBoss = false;
+            for (Boss boss : this.zone.getBosses()) {
+                if (!boss.isDie()) {
+                    hasAliveBoss = true;
+                    break;
+                }
+            }
+            if (!hasAliveBoss) {
+                for (Player pl : this.zone.getNotBosses()) {
+                    if (pl.isPl() && !pl.goHome) {
+                        pl.goHome = true;
+                        pl.timeGohome = 30;
+                        pl.lastUpdateGohomeTime = System.currentTimeMillis();
+                    }
                 }
             }
         }

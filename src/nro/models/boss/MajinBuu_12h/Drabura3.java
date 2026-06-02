@@ -117,6 +117,24 @@ public class Drabura3 extends Boss {
         }
         plKill.fightMabu.changePoint((byte) 20);
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
+        if (this.zone != null) {
+            boolean hasAliveBoss = false;
+            for (Boss boss : this.zone.getBosses()) {
+                if (!boss.isDie()) {
+                    hasAliveBoss = true;
+                    break;
+                }
+            }
+            if (!hasAliveBoss) {
+                for (Player pl : this.zone.getNotBosses()) {
+                    if (pl.isPl() && !pl.goHome) {
+                        pl.goHome = true;
+                        pl.timeGohome = 30;
+                        pl.lastUpdateGohomeTime = System.currentTimeMillis();
+                    }
+                }
+            }
+        }
     }
 
     @Override
