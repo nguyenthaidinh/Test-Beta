@@ -9,6 +9,7 @@ import nro.models.boss.BossID;
 import nro.models.boss.BossesData;
 import nro.models.consts.BossStatus;
 import nro.models.consts.ConstPlayer;
+import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.map.ItemMap;
 import nro.models.mob.Mob;
