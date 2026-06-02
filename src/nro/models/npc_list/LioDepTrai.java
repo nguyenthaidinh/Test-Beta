@@ -5,6 +5,7 @@ import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
 import nro.models.npc.Npc;
 import nro.models.player.Player;
+import nro.models.services.Service;
 import nro.models.shop_lio.LioShopManager;
 import nro.models.shop_lio.LioShopService;
 
@@ -28,7 +29,7 @@ public class LioDepTrai extends Npc {
     @Override
     public void openBaseMenu(Player player) {
         if (canOpenNpc(player)) {
-            int soLuongShop = LioShopManager.gI().getAvailableCount();
+            int soLuongShop = LioShopManager.gI() != null ? LioShopManager.gI().getAvailableCount() : 0;
             String npcSay = "|2|Chào " + player.name + "! Ta là Lio Đẹp Trai!\n"
                     + "|1|Chuyên thu mua và bán lại Đồ Thần Linh.\n"
                     + "|0|Bán cho ta: Nhận " + LioShopManager.PRICE_BUY_IN + " thỏi vàng/món\n"
@@ -52,6 +53,10 @@ public class LioDepTrai extends Npc {
                         }
                         case 1 -> {
                             // Mua đồ Thần Linh → mở shop
+                            if (LioShopManager.gI() == null) {
+                                Service.gI().sendThongBao(player, "Shop đang bảo trì, vui lòng quay lại sau!");
+                                return;
+                            }
                             if (LioShopManager.gI().getAvailableCount() == 0) {
                                 createOtherMenu(player, ConstNpc.IGNORE_MENU,
                                         "Shop hiện đang trống, chưa có ai bán đồ Thần Linh!", "Đóng");

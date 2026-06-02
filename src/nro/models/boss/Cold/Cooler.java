@@ -12,7 +12,6 @@ import nro.models.services.EffectSkillService;
 import nro.models.services.Service;
 import nro.models.utils.Util;
 
-import java.util.Random;
 import nro.models.consts.ConstTaskBadges;
 import nro.models.services.ItemService;
 import nro.models.services.TaskService;
@@ -77,14 +76,13 @@ public class Cooler extends Boss {
             // Drop vật phẩm tùy chọn xuống bản đồ
             Service.gI().dropItemMap(zone, optionalItemMap);
         }
-        // 80% xác suất rơi ngọc rồng
-        if (Util.isTrue(80, 100)) {
-            int[] dropItems = {15,16,17,18,19,20};
-            int dropOptional = dropItems[Util.nextInt(0, dropItems.length - 1)];
-            // Tạo và rơi vật phẩm ngọc rồng hoặc item cấp 2
-            ItemMap optionalItemMap = new ItemMap(this.zone, dropOptional, Util.nextInt(1, 3), x, y, plKill.id);
-            Item optionalItem = ItemService.gI().createNewItem((short) dropOptional);
-            Service.gI().dropItemMap(zone, optionalItemMap);
+        // Rơi Ngọc Rồng 1~3 sao (ID 15-17) - 1~3 viên
+        int[] dragonBallIds = {15, 16, 17};
+        int nrQuantity = Util.nextInt(1, 3);
+        for (int i = 0; i < nrQuantity; i++) {
+            int nrId = dragonBallIds[Util.nextInt(0, dragonBallIds.length - 1)];
+            ItemMap nrDrop = new ItemMap(this.zone, nrId, 1, x, y, plKill.id);
+            Service.gI().dropItemMap(zone, nrDrop);
         }
     }
 

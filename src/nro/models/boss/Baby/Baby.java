@@ -27,14 +27,15 @@ public class Baby extends Boss {
         int drop = 190; // 100% rơi item ID 190
         int quantity = Util.nextInt(20000, 30000);
         // Tạo itemMap cho item ID 190
-        if (Util.isTrue(10, 100)) {
+        if (Util.isTrue(70, 100)) {
             ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
             if (it != null) {
                 Service.gI().dropItemMap(zone, it);
             }
         }
         plKill.bossBabyDefeatParticipationCount++;
-        if (Util.isTrue(1, 100)) {
+        // Set Baby - 30%
+        if (Util.isTrue(30, 100)) {
             int[] costumes = {1785, 1786, 1788};
             int costumeId = costumes[Util.nextInt(costumes.length)];
 
@@ -55,7 +56,7 @@ public class Baby extends Boss {
         Item item = ItemService.gI().createNewItem((short) drop);
         Service.gI().dropItemMap(zone, itemMap);
         // 30% xác suất để rơi đồ
-        if (Util.isTrue(5, 100)) {
+        if (Util.isTrue(100, 100)) { // 100% rơi trang bị
             int group = Util.nextInt(1, 100) <= 70 ? 0 : 1;  // 70% chọn Áo Quần Giày (group = 0), 30% chọn Găng Rada (group = 1)
 
             // Các vật phẩm rơi từ nhóm Áo Quần Giày và Găng Rada
@@ -85,14 +86,14 @@ public class Baby extends Boss {
             // Drop vật phẩm tùy chọn xuống bản đồ
             Service.gI().dropItemMap(zone, optionalItemMap);
         }
-        // 80% xác suất rơi ngọc rồng
-        if (Util.isTrue(10, 100)) {
-            int[] dropItems = {15, 16, 17, 18, 19, 20, 992};
-            int dropOptional = dropItems[Util.nextInt(0, dropItems.length - 1)];
-            // Tạo và rơi vật phẩm ngọc rồng hoặc item cấp 2
-            ItemMap optionalItemMap = new ItemMap(this.zone, dropOptional, Util.nextInt(1, 3), x, y, plKill.id);
-            Item optionalItem = ItemService.gI().createNewItem((short) dropOptional);
-            Service.gI().dropItemMap(zone, optionalItemMap);
+        // Ngọc Rồng 1~5 sao (ID 15-19) - 100%, 1~5 viên
+        if (Util.isTrue(100, 100)) {
+            int[] dragonBallIds = {15, 16, 17, 18, 19};
+            int nrQuantity = Util.nextInt(1, 5);
+            for (int i = 0; i < nrQuantity; i++) {
+                int nrId = dragonBallIds[Util.nextInt(0, dragonBallIds.length - 1)];
+                Service.gI().dropItemMap(this.zone, new ItemMap(this.zone, nrId, 1, x, y, plKill.id));
+            }
         }
     }
 

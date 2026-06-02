@@ -44,11 +44,15 @@ public class XenBoHung extends Boss {
                 Service.gI().dropItemMap(this.zone, it);
             }
         }
+        // Rơi Ngọc Rồng 1~3 sao (ID 15-17) - 1~3 viên
         if (Util.isTrue(80, 100)) {
-            int[] items = Util.isTrue(50, 100) ? new int[]{18, 19, 20} : new int[]{18,19,20};
-            int randomItem = items[new Random().nextInt(items.length)];
-            Service.gI().dropItemMap(this.zone, new ItemMap(this.zone, randomItem, 1,
-          this.location.x, this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id));
+            int[] dragonBallIds = {15, 16, 17, 18, 19};
+            int nrQuantity = Util.nextInt(1, 3);
+            for (int i = 0; i < nrQuantity; i++) {
+                int nrId = dragonBallIds[new Random().nextInt(dragonBallIds.length)];
+                Service.gI().dropItemMap(this.zone, new ItemMap(this.zone, nrId, 1,
+                        this.location.x, this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id));
+            }
         }
     }
 

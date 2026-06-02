@@ -9,7 +9,6 @@ import nro.models.boss.BossID;
 import nro.models.boss.BossesData;
 import nro.models.consts.BossStatus;
 import nro.models.consts.ConstPlayer;
-import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.map.ItemMap;
 import nro.models.mob.Mob;
@@ -123,14 +122,15 @@ public class SieuBoHung extends Boss {
             // Drop vật phẩm tùy chọn xuống bản đồ
             Service.gI().dropItemMap(zone, optionalItemMap);
         }
-        // 80% xác suất rơi ngọc rồng
+        // Rơi Ngọc Rồng 1~3 sao (ID 15-17) - 1~3 viên
         if (Util.isTrue(80, 100)) {
-            int[] dropItems = {15, 16, 17, 18, 19, 20};
-            int dropOptional = dropItems[Util.nextInt(0, dropItems.length - 1)];
-            // Tạo và rơi vật phẩm ngọc rồng hoặc item cấp 2
-            ItemMap optionalItemMap = new ItemMap(this.zone, dropOptional, Util.nextInt(1, 3), x, y, plKill.id);
-            Item optionalItem = ItemService.gI().createNewItem((short) dropOptional);
-            Service.gI().dropItemMap(zone, optionalItemMap);
+            int[] dragonBallIds = {15, 16, 17};
+            int nrQuantity = Util.nextInt(1, 3);
+            for (int i = 0; i < nrQuantity; i++) {
+                int nrId = dragonBallIds[Util.nextInt(0, dragonBallIds.length - 1)];
+                ItemMap nrDrop = new ItemMap(this.zone, nrId, 1, x, y, plKill.id);
+                Service.gI().dropItemMap(zone, nrDrop);
+            }
             int diem = 5;
             plKill.event.addEventPoint(diem);
             Service.gI().sendThongBao(plKill, "+5 Point");

@@ -31,8 +31,8 @@ public class LioShopManager {
     // Giá mua vào (player bán cho NPC) = 25 thỏi vàng
     public static final int PRICE_BUY_IN = 25;
 
-    // Giá bán ra (player mua từ NPC) = 100 thỏi vàng
-    public static final int PRICE_SELL_OUT = 100;
+    // Giá bán ra (player mua từ NPC) = 15 thỏi vàng
+    public static final int PRICE_SELL_OUT = 15;
 
     public List<LioShopItem> listItem = new ArrayList<>();
 

@@ -145,6 +145,10 @@ public class LioShopService {
      * Mở giao diện shop (sử dụng protocol ConsignShop -100)
      */
     public void openShop(Player player) {
+        if (LioShopManager.gI() == null) {
+            Service.gI().sendThongBao(player, "Shop đang bảo trì, vui lòng quay lại sau!");
+            return;
+        }
         List<LioShopItem> available = LioShopManager.gI().listItem.stream()
                 .filter(it -> it != null && !it.isSold)
                 .collect(Collectors.toList());

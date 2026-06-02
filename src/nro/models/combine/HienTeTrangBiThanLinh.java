@@ -185,6 +185,9 @@ public class HienTeTrangBiThanLinh {
                 return;
             }
 
+            // Lấy gender TRƯỚC KHI xóa item (vì subQuantityItemsBag sẽ set template = null)
+            int gender = getGenderFromItem(item, player);
+
             // Trừ vàng
             player.inventory.gold -= GOLD_HIEN_TE;
 
@@ -193,7 +196,6 @@ public class HienTeTrangBiThanLinh {
 
             if (Util.isTrue(RATIO_HIEN_TE, 100)) {
                 // Thành công - tạo đồ SKH
-                int gender = getGenderFromItem(item, player);
                 int type = Util.nextInt(5);
                 int itemId = randomItemByTier(type, gender);
                 int skhOptionId = OPTION_IDS[gender][Util.nextInt(OPTION_IDS[gender].length)];
