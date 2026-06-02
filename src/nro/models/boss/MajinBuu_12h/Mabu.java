@@ -99,8 +99,8 @@ public class Mabu extends Boss {
         // Kicked all players home after Mabu final death
         if (this.zone != null) {
             boolean hasAliveBoss = false;
-            for (Boss boss : this.zone.getBosses()) {
-                if (!boss.isDie()) {
+            for (Player p : this.zone.getBosses()) {
+                if (p != null && p.isBoss && !p.isDie()) {
                     hasAliveBoss = true;
                     break;
                 }

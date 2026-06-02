@@ -119,8 +119,8 @@ public class Drabura3 extends Boss {
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
         if (this.zone != null) {
             boolean hasAliveBoss = false;
-            for (Boss boss : this.zone.getBosses()) {
-                if (!boss.isDie()) {
+            for (Player p : this.zone.getBosses()) {
+                if (p != null && p.isBoss && !p.isDie()) {
                     hasAliveBoss = true;
                     break;
                 }
