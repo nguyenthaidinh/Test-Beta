@@ -1248,35 +1248,52 @@ public class ShopService {
             return;
         }
         if (item.template.level == 14) {
-            Item doAn = player.inventory.itemsBag.stream().filter(it -> it != null && it.template != null && (it.template.id == 663 || it.template.id == 664 || it.template.id == 665 || it.template.id == 666 || it.template.id == 667) && it.quantity >= 99).findFirst().orElse(null);
+            // Trừ 99 thức ăn
+            Item doAn = player.inventory.itemsBag.stream().filter(it -> it != null && it.template != null
+                    && (it.template.id == 663 || it.template.id == 664 || it.template.id == 665
+                    || it.template.id == 666 || it.template.id == 667) && it.quantity >= 99).findFirst().orElse(null);
             if (doAn != null) {
                 InventoryService.gI().subQuantityItemsBag(player, doAn, 99);
             } else {
-                Service.gI().sendThongBao(player, "Không có đủ thức ăn");
+                Service.gI().sendThongBao(player, "Cần 99 thức ăn để mua đồ Hủy Diệt!");
                 return;
             }
-        }
-        if (player.inventory.itemsBody.get(0) != null || player.inventory.itemsBody.get(1) != null || player.inventory.itemsBody.get(2) != null || player.inventory.itemsBody.get(3) != null || player.inventory.itemsBody.get(4) != null || player.inventory.itemsBody.get(5) != null) {
-            Item dothan = player.inventory.itemsBody.stream().filter(it -> it != null && it.template != null && it.template.level == 13).findFirst().orElse(null);
-            if (dothan == null) {
-                Service.gI().sendThongBao(player, "Không có đủ set thần");
+            // Trừ 5 đồ Thần Linh từ body của sư phụ đang mặc (ID 555-567)
+            List<Item> thanLinhItems = new ArrayList<>();
+            for (Item it : player.inventory.itemsBody) {
+                if (it != null && it.isNotNullItem() && it.template.id >= 555 && it.template.id <= 567) {
+                    thanLinhItems.add(it);
+                    if (thanLinhItems.size() >= 5) break;
+                }
+            }
+            if (thanLinhItems.size() < 5) {
+                Service.gI().sendThongBao(player, "Cần mặc đủ 5 trang bị Thần Linh (ID 555-567) trên người sư phụ!");
                 return;
             }
+            // Tháo ra khỏi body (set về null)
+            for (Item it : thanLinhItems) {
+                int idx = player.inventory.itemsBody.indexOf(it);
+                if (idx >= 0) {
+                    player.inventory.itemsBody.set(idx, ItemService.gI().createItemNull());
+                }
+            }
+            player.nPoint.calPoint();
+            InventoryService.gI().sendItemBags(player);
+            InventoryService.gI().sendItemBody(player);
         }
         int param = 0;
         if (item.template.level == 14) {
-            int random = Util.nextInt(1, 100); // Số ngẫu nhiên từ 1 đến 100
-
+            int random = Util.nextInt(1, 100);
             if (random <= 1) {
-                param = 15; // 1%
+                param = 15;
             } else if (random <= 15) {
-                param = Util.nextInt(11, 14); // 14% (2-15)
+                param = Util.nextInt(11, 14);
             } else if (random <= 35) {
-                param = Util.nextInt(7, 10); // 20% (16-35)
+                param = Util.nextInt(7, 10);
             } else if (random <= 60) {
-                param = Util.nextInt(4, 6); // 25% (36-55)
+                param = Util.nextInt(4, 6);
             } else {
-                param = Util.nextInt(0, 3); // 40% còn lại
+                param = Util.nextInt(0, 3);
             }
         }
 
@@ -1295,6 +1312,12 @@ public class ShopService {
             itemoptions.add(new ItemOption(73, (short) 0));
         }
         itemoptions.add(new ItemOption(30, (short) 0));
+        // 3 option bonus ngẫu nhiên cho đồ Hủy Diệt
+        if (item.template.level == 14) {
+            itemoptions.add(new ItemOption(77,  Util.nextInt(1, 5)));   // HP +1~5%
+            itemoptions.add(new ItemOption(50,  Util.nextInt(1, 3)));   // SD +1~3%
+            itemoptions.add(new ItemOption(103, Util.nextInt(1, 5)));   // KI +1~5%
+        }
         item.itemOptions.clear();
         item.itemOptions.addAll(itemoptions);
         InventoryService.gI().addItemBag(player, item);

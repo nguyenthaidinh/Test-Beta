@@ -94,12 +94,11 @@ public class Bill extends Npc {
                             doiNhanhItem(player);
                         }
                     }
-                }
-            }
-
-            case 2 -> {
-                if (select == 100 && InventoryService.gI().canOpenBillShop(player)) {
-                    ShopService.gI().opendShop(player, "BILL", true);
+                    case 100 -> {
+                        if (select == 0 && InventoryService.gI().canOpenBillShop(player)) {
+                            ShopService.gI().opendShop(player, "BILL", true);
+                        }
+                    }
                 }
             }
 
