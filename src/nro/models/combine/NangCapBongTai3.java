@@ -4,6 +4,7 @@ import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.player.Player;
+import nro.models.services.ChatGlobalService;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
 import nro.models.services.Service;
@@ -137,7 +138,7 @@ public class NangCapBongTai3 {
                     // Trừ đủ mảnh vỡ yêu cầu
                     InventoryService.gI().subParamItemsBag(player, ITEM_ID_MANH_VO_BT3, ITEM_PARAM_INDEX, REQUIRED_MANH_VO_FULL);
                     CombineService.gI().sendEffectSuccessCombine(player);
-                    Service.gI().sendThongBaoAllPlayer(
+                    ChatGlobalService.gI().ThongBaoDapDo(player,
                         "Lio đẹp trai chúc mừng " + player.name
                         + " vừa nâng cấp thành công [Bông tai Porata] lên cấp 3!"
                     );

@@ -15,6 +15,7 @@ import nro.models.map.service.ItemMapService;
 import nro.models.services.ItemService;
 import nro.models.map.service.MapService;
 import nro.models.services.PlayerService;
+import nro.models.services.ChatGlobalService;
 import nro.models.services.Service;
 import nro.models.services.TaskService;
 import nro.models.services.InventoryService;
@@ -382,8 +383,8 @@ public class Zone {
                                     // Broadcast toàn server khi nhặt đồ Thần Linh
                                     int itemId = item.template.id;
                                     if (itemId >= 555 && itemId <= 567) {
-                                        Service.gI().sendThongBaoAllPlayer(
-                                            "🎉 [" + player.name + "] vừa nhặt được ["
+                                        ChatGlobalService.gI().ThongBaoDapDo(player,
+                                            "Lio đẹp trai chúc mừng " + player.name + " vừa nhặt được ["
                                             + item.template.name + "] từ Boss!"
                                         );
                                     }

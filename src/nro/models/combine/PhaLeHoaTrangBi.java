@@ -3,6 +3,7 @@ package nro.models.combine;
 import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
 import nro.models.player.Player;
+import nro.models.services.ChatGlobalService;
 import nro.models.services.InventoryService;
 import nro.models.services.Service;
 import nro.models.utils.Util;
@@ -189,7 +190,7 @@ public class PhaLeHoaTrangBi {
                     }
                     // Broadcast toàn server khi đập thành công từ 6 sao trở lên
                     if (star >= 6) {
-                        Service.gI().sendThongBaoAllPlayer(
+                        ChatGlobalService.gI().ThongBaoDapDo(player,
                             "Lio đẹp trai chúc mừng " + player.name + " vừa pha lê hóa thành công ["
                             + item.template.name + "] lên "
                             + star + " sao!"

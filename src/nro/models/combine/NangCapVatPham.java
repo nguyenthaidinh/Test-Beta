@@ -209,7 +209,7 @@ public class NangCapVatPham {
                             optionLevel.param++;
                         }
                         if (optionLevel != null && optionLevel.param >= 3) {
-                            Service.gI().sendThongBaoAllPlayer(
+                            ChatGlobalService.gI().ThongBaoDapDo(player,
                                 "Cảm ơn anh Lio đẹp trai đã giúp " + player.name
                                 + " vừa nâng cấp thành công ["
                                 + itemDo.template.name + "] lên +" + optionLevel.param
