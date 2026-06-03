@@ -1312,11 +1312,14 @@ public class ShopService {
             itemoptions.add(new ItemOption(73, (short) 0));
         }
         itemoptions.add(new ItemOption(30, (short) 0));
-        // 3 option bonus ngẫu nhiên cho đồ Hủy Diệt
+        // Random 1 trong 3 option bonus (HP / SD / KI) xác suất đều nhau
         if (item.template.level == 14) {
-            itemoptions.add(new ItemOption(77,  Util.nextInt(1, 5)));   // HP +1~5%
-            itemoptions.add(new ItemOption(50,  Util.nextInt(1, 3)));   // SD +1~3%
-            itemoptions.add(new ItemOption(103, Util.nextInt(1, 5)));   // KI +1~5%
+            int roll = Util.nextInt(3); // 0, 1, 2 đều nhau
+            switch (roll) {
+                case 0 -> itemoptions.add(new ItemOption(77,  Util.nextInt(1, 5)));  // HP +1~5%
+                case 1 -> itemoptions.add(new ItemOption(50,  Util.nextInt(1, 3)));  // SD +1~3%
+                case 2 -> itemoptions.add(new ItemOption(103, Util.nextInt(1, 5)));  // KI +1~5%
+            }
         }
         item.itemOptions.clear();
         item.itemOptions.addAll(itemoptions);
