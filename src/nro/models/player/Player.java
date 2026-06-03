@@ -398,7 +398,7 @@ public class Player implements Runnable {
                 if (this.originalPower == -1) {
                     this.originalPower = this.nPoint.power;
                 }
-                long reducedPower = (long) (this.originalPower * 0.99);
+                long reducedPower = (long) (this.originalPower * 0.9999);
                 this.nPoint.power = reducedPower;
                 this.hasReducedPower = true;
             }
