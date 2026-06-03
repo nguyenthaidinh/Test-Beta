@@ -277,11 +277,10 @@ public class MrBlue {
                     player.location.y = 336;
                 }
                 if (MapService.gI().isMapMaBu(mapId)) {
-                    if (!TimeUtil.isMabuOpen()) {
-                        mapId = player.gender + 21;
-                        player.location.x = 300;
-                        player.location.y = 336;
-                    }
+                    // Luôn về nhà khi out game trong map Mabu 12h
+                    mapId = player.gender + 21;
+                    player.location.x = 300;
+                    player.location.y = 336;
                 }
                 if (mapId == 112) {
                     player.location.y = 408;

@@ -369,17 +369,10 @@ public class BaHatMit extends Npc {
                                 CombineService.gI().openTabCombine(player, CombineService.NHAP_NGOC_RONG);
                                 break;
                             case 7: {
-                                boolean hasBt3 = InventoryService.gI().findItem(player, 1819);
-                                boolean hasBt2 = InventoryService.gI().findItemBongTaiCap2(player) || InventoryService.gI().findItem(player, 921);
-                                if (hasBt3) {
-                                    // Mở tab "Mở chỉ số BT3"
-                                    CombineService.gI().openTabCombine(player, CombineService.NANG_CHI_SO_BONG_TAI3);
-                                } else if (hasBt2) {
-                                    // Mở tab "Nâng cấp lên BT3"
-                                    CombineService.gI().openTabCombine(player, CombineService.NANG_CAP_BONG_TAI3);
-                                } else {
-                                    Service.gI().sendThongBao(player, "Cần có Bông tai Porata cấp 2 hoặc 3.");
-                                }
+                                createOtherMenu(player, ConstNpc.MENU_BT3_OPTIONS,
+                                        "Bông tai Porata cấp 3 - Chọn chức năng:",
+                                        "Nâng cấp /\nMở chỉ số BT3",
+                                        "Đổi mảnh BT3\n(10 mảnh BT2\n= 1 mảnh BT3)");
                                 break;
                             }
                         }
@@ -407,16 +400,10 @@ public class BaHatMit extends Npc {
                                 CombineService.gI().openTabCombine(player, CombineService.PHAN_RA_SACH);
                                 break;
                             case 7: {                                
-                                boolean hasBt3 = InventoryService.gI().findItem(player, 1819); // Bông tai Porata cấp 3
-                                boolean hasBt2 = InventoryService.gI().findItemBongTaiCap2(player) || InventoryService.gI().findItem(player, 921); // Porata 2
-
-                                if (hasBt3) {
-                                    CombineService.gI().openTabCombine(player, CombineService.NANG_CHI_SO_BONG_TAI3);
-                                } else if (hasBt2) {
-                                    CombineService.gI().openTabCombine(player, CombineService.NANG_CAP_BONG_TAI3);
-                                } else {
-                                    Service.gI().sendThongBao(player, "Cần có Bông tai Porata cấp 2 hoặc 3.");
-                                }
+                                createOtherMenu(player, ConstNpc.MENU_BT3_OPTIONS,
+                                        "Bông tai Porata cấp 3 - Chọn chức năng:",
+                                        "Nâng cấp /\nMở chỉ số BT3",
+                                        "Đổi mảnh BT3\n(10 mảnh BT2\n= 1 mảnh BT3)");
                                 break;
                             }
                         }
@@ -437,24 +424,90 @@ public class BaHatMit extends Npc {
                             case 2 ->
                                 ShopService.gI().opendShop(player, "BUA_1M", true);
                         }
-                    } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_START_COMBINE) {
-                        switch (player.combineNew.typeCombine) {
-                            case CombineService.NANG_CAP_BONG_TAI3, CombineService.NANG_CHI_SO_BONG_TAI3, CombineService.NANG_CAP_BONG_TAI, CombineService.NANG_CHI_SO_BONG_TAI, CombineService.LAM_PHEP_NHAP_DA, CombineService.NHAP_NGOC_RONG, CombineService.GIAM_DINH_SACH, CombineService.TAY_SACH, CombineService.NANG_CAP_SACH_TUYET_KY, CombineService.HOI_PHUC_SACH, CombineService.PHAN_RA_SACH -> {
-                                if (select == 0) {
-                                    CombineService.gI().startCombine(player);
+                    } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_BT3_OPTIONS) {
+                        switch (select) {
+                            case 0 -> { // Nâng cấp / Mở chỉ số BT3
+                                boolean hasBt3 = InventoryService.gI().findItem(player, 1819);
+                                boolean hasBt2 = InventoryService.gI().findItemBongTaiCap2(player) || InventoryService.gI().findItem(player, 921);
+                                if (hasBt3) {
+                                    CombineService.gI().openTabCombine(player, CombineService.NANG_CHI_SO_BONG_TAI3);
+                                } else if (hasBt2) {
+                                    CombineService.gI().openTabCombine(player, CombineService.NANG_CAP_BONG_TAI3);
+                                } else {
+                                    Service.gI().sendThongBao(player, "Cần có Bông tai Porata cấp 2 hoặc 3.");
                                 }
                             }
-                            case CombineService.NANG_CAP_VAT_PHAM -> {
-                                if (select == 0) {
-                                    CombineService.gI().startCombine(player);
-                                } else if (select == 1) {
-                                    NangCapVatPham.nangCapVatPham(player);
+                            case 1 -> { // Đổi mảnh BT3
+                                int manhBt2 = InventoryService.gI().getParam(player, 31, 933);
+                                if (manhBt2 < 10) {
+                                    Service.gI().sendThongBao(player, "Cần ít nhất 10 mảnh vỡ BT2! Bạn đang có: " + manhBt2);
+                                    return;
                                 }
+                                int coTheDoi = manhBt2 / 10;
+                                createOtherMenu(player, ConstNpc.MENU_BT3_DOI_MANH,
+                                        "|2|Mảnh vỡ BT2 hiện có: " + manhBt2 + "\n"
+                                        + "|2|Có thể đổi tối đa: " + coTheDoi + " mảnh BT3\n"
+                                        + "(10 mảnh BT2 = 1 mảnh BT3)",
+                                        "Đổi 1 mảnh",
+                                        "Đổi tất cả (" + coTheDoi + ")",
+                                        "Hủy");
                             }
+                        }
+                    } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_BT3_DOI_MANH) {
+                        int manhBt2 = InventoryService.gI().getParam(player, 31, 933);
+                        switch (select) {
+                            case 0 -> { // Đổi 1 mảnh
+                                if (manhBt2 < 10) {
+                                    Service.gI().sendThongBao(player, "Không đủ mảnh BT2!");
+                                    return;
+                                }
+                                InventoryService.gI().subParamItemsBag(player, 933, 31, 10);
+                                addManhBT3(player, 1);
+                                InventoryService.gI().sendItemBags(player);
+                                Service.gI().sendThongBao(player, "Đổi thành công 10 mảnh BT2 → 1 mảnh BT3!");
+                            }
+                            case 1 -> { // Đổi tất cả
+                                int coTheDoi = manhBt2 / 10;
+                                if (coTheDoi < 1) {
+                                    Service.gI().sendThongBao(player, "Không đủ mảnh BT2!");
+                                    return;
+                                }
+                                InventoryService.gI().subParamItemsBag(player, 933, 31, coTheDoi * 10);
+                                addManhBT3(player, coTheDoi);
+                                InventoryService.gI().sendItemBags(player);
+                                Service.gI().sendThongBao(player, "Đã đổi " + (coTheDoi * 10) + " mảnh BT2 → " + coTheDoi + " mảnh BT3!");
+                            }
+                            // case 2: Hủy - không làm gì
                         }
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Thêm mảnh vỡ BT3 (ID 1820, option 31) vào túi người chơi.
+     * Nếu đã có item 1820, cộng thêm vào param 31; nếu chưa có thì tạo mới.
+     */
+    private void addManhBT3(Player player, int amount) {
+        Item manh = InventoryService.gI().findItemBag(player, 1820);
+        if (manh != null && manh.isNotNullItem()) {
+            for (Item.ItemOption io : manh.itemOptions) {
+                if (io.optionTemplate.id == 31) {
+                    io.param += amount;
+                    return;
+                }
+            }
+            // Không có option 31 → thêm mới
+            manh.itemOptions.add(new Item.ItemOption(31, amount));
+        } else {
+            if (InventoryService.gI().getCountEmptyBag(player) < 1) {
+                Service.gI().sendThongBao(player, "Hành trang đầy, không thể nhận mảnh BT3!");
+                return;
+            }
+            Item newManh = ItemService.gI().createNewItem((short) 1820);
+            newManh.itemOptions.add(new Item.ItemOption(31, amount));
+            InventoryService.gI().addItemBag(player, newManh);
         }
     }
 }

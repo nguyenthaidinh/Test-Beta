@@ -379,6 +379,15 @@ public class Zone {
                                     msg.cleanup();
                                     Service.gI().sendToAntherMePickItem(player, itemMapId);
 
+                                    // Broadcast toàn server khi nhặt đồ Thần Linh
+                                    int itemId = item.template.id;
+                                    if (itemId >= 555 && itemId <= 567) {
+                                        Service.gI().sendThongBaoAllPlayer(
+                                            "🎉 [" + player.name + "] vừa nhặt được ["
+                                            + item.template.name + "] từ Boss!"
+                                        );
+                                    }
+
                                     // Mark item as picked up unless the item ID is 74
                                     if (picked) {
                                         if (itemMap.itemTemplate.id != 74) {

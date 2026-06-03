@@ -76,9 +76,9 @@ public class PhaLeHoaTrangBi {
             case 4:
                 return 10f;
             case 5:
-                return 5f;
+                return 1f;
             case 6:
-                return 0.6f;
+                return 0.3f;
             case 7:
                 return 0.4f;
             case 8:
@@ -101,9 +101,9 @@ public class PhaLeHoaTrangBi {
             case 4 ->
                 10f;
             case 5 ->
-                5f;
+                1f;
             case 6 ->
-                0.6f;
+                0.3f;
             case 7 ->
                 0.4f;
             case 8 ->
@@ -187,7 +187,14 @@ public class PhaLeHoaTrangBi {
                     } else {
                         optionStar.param = star;
                     }
-                    //  ChatGlobalService.gI().ThongBaoDapDo(player, "Chúc mừng " + player.name + " vừa pha lê hóa thành công " + item.template.name + " lên " + star + " sao pha lê");
+                    // Broadcast toàn server khi đập thành công từ 6 sao trở lên
+                    if (star >= 6) {
+                        Service.gI().sendThongBaoAllPlayer(
+                            "Lio đẹp trai chúc mừng " + player.name + " vừa pha lê hóa thành công ["
+                            + item.template.name + "] lên "
+                            + star + " sao!"
+                        );
+                    }
                 }
                 CombineService.gI().sendEffectSuccessCombine(player);
                 CombineService.gI().baHatMit.npcChat(player, "Chúc mừng con nhé");

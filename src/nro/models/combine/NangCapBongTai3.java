@@ -24,7 +24,7 @@ public class NangCapBongTai3 {
     private static final int ITEM_OPTION_ID_CAP = 72;
     private static final int ITEM_OPTION_VALUE_CAP_3 = 3;
     private static final int ITEM_PARAM_INDEX = 31;
-    private static final int REQUIRED_MANH_VO_FULL = 20_000;
+    private static final int REQUIRED_MANH_VO_FULL = 1_000;
     private static final int REQUIRED_MANH_VO_FAIL = 200;
 
     public static void showInfoCombine(Player player) {
@@ -137,6 +137,10 @@ public class NangCapBongTai3 {
                     // Trừ đủ mảnh vỡ yêu cầu
                     InventoryService.gI().subParamItemsBag(player, ITEM_ID_MANH_VO_BT3, ITEM_PARAM_INDEX, REQUIRED_MANH_VO_FULL);
                     CombineService.gI().sendEffectSuccessCombine(player);
+                    Service.gI().sendThongBaoAllPlayer(
+                        "Lio đẹp trai chúc mừng " + player.name
+                        + " vừa nâng cấp thành công [Bông tai Porata] lên cấp 3!"
+                    );
                 } else {
                     // Thất bại: chỉ trừ mảnh vỡ theo mức fail
                     InventoryService.gI().subParamItemsBag(player, ITEM_ID_MANH_VO_BT3, ITEM_PARAM_INDEX, REQUIRED_MANH_VO_FAIL);

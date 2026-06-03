@@ -2630,7 +2630,7 @@ public class BossesData {
                     "|-1|Lại thêm một tên ngốc nữa chán sống!"
             }, // text chat 2
             new String[] { "|-2|Khốn kiếp, vegeta.. hắn bị baby kí sinh rồi!!" }, // text chat 3
-            REST_15_M);
+            REST_1_H);
 
     public static final BossData BABY_2 = new BossData(
             "Baby",

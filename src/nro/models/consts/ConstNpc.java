@@ -192,6 +192,8 @@ public class ConstNpc {
     public static final int MENU_NANG_CAP_CHAN_MENH = 508;
     public static final int MENU_NANG_CAP_DAC_CAU = 509;
     public static final int MENU_SACH_TUYET_KY = 510;
+    public static final int MENU_BT3_OPTIONS   = 560; // sub-menu chức năng BT3
+    public static final int MENU_BT3_DOI_MANH  = 561; // confirm đổi mảnh BT2 → BT3
     //index menu whis
     public static final int MENU_DAP_DO = 508;
 

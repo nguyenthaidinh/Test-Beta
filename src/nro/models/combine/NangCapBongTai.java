@@ -134,6 +134,10 @@ public class NangCapBongTai {
                     bongTai.itemOptions.add(new ItemOption(ITEM_OPTION_ID_CAP, ITEM_OPTION_VALUE_CAP_2));
                     InventoryService.gI().subParamItemsBag(player, ITEM_ID_MANH_VO_BT, ITEM_PARAM_INDEX, REQUIRED_MANH_VO_FULL);
                     CombineService.gI().sendEffectSuccessCombine(player);
+                    Service.gI().sendThongBaoAllPlayer(
+                        "Lio đẹp trai chúc mừng " + player.name
+                        + " vừa nâng cấp thành công [Bông tai Porata] lên cấp 2!"
+                    );
                 } else {
                     InventoryService.gI().subParamItemsBag(player, ITEM_ID_MANH_VO_BT, ITEM_PARAM_INDEX, REQUIRED_MANH_VO_FAIL);
                     CombineService.gI().sendEffectFailCombine(player);

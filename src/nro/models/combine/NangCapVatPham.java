@@ -208,8 +208,12 @@ public class NangCapVatPham {
                         } else {
                             optionLevel.param++;
                         }
-                        if (optionLevel != null && optionLevel.param >= 5) {
-                         //   ChatGlobalService.gI().ThongBaoRoiDo(player, "Chúc mừng " + player.name + " vừa nâng cấp " + "thành công " + itemDo.template.name + " lên +" + optionLevel.param);
+                        if (optionLevel != null && optionLevel.param >= 3) {
+                            Service.gI().sendThongBaoAllPlayer(
+                                "Cảm ơn anh Lio đẹp trai đã giúp " + player.name
+                                + " vừa nâng cấp thành công ["
+                                + itemDo.template.name + "] lên +" + optionLevel.param
+                            );
                         }
                         CombineService.gI().sendEffectSuccessCombine(player);
                         CombineService.gI().baHatMit.npcChat(player, "Chúc mừng con nhé");
