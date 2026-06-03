@@ -479,6 +479,21 @@ public class BaHatMit extends Npc {
                             }
                             // case 2: Hủy - không làm gì
                         }
+                    } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_START_COMBINE) {
+                        switch (player.combineNew.typeCombine) {
+                            case CombineService.EP_SAO_TRANG_BI, CombineService.PHA_LE_HOA_TRANG_BI, CombineService.CHUYEN_HOA_TRANG_BI_VANG, CombineService.CHUYEN_HOA_TRANG_BI_NGOC, CombineService.PHAN_RA_TRANG_BI_KH, CombineService.TAI_TAO_CAPSULE_KH, CombineService.HIEN_TE_THAN_LINH, CombineService.NANG_CAP_SAO_PHA_LE, CombineService.DANH_BONG_SAO_PHA_LE, CombineService.CUONG_HOA_LO_SAO_PHA_LE, CombineService.TAO_DA_HEMATITE, CombineService.NANG_CAP_VAT_PHAM, CombineService.NANG_CAP_BONG_TAI, CombineService.NANG_CHI_SO_BONG_TAI, CombineService.NANG_CAP_BONG_TAI3, CombineService.NANG_CHI_SO_BONG_TAI3, CombineService.NHAP_NGOC_RONG, CombineService.BAN_DO_THAN_LINH_LIO, CombineService.PHAN_RA_DO_THAN_LINH, CombineService.LAM_PHEP_NHAP_DA -> {
+                                switch (select) {
+                                    case 0 ->
+                                        CombineService.gI().startCombine(player);
+                                    case 1 ->
+                                        CombineService.gI().startCombineVip(player, 10);
+                                    case 2 ->
+                                        CombineService.gI().startCombineVip(player, 100);
+                                    default -> {
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
