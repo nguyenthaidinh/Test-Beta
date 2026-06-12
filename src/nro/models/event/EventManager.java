@@ -52,7 +52,7 @@ public class EventManager {
             new HungVuong().init();
         }
         if (TRUNG_THU) {
-           // new TrungThu().init();
+            new TrungThu().init();
         }
         if (TOP_UP) {
             new TopUp().init();

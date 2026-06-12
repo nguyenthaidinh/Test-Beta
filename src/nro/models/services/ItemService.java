@@ -1109,11 +1109,11 @@ public class ItemService {
         //găng
         if (Util.isTrue(80, 100)) {
             if (gang.contains(itemId)) {
-                dots.itemOptions.add(new ItemOption(0, Util.highlightsItem(gender == 2, new Random().nextInt(651) + 10350))); // 9350-10000
+                dots.itemOptions.add(new ItemOption(0, Util.highlightsItem(gender == 2, new Random().nextInt(1001) + 11000))); // 11000-12000
             }
         } else {
             if (gang.contains(itemId)) {
-                dots.itemOptions.add(new ItemOption(0, Util.highlightsItem(gender == 2, new Random().nextInt(1001) + 10500))); // gang 15% 10-11k -xayda 12k1
+                dots.itemOptions.add(new ItemOption(0, Util.highlightsItem(gender == 2, new Random().nextInt(2501) + 12000))); // gang hiếm 12000-14500
             }
         }
         //giày
@@ -1129,6 +1129,10 @@ public class ItemService {
         if (nhan.contains(itemId)) {
             dots.itemOptions.add(new ItemOption(14, Util.highlightsItem(gender == 1, new Random().nextInt(3) + 18))); // nhẫn 18-20%
         }
+        // Thêm 1 option ngẫu nhiên %HP, %KI hoặc %SD (1-5%)
+        int[] percentOptions = {77, 103, 50}; // 77=%HP, 103=%KI, 50=%SD
+        int randomOpt = percentOptions[new Random().nextInt(percentOptions.length)];
+        dots.itemOptions.add(new ItemOption(randomOpt, Util.nextInt(1, 5)));
         dots.itemOptions.add(new ItemOption(21, 30));
         dots.itemOptions.add(new ItemOption(30, 1));
         return dots;
