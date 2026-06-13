@@ -80,6 +80,7 @@ import nro.models.task.BadgesTaskService;
 public class Player implements Runnable {
 
     public long lastTimeEatPea;
+    public long lastTimeLioDepTraiHeal;  // CT Lio đẹp trai hồi HP
     public Map<Integer, Long> activeEffects = new HashMap<>();
     @Setter
     @Getter
@@ -457,6 +458,16 @@ public class Player implements Runnable {
                     }
                     if (nPoint != null) {
                         nPoint.update();
+                    }
+                    // CT Lio đẹp trai: hồi 5% HP mỗi 30s khi hợp thể
+                    if (this.isPl() && !this.isDie() && this.nPoint != null && this.nPoint.isLioDepTrai
+                            && Util.canDoWithTime(this.lastTimeLioDepTraiHeal, 30000)) {
+                        long hoiHp = this.nPoint.hpMax * 5 / 100;
+                        if (this.nPoint.hp < this.nPoint.hpMax) {
+                            this.nPoint.hp = (int) Math.min(this.nPoint.hp + hoiHp, this.nPoint.hpMax);
+                            PlayerService.gI().sendInfoHp(this);
+                        }
+                        this.lastTimeLioDepTraiHeal = System.currentTimeMillis();
                     }
                     if (fusion != null) {
                         fusion.update();

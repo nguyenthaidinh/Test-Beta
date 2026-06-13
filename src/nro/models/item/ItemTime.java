@@ -25,6 +25,10 @@ public class ItemTime {
     public static final int TIME_NUOC_MIA2 = 600_000;
     public static final int TIME_NUOC_MIA3 = 600_000;
 
+    public static final int TIME_BANH_TT_1 = 3_600_000;   // 60 phút
+    public static final int TIME_BANH_TT_2 = 5_400_000;   // 90 phút
+    public static final int TIME_BANH_TT_DB = 5_400_000;  // 90 phút
+
     public static final int TIME_BUA_SANTA = 1800000;
     public static final int TIME_EAT_MEAL = 600000;
     public static final int TIME_CMS = 3600000;
@@ -111,6 +115,14 @@ public class ItemTime {
     public long timeLengthKilis;
     public long totalCoBonLaTime;
     public long timeLengthCoBonLa;
+
+    // Bánh Trung Thu buffs
+    public boolean isUseBanhTT1;       // +10% SĐ/HP/KI
+    public long lastTimeBanhTT1;
+    public boolean isUseBanhTT2;       // +20% SĐ/HP/KI
+    public long lastTimeBanhTT2;
+    public boolean isUseBanhTTDB;      // +30% SĐ/HP/KI
+    public long lastTimeBanhTTDB;
 
     public ItemTime(Player player) {
         this.player = player;
@@ -269,6 +281,28 @@ public class ItemTime {
         if (isUseRX) {
             if (Util.canDoWithTime(lastTimeUseRX, timeRX)) {
                 isUseRX = false;
+            }
+        }
+        // Bánh Trung Thu
+        if (isUseBanhTT1) {
+            if (Util.canDoWithTime(lastTimeBanhTT1, TIME_BANH_TT_1)) {
+                isUseBanhTT1 = false;
+                Service.gI().sendThongBao(player, "Hiệu ứng Bánh Trung Thu 1 Trứng đã hết");
+                Service.gI().point(player);
+            }
+        }
+        if (isUseBanhTT2) {
+            if (Util.canDoWithTime(lastTimeBanhTT2, TIME_BANH_TT_2)) {
+                isUseBanhTT2 = false;
+                Service.gI().sendThongBao(player, "Hiệu ứng Bánh Trung Thu 2 Trứng đã hết");
+                Service.gI().point(player);
+            }
+        }
+        if (isUseBanhTTDB) {
+            if (Util.canDoWithTime(lastTimeBanhTTDB, TIME_BANH_TT_DB)) {
+                isUseBanhTTDB = false;
+                Service.gI().sendThongBao(player, "Hiệu ứng Bánh Trung Thu Đặc Biệt đã hết");
+                Service.gI().point(player);
             }
         }
     }

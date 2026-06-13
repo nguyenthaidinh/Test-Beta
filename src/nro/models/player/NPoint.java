@@ -34,7 +34,7 @@ import nro.models.utils.TimeUtil;
  */
 public class NPoint {
 
-    public static final byte MAX_LIMIT = 9;
+    public static final byte MAX_LIMIT = 12;
 
     @Setter
     private Player player;
@@ -199,6 +199,7 @@ public class NPoint {
     public short tlHpGiamODo;
 
     public boolean isGogeta;
+    public boolean isLioDepTrai;  // CT Lio đẹp trai (ID 1815)
 
     public int tlSpeed;
 
@@ -657,6 +658,16 @@ public class NPoint {
         } else {
             this.isGogeta = false;
         }
+        // CT Lio đẹp trai - chỉ có tác dụng khi hợp thể
+        if (this.player.fusion.typeFusion != ConstPlayer.NON_FUSION) {
+            if (skin.isNotNullItem() && skin.template.id == 1815) {
+                this.isLioDepTrai = true;
+            } else {
+                this.isLioDepTrai = false;
+            }
+        } else {
+            this.isLioDepTrai = false;
+        }
     }
 
     private void setDameTrainArmor() {
@@ -846,6 +857,11 @@ public class NPoint {
             hpMax += (hpMax * 10 / 100L);
         }
 
+        // CT Lio đẹp trai +50% HP
+        if (this.isLioDepTrai) {
+            hpMax += (hpMax * 50 / 100L);
+        }
+
         // Phù map mabu
         if (this.player.isPhuHoMapMabu) {
             hpMax += 1_000_000;
@@ -871,6 +887,17 @@ public class NPoint {
 
         if (this.player.itemTime != null && this.player.itemTime.isUseNuocMia1) {
             hpMax += hpMax / 10;  // Tăng 10%
+        }
+
+        // Xử lý Bánh Trung Thu (+HP)
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTT1) {
+            hpMax += hpMax * 10 / 100;  // +10%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTT2) {
+            hpMax += hpMax * 20 / 100;  // +20%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTTDB) {
+            hpMax += hpMax * 30 / 100;  // +30%
         }
 
         // Xử lý item sieu cap
@@ -974,6 +1001,11 @@ public class NPoint {
             mpMax += (mpMax * 10 / 100L);
         }
 
+        // CT Lio đẹp trai +50% KI
+        if (this.isLioDepTrai) {
+            mpMax += (mpMax * 50 / 100L);
+        }
+
         // Phù map mabu
         if (this.player.isPhuHoMapMabu) {
             mpMax += 1_000_000;
@@ -998,6 +1030,17 @@ public class NPoint {
         // Xử lý item sieu cap
         if (this.player.itemTime != null && this.player.itemTime.isUseBoKhi2) {
             mpMax *= 2.2;
+        }
+
+        // Xử lý Bánh Trung Thu (+KI)
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTT1) {
+            mpMax += mpMax * 10 / 100;  // +10%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTT2) {
+            mpMax += mpMax * 20 / 100;  // +20%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTTDB) {
+            mpMax += mpMax * 30 / 100;  // +30%
         }
 
         // Lấy tất cả option danh hiệu
@@ -1114,6 +1157,17 @@ public class NPoint {
         if (this.player.itemTime != null && this.player.itemTime.isUseNuocMia3) {
             dame += dame / 10; // tăng 10%
         }
+
+        // Xử lý Bánh Trung Thu (+SĐ)
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTT1) {
+            dame += dame * 10 / 100;  // +10%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTT2) {
+            dame += dame * 20 / 100;  // +20%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseBanhTTDB) {
+            dame += dame * 30 / 100;  // +30%
+        }
         if (this.player.itemTime != null && this.player.itemTime.isUseCuongNo2) {
             dame *= 2.2;
         }
@@ -1131,6 +1185,25 @@ public class NPoint {
         // Xử lý gogeta
         if (this.isGogeta) {
             dame += (dame * 10 / 100L);
+        }
+
+        // CT Lio đẹp trai +30% SĐ + 20% SĐCM
+        if (this.isLioDepTrai) {
+            dame += (dame * 30 / 100L);
+            this.tlDameCrit.add(20);
+            this.tlSDCM += 20;
+        }
+
+        // Đẳng cấp CT Lio đẹp trai: +25% SĐ cho người xung quanh
+        if (this.player.zone != null && this.player.isPl()) {
+            for (Player pl : this.player.zone.getNotBosses()) {
+                if (pl != null && pl != this.player && pl.nPoint != null
+                        && pl.nPoint.isLioDepTrai
+                        && Util.getDistance(this.player, pl) <= 200) {
+                    dame += (dame * 25 / 100L);
+                    break; // chỉ nhận buff từ 1 người
+                }
+            }
         }
 
         // Phù map mabu
@@ -1649,7 +1722,13 @@ public class NPoint {
     }
 
     public long calSubTNSM(long tiemNang) {
-        if (power >= 90_000_000_000L) {
+        if (power >= 120_000_000_000L) {
+            tiemNang /= 200;
+        } else if (power >= 110_000_000_000L) {
+            tiemNang /= 150;
+        } else if (power >= 100_000_000_000L) {
+            tiemNang /= 120;
+        } else if (power >= 90_000_000_000L) {
             tiemNang /= 100;
         } else if (power >= 80_000_000_000L) {
             tiemNang /= 90;
@@ -1711,6 +1790,12 @@ public class NPoint {
                 return 80010000000L;
             case 9:
                 return 90010000000L;
+            case 10:
+                return 100010000000L;
+            case 11:
+                return 110010000000L;
+            case 12:
+                return 120010000000L;
             default:
                 return 0;
         }
@@ -1738,6 +1823,12 @@ public class NPoint {
                 return 80010000000L;
             case 9:
                 return 90010000000L;
+            case 10:
+                return 100010000000L;
+            case 11:
+                return 110010000000L;
+            case 12:
+                return 120010000000L;
             default:
                 return 0;
         }
@@ -1765,6 +1856,12 @@ public class NPoint {
                 return 550000;
             case 9:
                 return 575000;
+            case 10:
+                return 625000;
+            case 11:
+                return 675000;
+            case 12:
+                return 750000;
             default:
                 return 0;
         }
@@ -1792,6 +1889,12 @@ public class NPoint {
                 return 25000;
             case 9:
                 return 26000;
+            case 10:
+                return 28000;
+            case 11:
+                return 30000;
+            case 12:
+                return 33000;
             default:
                 return 0;
         }
@@ -1819,6 +1922,12 @@ public class NPoint {
                 return 1600;
             case 9:
                 return 1800;
+            case 10:
+                return 2000;
+            case 11:
+                return 2200;
+            case 12:
+                return 2500;
             default:
                 return 0;
         }
@@ -1846,6 +1955,12 @@ public class NPoint {
                 return 9;
             case 9:
                 return 10;
+            case 10:
+                return 11;
+            case 11:
+                return 12;
+            case 12:
+                return 13;
             default:
                 return 0;
         }
@@ -1914,7 +2029,7 @@ public class NPoint {
             }
         }
         if (type == 4) {
-            tiemNangUse = 2500000L; // giảm 20 lần (gốc 50000000L)
+            tiemNangUse = 250000L; // giảm 200 lần (gốc 50000000L)
             for (int i = 0; i < this.critg; i++) {
                 tiemNangUse *= 5L;
             }

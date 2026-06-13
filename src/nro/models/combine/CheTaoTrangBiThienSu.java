@@ -114,8 +114,8 @@ public class CheTaoTrangBiThienSu {
                     { 1050, 1053, 1056, 1059, 1062 }
             };
 
-            int genderIndex = CtVip.template.gender > 2 ? player.gender : CtVip.template.gender;
-            Item itemTS = ItemService.gI().DoThienSu(itemIds[genderIndex][mTS.typeIdManh()], CtVip.template.gender);
+            int genderIndex = player.gender;
+            Item itemTS = ItemService.gI().DoThienSu(itemIds[genderIndex][mTS.typeIdManh()], player.gender);
 
             // Bonus chỉ số 100%
             for (int w = 0; w < itemTS.itemOptions.size(); w++) {
