@@ -2055,7 +2055,7 @@ public class BossesData {
             new String[] {}, // text chat 2
             new String[] {}, // text chat 3
             REST_15_M, // second rest
-            new int[] { BossID.NHATTHAN });
+            new int[] {});
 
     public static final BossData NHATTTHAN = new BossData(
             "Nhật thần", // name

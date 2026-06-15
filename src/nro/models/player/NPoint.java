@@ -1651,13 +1651,10 @@ public class NPoint {
                 tiemNang += tn;
             }
             if (this.player.charms.tdTriTue3 > System.currentTimeMillis()) {
+                tiemNang += tn * 2;
+            }
+            if (this.player.charms.tdTriTue4 > System.currentTimeMillis()) {
                 tiemNang += tn * 3;
-            }
-            if (this.player.charms.tdTriTue4 > System.currentTimeMillis()) {
-                tiemNang += tn * 4;
-            }
-            if (this.player.charms.tdTriTue4 > System.currentTimeMillis()) {
-                tiemNang += tn * 4;
             }
             if (this.player.timevip > System.currentTimeMillis()) {
                 tiemNang += tn * 3;
