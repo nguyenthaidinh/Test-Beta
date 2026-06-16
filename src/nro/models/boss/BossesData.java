@@ -989,7 +989,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 297, 298, 299, -1, -1, -1 },
             5_000_00,
-            new int[] { 50000000 },
+            new int[] { 500_000_000 },
             new int[] { 127 },
             new int[][] {
                     { Skill.KAMEJOKO, 3, 5000 },
@@ -1005,7 +1005,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 421, 422, 423, -1, -1, -1 },
             500000,
-            new int[] { 60000000 },
+            new int[] { 600_000_000 },
             new int[] { 127, 128 },
             new int[][] {
                     { Skill.KAMEJOKO, 3, 5000 },
@@ -1020,7 +1020,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 424, 425, 426, -1, -1, -1 },
             500000,
-            new int[] { 80000000 },
+            new int[] { 700_000_000 },
             new int[] { 127 },
             new int[][] {
                     { Skill.KAMEJOKO, 3, 5000 },
@@ -1036,7 +1036,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 427, 428, 429, -1, -1, -1 },
             500000,
-            new int[] { 100000000 },
+            new int[] { 800_000_000 },
             new int[] { 127 },
             new int[][] {
                     { Skill.KAMEJOKO, 3, 5000 },
@@ -1051,7 +1051,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 439, 440, 441, -1, -1, -1 },
             500000,
-            new int[] { 150000000 },
+            new int[] { 900_000_000 },
             new int[] { 127 },
             new int[][] {
                     { Skill.KAMEJOKO, 3, 5000 },

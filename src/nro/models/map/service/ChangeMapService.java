@@ -180,10 +180,6 @@ public class ChangeMapService {
                 NpcService.gI().createTutorial(pl, -1, "Không thể đến khu vực này");
                 return;
             }
-            if (MapService.gI().isMapMabu2H(pl.zone.map.mapId)) {
-                NpcService.gI().createTutorial(pl, -1, "Không thể đến khu vực này");
-                return;
-            }
         }
         if (pl.isAdmin() || pl.isBoss || Util.canDoWithTime(pl.idMark.getLastTimeChangeZone(), 5000)) {
             pl.idMark.setLastTimeChangeZone(System.currentTimeMillis());
