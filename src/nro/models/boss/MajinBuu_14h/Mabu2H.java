@@ -19,10 +19,13 @@ import nro.models.map.ItemMap;
 import nro.models.services.ItemService;
 
 import nro.models.server.ServerNotify;
+import nro.models.server.Manager;
 import nro.models.services.ItemTimeService;
 import nro.models.services.SkillService;
 import nro.models.services.TaskService;
 import nro.models.map.service.ChangeMapService;
+import nro.models.shop.ItemShop;
+import nro.models.shop.Shop;
 import nro.models.skill.Skill;
 import nro.models.utils.SkillUtil;
 
@@ -150,7 +153,87 @@ public class Mabu2H extends Boss {
             Service.gI().dropItemMap(zone, quanDrop);
         }
 
+        // 5% roi do Huy Diet, chi so theo shop Bill
+        if (Util.isTrue(5, 100)) {
+            short[] doHuyDietIds = {650, 651, 652, 653, 654, 655, 656, 657, 658, 659, 660, 661, 662};
+            short doHuyDietId = doHuyDietIds[Util.nextInt(doHuyDietIds.length)];
+            Item doHuyDietItem = createBillHuyDietItem(doHuyDietId);
+            if (doHuyDietItem != null) {
+                ItemMap doHuyDietDrop = new ItemMap(this.zone, doHuyDietItem.template, 1, x + Util.nextInt(-50, 50), y, plKill.id);
+                doHuyDietDrop.options.addAll(doHuyDietItem.itemOptions);
+                Service.gI().dropItemMap(zone, doHuyDietDrop);
+            }
+        }
+
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
+    }
+
+    private Item createBillHuyDietItem(short itemId) {
+        Item item = null;
+        for (Shop shop : Manager.SHOPS) {
+            if (shop.tagName != null && shop.tagName.equals("BILL")) {
+                ItemShop itemShop = shop.getItemShop(itemId);
+                if (itemShop != null) {
+                    item = ItemService.gI().createItemFromItemShop(itemShop);
+                }
+                break;
+            }
+        }
+        if (item == null) {
+            return null;
+        }
+        applyBillHuyDietOptions(item);
+        return item;
+    }
+
+    private void applyBillHuyDietOptions(Item item) {
+        int param = 0;
+        if (item.template.level == 14) {
+            int random = Util.nextInt(1, 100);
+            if (random <= 1) {
+                param = 15;
+            } else if (random <= 15) {
+                param = Util.nextInt(11, 14);
+            } else if (random <= 35) {
+                param = Util.nextInt(7, 10);
+            } else if (random <= 60) {
+                param = Util.nextInt(4, 6);
+            } else {
+                param = Util.nextInt(0, 3);
+            }
+        }
+
+        List<Item.ItemOption> itemOptions = new ArrayList<>();
+        if (!item.itemOptions.isEmpty()) {
+            for (Item.ItemOption option : item.itemOptions) {
+                if (item.template.level == 14 && canUpgradeBillHuyDietOption(option.optionTemplate.id) && param > 0) {
+                    int optionId = option.optionTemplate.id;
+                    int optionParam = option.param + (option.param * param) / 100;
+                    itemOptions.add(new Item.ItemOption(optionId, optionParam));
+                } else if (option.optionTemplate.id != 164) {
+                    itemOptions.add(new Item.ItemOption(option.optionTemplate.id, option.param));
+                }
+            }
+        } else {
+            itemOptions.add(new Item.ItemOption(73, (short) 0));
+        }
+        itemOptions.add(new Item.ItemOption(30, (short) 0));
+
+        if (item.template.level == 14) {
+            int roll = Util.nextInt(3);
+            switch (roll) {
+                case 0 -> itemOptions.add(new Item.ItemOption(77, Util.nextInt(1, 5)));
+                case 1 -> itemOptions.add(new Item.ItemOption(50, Util.nextInt(1, 3)));
+                case 2 -> itemOptions.add(new Item.ItemOption(103, Util.nextInt(1, 5)));
+            }
+        }
+        item.itemOptions.clear();
+        item.itemOptions.addAll(itemOptions);
+    }
+
+    private boolean canUpgradeBillHuyDietOption(int optionId) {
+        return optionId == 0 || optionId == 22 || optionId == 23 || optionId == 14
+                || optionId == 27 || optionId == 28 || optionId == 47;
     }
 
     @Override
