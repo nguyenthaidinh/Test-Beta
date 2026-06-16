@@ -130,7 +130,7 @@ public class Santa extends Npc {
             Service.gI().sendThongBao(player, "Đã cập nhật option CT Lio đẹp trai!");
             return;
         }
-
+        
         // Kiểm tra hành trang
         if (InventoryService.gI().getCountEmptyBag(player) == 0) {
             Service.gI().sendThongBao(player, "Hành trang đã đầy!");
