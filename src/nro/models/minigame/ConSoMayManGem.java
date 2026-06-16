@@ -15,7 +15,9 @@ import nro.models.utils.Util;
  */
 public class ConSoMayManGem implements Runnable {
 
-    public long second = 50;
+    private static final long BETTING_SECONDS = 120;
+
+    public long second = BETTING_SECONDS;
     public long currlast = System.currentTimeMillis();
     public long rewardAmount = 450;
     public long cost = 5;
@@ -56,7 +58,7 @@ public class ConSoMayManGem implements Runnable {
                     if ((System.currentTimeMillis() - currlast) >= 10000) {
                         ResetGame((int) result_next);
                         result_next = Util.nextInt((int) min, (int) max);
-                        second = 50;
+                        second = BETTING_SECONDS;
                         currlast = System.currentTimeMillis();
                         inBettingPhase = true;
                     }

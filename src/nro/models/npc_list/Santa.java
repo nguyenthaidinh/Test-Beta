@@ -47,8 +47,8 @@ public class Santa extends Npc {
                     "Xin chào, ta có một số vật phẩm đặc biệt cậu có muốn xem không?"
                     + "\n\n|7|HOT: CT Lio đẹp trai - 1.000.000 ngọc"
                     + "\n|2|+30% SĐ | +50% HP | +50% KI"
-                    + "\n|2|+20% SĐCM | +5% HP/30s"
-                    + "\n|2|+25% SĐ cho người xung quanh", menus);
+                    + "\n|2|+20% SĐCM | +10% hút KI"
+                    + "\n|2|Đẹp +25% SĐ cho mình và người xung quanh", menus);
         }
 
     }
@@ -125,7 +125,9 @@ public class Santa extends Npc {
         // Kiểm tra đã có chưa
         Item existing = InventoryService.gI().findItemBag(player, 1815);
         if (existing != null) {
-            Service.gI().sendThongBao(player, "Bạn đã sở hữu CT Lio đẹp trai rồi!");
+            setCTLioDepTraiOptions(existing);
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendThongBao(player, "Đã cập nhật option CT Lio đẹp trai!");
             return;
         }
 
@@ -148,12 +150,7 @@ public class Santa extends Npc {
 
         // Tạo CT Lio đẹp trai
         Item ct = ItemService.gI().createNewItem((short) 1815);
-        ct.itemOptions.clear();
-        ct.itemOptions.add(new Item.ItemOption(30, 30));  // SĐ +30%
-        ct.itemOptions.add(new Item.ItemOption(77, 50));  // HP +50%
-        ct.itemOptions.add(new Item.ItemOption(103, 50)); // KI +50%
-        ct.itemOptions.add(new Item.ItemOption(50, 20));  // SĐCM +20%
-        ct.itemOptions.add(new Item.ItemOption(173, 5));  // Hồi 5% HP/30s
+        setCTLioDepTraiOptions(ct);
 
         InventoryService.gI().addItemBag(player, ct);
         InventoryService.gI().sendItemBags(player);
@@ -163,8 +160,19 @@ public class Santa extends Npc {
                 + "\n|2|+50% HP"
                 + "\n|2|+50% KI"
                 + "\n|2|+20% Sức Đánh Chí Mạng"
-                + "\n|2|+5% HP hồi/30s"
-                + "\n|2|+25% SĐ cho người xung quanh"
+                + "\n|2|+10% hút KI"
+                + "\n|2|Đẹp +25% SĐ cho mình và người xung quanh"
                 + "\n\n|1|Chỉ có tác dụng khi hợp thể!");
+    }
+
+    private void setCTLioDepTraiOptions(Item ct) {
+        ct.itemOptions.clear();
+        ct.itemOptions.add(new Item.ItemOption(30, 0));   // Khong the giao dich
+        ct.itemOptions.add(new Item.ItemOption(50, 30));  // SD +30%
+        ct.itemOptions.add(new Item.ItemOption(77, 50));  // HP +50%
+        ct.itemOptions.add(new Item.ItemOption(103, 50)); // KI +50%
+        ct.itemOptions.add(new Item.ItemOption(5, 20));   // SDCM +20%
+        ct.itemOptions.add(new Item.ItemOption(96, 10));  // Hut KI +10%
+        ct.itemOptions.add(new Item.ItemOption(117, 25)); // Dep +25% SD
     }
 }

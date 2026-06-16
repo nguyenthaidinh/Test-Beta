@@ -742,6 +742,17 @@ public class Player implements Runnable {
         return -1;
     }
 
+    private Item getLioDepTraiFusionOutfit() {
+        if (this.isPl() && this.fusion != null && this.fusion.typeFusion != ConstPlayer.NON_FUSION
+                && this.inventory != null && this.inventory.itemsBody.size() > 5) {
+            Item outfit = this.inventory.itemsBody.get(5);
+            if (outfit.isNotNullItem() && outfit.template.id == 1815) {
+                return outfit;
+            }
+        }
+        return null;
+    }
+
     public byte getAura() {
         if (!isPl() || this.Cards.isEmpty()) {
             return -1;
@@ -859,6 +870,10 @@ public class Player implements Runnable {
         } else if (effectSkill != null && effectSkill.isSocola) {
             return 412;
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
+            Item outfit = getLioDepTraiFusionOutfit();
+            if (outfit != null && outfit.template.head != -1) {
+                return (short) outfit.template.head;
+            }
             if (nPoint != null && nPoint.isGogeta) {
                 return 2100;
             } else if (fusion.typeFusion == ConstPlayer.LUONG_LONG_NHAT_THE) {
@@ -916,6 +931,10 @@ public class Player implements Runnable {
         } else if (isPhuHoMapMabu && fusion != null && fusion.typeFusion == ConstPlayer.NON_FUSION) {
             return idOutfitGod[this.gender][1];
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
+            Item outfit = getLioDepTraiFusionOutfit();
+            if (outfit != null && outfit.template.body != -1) {
+                return (short) outfit.template.body;
+            }
             if (nPoint != null && nPoint.isGogeta) {
                 return 2101;
             } else if (fusion.typeFusion == ConstPlayer.LUONG_LONG_NHAT_THE) {
@@ -976,6 +995,10 @@ public class Player implements Runnable {
         } else if (isPhuHoMapMabu && fusion != null && fusion.typeFusion == ConstPlayer.NON_FUSION) {
             return idOutfitGod[this.gender][2];
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
+            Item outfit = getLioDepTraiFusionOutfit();
+            if (outfit != null && outfit.template.leg != -1) {
+                return (short) outfit.template.leg;
+            }
             if (nPoint != null && nPoint.isGogeta) {
                 return 2102;
             } else if (fusion.typeFusion == ConstPlayer.LUONG_LONG_NHAT_THE) {

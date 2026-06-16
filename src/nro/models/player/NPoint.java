@@ -450,14 +450,17 @@ public class NPoint {
                 if (item.template.id >= 592 && item.template.id <= 594) {
                     teleport = true;
                 }
-                for (ItemOption io : item.itemOptions) {
-                    addOption(io);
+                if (item.template.id != 1815) {
+                    for (ItemOption io : item.itemOptions) {
+                        addOption(io);
+                    }
                 }
             }
         }
         setDameTrainArmor();
-        setBasePoint();
         setOutfitFusion();
+        setLioDepTraiBonus();
+        setBasePoint();
         setSpeed();
     }
 
@@ -648,6 +651,8 @@ public class NPoint {
     }
 
     private void setOutfitFusion() {
+        this.isGogeta = false;
+        this.isLioDepTrai = false;
         if (this.player.inventory.itemsBody.size() < 6 || this.player.pet == null || this.player.pet.inventory.itemsBody.size() < 6) {
             return;
         }
@@ -655,18 +660,16 @@ public class NPoint {
         Item pskin = this.player.pet.inventory.itemsBody.get(5);
         if (skin.isNotNullItem() && pskin.isNotNullItem()) {
             this.isGogeta = skin.template.id == 2133 && pskin.template.id == 2134 || skin.template.id == 2134 && pskin.template.id == 2133;
-        } else {
-            this.isGogeta = false;
         }
         // CT Lio đẹp trai - chỉ có tác dụng khi hợp thể
-        if (this.player.fusion.typeFusion != ConstPlayer.NON_FUSION) {
-            if (skin.isNotNullItem() && skin.template.id == 1815) {
-                this.isLioDepTrai = true;
-            } else {
-                this.isLioDepTrai = false;
-            }
-        } else {
-            this.isLioDepTrai = false;
+        this.isLioDepTrai = this.player.fusion.typeFusion != ConstPlayer.NON_FUSION
+                && skin.isNotNullItem()
+                && skin.template.id == 1815;
+    }
+
+    private void setLioDepTraiBonus() {
+        if (this.isLioDepTrai) {
+            this.tlHutMp += 10;
         }
     }
 
@@ -1187,11 +1190,12 @@ public class NPoint {
             dame += (dame * 10 / 100L);
         }
 
-        // CT Lio đẹp trai +30% SĐ + 20% SĐCM
+        // CT Lio đẹp trai +30% SĐ + 20% SĐCM + đẹp 25% SĐ bản thân
         if (this.isLioDepTrai) {
             dame += (dame * 30 / 100L);
             this.tlDameCrit.add(20);
             this.tlSDCM += 20;
+            dame += (dame * 25 / 100L);
         }
 
         // Đẳng cấp CT Lio đẹp trai: +25% SĐ cho người xung quanh

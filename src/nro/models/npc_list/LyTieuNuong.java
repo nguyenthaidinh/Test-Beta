@@ -233,7 +233,7 @@ public class LyTieuNuong extends Npc {
             case 4:
                 createOtherMenu(player, 1, "Thời gian từ 8h đến hết 21h59 hằng ngày\n"
                         + "Mỗi lượt được chọn 10 con số từ 0 đến 99\n"
-                        + "Thời gian mỗi lượt là 5 phút.", "Đồng ý");
+                        + "Thời gian mỗi lượt là 120 giây.", "Đồng ý");
                 break;
         }
     }
@@ -255,7 +255,7 @@ public class LyTieuNuong extends Npc {
             case 4:
                 createOtherMenu(player, 1, "Thời gian từ 8h đến hết 21h59 hằng ngày\n"
                         + "Mỗi lượt được chọn 10 con số từ 0 đến 99\n"
-                        + "Thời gian mỗi lượt là 5 phút.", "Đồng ý");
+                        + "Thời gian mỗi lượt là 120 giây.", "Đồng ý");
                 break;
         }
     }

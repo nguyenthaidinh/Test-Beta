@@ -18,7 +18,9 @@ import nro.models.utils.Util;
  */
 public class ConSoMayManGold implements Runnable {
 
-    public long second = 50;
+    private static final long BETTING_SECONDS = 120;
+
+    public long second = BETTING_SECONDS;
     public long currlast = System.currentTimeMillis();
     public long rewardAmount = 90;
     public long cost = 1;
@@ -59,7 +61,7 @@ public class ConSoMayManGold implements Runnable {
                     if ((System.currentTimeMillis() - currlast) >= 10000) {
                         ResetGame((int) result_next);
                         result_next = Util.nextInt((int) min, (int) max);
-                        second = 50;
+                        second = BETTING_SECONDS;
                         currlast = System.currentTimeMillis();
                         inBettingPhase = true;
                     }
