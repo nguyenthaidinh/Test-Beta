@@ -1190,13 +1190,14 @@ public class NPoint {
             dame += (dame * 10 / 100L);
         }
 
-        // CT Lio đẹp trai +30% SĐ + 20% SĐCM + đẹp 25% SĐ bản thân (bug cộng 2 lần như CT Frieren)
+        // CT Lio đẹp trai +30% SĐ + 20% SĐCM
         if (this.isLioDepTrai) {
             dame += (dame * 30 / 100L);
             this.tlDameCrit.add(20);
             this.tlSDCM += 20;
-            dame += (dame * 25 / 100L);
-            dame += (dame * 25 / 100L);
+            if (this.tlSexyDame < 25) {
+                this.tlSexyDame = 25;
+            }
         }
 
         // Đẳng cấp CT Lio đẹp trai: +25% SĐ cho người xung quanh
