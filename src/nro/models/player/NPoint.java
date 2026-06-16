@@ -1190,11 +1190,12 @@ public class NPoint {
             dame += (dame * 10 / 100L);
         }
 
-        // CT Lio đẹp trai +30% SĐ + 20% SĐCM + đẹp 25% SĐ bản thân
+        // CT Lio đẹp trai +30% SĐ + 20% SĐCM + đẹp 25% SĐ bản thân (bug cộng 2 lần như CT Frieren)
         if (this.isLioDepTrai) {
             dame += (dame * 30 / 100L);
             this.tlDameCrit.add(20);
             this.tlSDCM += 20;
+            dame += (dame * 25 / 100L);
             dame += (dame * 25 / 100L);
         }
 
