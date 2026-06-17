@@ -742,11 +742,11 @@ public class Player implements Runnable {
         return -1;
     }
 
-    private Item getLioDepTraiFusionOutfit() {
+    private Item getFusionCostumeOutfit() {
         if (this.isPl() && this.fusion != null && this.fusion.typeFusion != ConstPlayer.NON_FUSION
                 && this.inventory != null && this.inventory.itemsBody.size() > 5) {
             Item outfit = this.inventory.itemsBody.get(5);
-            if (outfit.isNotNullItem() && outfit.template.id == 1815) {
+            if (outfit.isNotNullItem() && (outfit.template.id == 1815 || outfit.template.id == 1870)) {
                 return outfit;
             }
         }
@@ -870,7 +870,7 @@ public class Player implements Runnable {
         } else if (effectSkill != null && effectSkill.isSocola) {
             return 412;
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
-            Item outfit = getLioDepTraiFusionOutfit();
+            Item outfit = getFusionCostumeOutfit();
             if (outfit != null && outfit.template.head != -1) {
                 return (short) outfit.template.head;
             }
@@ -931,7 +931,7 @@ public class Player implements Runnable {
         } else if (isPhuHoMapMabu && fusion != null && fusion.typeFusion == ConstPlayer.NON_FUSION) {
             return idOutfitGod[this.gender][1];
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
-            Item outfit = getLioDepTraiFusionOutfit();
+            Item outfit = getFusionCostumeOutfit();
             if (outfit != null && outfit.template.body != -1) {
                 return (short) outfit.template.body;
             }
@@ -995,7 +995,7 @@ public class Player implements Runnable {
         } else if (isPhuHoMapMabu && fusion != null && fusion.typeFusion == ConstPlayer.NON_FUSION) {
             return idOutfitGod[this.gender][2];
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
-            Item outfit = getLioDepTraiFusionOutfit();
+            Item outfit = getFusionCostumeOutfit();
             if (outfit != null && outfit.template.leg != -1) {
                 return (short) outfit.template.leg;
             }
