@@ -45,6 +45,11 @@ public class ShopService {
     private static final byte NORMAL_SHOP = 0;
     private static final byte SPEC_SHOP = 3;
     private static final byte KINANG_SHOP = 1;
+    private static final String SHOP_CHI_CHI = "SHOP_CHI_CHI";
+    private static final int TAB_CHI_CHI_EVENT_ID = 58;
+    private static final short TRUM_TOP_1_ITEM_ID = 1870;
+    private static final int TRUM_TOP_1_GEM_COST = 1_200_000;
+    private static final long BADGE_GOLD_COST = 16_000_000_000L;
     private int eventPointPrice;
 
     private static ShopService I;
@@ -66,6 +71,9 @@ public class ShopService {
         }
         try {
             Shop shop = this.getShop(tagName);
+            if (SHOP_CHI_CHI.equals(tagName)) {
+                ensureTrumTop1InChiChiShop(shop);
+            }
             for (TabShop tabShop : shop.tabShops) {
                 for (ItemShop item : tabShop.itemShops) {
                     switch (item.temp.id) {
@@ -111,6 +119,55 @@ public class ShopService {
             return this.resolveShopBua(player, new Shop(shop));
         }
         return allGender ? new Shop(shop) : new Shop(shop, player);
+    }
+
+    private void ensureTrumTop1InChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        for (TabShop tabShop : shop.tabShops) {
+            for (ItemShop itemShop : tabShop.itemShops) {
+                if (itemShop.temp != null && itemShop.temp.id == TRUM_TOP_1_ITEM_ID) {
+                    configureTrumTop1ShopItem(itemShop, tabShop);
+                    return;
+                }
+            }
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null && !shop.tabShops.isEmpty()) {
+            eventTab = shop.tabShops.get(0);
+        }
+        if (eventTab == null) {
+            return;
+        }
+        ItemShop trumTop1 = new ItemShop();
+        trumTop1.id = -TRUM_TOP_1_ITEM_ID;
+        if (!configureTrumTop1ShopItem(trumTop1, eventTab)) {
+            return;
+        }
+        eventTab.itemShops.add(0, trumTop1);
+    }
+
+    private boolean configureTrumTop1ShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(TRUM_TOP_1_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        ItemService.gI().normalizeTrumTop1Template(itemShop.temp);
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = TRUM_TOP_1_GEM_COST;
+        itemShop.iconSpec = 0;
+        itemShop.options.clear();
+        itemShop.options.addAll(ItemService.gI().getTrumTop1Options());
+        return true;
     }
 
     private Shop resolveShopBua(Player player, Shop s) {
@@ -942,11 +999,6 @@ public class ShopService {
         int idEffect = BagesTemplate.fineIdEffectbyIdItem(is.temp.id);
         int percent = BadgesTaskService.sendPercenBadgesTask(pl, idEffect);
 
-        if (percent < 100) {
-            Service.gI().sendThongBao(pl, "Bạn chưa mở khóa danh hiệu này");
-            return;
-        }
-
         for (BadgesData badge : pl.dataBadges) {
             if (badge.idBadGes == idEffect) {
                 Service.gI().sendThongBao(pl, "Bạn đã sở hữu danh hiệu này rồi");
@@ -954,13 +1006,24 @@ public class ShopService {
             }
         }
 
-        BadgesData danhHieu = new BadgesData(pl, idEffect, 30);
-        pl.dataBadges.add(danhHieu);
+        boolean buyByGold = false;
+        if (percent < 100) {
+            if (pl.inventory.gold < BADGE_GOLD_COST) {
+                Service.gI().sendThongBao(pl, "Bạn không đủ vàng, còn thiếu "
+                        + Util.numberToMoney(BADGE_GOLD_COST - pl.inventory.gold) + " vàng");
+                return;
+            }
+            pl.inventory.gold -= BADGE_GOLD_COST;
+            Service.gI().sendMoney(pl);
+            buyByGold = true;
+        }
+
+        new BadgesData(pl, idEffect, 30);
 
         BagesTemplate template = BagesTemplate.fineBadgesbyIdItem(is.temp.id);
         String badgeName = template != null ? template.NAME : "không rõ";
 
-        Service.gI().sendThongBao(pl, "Bạn đã nhận được danh hiệu " + badgeName);
+        Service.gI().sendThongBao(pl, (buyByGold ? "Bạn đã mua danh hiệu " : "Bạn đã nhận được danh hiệu ") + badgeName);
     }
 
     private void changeDanhHieu(Player pl, ItemShop is) {

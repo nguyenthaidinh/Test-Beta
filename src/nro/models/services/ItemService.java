@@ -23,6 +23,10 @@ import nro.models.map.Zone;
 public class ItemService {
 
     private static ItemService i;
+    private static final short COSTUME_TRUM_TOP_1_ID = 1870;
+    private static final String COSTUME_TRUM_TOP_1_NAME = "Trùm Top 1";
+    private static final String COSTUME_TRUM_TOP_1_DESCRIPTION = "Cải trang Trùm Top 1";
+    private static final int[] TRUM_TOP_1_CONTROLLED_OPTIONS = {38, 50, 77, 103, 204, 106, 95, 96};
 
     public static ItemService gI() {
         if (i == null) {
@@ -84,6 +88,50 @@ public class ItemService {
         item.content = item.getContent();
         item.info = item.getInfo();
         return item;
+    }
+
+    public void normalizeTrumTop1Options(Item item) {
+        if (item == null || item.template == null || item.template.id != COSTUME_TRUM_TOP_1_ID || item.itemOptions == null) {
+            return;
+        }
+        normalizeTrumTop1Template(item.template);
+        item.itemOptions.removeIf(this::isTrumTop1ControlledOption);
+        item.itemOptions.addAll(getTrumTop1Options());
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    public void normalizeTrumTop1Template(Template.ItemTemplate template) {
+        if (template == null || template.id != COSTUME_TRUM_TOP_1_ID) {
+            return;
+        }
+        template.name = COSTUME_TRUM_TOP_1_NAME;
+        template.description = COSTUME_TRUM_TOP_1_DESCRIPTION;
+    }
+
+    public List<ItemOption> getTrumTop1Options() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(38, 0));
+        options.add(new ItemOption(50, 30));
+        options.add(new ItemOption(77, 60));
+        options.add(new ItemOption(103, 60));
+        options.add(new ItemOption(204, 30));
+        options.add(new ItemOption(106, 0));
+        options.add(new ItemOption(95, 10));
+        options.add(new ItemOption(96, 10));
+        return options;
+    }
+
+    private boolean isTrumTop1ControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : TRUM_TOP_1_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Item otpts(short tempId, int quantity) {
@@ -375,12 +423,21 @@ public class ItemService {
                     return 30;
                 case 1716:
                     return 40;
+                case 1869:
+                    return 50;
                 default:
                     return 0;
             }
         } else {
             return 0;
         }
+    }
+
+    public int getMaxTimeTrainArmor(Item item) {
+        if (item != null && item.template != null && item.template.id == 1869) {
+            return 2000;
+        }
+        return 1000;
     }
 
     public boolean isTrainArmor(Item item) {
@@ -393,6 +450,7 @@ public class ItemService {
                 case 531:
                 case 536:
                 case 1716:
+                case 1869:
                     return true;
                 default:
                     return false;

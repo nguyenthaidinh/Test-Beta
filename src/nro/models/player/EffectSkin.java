@@ -446,9 +446,10 @@ public class EffectSkin {
     private void updateTrainArmor() {
         if (Util.canDoWithTime(lastTimeAddTimeTrainArmor, 60000) && !Util.canDoWithTime(lastTimeAttack, 30000)) {
             if (this.player.nPoint.wearingTrainArmor) {
+                int maxTimeTrainArmor = ItemService.gI().getMaxTimeTrainArmor(this.player.inventory.trainArmor);
                 for (Item.ItemOption io : this.player.inventory.trainArmor.itemOptions) {
                     if (io.optionTemplate.id == 9) {
-                        if (io.param < 1000) {
+                        if (io.param < maxTimeTrainArmor) {
                             io.param++;
                             InventoryService.gI().sendItemBody(player);
                         }

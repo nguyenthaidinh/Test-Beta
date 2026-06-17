@@ -486,7 +486,7 @@ public class SkillService {
                     //bắt đầu nạp laze
                     player.playerSkill.prepareLaze = true;
                     player.playerSkill.lastTimePrepareLaze = System.currentTimeMillis();
-                    sendPlayerPrepareSkill(player, 3000);
+                    sendPlayerPrepareSkill(player, 1500);
                 } else {
                     //bắn laze
                     player.playerSkill.prepareLaze = false;
@@ -768,8 +768,12 @@ public class SkillService {
                     if (!MapService.gI().isMapOffline(player.zone.map.mapId)) {
                         for (Player pl : playersMap) {
                             if (!player.equals(pl) && canAttackPlayer(player, pl) && Util.getDistance(player, pl) <= rangeBom) {
-                                dame = pl.isBoss ? player.effectSkill.isMonkey ? dame / 3 : dame / 2 : dame;
-                                pl.injured(player, dame, MapService.gI().isMapYardart(player.zone.map.mapId), false);
+                                long damePlayer = dame;
+                                if (pl.isBoss) {
+                                    damePlayer = applyDameBoss(player, pl, damePlayer);
+                                    damePlayer = player.effectSkill.isMonkey ? damePlayer / 3 : damePlayer / 2;
+                                }
+                                pl.injured(player, limitDame(damePlayer), MapService.gI().isMapYardart(player.zone.map.mapId), false);
                                 PlayerService.gI().sendInfoHpMpMoney(pl);
                                 Service.gI().Send_Info_NV(pl);
                             }
@@ -882,6 +886,17 @@ public class SkillService {
         }
     }
 
+    private long applyDameBoss(Player plAtt, Player plInjure, long dame) {
+        if (plAtt != null && plAtt.nPoint != null && plInjure != null && plInjure.isBoss && plAtt.nPoint.tlDameBoss > 0) {
+            dame += dame * plAtt.nPoint.tlDameBoss / 100L;
+        }
+        return dame;
+    }
+
+    private long limitDame(long dame) {
+        return Math.min(dame, 2_147_483_647L);
+    }
+
     private void hutHPMP(Player player, long dame, Player pl, Mob mob) {
         int tiLeHutHp = player.nPoint.getTileHutHp(mob != null);
         int tiLeHutMp = player.nPoint.getTiLeHutMp();
@@ -906,13 +921,14 @@ public class SkillService {
         if (plInjure.effectSkill.anTroi) {
             plAtt.nPoint.isCrit100 = true;
         }
-        long dameAttack = plAtt.nPoint.getDameAttack(false);
+        long dameAttack = applyDameBoss(plAtt, plInjure, plAtt.nPoint.getDameAttack(false));
         if (plAtt.isPl() && plAtt.effectSkin != null && plAtt.effectSkin.isXDame) {
             plAtt.effectSkin.isXDame = false;
             if (plInjure.isBoss) {
                 dameAttack /= 3;
             }
         }
+        dameAttack = limitDame(dameAttack);
         int dameHit = plInjure.injured(plAtt, miss ? 0 : dameAttack, false, false);
         if (plAtt.playerSkill == null) {
             return;

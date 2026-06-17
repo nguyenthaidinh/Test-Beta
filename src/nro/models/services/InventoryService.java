@@ -330,6 +330,7 @@ public class InventoryService {
             Service.gI().sendThongBaoOK(player.isPet ? ((Pet) player).master : player, "Sức mạnh không đủ yêu cầu!");
             return sItem;
         }
+        ItemService.gI().normalizeTrumTop1Options(item);
         handleOption210(item);
         checkOption231(item);
         int index = -1;

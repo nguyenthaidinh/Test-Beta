@@ -9,9 +9,11 @@ import nro.models.npc.Npc;
 import nro.models.player.Player;
 import nro.models.services.InventoryService;
 import nro.models.server.Manager;
+import nro.models.services.ItemService;
 import nro.models.services.Service;
 import nro.models.services_func.Input;
 import nro.models.shop.ShopService;
+import nro.models.utils.Util;
 
 /**
  *
@@ -19,6 +21,10 @@ import nro.models.shop.ShopService;
  *
  */
 public class ChiChi extends Npc {
+
+    private static final int MENU_BUY_TRAIN_ARMOR_5 = 186900;
+    private static final short TRAIN_ARMOR_5_ITEM_ID = 1869;
+    private static final long TRAIN_ARMOR_5_GOLD_COST = 36_000_000_000L;
 
     public ChiChi(int mapId, int status, int cx, int cy, int tempId, int avartar) {
         super(mapId, status, cx, cy, tempId, avartar);
@@ -32,6 +38,7 @@ public class ChiChi extends Npc {
                     "Top\nNước mía",
                     "Top\nKem trái cây",
                     "Cửa hàng",
+                    "Giáp\nluyện tập\ncấp 5",
                     "Đóng"));
 
             String[] menus = menu.toArray(new String[0]);
@@ -51,6 +58,12 @@ public class ChiChi extends Npc {
                     switch (select) {
                         case 3:
                             ShopService.gI().opendShop(player, "SHOP_CHI_CHI", false);
+                            break;
+                        case 4:
+                            createOtherMenu(player, MENU_BUY_TRAIN_ARMOR_5,
+                                    "Con có muốn mua Giáp tập luyện cấp 5\nGiá "
+                                    + Util.numberToMoney(TRAIN_ARMOR_5_GOLD_COST) + " vàng không?",
+                                    "Mua", "Từ chối");
                             break;
                         case 0:
                             createOtherMenu(player, ConstNpc.PHAO_BONG_VIP,
@@ -101,8 +114,39 @@ public class ChiChi extends Npc {
                             Service.gI().sendThongBao(player, "Bạn có " + player.point_sukien2 + " điểm Kem trái cây.");
                             break;
                     }
+                } else if (player.idMark.getIndexMenu() == MENU_BUY_TRAIN_ARMOR_5) {
+                    if (select == 0) {
+                        buyTrainArmor5(player);
+                    }
                 }
             }
         }
+    }
+
+    private void buyTrainArmor5(Player player) {
+        if (InventoryService.gI().getCountEmptyBag(player) == 0) {
+            Service.gI().sendThongBao(player, "Hành trang đã đầy");
+            return;
+        }
+        if (player.inventory.gold < TRAIN_ARMOR_5_GOLD_COST) {
+            Service.gI().sendThongBao(player, "Bạn không đủ vàng, còn thiếu "
+                    + Util.numberToMoney(TRAIN_ARMOR_5_GOLD_COST - player.inventory.gold) + " vàng");
+            return;
+        }
+        Item trainArmor = ItemService.gI().createNewItem(TRAIN_ARMOR_5_ITEM_ID);
+        if (trainArmor.template == null) {
+            Service.gI().sendThongBao(player, "Vật phẩm không tồn tại");
+            return;
+        }
+        trainArmor.itemOptions.add(new Item.ItemOption(77, 15));
+        trainArmor.itemOptions.add(new Item.ItemOption(103, 15));
+        trainArmor.itemOptions.add(new Item.ItemOption(9, 0));
+        if (!InventoryService.gI().addItemBag(player, trainArmor)) {
+            return;
+        }
+        player.inventory.gold -= TRAIN_ARMOR_5_GOLD_COST;
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendMoney(player);
+        Service.gI().sendThongBao(player, "Mua thành công " + trainArmor.template.name);
     }
 }

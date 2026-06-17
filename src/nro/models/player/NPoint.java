@@ -103,6 +103,7 @@ public class NPoint {
      * Tỉ lệ sức đánh/ sức đánh khi đánh quái
      */
     public List<Integer> tlDame, tlDameAttMob;
+    public short tlDameBoss;
 
     /**
      * Lượng hp, mp hồi mỗi 30s, mp hồi cho người khác
@@ -450,7 +451,8 @@ public class NPoint {
                 if (item.template.id >= 592 && item.template.id <= 594) {
                     teleport = true;
                 }
-                if (item.template.id != 1815) {
+                ItemService.gI().normalizeTrumTop1Options(item);
+                if (item.template.id != 1815 && isBodyItemOptionActive(item)) {
                     for (ItemOption io : item.itemOptions) {
                         addOption(io);
                     }
@@ -462,6 +464,17 @@ public class NPoint {
         setLioDepTraiBonus();
         setBasePoint();
         setSpeed();
+    }
+
+    private boolean isBodyItemOptionActive(Item item) {
+        if (item != null && item.template != null && item.template.id == 1870) {
+            return isFusionActive();
+        }
+        return true;
+    }
+
+    private boolean isFusionActive() {
+        return this.player.fusion != null && this.player.fusion.typeFusion != ConstPlayer.NON_FUSION;
     }
 
     private void addOption(ItemOption io) {
@@ -635,6 +648,9 @@ public class NPoint {
                 this.tlHpHoiBanThanVaDongDoi += io.param;
                 this.tlMpHoiBanThanVaDongDoi += io.param;
                 break;
+            case 204:
+                this.tlDameBoss += io.param;
+                break;
             case 211:
                 this.setltdb += 1;
                 break;
@@ -662,7 +678,7 @@ public class NPoint {
             this.isGogeta = skin.template.id == 2133 && pskin.template.id == 2134 || skin.template.id == 2134 && pskin.template.id == 2133;
         }
         // CT Lio đẹp trai - chỉ có tác dụng khi hợp thể
-        this.isLioDepTrai = this.player.fusion.typeFusion != ConstPlayer.NON_FUSION
+        this.isLioDepTrai = isFusionActive()
                 && skin.isNotNullItem()
                 && skin.template.id == 1815;
     }
@@ -1421,6 +1437,7 @@ public class NPoint {
         this.tlPST = 0;
         this.tlTNSM.clear();
         this.tlDameAttMob.clear();
+        this.tlDameBoss = 0;
         this.tlGold = 0;
         this.tlNeDon = 0;
         this.tlNeDonXinbato = 0;
