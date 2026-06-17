@@ -191,6 +191,8 @@ public class BossID {
     //========================LINH TINH========================
     public static final int AN_TROM = -365;
     public static final int TAU_PAIPAI = -385;
+    public static final int POCOLO_NAMEK = -386;
+    public static final int POCOLO_NAMEK_CLONE = -387;
     public static final int RONG_NHI = -386998;
     //========================Cadic M========================
     public static final int CADIC_M = -924;

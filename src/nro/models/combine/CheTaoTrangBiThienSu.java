@@ -56,6 +56,13 @@ public class CheTaoTrangBiThienSu {
         // Hiển thị preview
         player.combineNew.goldCombine = 2_000_000_000;
         player.combineNew.ratioCombine = 90;
+
+        String npcSay = "|2|Chế tạo trang bị Thiên Sứ\n";
+        npcSay += "|2|Tỉ lệ thành công: " + player.combineNew.ratioCombine + "%\n";
+        npcSay += "|2|Cần: " + Util.numberToMoney(player.combineNew.goldCombine) + " vàng\n";
+        npcSay += "|7|Thất bại vẫn mất nguyên liệu\n";
+        CombineService.gI().whis.createOtherMenu(player, CombineService.CHE_TAO_TRANG_BI_THIEN_SU, npcSay,
+                "Nâng cấp\n" + Util.numberToMoney(player.combineNew.goldCombine) + " vàng", "Từ chối");
     }
 
     // Thực thi chế tạo — cùng công thức với showInfoCombine

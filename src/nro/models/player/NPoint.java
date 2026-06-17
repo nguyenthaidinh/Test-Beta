@@ -673,6 +673,72 @@ public class NPoint {
         }
     }
 
+    private int getSexyDameAroundBuff(Player pl) {
+        if (pl == null || pl.nPoint == null || pl.inventory == null || pl.inventory.itemsBody == null
+                || pl.inventory.itemsBody.size() <= 5) {
+            return 0;
+        }
+        if (pl.nPoint.isLioDepTrai) {
+            return 25;
+        }
+        Item skin = pl.inventory.itemsBody.get(5);
+        if (skin == null || !skin.isNotNullItem() || skin.itemOptions == null) {
+            return 0;
+        }
+        int buff = 0;
+        for (ItemOption io : skin.itemOptions) {
+            if (io.optionTemplate == null) {
+                continue;
+            }
+            switch (io.optionTemplate.id) {
+                case 117:
+                case 226:
+                    if (io.param > buff) {
+                        buff = io.param;
+                    }
+                    break;
+            }
+        }
+        return buff;
+    }
+
+    private int getFullUpgradeSetBonusPercent() {
+        if (this.player == null || !this.player.isPl() || this.player.inventory == null
+                || this.player.inventory.itemsBody == null || this.player.inventory.itemsBody.size() < 5) {
+            return 0;
+        }
+        int minLevel = Integer.MAX_VALUE;
+        for (int i = 0; i < 5; i++) {
+            Item item = this.player.inventory.itemsBody.get(i);
+            if (item == null || !item.isNotNullItem() || item.itemOptions == null) {
+                return 0;
+            }
+            int level = 0;
+            for (ItemOption io : item.itemOptions) {
+                if (io.optionTemplate != null && io.optionTemplate.id == 72) {
+                    level = io.param;
+                    break;
+                }
+            }
+            if (level <= 0) {
+                return 0;
+            }
+            if (level < minLevel) {
+                minLevel = level;
+            }
+        }
+        if (minLevel >= 8) {
+            return 10;
+        }
+        if (minLevel >= 7) {
+            return 5;
+        }
+        if (minLevel >= 6) {
+            return 3;
+        }
+        return 0;
+    }
+
     private void setDameTrainArmor() {
         if (!this.player.isPet && !this.player.isBot && !this.player.isBoss) {
             if (this.player.inventory.itemsBody.size() < 7) {
@@ -789,6 +855,11 @@ public class NPoint {
                     hpMax += (hpMax * tl / 100L);
                 }
             }
+        }
+
+        int fullUpgradeSetBonus = getFullUpgradeSetBonusPercent();
+        if (fullUpgradeSetBonus > 0) {
+            hpMax += (hpMax * fullUpgradeSetBonus / 100L);
         }
 
         // Xử lý set nappa
@@ -956,6 +1027,10 @@ public class NPoint {
                 }
             }
         }
+        int fullUpgradeSetBonus = getFullUpgradeSetBonusPercent();
+        if (fullUpgradeSetBonus > 0) {
+            mpMax += (mpMax * fullUpgradeSetBonus / 100L);
+        }
         if (this.isNguyetAn) {
             mpMax += (mpMax * 15L / 100L);
         }
@@ -1101,6 +1176,10 @@ public class NPoint {
                 }
             }
         }
+        int fullUpgradeSetBonus = getFullUpgradeSetBonusPercent();
+        if (fullUpgradeSetBonus > 0) {
+            dame += (dame * fullUpgradeSetBonus / 100L);
+        }
         // Xử lý pet pic
         if (this.player.isPet && ((Pet) this.player).typePet == 3 && (((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA || ((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA2 || ((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA3)) {
             dame += (dame * 20 / 100L);
@@ -1200,16 +1279,21 @@ public class NPoint {
             }
         }
 
-        // Đẳng cấp CT Lio đẹp trai: +25% SĐ cho người xung quanh
+        // Buff SD dep cho nguoi xung quanh tu cai trang.
+        int sexyDameAround = 0;
         if (this.player.zone != null && this.player.isPl()) {
             for (Player pl : this.player.zone.getNotBosses()) {
                 if (pl != null && pl != this.player && pl.nPoint != null
-                        && pl.nPoint.isLioDepTrai
                         && Util.getDistance(this.player, pl) <= 200) {
-                    dame += (dame * 25 / 100L);
-                    break; // chỉ nhận buff từ 1 người
+                    int buff = getSexyDameAroundBuff(pl);
+                    if (buff > sexyDameAround) {
+                        sexyDameAround = buff;
+                    }
                 }
             }
+        }
+        if (sexyDameAround > 0) {
+            dame += (dame * sexyDameAround / 100L);
         }
 
         // Phù map mabu

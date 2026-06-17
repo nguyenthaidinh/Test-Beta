@@ -3,9 +3,9 @@ package nro.models.boss.Golden_fireza;
 import nro.models.services.SkillService;
 import nro.models.services.Service;
 import nro.models.services.EffectSkillService;
+import nro.models.services.ItemService;
 import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
-import nro.models.utils.TimeUtil;
 import nro.models.boss.Boss;
 import nro.models.boss.BossID;
 import nro.models.boss.BossesData;
@@ -19,7 +19,10 @@ import nro.models.map.service.MapService;
 import nro.models.mob.Mob;
 import nro.models.network.Message;
 import nro.models.player.Player;
+import nro.models.server.Manager;
 import nro.models.services.PlayerService;
+import nro.models.shop.ItemShop;
+import nro.models.shop.Shop;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -42,13 +45,104 @@ public class GoldenFrieza extends Boss {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
-        ItemMap CaiTrangFideVang = new ItemMap(zone, 629,1, this.location.x + Util.nextInt(-50, 50), this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id);
+        int x = this.location.x;
+        int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
+
+        ItemMap CaiTrangFideVang = new ItemMap(zone, 629, 1, x + Util.nextInt(-50, 50), y, plKill.id);
         CaiTrangFideVang.options.add(new Item.ItemOption(30, 1));
         CaiTrangFideVang.options.add(new Item.ItemOption(50, 20));
         CaiTrangFideVang.options.add(new Item.ItemOption(77, 20));
         CaiTrangFideVang.options.add(new Item.ItemOption(103, 20));
         CaiTrangFideVang.options.add(new Item.ItemOption(93, 20));
         Service.gI().dropItemMap(this.zone, CaiTrangFideVang);
+
+        // 30% roi do Than Linh
+        if (Util.isTrue(30, 100)) {
+            ItemMap thanLinhDrop = ItemService.gI().randDoTLBoss(this.zone, 1, x + Util.nextInt(-50, 50), y, plKill.id);
+            if (thanLinhDrop != null) {
+                Service.gI().dropItemMap(this.zone, thanLinhDrop);
+            }
+        }
+
+        // 2% roi do Huy Diet, chi so theo shop Bill
+        if (Util.isTrue(2, 100)) {
+            short[] doHuyDietIds = {650, 651, 652, 653, 654, 655, 656, 657, 658, 659, 660, 661, 662};
+            short doHuyDietId = doHuyDietIds[Util.nextInt(doHuyDietIds.length)];
+            Item doHuyDietItem = createBillHuyDietItem(doHuyDietId);
+            if (doHuyDietItem != null) {
+                ItemMap doHuyDietDrop = new ItemMap(this.zone, doHuyDietItem.template, 1, x + Util.nextInt(-50, 50), y, plKill.id);
+                doHuyDietDrop.options.addAll(doHuyDietItem.itemOptions);
+                Service.gI().dropItemMap(this.zone, doHuyDietDrop);
+            }
+        }
+    }
+
+    private Item createBillHuyDietItem(short itemId) {
+        Item item = null;
+        for (Shop shop : Manager.SHOPS) {
+            if (shop.tagName != null && shop.tagName.equals("BILL")) {
+                ItemShop itemShop = shop.getItemShop(itemId);
+                if (itemShop != null) {
+                    item = ItemService.gI().createItemFromItemShop(itemShop);
+                }
+                break;
+            }
+        }
+        if (item == null) {
+            return null;
+        }
+        applyBillHuyDietOptions(item);
+        return item;
+    }
+
+    private void applyBillHuyDietOptions(Item item) {
+        int param = 0;
+        if (item.template.level == 14) {
+            int random = Util.nextInt(1, 100);
+            if (random <= 1) {
+                param = 15;
+            } else if (random <= 15) {
+                param = Util.nextInt(11, 14);
+            } else if (random <= 35) {
+                param = Util.nextInt(7, 10);
+            } else if (random <= 60) {
+                param = Util.nextInt(4, 6);
+            } else {
+                param = Util.nextInt(0, 3);
+            }
+        }
+
+        List<Item.ItemOption> itemOptions = new ArrayList<>();
+        if (!item.itemOptions.isEmpty()) {
+            for (Item.ItemOption option : item.itemOptions) {
+                if (item.template.level == 14 && canUpgradeBillHuyDietOption(option.optionTemplate.id) && param > 0) {
+                    int optionId = option.optionTemplate.id;
+                    int optionParam = option.param + (option.param * param) / 100;
+                    itemOptions.add(new Item.ItemOption(optionId, optionParam));
+                } else if (option.optionTemplate.id != 164) {
+                    itemOptions.add(new Item.ItemOption(option.optionTemplate.id, option.param));
+                }
+            }
+        } else {
+            itemOptions.add(new Item.ItemOption(73, (short) 0));
+        }
+        itemOptions.add(new Item.ItemOption(30, (short) 0));
+
+        if (item.template.level == 14) {
+            int roll = Util.nextInt(3);
+            switch (roll) {
+                case 0 -> itemOptions.add(new Item.ItemOption(77, Util.nextInt(1, 5)));
+                case 1 -> itemOptions.add(new Item.ItemOption(50, Util.nextInt(1, 3)));
+                case 2 -> itemOptions.add(new Item.ItemOption(103, Util.nextInt(1, 5)));
+            }
+        }
+        item.itemOptions.clear();
+        item.itemOptions.addAll(itemOptions);
+    }
+
+    private boolean canUpgradeBillHuyDietOption(int optionId) {
+        return optionId == 0 || optionId == 22 || optionId == 23 || optionId == 14
+                || optionId == 27 || optionId == 28 || optionId == 47;
     }
 
     @Override
@@ -87,24 +181,17 @@ public class GoldenFrieza extends Boss {
 
     @Override
     public void autoLeaveMap() {
-        if (!TimeUtil.is21H()) {
-            this.leaveMap();
-        }
     }
 
     @Override
     public void joinMap() {
-        if (TimeUtil.is21H()) {
-            this.name = this.data[this.currentLevel].getName() + " " + Util.nextInt(1, 100);
-            super.joinMap();
-            if (this.zone != null) {
-                for (Mob mob : this.zone.mobs) {
-                    mob.injured(this, 99999999, true);
-                }
-                this.zone.isGoldenFriezaAlive = true;
+        this.name = this.data[this.currentLevel].getName() + " " + Util.nextInt(1, 100);
+        super.joinMap();
+        if (this.zone != null) {
+            for (Mob mob : this.zone.mobs) {
+                mob.injured(this, 99999999, true);
             }
-        } else {
-            this.changeStatus(BossStatus.REST);
+            this.zone.isGoldenFriezaAlive = true;
         }
     }
 

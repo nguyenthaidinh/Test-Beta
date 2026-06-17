@@ -389,6 +389,13 @@ public class Zone {
                                         );
                                     }
 
+                                    if (itemId >= 650 && itemId <= 662) {
+                                        ChatGlobalService.gI().ThongBaoDapDo(player,
+                                            player.name + ": Cảm ơn Anh Lio đẹp trai đã cho em ["
+                                            + item.template.name + "] Hủy Diệt từ Boss!"
+                                        );
+                                    }
+
                                     // Mark item as picked up unless the item ID is 74
                                     if (picked) {
                                         if (itemMap.itemTemplate.id != 74) {

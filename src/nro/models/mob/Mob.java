@@ -29,7 +29,6 @@ import nro.models.services.ItemService;
 import nro.models.map.service.MapService;
 import nro.models.skill.Skill;
 import nro.models.task.BadgesTaskService;
-import nro.models.utils.TimeUtil;
 
 public class Mob {
 
@@ -254,7 +253,7 @@ public class Mob {
     }
 
     public void update() {
-        if (zone.isGoldenFriezaAlive && TimeUtil.is21H()) {
+        if (zone.isGoldenFriezaAlive) {
             if (!isDie()) {
                 startDie();
                 return;
@@ -288,7 +287,7 @@ public class Mob {
                 case ConstMap.MAP_TAY_KARIN:
                     break;
                 default:
-                    if (this.zone.isGoldenFriezaAlive && TimeUtil.is21H()) {
+                    if (this.zone.isGoldenFriezaAlive) {
                         return;
                     }
                     if (Util.canDoWithTime(lastTimeDie, 3000)) {

@@ -1,7 +1,6 @@
 package nro.models.mob;
 
 import nro.models.player.Player;
-import nro.models.utils.TimeUtil;
 
 public class BigBoss extends Mob {
 
@@ -15,7 +14,7 @@ public class BigBoss extends Mob {
 
     @Override
     public void update() {
-        if (zone.isGoldenFriezaAlive && TimeUtil.is21H()) {
+        if (zone.isGoldenFriezaAlive) {
             if (!isDie()) {
                 startDie();
                 return;

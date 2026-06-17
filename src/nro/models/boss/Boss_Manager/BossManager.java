@@ -51,6 +51,7 @@ import nro.models.boss.MajinBuu_12h.Mabu;
 import nro.models.boss.MajinBuu_12h.Yacon;
 import nro.models.boss.MajinBuu_14h.Mabu2H;
 import nro.models.boss.MajinBuu_14h.SuperBu;
+import nro.models.boss.ma_vuong_picolo_namek.Pocolo;
 import nro.models.boss.tieu_doi_sat_thu_namek.SO1_NM;
 import nro.models.boss.tieu_doi_sat_thu_namek.SO2_NM;
 import nro.models.boss.tieu_doi_sat_thu_namek.SO3_NM;
@@ -155,12 +156,13 @@ public class BossManager implements Runnable {
         this.createBoss(BossID.CUMBER);
         this.createBoss(BossID.COOLER, 1);
         this.createBoss(BossID.BLACK_GOKU, 2);
-        this.createBoss(BossID.GOLDEN_FRIEZA, 1);
+        this.createBoss(BossID.GOLDEN_FRIEZA, 3);
         this.createBoss(BossID.SOI_HEC_QUYN1, 2);
         this.createBoss(BossID.AN_TROM, 5);
         this.createBoss(BossID.O_DO1, 5);
         this.createBoss(BossID.BABY, 2);
         this.createBoss(BossID.MAT_TROI, 20);
+        this.createBoss(BossID.POCOLO_NAMEK, 1);
 
     }
 
@@ -351,6 +353,8 @@ public class BossManager implements Runnable {
                     new Virut();
                 case BossID.MAT_TROI ->
                     new MatTroi();
+                case BossID.POCOLO_NAMEK ->
+                    new Pocolo();
                 case BossID.BLACK_GOKU ->
                     new BlackGoku();
                 case BossID.CUMBER ->
