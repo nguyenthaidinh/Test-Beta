@@ -45,7 +45,7 @@ public class Whis extends Npc {
             case 48 ->
                 createOtherMenu(player, ConstNpc.BASE_MENU,
                         "Đại chiến Anh Hùng đang chờ người thách thức.",
-                        "Tham gia", "Từ chối");
+                        "Tham gia", "Bảng xếp hạng", "Từ chối");
         }
     }
 
@@ -87,16 +87,23 @@ public class Whis extends Npc {
                     HeroWarService.gI().joinFromWhis(player);
                 }
             }
-            case 2 ->
-                Service.gI().showListTop(player, Manager.Topwhis);
-            case 1 -> {
-                if (this.mapId == 48) {
-                    return;
+            case 2 -> {
+                if (this.mapId == 154) {
+                    Service.gI().showListTop(player, Manager.Topwhis);
                 }
-                showSkillLearningMenu(player, biKiepTuyetKy);
             }
-            case 3 ->
-                TrainingService.gI().callBoss(player, BossID.WHIS, false);
+            case 1 -> {
+                if (this.mapId == 154) {
+                    showSkillLearningMenu(player, biKiepTuyetKy);
+                } else if (this.mapId == 48) {
+                    HeroWarService.gI().showWinnerHistory(player);
+                }
+            }
+            case 3 -> {
+                if (this.mapId == 154) {
+                    TrainingService.gI().callBoss(player, BossID.WHIS, false);
+                }
+            }
         }
     }
 

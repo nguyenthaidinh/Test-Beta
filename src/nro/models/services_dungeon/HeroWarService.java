@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import nro.models.consts.ConstItem;
 import nro.models.consts.ConstMap;
+import nro.models.data.LocalManager;
+import nro.models.data.LocalResultSet;
 import nro.models.item.Item;
 import nro.models.map.ItemMap;
 import nro.models.map.Map;
@@ -19,6 +21,7 @@ import nro.models.services.InventoryService;
 import nro.models.services.PlayerService;
 import nro.models.services.Service;
 import nro.models.utils.Functions;
+import nro.models.utils.Logger;
 import nro.models.utils.TimeUtil;
 import nro.models.utils.Util;
 
@@ -36,6 +39,7 @@ public class HeroWarService implements Runnable {
     private static final int RETURN_X = 754;
     private static final int RETURN_Y = 336;
     private static final String OPEN_TIME_TEXT = "21h00 đến 22h00";
+    private static final int HISTORY_LIMIT = 20;
     private static final int COST_X100 = 50;
     private static final int[] FRIEND_POWER_MULTIPLIERS = {10, 20, 30, 40, 50};
 
@@ -204,6 +208,41 @@ public class HeroWarService implements Runnable {
         ChangeMapService.gI().changeMap(player, zone, BALL_X, RETURN_Y);
     }
 
+    public void showWinnerHistory(Player player) {
+        if (player == null) {
+            return;
+        }
+        LocalResultSet rs = null;
+        try {
+            rs = LocalManager.executeQuery(
+                    "SELECT player_name, DATE_FORMAT(win_time, '%d/%m/%Y %H:%i') AS win_time_text, hold_seconds "
+                    + "FROM hero_war_history ORDER BY win_time DESC LIMIT ?",
+                    HISTORY_LIMIT);
+            StringBuilder text = new StringBuilder("Bảng xếp hạng Đại chiến Anh Hùng\n");
+            int rank = 1;
+            while (rs.next()) {
+                int holdSeconds = rs.getInt("hold_seconds");
+                text.append(rank++).append(". ")
+                        .append(rs.getString("player_name"))
+                        .append(" - ").append(rs.getString("win_time_text"))
+                        .append(" - giữ ").append(TimeUtil.convertTime(holdSeconds)).append("\n");
+            }
+            if (rank == 1) {
+                text.append("Chưa có lịch sử chiến thắng.");
+            }
+            Service.gI().sendThongBaoOK(player, text.toString().trim());
+        } catch (Exception e) {
+            Logger.logException(HeroWarService.class, e, "Lỗi tải lịch sử Đại chiến Anh Hùng");
+            Service.gI().sendThongBaoOK(player,
+                    "Chưa có dữ liệu bảng xếp hạng Đại chiến Anh Hùng.\n"
+                    + "Nếu đây là lần đầu dùng, hãy chạy SQL tạo bảng hero_war_history.");
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+        }
+    }
+
     public void join(Player player) {
         if (player == null || player.zone == null || !isHeroWarMap(player.zone.map.mapId)) {
             return;
@@ -218,7 +257,7 @@ public class HeroWarService implements Runnable {
         }
         PlayerService.gI().sendInfoHpMp(player);
         Service.gI().sendThongBao(player, "Đại chiến Anh Hùng: giữ Ngọc Rồng Đen đủ 5 phút để chiến thắng.");
-        ensureBall(player.zone);
+        ensureBall(player.zone.map);
     }
 
     public void leave(Player player) {
@@ -324,22 +363,21 @@ public class HeroWarService implements Runnable {
             return;
         }
         for (Zone zone : map.zones) {
-            updateZone(zone);
+            forceBlackFlags(zone);
         }
-    }
-
-    private void updateZone(Zone zone) {
-        List<Player> players = zone.getPlayers();
-        if (players.isEmpty()) {
-            zone.finishBlackBallWar = false;
-            clearBlackBalls(zone);
+        Player holder = getHolder(map);
+        if (holder == null) {
+            if (changingZoneHolders.isEmpty()) {
+                ensureBall(map);
+            }
             return;
         }
+        clearBlackBalls(map);
+        updateHolder(holder);
+    }
 
-        forceBlackFlags(zone);
-        Player holder = getHolder(zone);
-        if (holder == null) {
-            ensureBall(zone);
+    private void updateHolder(Player holder) {
+        if (holder == null || holder.zone == null || !isHeroWarMap(holder.zone.map.mapId)) {
             return;
         }
         if (holder.isDie()) {
@@ -356,11 +394,19 @@ public class HeroWarService implements Runnable {
         }
     }
 
-    private void ensureBall(Zone zone) {
-        if (!canPickBallNow() || zone.finishBlackBallWar || !changingZoneHolders.isEmpty()
-                || getHolder(zone.map) != null || hasBlackBall(zone.map)) {
+    private void ensureBall(Map map) {
+        if (!canPickBallNow() || map == null || map.zones.isEmpty() || !changingZoneHolders.isEmpty()
+                || getHolder(map) != null) {
             return;
         }
+        List<ItemMap> balls = getBlackBalls(map);
+        if (balls.size() == 1) {
+            return;
+        }
+        if (!balls.isEmpty()) {
+            clearBlackBalls(map);
+        }
+        Zone zone = map.zones.get(Util.nextInt(map.zones.size()));
         ItemMap itemMap = new ItemMap(zone, BALL_ID, 1, BALL_X, zone.map.yPhysicInTop(BALL_X, BALL_Y), -1);
         Service.gI().dropItemMap(zone, itemMap);
     }
@@ -408,6 +454,18 @@ public class HeroWarService implements Runnable {
             }
         }
         return false;
+    }
+
+    private List<ItemMap> getBlackBalls(Map map) {
+        List<ItemMap> balls = new ArrayList<>();
+        for (Zone zone : map.zones) {
+            for (ItemMap item : zone.items) {
+                if (item != null && item.itemTemplate != null && ItemMapService.gI().isBlackBall(item.itemTemplate.id)) {
+                    balls.add(item);
+                }
+            }
+        }
+        return balls;
     }
 
     private void clearBlackBalls(Zone zone) {
@@ -507,6 +565,7 @@ public class HeroWarService implements Runnable {
         winner.idMark.setTempIdBlackBallHold(-1);
         Service.gI().sendFlagBag(winner);
         clearBlackBalls(map);
+        saveWinner(winner);
 
         Service.gI().sendThongBaoAllPlayer("Chúc mừng người chơi " + winner.name
                 + " đã giành chiến thắng Đại chiến Anh Hùng vô cùng out trình!");
@@ -530,5 +589,26 @@ public class HeroWarService implements Runnable {
         for (Zone zone : map.zones) {
             zone.finishBlackBallWar = false;
         }
+    }
+
+    private void saveWinner(Player winner) {
+        if (winner == null) {
+            return;
+        }
+        try {
+            LocalManager.executeUpdate(
+                    "INSERT INTO hero_war_history (player_id, player_name, win_time, hold_seconds) VALUES (?, ?, ?, ?)",
+                    winner.id, winner.name, TimeUtil.getTimeNow("yyyy-MM-dd HH:mm:ss"), getHoldSeconds(winner));
+        } catch (Exception e) {
+            Logger.logException(HeroWarService.class, e, "Lỗi lưu lịch sử Đại chiến Anh Hùng");
+        }
+    }
+
+    private int getHoldSeconds(Player winner) {
+        if (winner == null || winner.idMark == null || winner.idMark.getLastTimeHoldBlackBall() <= 0) {
+            return TIME_WIN / 1000;
+        }
+        long holdSeconds = (System.currentTimeMillis() - winner.idMark.getLastTimeHoldBlackBall()) / 1000;
+        return (int) Math.max(0, Math.min(Integer.MAX_VALUE, holdSeconds));
     }
 }
