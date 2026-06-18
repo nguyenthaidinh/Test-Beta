@@ -40,8 +40,9 @@ public class HeroWarService implements Runnable {
     private static final int RETURN_Y = 336;
     private static final String OPEN_TIME_TEXT = "21h00 đến 22h00";
     private static final int HISTORY_LIMIT = 20;
-    private static final int COST_X100 = 50;
+    private static final int COST_X100 = 20;
     private static final int[] FRIEND_POWER_MULTIPLIERS = {10, 20, 30, 40, 50};
+    private static final int[] FRIEND_POWER_COSTS = {2, 5, 8, 10, 15};
 
     private static HeroWarService instance;
     private final Set<Long> changingZoneHolders = ConcurrentHashMap.newKeySet();
@@ -71,7 +72,7 @@ public class HeroWarService implements Runnable {
             options.add("x" + multiplier + "\n" + getFriendPowerCost(multiplier) + " TV");
         }
         if (player != null && player.idMark != null && player.idMark.isHoldBlackBall()) {
-            options.add("x100\n" + COST_X100 + " TV");
+            options.add("x100\n" + getFriendPowerCost(100) + " TV");
         }
         options.add("Từ chối");
         return options.toArray(new String[0]);
@@ -152,7 +153,15 @@ public class HeroWarService implements Runnable {
     }
 
     private int getFriendPowerCost(int multiplier) {
-        return multiplier == 100 ? COST_X100 : multiplier;
+        if (multiplier == 100) {
+            return COST_X100;
+        }
+        for (int i = 0; i < FRIEND_POWER_MULTIPLIERS.length; i++) {
+            if (FRIEND_POWER_MULTIPLIERS[i] == multiplier) {
+                return FRIEND_POWER_COSTS[i];
+            }
+        }
+        return multiplier;
     }
 
     private boolean isOpen() {

@@ -1,5 +1,7 @@
 package nro.models.npc_list;
 
+import nro.models.clan.ClanMember;
+import nro.models.consts.ConstItem;
 import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
 import java.util.ArrayList;
@@ -23,8 +25,11 @@ import nro.models.utils.Util;
 public class ChiChi extends Npc {
 
     private static final int MENU_BUY_TRAIN_ARMOR_5 = 186900;
+    private static final int MENU_BUY_CLAN_CAPSULE = 186901;
     private static final short TRAIN_ARMOR_5_ITEM_ID = 1869;
     private static final long TRAIN_ARMOR_5_GOLD_COST = 36_000_000_000L;
+    private static final int CLAN_CAPSULE_AMOUNT = 1;
+    private static final int CLAN_CAPSULE_COST_TV = 10;
 
     public ChiChi(int mapId, int status, int cx, int cy, int tempId, int avartar) {
         super(mapId, status, cx, cy, tempId, avartar);
@@ -39,6 +44,7 @@ public class ChiChi extends Npc {
                     "Top\nKem trái cây",
                     "Cửa hàng",
                     "Giáp\nluyện tập\ncấp 5",
+                    "1 Capsule\nBang\n10 TV",
                     "Đóng"));
 
             String[] menus = menu.toArray(new String[0]);
@@ -63,6 +69,11 @@ public class ChiChi extends Npc {
                             createOtherMenu(player, MENU_BUY_TRAIN_ARMOR_5,
                                     "Con có muốn mua Giáp tập luyện cấp 5\nGiá "
                                     + Util.numberToMoney(TRAIN_ARMOR_5_GOLD_COST) + " vàng không?",
+                                    "Mua", "Từ chối");
+                            break;
+                        case 5:
+                            createOtherMenu(player, MENU_BUY_CLAN_CAPSULE,
+                                    "Con có muốn mua 1 Capsule Bang cho bang hội\nvới giá 10 thỏi vàng không?",
                                     "Mua", "Từ chối");
                             break;
                         case 0:
@@ -118,6 +129,10 @@ public class ChiChi extends Npc {
                     if (select == 0) {
                         buyTrainArmor5(player);
                     }
+                } else if (player.idMark.getIndexMenu() == MENU_BUY_CLAN_CAPSULE) {
+                    if (select == 0) {
+                        buyClanCapsule(player);
+                    }
                 }
             }
         }
@@ -148,5 +163,30 @@ public class ChiChi extends Npc {
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendMoney(player);
         Service.gI().sendThongBao(player, "Mua thành công " + trainArmor.template.name);
+    }
+
+    private void buyClanCapsule(Player player) {
+        if (player.clan == null) {
+            Service.gI().sendThongBao(player, "Bạn cần có bang hội để mua Capsule Bang.");
+            return;
+        }
+        Item thoiVang = InventoryService.gI().findItemBag(player, ConstItem.THOI_VANG);
+        int currentQuantity = thoiVang == null ? 0 : thoiVang.quantity;
+        if (currentQuantity < CLAN_CAPSULE_COST_TV) {
+            Service.gI().sendThongBao(player, "Bạn không đủ thỏi vàng, còn thiếu "
+                    + (CLAN_CAPSULE_COST_TV - currentQuantity) + " thỏi vàng.");
+            return;
+        }
+
+        InventoryService.gI().subQuantityItemsBag(player, thoiVang, CLAN_CAPSULE_COST_TV);
+        player.clan.capsuleClan += CLAN_CAPSULE_AMOUNT;
+        ClanMember member = player.clan.getClanMember((int) player.id);
+        if (member != null) {
+            member.memberPoint += CLAN_CAPSULE_AMOUNT;
+            member.clanPoint += CLAN_CAPSULE_AMOUNT;
+        }
+        InventoryService.gI().sendItemBags(player);
+        player.clan.sendMyClanForAllMember();
+        Service.gI().sendThongBao(player, "Mua thành công 1 Capsule Bang cho bang hội với giá 10 thỏi vàng.");
     }
 }

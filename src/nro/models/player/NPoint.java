@@ -1057,6 +1057,10 @@ public class NPoint {
         if (fullUpgradeSetBonus > 0) {
             mpMax += (mpMax * fullUpgradeSetBonus / 100L);
         }
+        // Xu ly set Picolo
+        if (this.player.setClothes.picolo == 5) {
+            mpMax += (mpMax * 100L / 100L);
+        }
         if (this.isNguyetAn) {
             mpMax += (mpMax * 15L / 100L);
         }
@@ -1620,9 +1624,6 @@ public class NPoint {
             case Skill.MAKANKOSAPPO:
                 percentDameSkill = skillSelect.damage;
                 int dameSkill = (int) Math.min(2_147_483_647L, (long) this.mpMax * percentDameSkill / 100);
-                if (this.player.setClothes.picolo == 5) {
-                    dameSkill *= 3 / 2;
-                }
                 return dameSkill;
             case Skill.QUA_CAU_KENH_KHI:
                 long hpmob = 0;
