@@ -10,6 +10,7 @@ import nro.models.npc.Npc;
 import nro.models.map.service.NpcManager;
 import nro.models.combine.PhanRaTrangBiKichHoat.PhanRaTrangBi;
 import nro.models.services.InventoryService;
+import nro.models.services.Service;
 import nro.models.shop_lio.LioShopManager;
 import nro.models.shop_lio.LioShopService;
 
@@ -638,7 +639,7 @@ public class CombineService {
             case HIEN_TE_THAN_LINH:
                 return "Ta sẽ phù phép\nhiến tế trang bị Thần Linh\nthành trang bị Kích Hoạt";
             case BAN_DO_THAN_LINH_LIO:
-                return "Đặt đồ Thần Linh\nvào đây để bán\nNhận 25 thỏi vàng";
+                return "Đặt đồ Thần Linh\nvào đây để bán\nNhận " + LioShopManager.PRICE_BUY_IN + " thỏi vàng";
             case NHAP_NGOC_RONG:
                 return "Ta sẽ phù phép\ncho 7 viên Ngọc Rồng\nthành 1 viên Ngọc Rồng cấp cao";
             case NANG_CAP_VAT_PHAM:
@@ -762,10 +763,13 @@ public class CombineService {
     }
 
     private void showInfoBanDoThanLinh(Player player) {
+        Npc lioNpc = getLioDepTraiNpc(player);
         if (player.combineNew.itemsCombine.size() != 1) {
-            if (lioDepTrai != null) {
-                lioDepTrai.createOtherMenu(player, ConstNpc.IGNORE_MENU,
+            if (lioNpc != null) {
+                lioNpc.createOtherMenu(player, ConstNpc.IGNORE_MENU,
                         "Cần đặt đúng 1 trang bị Thần Linh!", "Đóng");
+            } else {
+                Service.gI().sendThongBao(player, "Không tìm thấy NPC Lio Đẹp Trai.");
             }
             return;
         }
@@ -773,17 +777,21 @@ public class CombineService {
         Item item = player.combineNew.itemsCombine.get(0);
 
         if (item.template.id < 555 || item.template.id > 567) {
-            if (lioDepTrai != null) {
-                lioDepTrai.createOtherMenu(player, ConstNpc.IGNORE_MENU,
+            if (lioNpc != null) {
+                lioNpc.createOtherMenu(player, ConstNpc.IGNORE_MENU,
                         "Vật phẩm phải là trang bị Thần Linh!\n(Áo, Quần, Găng, Giày hoặc Nhẫn Thần Linh)", "Đóng");
+            } else {
+                Service.gI().sendThongBao(player, "Vật phẩm phải là trang bị Thần Linh!");
             }
             return;
         }
 
         if (LioShopManager.gI().getAvailableCount() >= LioShopManager.MAX_ITEMS) {
-            if (lioDepTrai != null) {
-                lioDepTrai.createOtherMenu(player, ConstNpc.IGNORE_MENU,
+            if (lioNpc != null) {
+                lioNpc.createOtherMenu(player, ConstNpc.IGNORE_MENU,
                         "Shop đã đầy (" + LioShopManager.MAX_ITEMS + " món), vui lòng quay lại sau!", "Đóng");
+            } else {
+                Service.gI().sendThongBao(player, "Shop đã đầy (" + LioShopManager.MAX_ITEMS + " món), vui lòng quay lại sau!");
             }
             return;
         }
@@ -795,9 +803,11 @@ public class CombineService {
                 + "|1|→ Nhận " + LioShopManager.PRICE_BUY_IN + " thỏi vàng\n"
                 + "|7|Đồ sẽ được bày bán với giá " + LioShopManager.PRICE_SELL_OUT + " thỏi vàng\n";
 
-        if (lioDepTrai != null) {
-            lioDepTrai.createOtherMenu(player, ConstNpc.MENU_START_COMBINE, npcSay,
+        if (lioNpc != null) {
+            lioNpc.createOtherMenu(player, ConstNpc.MENU_START_COMBINE, npcSay,
                     "Xác nhận\nBán", "Từ chối");
+        } else {
+            Service.gI().sendThongBao(player, "Không tìm thấy NPC Lio Đẹp Trai.");
         }
     }
 
@@ -814,5 +824,16 @@ public class CombineService {
 
         LioShopService.gI().sellItem(player, item);
         player.combineNew.clearCombine();
+    }
+
+    private Npc getLioDepTraiNpc(Player player) {
+        if (player != null && player.idMark != null && player.idMark.getNpcChose() != null
+                && player.idMark.getNpcChose().tempId == ConstNpc.LIO_DEP_TRAI) {
+            return player.idMark.getNpcChose();
+        }
+        if (lioDepTrai == null) {
+            lioDepTrai = NpcManager.getNpc(ConstNpc.LIO_DEP_TRAI);
+        }
+        return lioDepTrai;
     }
 }

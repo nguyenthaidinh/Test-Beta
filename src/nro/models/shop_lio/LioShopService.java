@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import nro.models.consts.ConstItem;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.network.Message;
@@ -21,6 +22,7 @@ import nro.models.services.Service;
  */
 public class LioShopService {
 
+    private static final int MAX_STACK_QUANTITY = 100_000_000;
     private static LioShopService instance;
 
     public static LioShopService gI() {
@@ -55,30 +57,39 @@ public class LioShopService {
             return;
         }
 
-        if (InventoryService.gI().getCountEmptyBag(player) <= 0) {
+        boolean canReceiveThoiVang = hasStackableThoiVang(player)
+                || item.quantity <= 1
+                || InventoryService.gI().getCountEmptyBag(player) > 0;
+        if (!canReceiveThoiVang) {
             Service.gI().sendThongBao(player, "Hành trang không còn chỗ trống để nhận thỏi vàng!");
             return;
         }
 
         // Copy item data trước khi xóa
         short itemId = item.template.id;
-        int qty = item.quantity;
-        List<ItemOption> ops = new ArrayList<>(item.itemOptions);
+        List<ItemOption> ops = copyOptions(item.itemOptions);
 
         // Xóa đồ TL khỏi hành trang
         InventoryService.gI().subQuantityItemsBag(player, item, 1);
 
-        // Thêm vào shop
+        // Trả 25 thỏi vàng cho player
+        Item thoiVang = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, LioShopManager.PRICE_BUY_IN);
+        if (!InventoryService.gI().addItemBag(player, thoiVang)) {
+            Item rollbackItem = ItemService.gI().createNewItem(itemId);
+            rollbackItem.itemOptions.clear();
+            rollbackItem.itemOptions.addAll(copyOptions(ops));
+            InventoryService.gI().addItemBag(player, rollbackItem);
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendThongBao(player, "Không thể trả thỏi vàng, đã hoàn lại đồ Thần Linh.");
+            return;
+        }
+
+        // Thêm vào shop sau khi trả thưởng thành công
         int newId = LioShopManager.gI().getMaxId() + 1;
         LioShopItem shopItem = new LioShopItem(
                 newId, itemId, (int) player.id, player.name,
                 LioShopManager.PRICE_SELL_OUT, 1, ops, false);
         LioShopManager.gI().listItem.add(shopItem);
-
-        // Trả 25 thỏi vàng cho player
-        Item thoiVang = ItemService.gI().createNewItem((short) 457);
-        thoiVang.quantity = LioShopManager.PRICE_BUY_IN;
-        InventoryService.gI().addItemBag(player, thoiVang);
 
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendMoney(player);
@@ -106,16 +117,16 @@ public class LioShopService {
             return;
         }
 
-        if (InventoryService.gI().getCountEmptyBag(player) <= 0) {
-            Service.gI().sendThongBao(player, "Hành trang không còn chỗ trống!");
+        // Kiểm tra đủ thỏi vàng
+        Item thoiVang = findThoiVang(player, LioShopManager.PRICE_SELL_OUT);
+        if (thoiVang == null) {
+            Service.gI().sendThongBao(player, "Bạn cần " + LioShopManager.PRICE_SELL_OUT + " thỏi vàng để mua!");
             openShop(player);
             return;
         }
 
-        // Kiểm tra đủ thỏi vàng
-        Item thoiVang = findThoiVang(player);
-        if (thoiVang == null || thoiVang.quantity < LioShopManager.PRICE_SELL_OUT) {
-            Service.gI().sendThongBao(player, "Bạn cần " + LioShopManager.PRICE_SELL_OUT + " thỏi vàng để mua!");
+        if (InventoryService.gI().getCountEmptyBag(player) <= 0 && thoiVang.quantity > LioShopManager.PRICE_SELL_OUT) {
+            Service.gI().sendThongBao(player, "Hành trang không còn chỗ trống!");
             openShop(player);
             return;
         }
@@ -126,9 +137,17 @@ public class LioShopService {
         // Tạo item và trả cho player
         Item newItem = ItemService.gI().createNewItem(shopItem.itemId);
         newItem.itemOptions.clear();
-        newItem.itemOptions.addAll(shopItem.options);
+        newItem.itemOptions.addAll(copyOptions(shopItem.options));
 
-        InventoryService.gI().addItemBag(player, newItem);
+        if (!InventoryService.gI().addItemBag(player, newItem)) {
+            Item refund = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, LioShopManager.PRICE_SELL_OUT);
+            InventoryService.gI().addItemBag(player, refund);
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendMoney(player);
+            Service.gI().sendThongBao(player, "Hành trang không còn chỗ trống!");
+            openShop(player);
+            return;
+        }
 
         // Xóa khỏi shop
         LioShopManager.gI().listItem.remove(shopItem);
@@ -209,12 +228,35 @@ public class LioShopService {
     /**
      * Tìm thỏi vàng (ID 457) trong hành trang
      */
-    private Item findThoiVang(Player player) {
+    private Item findThoiVang(Player player, int minQuantity) {
         for (Item item : player.inventory.itemsBag) {
-            if (item.isNotNullItem() && item.template.id == 457) {
+            if (item.isNotNullItem() && item.template.id == ConstItem.THOI_VANG && item.quantity >= minQuantity) {
                 return item;
             }
         }
         return null;
+    }
+
+    private boolean hasStackableThoiVang(Player player) {
+        for (Item item : player.inventory.itemsBag) {
+            if (item.isNotNullItem() && item.template.id == ConstItem.THOI_VANG
+                    && item.quantity < MAX_STACK_QUANTITY) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<ItemOption> copyOptions(List<ItemOption> options) {
+        List<ItemOption> copies = new ArrayList<>();
+        if (options == null) {
+            return copies;
+        }
+        for (ItemOption option : options) {
+            if (option != null && option.optionTemplate != null) {
+                copies.add(new ItemOption(option));
+            }
+        }
+        return copies;
     }
 }

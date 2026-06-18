@@ -1,5 +1,4 @@
 package nro.models.combine;
-import lombok.Setter;
 import nro.models.item.Item;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,6 @@ public class Combine {
     public long lastTimeCombine;
 
     public List<Item> itemsCombine;
-    @Setter
     public int typeCombine;
 
     public int goldCombine;
@@ -42,6 +40,10 @@ public class Combine {
     public void clearCombine() {
         clearItemCombine();
         clearParamCombine();
+    }
+
+    public void setTypeCombine(int typeCombine) {
+        this.typeCombine = typeCombine;
     }
 
     public void dispose() {

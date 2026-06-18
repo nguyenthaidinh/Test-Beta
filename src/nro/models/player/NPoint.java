@@ -232,14 +232,23 @@ public class NPoint {
         if (this.player.rewardBlackBall.timeOutOfDateReward[2] > System.currentTimeMillis()) {
             tlHutHp += RewardBlackBall.R3S_1;
         }
-        // 4s, 5s, 6s, 7s sao đen giờ cho item, không còn buff
+        if (this.player.rewardBlackBall.timeOutOfDateReward[3] > System.currentTimeMillis()) {
+            tlPST += RewardBlackBall.R4S_2;
+        }
+        // 5 sao đen nhận Đá bảo vệ ở NPC Rồng Omega, không cộng chỉ số.
         // Lấy tất cả option danh hiệu
         List<Item.ItemOption> options = BagesTemplate.sendListItemOption(player);
 
         for (Item.ItemOption opt : options) {
-            if (opt.optionTemplate.id == 108) {
+            if (opt.optionTemplate.id == 5) {
+                this.tlDameCrit.add(opt.param);
+                this.tlSDCM += opt.param;
+            } else if (opt.optionTemplate.id == 108) {
                 tlNeDon += (tlNeDon * opt.param / 100L);
             }
+        }
+        if (this.player.rewardBlackBall.timeOutOfDateReward[6] > System.currentTimeMillis()) {
+            tlNeDon += RewardBlackBall.R7S_1;
         }
 
         Card card = player.Cards.stream().filter(r -> r != null && r.Used == 1).findFirst().orElse(null);
@@ -1052,9 +1061,9 @@ public class NPoint {
             mpMax += (mpMax * 15L / 100L);
         }
 
-        // Xử lý ngọc rồng đen 2 sao - KI +15%
-        if (this.player.rewardBlackBall.timeOutOfDateReward[1] > System.currentTimeMillis()) {
-            mpMax += (mpMax * RewardBlackBall.R2S_KI / 100L);
+        // Xử lý ngọc rồng đen 6 sao
+        if (this.player.rewardBlackBall.timeOutOfDateReward[5] > System.currentTimeMillis()) {
+            mpMax += (mpMax * RewardBlackBall.R6S_1 / 100L);
         }
 
         // Xử lý set worldcup
