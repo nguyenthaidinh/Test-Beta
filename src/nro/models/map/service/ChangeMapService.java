@@ -25,6 +25,7 @@ import nro.models.utils.TimeUtil;
 
 import java.util.List;
 import nro.models.services_dungeon.BlackBallWarService;
+import nro.models.services_dungeon.HeroWarService;
 import nro.models.server.Manager;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
@@ -180,9 +181,12 @@ public class ChangeMapService {
                 NpcService.gI().createTutorial(pl, -1, "Không thể đến khu vực này");
                 return;
             }
+            if (HeroWarService.gI().isHeroWarMap(pl.zone.map.mapId)
+                    && !HeroWarService.gI().canChangeZone(pl)) {
+                return;
+            }
         }
         if (pl.isAdmin() || pl.isBoss || Util.canDoWithTime(pl.idMark.getLastTimeChangeZone(), 5000)) {
-            pl.idMark.setLastTimeChangeZone(System.currentTimeMillis());
             Map map = pl.zone.map;
             if (zoneId >= 0 && zoneId <= map.zones.size() - 1) {
                 Zone zoneJoin = map.zones.get(zoneId);
@@ -191,6 +195,7 @@ public class ChangeMapService {
                     return;
                 }
                 if (zoneJoin != null) {
+                    pl.idMark.setLastTimeChangeZone(System.currentTimeMillis());
                     changeMap(pl, zoneJoin, -1, -1, pl.location.x, pl.location.y, NON_SPACE_SHIP);
                 }
             } else {
@@ -761,17 +766,35 @@ public class ChangeMapService {
 
     public void goToMap(Player player, Zone zoneJoin) {
         Zone oldZone = player.zone;
-        if (oldZone != null) {
-            this.exitMap(player);
-            if (player.mobMe != null) {
-                player.mobMe.goToMap(zoneJoin);
+        boolean keepHeroWarState = oldZone != null && zoneJoin != null
+                && HeroWarService.gI().isHeroWarMap(oldZone.map.mapId)
+                && HeroWarService.gI().isHeroWarMap(zoneJoin.map.mapId);
+        boolean heroWarHolderChangingZone = keepHeroWarState && player.idMark != null
+                && player.idMark.isHoldBlackBall();
+        if (heroWarHolderChangingZone) {
+            HeroWarService.gI().beginChangeZone(player);
+        }
+        try {
+            if (oldZone != null) {
+                this.exitMap(player, keepHeroWarState);
+                if (player.mobMe != null) {
+                    player.mobMe.goToMap(zoneJoin);
+                }
+            }
+            player.zone = zoneJoin;
+            player.zone.addPlayer(player);
+        } finally {
+            if (heroWarHolderChangingZone) {
+                HeroWarService.gI().endChangeZone(player);
             }
         }
-        player.zone = zoneJoin;
-        player.zone.addPlayer(player);
     }
 
     public void exitMap(Player player) {
+        exitMap(player, false);
+    }
+
+    private void exitMap(Player player, boolean keepHeroWarState) {
         if (player.zone != null) {
             //xử thua pvp
             if (player.pvp != null) {
@@ -784,15 +807,25 @@ public class ChangeMapService {
                     && player.joinCDRD && player.clan.ConDuongRanDoc.allMobsDead && player.talkToThanMeo) {
                 player.timeChangeMap144 = System.currentTimeMillis();
             }
-            BlackBallWarService.gI().dropBlackBall(player);
+            if (HeroWarService.gI().isHeroWarMap(player.zone.map.mapId)) {
+                if (keepHeroWarState) {
+                    // Giữ trạng thái ôm ngọc khi chỉ đổi khu trong Võ Đài Siêu Cấp.
+                } else {
+                    HeroWarService.gI().leave(player);
+                }
+            } else {
+                BlackBallWarService.gI().dropBlackBall(player);
+            }
             if (player.effectSkill.useTroi) {
                 EffectSkillService.gI().removeUseTroi(player);
             }
-            if (player.effectSkin.xHPKI > 1 && !MapService.gI().isMapBlackBallWar(player.zone.map.mapId)) {
+            if (player.effectSkin.xHPKI > 1 && !MapService.gI().isMapBlackBallWar(player.zone.map.mapId)
+                    && !MapService.gI().isMapVoDaiSieuCap(player.zone.map.mapId)) {
                 player.effectSkin.xHPKI = 1;
                 Service.gI().point(player);
             }
-            if (player.effectSkin.xDame > 1 && !MapService.gI().isMapBlackBallWar(player.zone.map.mapId)) {
+            if (player.effectSkin.xDame > 1 && !MapService.gI().isMapBlackBallWar(player.zone.map.mapId)
+                    && !MapService.gI().isMapVoDaiSieuCap(player.zone.map.mapId)) {
                 player.effectSkin.xDame = 1;
                 Service.gI().point(player);
             }
@@ -1060,6 +1093,9 @@ public class ChangeMapService {
                 case 90:
                 case 91:
                     BlackBallWarService.gI().joinMapBlackBallWar(player);
+                    break;
+                case ConstMap.VO_DAI_SIEU_CAP:
+                    HeroWarService.gI().join(player);
                     break;
             }
         }

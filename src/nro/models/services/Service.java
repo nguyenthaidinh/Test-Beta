@@ -1442,7 +1442,8 @@ public class Service {
         if (index < 0) {
             return;
         }
-        if (MapService.gI().isMapBlackBallWar(pl.zone.map.mapId) || MapService.gI().isMapMaBu(pl.zone.map.mapId)) {
+        if (MapService.gI().isMapBlackBallWar(pl.zone.map.mapId) || MapService.gI().isMapMaBu(pl.zone.map.mapId)
+                || MapService.gI().isMapVoDaiSieuCap(pl.zone.map.mapId)) {
             sendThongBao(pl, "Không được đổi cờ lúc này");
             return;
         }

@@ -286,7 +286,7 @@ public class Item {
     }
 
     public boolean canPhaLeHoa() {
-        return this.template != null && (this.template.type < 5 || this.template.type == 32);
+        return this.template != null && (this.template.type < 5 || ItemService.gI().isTrainArmor(this));
     }
 
     public Item cloneItem() {

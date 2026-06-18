@@ -2,6 +2,7 @@ package nro.models.combine;
 
 import nro.models.item.Item;
 import nro.models.player.Player;
+import nro.models.services.ItemService;
 import nro.models.utils.Util;
 
 /**
@@ -12,7 +13,7 @@ public class CombineSystem {
 
     public static boolean isTrangBiPhaLeHoa(Item item) {
         if (item != null && item.isNotNullItem()) {
-            return item.template.type < 5 || item.template.type == 32;
+            return item.template.type < 5 || ItemService.gI().isTrainArmor(item);
         } else {
             return false;
         }

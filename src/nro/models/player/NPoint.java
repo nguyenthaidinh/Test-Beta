@@ -768,7 +768,7 @@ public class NPoint {
                     this.tlSubSD += ItemService.gI().getPercentTrainArmor(gtl);
                 } else {
                     if (this.player.inventory.trainArmor == null) {
-                        gtl = this.player.inventory.itemsBag.stream().filter(item -> item.isNotNullItem() && item.template.type == 32 && item.itemOptions != null
+                        gtl = this.player.inventory.itemsBag.stream().filter(item -> item.isNotNullItem() && ItemService.gI().isTrainArmor(item) && item.itemOptions != null
                                 && item.itemOptions.stream().filter(io -> io.optionTemplate.id == 9 && io.param > 0).findFirst().orElse(null) != null).findFirst().orElse(null);
                         if (gtl == null) {
                             return;
@@ -933,7 +933,8 @@ public class NPoint {
         }
 
         // Xử lý phù
-        if (this.player.zone != null && MapService.gI().isMapBlackBallWar(this.player.zone.map.mapId)) {
+        if (this.player.zone != null && (MapService.gI().isMapBlackBallWar(this.player.zone.map.mapId)
+                || MapService.gI().isMapVoDaiSieuCap(this.player.zone.map.mapId))) {
             hpMax *= this.player.effectSkin.xHPKI;
         }
 
@@ -1084,9 +1085,8 @@ public class NPoint {
         }
 
         // Xử lý phù
-        if (this.player.zone
-                != null && MapService.gI()
-                        .isMapBlackBallWar(this.player.zone.map.mapId)) {
+        if (this.player.zone != null && (MapService.gI().isMapBlackBallWar(this.player.zone.map.mapId)
+                || MapService.gI().isMapVoDaiSieuCap(this.player.zone.map.mapId))) {
             mpMax *= this.player.effectSkin.xHPKI;
         }
 
@@ -1323,7 +1323,8 @@ public class NPoint {
         }
 
         // Xử lý phù
-        if (this.player.zone != null && MapService.gI().isMapBlackBallWar(this.player.zone.map.mapId)) {
+        if (this.player.zone != null && (MapService.gI().isMapBlackBallWar(this.player.zone.map.mapId)
+                || MapService.gI().isMapVoDaiSieuCap(this.player.zone.map.mapId))) {
             dame *= this.player.effectSkin.xDame;
         }
 

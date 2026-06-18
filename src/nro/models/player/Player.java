@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import nro.models.services_dungeon.BlackBallWarService;
+import nro.models.services_dungeon.HeroWarService;
 import nro.models.matches.giai_dau.The23rdMartialArtCongressManager;
 import nro.models.map.ItemMap;
 import nro.models.map.MaBuHold;
@@ -1335,7 +1336,11 @@ public class Player implements Runnable {
         if (this.pvp != null && this.zone.map.mapId != 140) {
             this.pvp.lose(this, TYPE_LOSE_PVP.DEAD);
         }
-        BlackBallWarService.gI().dropBlackBall(this);
+        if (this.zone != null && HeroWarService.gI().isHeroWarMap(this.zone.map.mapId)) {
+            HeroWarService.gI().dropHeroBall(this);
+        } else {
+            BlackBallWarService.gI().dropBlackBall(this);
+        }
         NgocRongNamecService.gI().dropNamekBall(this);
     }
 

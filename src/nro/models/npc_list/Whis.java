@@ -13,6 +13,7 @@ import nro.models.services.InventoryService;
 import nro.models.server.Manager;
 import nro.models.services.Service;
 import nro.models.services.SkillService;
+import nro.models.services_dungeon.HeroWarService;
 import nro.models.services_dungeon.TrainingService;
 import nro.models.shop.ShopService;
 import nro.models.skill.Skill;
@@ -42,7 +43,9 @@ public class Whis extends Npc {
                 createOtherMenu(player, ConstNpc.BASE_MENU,
                         "Ta có thể giúp gì cho ngươi?", "Quay về", "Từ chối");
             case 48 ->
-                createOtherMenu(player, ConstNpc.BASE_MENU, "Coming Soon");
+                createOtherMenu(player, ConstNpc.BASE_MENU,
+                        "Dai chien Anh Hung dang cho nguoi thach thuc.",
+                        "Tham gia", "Tu choi");
         }
     }
 
@@ -80,12 +83,18 @@ public class Whis extends Npc {
                             "Shop thiên sứ", "Chế tạo", "Từ chối");
                 } else if (this.mapId == 164) {
                     ChangeMapService.gI().changeMapInYard(player, 154, -1, 758);
+                } else if (this.mapId == 48) {
+                    HeroWarService.gI().joinFromWhis(player);
                 }
             }
             case 2 ->
                 Service.gI().showListTop(player, Manager.Topwhis);
-            case 1 ->
+            case 1 -> {
+                if (this.mapId == 48) {
+                    return;
+                }
                 showSkillLearningMenu(player, biKiepTuyetKy);
+            }
             case 3 ->
                 TrainingService.gI().callBoss(player, BossID.WHIS, false);
         }

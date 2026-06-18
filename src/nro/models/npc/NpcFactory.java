@@ -1,6 +1,7 @@
 package nro.models.npc;
 
 import nro.models.npc_list.Whis;
+import nro.models.utils.TimeUtil;
 import nro.models.npc_list.LinhCanh;
 import nro.models.npc_list.Bulma;
 import nro.models.npc_list.Cargo;
@@ -512,6 +513,12 @@ public class NpcFactory {
                                 Input.gI().createFormFindPlayer(player);
                             case 4 ->
                                 BossManager.gI().showListBoss(player);
+                            case 5 ->
+                                Input.gI().createFormSetGameTime(player);
+                            case 6 -> {
+                                TimeUtil.resetTestTime();
+                                Service.gI().sendThongBao(player, "Da khoi phuc gio game ve gio that: " + TimeUtil.getGameTimeText());
+                            }
                         }
                     }
                     case ConstNpc.CONFIRM_DISSOLUTION_CLAN -> {

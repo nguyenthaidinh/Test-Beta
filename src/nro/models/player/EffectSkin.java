@@ -97,11 +97,13 @@ public class EffectSkin {
         if (!this.player.isBoss && !this.player.isPet && !player.isNewPet) {
             updateTrainArmor();
         }
-        if (xHPKI != 1 && Util.canDoWithTime(lastTimeXHPKI, 1800000)) {
+        boolean keepHeroWarPower = this.player.zone != null
+                && MapService.gI().isMapVoDaiSieuCap(this.player.zone.map.mapId);
+        if (!keepHeroWarPower && xHPKI != 1 && Util.canDoWithTime(lastTimeXHPKI, 1800000)) {
             xHPKI = 1;
             Service.gI().point(player);
         }
-        if (xDame != 1 && Util.canDoWithTime(lastTimeXDame, 1800000)) {
+        if (!keepHeroWarPower && xDame != 1 && Util.canDoWithTime(lastTimeXDame, 1800000)) {
             xDame = 1;
             Service.gI().point(player);
         }

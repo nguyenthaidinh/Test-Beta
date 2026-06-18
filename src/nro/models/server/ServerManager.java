@@ -20,6 +20,7 @@ import nro.models.interfaces.ISession;
 import nro.models.network.Network;
 import nro.models.network.MyKeyHandler;
 import nro.models.network.MySession;
+import nro.models.services_dungeon.HeroWarService;
 import nro.models.services_dungeon.NgocRongNamecService;
 import nro.models.utils.Logger;
 import nro.models.utils.TimeUtil;
@@ -115,6 +116,7 @@ public class ServerManager {
             new Thread(The23rdMartialArtCongressManager.gI(), "Update DHVT23").start();
             new Thread(DeathOrAliveArenaManager.gI(), "Update Võ Đài Sinh Tử").start();
             new Thread(WorldMartialArtsTournamentManager.gI(), "Update WMAT").start();
+            new Thread(HeroWarService.gI(), "Update Dai chien Anh Hung").start();
 
             AutoMaintenance.AutoMaintenance = true;
             new Thread(AutoMaintenance.gI(), "Update Bao Tri Tu Dong").start();

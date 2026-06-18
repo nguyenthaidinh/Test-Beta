@@ -35,6 +35,7 @@ import nro.models.map.service.ChangeMapService;
 import nro.models.services.PlayerService;
 import nro.models.server.ServerLog;
 import nro.models.task.BadgesTaskService;
+import nro.models.utils.TimeUtil;
 import nro.models.utils.Util;
 
 /**
@@ -80,6 +81,7 @@ public class Input {
     public static final int BOTBOSS = 32;
     public static final int BOTATTACKPLAYER = 33;
     public static final int FIND_PLAYER_GIFT_RUBY = 34;
+    public static final int SET_GAME_TIME = 35;
 
     private static Input intance;
 
@@ -101,6 +103,20 @@ public class Input {
                 text[i] = msg.reader().readUTF();
             }
             switch (player.idMark.getTypeInput()) {
+                case SET_GAME_TIME -> {
+                    if (!player.isAdmin()) {
+                        Service.gI().sendThongBao(player, "Khong du quyen.");
+                        return;
+                    }
+                    try {
+                        int hour = Integer.parseInt(text[0].trim());
+                        int minute = Integer.parseInt(text[1].trim());
+                        TimeUtil.setTestTime(hour, minute);
+                        Service.gI().sendThongBao(player, "Da cai dat gio game: " + TimeUtil.getGameTimeText());
+                    } catch (Exception e) {
+                        Service.gI().sendThongBao(player, "Gio khong hop le. Gio 0-23, phut 0-59.");
+                    }
+                }
                 case BOTITEM -> {
                     int slot = Integer.parseInt(text[0]);
                     int idBan = Integer.parseInt(text[1]);
@@ -647,6 +663,12 @@ public class Input {
 
     public void createFormFindPlayer(Player pl) {
         createForm(pl, FIND_PLAYER, "Tìm kiếm người chơi", new SubInput("Tên người chơi", ANY));
+    }
+
+    public void createFormSetGameTime(Player pl) {
+        createForm(pl, SET_GAME_TIME, "Cai dat thoi gian game",
+                new SubInput("Gio (0-23)", NUMERIC),
+                new SubInput("Phut (0-59)", NUMERIC));
     }
 
     public void createFormFindPlayer1(Player pl) {

@@ -26,6 +26,9 @@ import nro.models.services_dungeon.MajinBuuService;
 public class TimeUtil {
 
     public static final ZoneId VIETNAM_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
+    private static volatile int testHour = -1;
+    private static volatile int testMinute = -1;
+    private static volatile long testStartMillis = -1;
 
     public static final byte SECOND = 1;
     public static final byte MINUTE = 2;
@@ -74,7 +77,7 @@ public class TimeUtil {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
             LocalTime start = LocalTime.parse(fromTime, formatter);
             LocalTime end = LocalTime.parse(toTime, formatter);
-            LocalTime now = LocalTime.now(VIETNAM_ZONE);
+            LocalTime now = currentGameTime();
             return now.isAfter(start) && now.isBefore(end);
         } catch (Exception e) {
             throw new Exception("Thời gian không hợp lệ");
@@ -86,11 +89,43 @@ public class TimeUtil {
     }
 
     public static int getCurrHour() {
-        return LocalTime.now(VIETNAM_ZONE).getHour();
+        return currentGameTime().getHour();
     }
 
     public static int getCurrMin() {
-        return LocalTime.now(VIETNAM_ZONE).getMinute();
+        return currentGameTime().getMinute();
+    }
+
+    public static void setTestTime(int hour, int minute) {
+        if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+            throw new IllegalArgumentException("Invalid game time");
+        }
+        testHour = hour;
+        testMinute = minute;
+        testStartMillis = System.currentTimeMillis();
+    }
+
+    public static void resetTestTime() {
+        testHour = -1;
+        testMinute = -1;
+        testStartMillis = -1;
+    }
+
+    public static boolean isTestTime() {
+        return testHour >= 0 && testMinute >= 0 && testStartMillis > 0;
+    }
+
+    public static String getGameTimeText() {
+        String time = String.format("%02d:%02d", getCurrHour(), getCurrMin());
+        return isTestTime() ? time + " (test)" : time + " (real)";
+    }
+
+    private static LocalTime currentGameTime() {
+        if (!isTestTime()) {
+            return LocalTime.now(VIETNAM_ZONE);
+        }
+        long elapsedSeconds = Math.max(0, (System.currentTimeMillis() - testStartMillis) / 1000);
+        return LocalTime.of(testHour, testMinute, 0).plusSeconds(elapsedSeconds);
     }
 
     public static String convertTime(int totalSeconds) {
@@ -197,20 +232,17 @@ public class TimeUtil {
     }
 
     public static boolean isMabuOpen() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int hour = getCurrHour();
         return (hour >= 12 && hour < 13);
     }
 
     public static boolean isMabu14HOpen() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int hour = getCurrHour();
         return (hour >= 14 && hour < 15);
     }
 
     public static boolean is21H() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int hour = getCurrHour();
         return (hour >= 21 && hour < 22);
     }
 
@@ -222,7 +254,7 @@ public class TimeUtil {
     }
 
     public static boolean isBlackBallWarOpen() {
-        LocalTime currentTime = LocalTime.now(VIETNAM_ZONE);
+        LocalTime currentTime = currentGameTime();
         LocalTime startTime = LocalTime.of(BlackBallWar.HOUR_OPEN, BlackBallWar.MIN_OPEN, BlackBallWar.SECOND_OPEN);
         LocalTime endTime = LocalTime.of(BlackBallWar.HOUR_CLOSE, BlackBallWar.MIN_CLOSE, BlackBallWar.SECOND_CLOSE);
 
@@ -230,14 +262,14 @@ public class TimeUtil {
     }
 
     public static boolean isBlackBallWarCanPick() {
-        LocalTime currentTime = LocalTime.now(VIETNAM_ZONE);
+        LocalTime currentTime = currentGameTime();
         LocalTime startTime = LocalTime.of(BlackBallWar.HOUR_CAN_PICK_DB, BlackBallWar.MIN_CAN_PICK_DB, BlackBallWar.SECOND_CAN_PICK_DB);
 
         return currentTime.isAfter(startTime) && isBlackBallWarOpen();
     }
 
     public static long getSecondsUntilCanPick() {
-        LocalTime currentTime = LocalTime.now(VIETNAM_ZONE);
+        LocalTime currentTime = currentGameTime();
         LocalTime startTime = LocalTime.of(BlackBallWar.HOUR_CAN_PICK_DB, BlackBallWar.MIN_CAN_PICK_DB, BlackBallWar.SECOND_CAN_PICK_DB);
 
         if (currentTime.isBefore(startTime)) {
@@ -259,11 +291,11 @@ public class TimeUtil {
     }
 
     public static int getCurrMinute() {
-        return LocalTime.now().getMinute();
+        return currentGameTime().getMinute();
     }
 
     public static int getCurrSecond() {
-        return LocalTime.now().getSecond();
+        return currentGameTime().getSecond();
     }
 
 }

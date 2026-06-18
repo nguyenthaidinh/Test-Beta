@@ -228,6 +228,9 @@ public class Trade {
             case 921:
                 return true;
         }
+        if (ItemService.gI().isTrainArmor(item)) {
+            return true;
+        }
         switch (item.template.type) {
             case 27: //
                 if (item.template.id == 590) {

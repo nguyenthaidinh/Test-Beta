@@ -496,6 +496,10 @@ public class MapService {
         return mapId == 146;
     }
 
+    public boolean isMapVoDaiSieuCap(int mapId) {
+        return mapId == ConstMap.VO_DAI_SIEU_CAP;
+    }
+
     public boolean isMapRiengTu(int mapId) {
         return mapId == 164;
     }

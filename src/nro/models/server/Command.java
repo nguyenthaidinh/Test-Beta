@@ -17,6 +17,7 @@ import nro.models.map.service.ChangeMapService;
 import nro.models.map.service.NpcService;
 import nro.models.services.InventoryService;
 import nro.models.utils.SystemMetrics;
+import nro.models.utils.TimeUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,20 @@ public class Command {
                 "Ngọc rồng", "Đệ tử", "Bảo trì", "Tìm kiếm\nngười chơi", "Boss", "Đóng"));
     }
 
+    private void showAdminMenu(Player player) {
+        NpcService.gI().createMenuConMeo(player, ConstNpc.MENU_ADMIN, -1,
+                "|0|Time start: " + ServerManager.timeStart
+                + "\nGame time: " + TimeUtil.getGameTimeText()
+                + "\nClients: " + Client.gI().getPlayers().size()
+                + "\n Sessions: " + SessionManager.gI().getNumSession()
+                + "\nThreads: " + Thread.activeCount()
+                + " luong" + "\n" + SystemMetrics.ToString(),
+                "Ngoc rong", "De tu", "Bao tri", "Tim kiem\nnguoi choi", "Boss",
+                "Cai dat\nthoi gian", "Khoi phuc\ngio that", "Dong");
+    }
+
     private void initParameterizedCommands() {
+        adminCommands.put("a", this::showAdminMenu);
         parameterizedCommands.put("m", (player, text) -> {
             try {
                 int mapId = Integer.parseInt(text.replace("m", "").trim());

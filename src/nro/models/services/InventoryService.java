@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import nro.models.consts.ConstTaskBadges;
 import nro.models.services_dungeon.BlackBallWarService;
+import nro.models.services_dungeon.HeroWarService;
 import nro.models.map.service.ItemMapService;
 import nro.models.task.BadgesTaskService;
 
@@ -293,13 +294,17 @@ public class InventoryService {
             return sItem;
         }
 
+        boolean trainArmor = ItemService.gI().isTrainArmor(item);
+
         // Kiểm tra các loại item hợp lệ
-        switch (item.template.type) {
-            case 0, 1, 2, 3, 4, 5, 32, 23, 24, 11, 27, 25 -> {
-            }
-            default -> {
-                Service.gI().sendThongBaoOK(player.isPet ? ((Pet) player).master : player, "Trang bị không phù hợp!1");
-                return sItem;
+        if (!trainArmor) {
+            switch (item.template.type) {
+                case 0, 1, 2, 3, 4, 5, 32, 23, 24, 11, 27, 25 -> {
+                }
+                default -> {
+                    Service.gI().sendThongBaoOK(player.isPet ? ((Pet) player).master : player, "Trang bị không phù hợp!1");
+                    return sItem;
+                }
             }
         }
 
@@ -359,6 +364,9 @@ public class InventoryService {
             case 25:
                 index = player.isPet ? 8 : 10;
                 break;
+        }
+        if (trainArmor) {
+            index = 6;
         }
         if (player.isPet && (item.template.type == 11 || item.template.type == 25)) {
             Pet pet = (Pet) player;
@@ -480,8 +488,10 @@ public class InventoryService {
         Item item = player.inventory.itemsBox.get(index);
         if (item.isNotNullItem()) {
             boolean done = false;
-            if (item.template.type >= 0 && item.template.type <= 5 || item.template.type == 32) {
-                Item itemBody = player.inventory.itemsBody.get(item.template.type == 32 ? 6 : item.template.type);
+            boolean trainArmor = ItemService.gI().isTrainArmor(item);
+            if ((item.template.type >= 0 && item.template.type <= 5) || item.template.type == 32 || trainArmor) {
+                int bodyIndex = item.template.type == 32 || trainArmor ? 6 : item.template.type;
+                Item itemBody = player.inventory.itemsBody.get(bodyIndex);
                 if (!itemBody.isNotNullItem()) {
                     if (item.template.gender == player.gender || item.template.gender == 3) {
                         long powerRequire = item.template.strRequire;
@@ -492,7 +502,7 @@ public class InventoryService {
                             }
                         }
                         if (powerRequire <= player.nPoint.power) {
-                            player.inventory.itemsBody.set(item.template.type == 32 ? 6 : item.template.type, item);
+                            player.inventory.itemsBody.set(bodyIndex, item);
                             player.inventory.itemsBox.set(index, itemBody);
                             done = true;
 
@@ -736,6 +746,9 @@ public class InventoryService {
     public boolean addItemBag(Player player, Item item) {
         //ngọc rồng đen
         if (ItemMapService.gI().isBlackBall(item.template.id)) {
+            if (player.zone != null && HeroWarService.gI().isHeroWarMap(player.zone.map.mapId)) {
+                return HeroWarService.gI().pickHeroBall(player, item);
+            }
             return BlackBallWarService.gI().pickBlackBall(player, item);
         }
 

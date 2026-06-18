@@ -27,6 +27,9 @@ public class ItemService {
     private static final String COSTUME_TRUM_TOP_1_NAME = "Trùm Top 1";
     private static final String COSTUME_TRUM_TOP_1_DESCRIPTION = "Cải trang Trùm Top 1";
     private static final int[] TRUM_TOP_1_CONTROLLED_OPTIONS = {38, 50, 77, 103, 204, 106, 95, 96};
+    private static final short TRAIN_ARMOR_5_ID = 1869;
+    private static final byte TRAIN_ARMOR_TYPE = 32;
+    private static final int TRAIN_ARMOR_5_POWER_REQUIRE = 1_500_000;
 
     public static ItemService gI() {
         if (i == null) {
@@ -82,6 +85,7 @@ public class ItemService {
     public Item createNewItem(short tempId, int quantity) {
         Item item = new Item();
         item.template = getTemplate(tempId);
+        normalizeTrainArmorTemplate(item.template);
         item.quantity = quantity;
         item.createTime = System.currentTimeMillis();
 
@@ -109,13 +113,30 @@ public class ItemService {
         template.description = COSTUME_TRUM_TOP_1_DESCRIPTION;
     }
 
+    public void normalizeTrainArmorTemplate(Template.ItemTemplate template) {
+        if (template == null || template.id != TRAIN_ARMOR_5_ID) {
+            return;
+        }
+        template.type = TRAIN_ARMOR_TYPE;
+        template.gender = 3;
+        if (template.strRequire <= 0) {
+            template.strRequire = TRAIN_ARMOR_5_POWER_REQUIRE;
+        }
+        if (template.name == null || template.name.isEmpty()) {
+            template.name = "Gi\u00e1p t\u1eadp luy\u1ec7n c\u1ea5p 5";
+        }
+        if (template.description == null || template.description.isEmpty()) {
+            template.description = "Khi m\u1eb7c v\u00e0o s\u1ebd \u0111\u00e1nh y\u1ebfu h\u01a1n b\u00ecnh th\u01b0\u1eddng 50%, khi c\u1edfi ra s\u1ebd t\u0103ng s\u1ee9c \u0111\u00e1nh 50";
+        }
+    }
+
     public List<ItemOption> getTrumTop1Options() {
         List<ItemOption> options = new ArrayList<>();
         options.add(new ItemOption(38, 0));
         options.add(new ItemOption(50, 30));
         options.add(new ItemOption(77, 60));
         options.add(new ItemOption(103, 60));
-        options.add(new ItemOption(204, 30));
+        options.add(new ItemOption(204, 50));
         options.add(new ItemOption(106, 0));
         options.add(new ItemOption(95, 10));
         options.add(new ItemOption(96, 10));
@@ -441,22 +462,22 @@ public class ItemService {
     }
 
     public boolean isTrainArmor(Item item) {
-        if (item != null && item.template != null) {
-            switch (item.template.id) {
-                case 529:
-                case 534:
-                case 530:
-                case 535:
-                case 531:
-                case 536:
-                case 1716:
-                case 1869:
-                    return true;
-                default:
-                    return false;
-            }
-        } else {
-            return false;
+        return item != null && item.template != null && isTrainArmorId(item.template.id);
+    }
+
+    public boolean isTrainArmorId(int itemId) {
+        switch (itemId) {
+            case 529:
+            case 534:
+            case 530:
+            case 535:
+            case 531:
+            case 536:
+            case 1716:
+            case 1869:
+                return true;
+            default:
+                return false;
         }
     }
 

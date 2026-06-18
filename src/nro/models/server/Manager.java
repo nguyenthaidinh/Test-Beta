@@ -2,6 +2,7 @@ package nro.models.server;
 
 import nro.models.radar.OptionCard;
 import nro.models.services.RadarService;
+import nro.models.services.ItemService;
 import nro.models.radar.RadarCard;
 import nro.models.data.LocalManager;
 import nro.models.consts.ConstPlayer;
@@ -651,6 +652,7 @@ public final class Manager {
                         itemTemp.body = rs.getInt("body");
                         itemTemp.leg = rs.getInt("leg");
 
+                        ItemService.gI().normalizeTrainArmorTemplate(itemTemp);
                         ITEM_TEMPLATES.add(itemTemp);
                     } while (rs.next());
                     offset += batchSize;
