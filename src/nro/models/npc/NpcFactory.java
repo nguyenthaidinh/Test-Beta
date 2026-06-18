@@ -517,7 +517,7 @@ public class NpcFactory {
                                 Input.gI().createFormSetGameTime(player);
                             case 6 -> {
                                 TimeUtil.resetTestTime();
-                                Service.gI().sendThongBao(player, "Da khoi phuc gio game ve gio that: " + TimeUtil.getGameTimeText());
+                                Service.gI().sendThongBao(player, "Đã khôi phục giờ game về giờ thật: " + TimeUtil.getGameTimeText());
                             }
                         }
                     }

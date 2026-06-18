@@ -83,9 +83,9 @@ public class Command {
                 + "\nClients: " + Client.gI().getPlayers().size()
                 + "\n Sessions: " + SessionManager.gI().getNumSession()
                 + "\nThreads: " + Thread.activeCount()
-                + " luong" + "\n" + SystemMetrics.ToString(),
-                "Ngoc rong", "De tu", "Bao tri", "Tim kiem\nnguoi choi", "Boss",
-                "Cai dat\nthoi gian", "Khoi phuc\ngio that", "Dong");
+                + " luồng" + "\n" + SystemMetrics.ToString(),
+                "Ngọc rồng", "Đệ tử", "Bảo trì", "Tìm kiếm\nngười chơi", "Boss",
+                "Cài đặt\nthời gian", "Khôi phục\ngiờ thật", "Đóng");
     }
 
     private void initParameterizedCommands() {

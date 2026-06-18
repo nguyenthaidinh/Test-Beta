@@ -105,16 +105,16 @@ public class Input {
             switch (player.idMark.getTypeInput()) {
                 case SET_GAME_TIME -> {
                     if (!player.isAdmin()) {
-                        Service.gI().sendThongBao(player, "Khong du quyen.");
+                        Service.gI().sendThongBao(player, "Không đủ quyền.");
                         return;
                     }
                     try {
                         int hour = Integer.parseInt(text[0].trim());
                         int minute = Integer.parseInt(text[1].trim());
                         TimeUtil.setTestTime(hour, minute);
-                        Service.gI().sendThongBao(player, "Da cai dat gio game: " + TimeUtil.getGameTimeText());
+                        Service.gI().sendThongBao(player, "Đã cài đặt giờ game: " + TimeUtil.getGameTimeText());
                     } catch (Exception e) {
-                        Service.gI().sendThongBao(player, "Gio khong hop le. Gio 0-23, phut 0-59.");
+                        Service.gI().sendThongBao(player, "Giờ không hợp lệ. Giờ 0-23, phút 0-59.");
                     }
                 }
                 case BOTITEM -> {
@@ -666,9 +666,9 @@ public class Input {
     }
 
     public void createFormSetGameTime(Player pl) {
-        createForm(pl, SET_GAME_TIME, "Cai dat thoi gian game",
-                new SubInput("Gio (0-23)", NUMERIC),
-                new SubInput("Phut (0-59)", NUMERIC));
+        createForm(pl, SET_GAME_TIME, "Cài đặt thời gian game",
+                new SubInput("Giờ (0-23)", NUMERIC),
+                new SubInput("Phút (0-59)", NUMERIC));
     }
 
     public void createFormFindPlayer1(Player pl) {

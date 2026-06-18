@@ -44,8 +44,8 @@ public class Whis extends Npc {
                         "Ta có thể giúp gì cho ngươi?", "Quay về", "Từ chối");
             case 48 ->
                 createOtherMenu(player, ConstNpc.BASE_MENU,
-                        "Dai chien Anh Hung dang cho nguoi thach thuc.",
-                        "Tham gia", "Tu choi");
+                        "Đại chiến Anh Hùng đang chờ người thách thức.",
+                        "Tham gia", "Từ chối");
         }
     }
 

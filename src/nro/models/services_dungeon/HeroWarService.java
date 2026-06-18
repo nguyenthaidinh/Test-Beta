@@ -35,7 +35,7 @@ public class HeroWarService implements Runnable {
     private static final int RETURN_MAP_ID = ConstMap.HANH_TINH_KAIO;
     private static final int RETURN_X = 754;
     private static final int RETURN_Y = 336;
-    private static final String OPEN_TIME_TEXT = "21h00 den 22h00";
+    private static final String OPEN_TIME_TEXT = "21h00 đến 22h00";
     private static final int COST_X100 = 50;
     private static final int[] FRIEND_POWER_MULTIPLIERS = {10, 20, 30, 40, 50};
 
@@ -54,9 +54,9 @@ public class HeroWarService implements Runnable {
     }
 
     public String getFriendPowerMenuText(Player player) {
-        String text = "Suc manh tinh ban se tang HP, KI va suc danh trong Dai chien Anh Hung.";
+        String text = "Sức mạnh tình bạn sẽ tăng HP, KI và sức đánh trong Đại chiến Anh Hùng.";
         if (player != null && player.idMark != null && player.idMark.isHoldBlackBall()) {
-            text += "\nNguoi dang giu Ngoc Rong Den co the dung x100.";
+            text += "\nNgười đang giữ Ngọc Rồng Đen có thể dùng x100.";
         }
         return text;
     }
@@ -69,7 +69,7 @@ public class HeroWarService implements Runnable {
         if (player != null && player.idMark != null && player.idMark.isHoldBlackBall()) {
             options.add("x100\n" + COST_X100 + " TV");
         }
-        options.add("Tu choi");
+        options.add("Từ chối");
         return options.toArray(new String[0]);
     }
 
@@ -91,11 +91,11 @@ public class HeroWarService implements Runnable {
             return;
         }
         if (!isOpen()) {
-            Service.gI().sendThongBao(player, "Da het gio Dai chien Anh Hung.");
+            Service.gI().sendThongBao(player, "Đã hết giờ Đại chiến Anh Hùng.");
             return;
         }
         if (player.isDie()) {
-            Service.gI().sendThongBao(player, "Hay hoi sinh truoc khi dung Suc manh tinh ban.");
+            Service.gI().sendThongBao(player, "Hãy hồi sinh trước khi dùng Sức mạnh tình bạn.");
             return;
         }
         boolean holder = player.idMark != null && player.idMark.isHoldBlackBall();
@@ -103,23 +103,23 @@ public class HeroWarService implements Runnable {
             return;
         }
         if (multiplier == 100 && !holder) {
-            Service.gI().sendThongBao(player, "Chi nguoi dang giu Ngoc Rong Den moi dung duoc x100.");
+            Service.gI().sendThongBao(player, "Chỉ người đang giữ Ngọc Rồng Đen mới dùng được x100.");
             return;
         }
         boolean hasBuff = player.effectSkin.xHPKI > 1 || player.effectSkin.xDame > 1;
         if (hasBuff && multiplier != 100) {
-            Service.gI().sendThongBao(player, "Ban dang co Suc manh tinh ban, chet roi hoi sinh moi co the x lai.");
+            Service.gI().sendThongBao(player, "Bạn đang có Sức mạnh tình bạn, chết rồi hồi sinh mới có thể x lại.");
             return;
         }
         if (multiplier == 100 && player.effectSkin.xHPKI == 100 && player.effectSkin.xDame == 100) {
-            Service.gI().sendThongBao(player, "Ban dang co Suc manh tinh ban x100 roi.");
+            Service.gI().sendThongBao(player, "Bạn đang có Sức mạnh tình bạn x100 rồi.");
             return;
         }
 
         int cost = getFriendPowerCost(multiplier);
         Item thoiVang = InventoryService.gI().findItemBag(player, ConstItem.THOI_VANG);
         if (thoiVang == null || thoiVang.quantity < cost) {
-            Service.gI().sendThongBao(player, "Can " + cost + " Thoi vang de dung Suc manh tinh ban.");
+            Service.gI().sendThongBao(player, "Cần " + cost + " Thỏi vàng để dùng Sức mạnh tình bạn.");
             return;
         }
         InventoryService.gI().subQuantityItemsBag(player, thoiVang, cost);
@@ -130,11 +130,12 @@ public class HeroWarService implements Runnable {
         player.effectSkin.xDame = multiplier;
         player.effectSkin.lastTimeXHPKI = now;
         player.effectSkin.lastTimeXDame = now;
-        Service.gI().point(player);
+        player.nPoint.calPoint();
         player.nPoint.setHp(player.nPoint.hpMax);
         player.nPoint.setMp(player.nPoint.mpMax);
+        Service.gI().point(player);
         PlayerService.gI().sendInfoHpMp(player);
-        Service.gI().sendThongBao(player, "Da kich hoat Suc manh tinh ban x" + multiplier + ".");
+        Service.gI().sendThongBao(player, "Đã kích hoạt Sức mạnh tình bạn x" + multiplier + ".");
     }
 
     private boolean isFriendPowerMultiplier(int multiplier) {
@@ -167,8 +168,8 @@ public class HeroWarService implements Runnable {
         long waitZone = player.idMark.getLastTimeChangeZone() + TIME_HOLD_TO_CHANGE_ZONE - now;
         long wait = Math.max(waitHold, waitZone);
         if (wait > 0) {
-            Service.gI().sendThongBao(player, "Dang giu Ngoc Rong Den, can doi "
-                    + ((wait + 999) / 1000) + " giay nua moi duoc doi khu.");
+            Service.gI().sendThongBao(player, "Đang giữ Ngọc Rồng Đen, cần đợi "
+                    + ((wait + 999) / 1000) + " giây nữa mới được đổi khu.");
             return false;
         }
         return true;
@@ -188,16 +189,16 @@ public class HeroWarService implements Runnable {
 
     public void joinFromWhis(Player player) {
         if (!isOpen()) {
-            Service.gI().sendThongBao(player, "Dai chien Anh Hung chi mo cua tu " + OPEN_TIME_TEXT + ".");
+            Service.gI().sendThongBao(player, "Đại chiến Anh Hùng chỉ mở cửa từ " + OPEN_TIME_TEXT + ".");
             return;
         }
         Zone zone = MapService.gI().getZoneByMapIDAndZoneID(MAP_ID, 0);
         if (zone == null) {
-            Service.gI().sendThongBao(player, "Dai chien Anh Hung chua san sang.");
+            Service.gI().sendThongBao(player, "Đại chiến Anh Hùng chưa sẵn sàng.");
             return;
         }
         if (zone.getNumOfPlayers() >= zone.maxPlayer && !player.isAdmin()) {
-            Service.gI().sendThongBao(player, "Vo dai dang day, hay quay lai sau.");
+            Service.gI().sendThongBao(player, "Võ đài đang đầy, hãy quay lại sau.");
             return;
         }
         ChangeMapService.gI().changeMap(player, zone, BALL_X, RETURN_Y);
@@ -208,7 +209,7 @@ public class HeroWarService implements Runnable {
             return;
         }
         if (!isOpen()) {
-            Service.gI().sendThongBao(player, "Dai chien Anh Hung chi mo cua tu " + OPEN_TIME_TEXT + ".");
+            Service.gI().sendThongBao(player, "Đại chiến Anh Hùng chỉ mở cửa từ " + OPEN_TIME_TEXT + ".");
             ChangeMapService.gI().changeMap(player, RETURN_MAP_ID, -1, RETURN_X, RETURN_Y);
             return;
         }
@@ -216,7 +217,7 @@ public class HeroWarService implements Runnable {
             Service.gI().changeFlag(player, 8);
         }
         PlayerService.gI().sendInfoHpMp(player);
-        Service.gI().sendThongBao(player, "Dai chien Anh Hung: giu Ngoc Rong Den du 5 phut de chien thang.");
+        Service.gI().sendThongBao(player, "Đại chiến Anh Hùng: giữ Ngọc Rồng Đen đủ 5 phút để chiến thắng.");
         ensureBall(player.zone);
     }
 
@@ -236,24 +237,24 @@ public class HeroWarService implements Runnable {
             return false;
         }
         if (!isOpen()) {
-            Service.gI().sendThongBao(player, "Da het gio Dai chien Anh Hung.");
+            Service.gI().sendThongBao(player, "Đã hết giờ Đại chiến Anh Hùng.");
             return false;
         }
         if (!canPickBallNow()) {
-            Service.gI().sendThongBao(player, "21h15 moi co the nhat Ngoc Rong Den.");
+            Service.gI().sendThongBao(player, "21h15 mới có thể nhặt Ngọc Rồng Đen.");
             return false;
         }
         if (player.zone.finishBlackBallWar) {
-            Service.gI().sendThongBao(player, "Tran dau da ket thuc.");
+            Service.gI().sendThongBao(player, "Trận đấu đã kết thúc.");
             return false;
         }
         if (getHolder(player.zone) != null) {
-            Service.gI().sendThongBao(player, "Da co nguoi dang giu Ngoc Rong Den.");
+            Service.gI().sendThongBao(player, "Đã có người đang giữ Ngọc Rồng Đen.");
             return false;
         }
         if (!Util.canDoWithTime(player.zone.lastTimeDropBlackBall, TIME_CAN_PICK_AFTER_DROP)) {
-            Service.gI().sendThongBao(player, "Chua the nhat luc nay, hay doi "
-                    + TimeUtil.getTimeLeft(player.zone.lastTimeDropBlackBall, TIME_CAN_PICK_AFTER_DROP / 1000) + " nua");
+            Service.gI().sendThongBao(player, "Chưa thể nhặt lúc này, hãy đợi "
+                    + TimeUtil.getTimeLeft(player.zone.lastTimeDropBlackBall, TIME_CAN_PICK_AFTER_DROP / 1000) + " nữa");
             return false;
         }
         player.idMark.setHoldBlackBall(true);
@@ -262,7 +263,7 @@ public class HeroWarService implements Runnable {
         player.idMark.setLastTimeNotifyTimeHoldBlackBall(System.currentTimeMillis());
         Service.gI().sendFlagBag(player);
         forceBlackFlags(player.zone);
-        Service.gI().sendThongBao(player.zone.getPlayers(), player.name + " dang giu Ngoc Rong Den!");
+        Service.gI().sendThongBao(player.zone.getPlayers(), player.name + " đang giữ Ngọc Rồng Đen!");
         return true;
     }
 
@@ -280,7 +281,7 @@ public class HeroWarService implements Runnable {
                     player.zone.map.yPhysicInTop(player.location.x, player.location.y - 24), -1);
             Service.gI().dropItemMap(itemMap.zone, itemMap);
             player.zone.lastTimeDropBlackBall = System.currentTimeMillis();
-            Service.gI().sendThongBao(player.zone.getPlayers(), player.name + " da lam roi Ngoc Rong Den!");
+            Service.gI().sendThongBao(player.zone.getPlayers(), player.name + " đã làm rơi Ngọc Rồng Đen!");
         }
     }
 
@@ -348,9 +349,9 @@ public class HeroWarService implements Runnable {
         if (Util.canDoWithTime(holder.idMark.getLastTimeHoldBlackBall(), TIME_WIN)) {
             win(holder);
         } else if (Util.canDoWithTime(holder.idMark.getLastTimeNotifyTimeHoldBlackBall(), 10_000)) {
-            Service.gI().sendThongBao(holder, "Co giu ngoc them "
+            Service.gI().sendThongBao(holder, "Cố giữ ngọc thêm "
                     + TimeUtil.getSecondLeft(holder.idMark.getLastTimeHoldBlackBall(), TIME_WIN / 1000)
-                    + " giay nua se chien thang.");
+                    + " giây nữa sẽ chiến thắng.");
             holder.idMark.setLastTimeNotifyTimeHoldBlackBall(System.currentTimeMillis());
         }
     }
@@ -453,7 +454,7 @@ public class HeroWarService implements Runnable {
     private void closeNoWinner(Zone zone) {
         zone.finishBlackBallWar = true;
         clearBlackBalls(zone);
-        Service.gI().sendThongBao(zone.getPlayers(), "Da het gio Dai chien Anh Hung, khong co nguoi giu Ngoc Rong Den.");
+        Service.gI().sendThongBao(zone.getPlayers(), "Đã hết giờ Đại chiến Anh Hùng, không có người giữ Ngọc Rồng Đen.");
         List<Player> players = new ArrayList<>(zone.getPlayers());
         for (Player player : players) {
             if (player == null || player.zone == null || !zone.equals(player.zone)) {
@@ -479,7 +480,7 @@ public class HeroWarService implements Runnable {
         if (players.isEmpty()) {
             return;
         }
-        Service.gI().sendThongBao(players, "Da het gio Dai chien Anh Hung, khong co nguoi giu Ngoc Rong Den.");
+        Service.gI().sendThongBao(players, "Đã hết giờ Đại chiến Anh Hùng, không có người giữ Ngọc Rồng Đen.");
         for (Player player : players) {
             if (player == null || player.zone == null || !isHeroWarMap(player.zone.map.mapId)) {
                 continue;
@@ -510,7 +511,7 @@ public class HeroWarService implements Runnable {
         Service.gI().sendThongBaoAllPlayer("Chúc mừng người chơi " + winner.name
                 + " đã giành chiến thắng Đại chiến Anh Hùng vô cùng out trình!");
         List<Player> players = new ArrayList<>(getPlayers(map));
-        Service.gI().sendThongBao(players, winner.name + " da chien thang Dai chien Anh Hung!");
+        Service.gI().sendThongBao(players, winner.name + " đã chiến thắng Đại chiến Anh Hùng!");
         for (Player player : players) {
             if (player == null || player.zone == null || !isHeroWarMap(player.zone.map.mapId)) {
                 continue;

@@ -26,8 +26,8 @@ public class DaiThienSu extends Npc {
         }
         if (HeroWarService.gI().isHeroWarMap(this.mapId)) {
             createOtherMenu(player, MENU_HERO_WAR_BASE,
-                    "Dai chien Anh Hung dang dien ra.",
-                    "Wish", "Tu choi");
+                    "Đại chiến Anh Hùng đang diễn ra.",
+                    "Wish", "Từ chối");
         }
     }
 
