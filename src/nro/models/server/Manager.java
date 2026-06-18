@@ -156,6 +156,7 @@ public final class Manager {
         radar.Body = -1;
         radar.Leg = -1;
         radar.Bag = -1;
+        radar.AuraId = -1;
     }
 
     public class MapBgDataManager {

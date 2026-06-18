@@ -763,9 +763,11 @@ public class Player implements Runnable {
             return -1;
         }
         for (Card card : this.Cards) {
-            if (card != null && (card.Id == 956 || card.Id == 1792 || card.Id == 1793 || card.Id == 1791 || card.Id == 1204 || card.Id == 1142) && card.Level > 1) {
+            if (card != null && card.Used == 1
+                    && (card.Id == 956 || card.Id == 1792 || card.Id == 1793 || card.Id == 1791 || card.Id == 1204 || card.Id == 1142)
+                    && card.Level > 1) {
                 RadarCard radarTemplate = RadarService.gI().RADAR_TEMPLATE.stream().filter(r -> r.Id == card.Id).findFirst().orElse(null);
-                if (radarTemplate != null) {
+                if (radarTemplate != null && radarTemplate.AuraId >= 0) {
                     return (byte) radarTemplate.AuraId;
                 }
             }
