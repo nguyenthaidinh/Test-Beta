@@ -119,6 +119,8 @@ public final class Manager {
     public static final String queryTopsukien2 = "SELECT id, point_sukien2 FROM player ORDER BY point_sukien2 DESC LIMIT 100";
     public static final String queryTopwhis = "SELECT id, thachdauwhis FROM player ORDER BY thachdauwhis DESC LIMIT 100";
     public static final String queryTopsukien = "SELECT id, point_sukien FROM player ORDER BY point_sukien DESC LIMIT 100";
+    private static final short RADAR_NAMEK_DRAGON_CARD_ID = 1204;
+    private static final short MOB_NAMEK_DRAGON_ID = 27;
     public static boolean isTopMaydamChanged = false;
     public static boolean isTopSukienChanged = false;
     public static boolean isTopSukien1Changed = false;
@@ -142,6 +144,18 @@ public final class Manager {
         isTopSukien1Changed = false;
         isTopSukien2Changed = false;
         isTopWhisChanged = false;
+    }
+
+    private static void normalizeRadarTemplate(RadarCard radar) {
+        if (radar == null || radar.Id != RADAR_NAMEK_DRAGON_CARD_ID) {
+            return;
+        }
+        radar.Type = 0;
+        radar.Template = MOB_NAMEK_DRAGON_ID;
+        radar.Head = -1;
+        radar.Body = -1;
+        radar.Leg = -1;
+        radar.Bag = -1;
     }
 
     public class MapBgDataManager {
@@ -931,6 +945,7 @@ public final class Manager {
                 rd.Require = rs.getShort("require");
                 rd.RequireLevel = rs.getShort("require_level");
                 rd.AuraId = rs.getShort("aura_id");
+                normalizeRadarTemplate(rd);
                 RadarService.gI().RADAR_TEMPLATE.add(rd);
             }
             Logger.success(Logger.PURPLE + "Successfully loaded radar template (" + RadarService.gI().RADAR_TEMPLATE.size() + ")\n");
