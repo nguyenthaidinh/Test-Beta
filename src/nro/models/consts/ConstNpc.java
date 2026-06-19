@@ -252,6 +252,7 @@ public class ConstNpc {
 
     public static final int SUB_MENU = 31720025;
     public static final int TAP_TU_DONG_CONFIRM = 31720026;
+    public static final int MENU_THANH_CO_CLONE = 31720027;
     public static final int MENU_CLAN_UP = 4;
     public static final int MENU_CLAN_TASK = 5;
     public static final int MENU_CLAN_TASK_REMOVE = 6;

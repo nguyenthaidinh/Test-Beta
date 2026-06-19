@@ -1,6 +1,5 @@
 package nro.models.event_list;
 
-
 import nro.models.boss.BossID;
 import nro.models.event.Event;
 

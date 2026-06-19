@@ -11,6 +11,7 @@ import nro.models.boss.Android.Poc;
 import nro.models.boss.Black_Goku.BlackGoku;
 import nro.models.boss.Boss;
 import nro.models.boss.BossID;
+import nro.models.boss.BossesData;
 import nro.models.boss.Boss_mini.AnTrom;
 import nro.models.boss.Boss_mini.Odo;
 import nro.models.boss.Boss_mini.RongNhi;
@@ -315,6 +316,8 @@ public class BossManager implements Runnable {
                     new Cooler();
                 case BossID.KHIDOT ->
                     new KhiDot();
+                case BossID.KHIDOT_THANH_CO ->
+                    new KhiDot(BossID.KHIDOT_THANH_CO, BossesData.KHIDOT_THANH_CO);
                 case BossID.NGUYETTHAN ->
                     new NguyetThan();
                 case BossID.NHATTHAN ->
@@ -343,6 +346,8 @@ public class BossManager implements Runnable {
                     new SonTinh();
                 case BossID.THUY_TINH ->
                     new ThuyTinh();
+                case BossID.THUY_TINH_THANH_CO ->
+                    new ThuyTinh(BossID.THUY_TINH_THANH_CO, BossesData.THUY_TINH_THANH_CO);
                 case BossID.LAN_CON ->
                     new LanCon();
                 case BossID.SOI_HEC_QUYN1 ->

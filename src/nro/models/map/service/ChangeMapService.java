@@ -26,6 +26,7 @@ import nro.models.utils.TimeUtil;
 import java.util.List;
 import nro.models.services_dungeon.BlackBallWarService;
 import nro.models.services_dungeon.HeroWarService;
+import nro.models.services_dungeon.AncientCastleService;
 import nro.models.server.Manager;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
@@ -60,6 +61,10 @@ public class ChangeMapService {
      */
     public void openChangeMapTab(Player pl) {
         List<Zone> list = null;
+        if (!pl.isAdmin() && AncientCastleService.gI().isZoneLocked(pl)) {
+            Service.gI().sendThongBaoOK(pl, "Không thể đổi khu trong lượt Thành cổ.");
+            return;
+        }
         Message msg = null;
         try {
             msg = new Message(-91);
@@ -123,10 +128,15 @@ public class ChangeMapService {
                 Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
-            if (MapService.gI().isMapPhoBan(pl.zone.map.mapId)) {
+            if (MapService.gI().isMapPhoBan(pl.zone.map.mapId)
+                    && !MapService.gI().isMapThanhCo(pl.zone.map.mapId)) {
                 Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
+        }
+        if (!pl.isAdmin() && AncientCastleService.gI().isZoneLocked(pl)) {
+            Service.gI().sendThongBaoOK(pl, "Không thể đổi khu trong lượt Thành cổ.");
+            return;
         }
         Message msg = null;
         try {
@@ -173,8 +183,13 @@ public class ChangeMapService {
                 NpcService.gI().createTutorial(pl, -1, "Không thể đến khu vực này");
                 return;
             }
-            if (MapService.gI().isMapPhoBan(pl.zone.map.mapId)) {
+            if (MapService.gI().isMapPhoBan(pl.zone.map.mapId)
+                    && !MapService.gI().isMapThanhCo(pl.zone.map.mapId)) {
                 NpcService.gI().createTutorial(pl, -1, "Không thể đến khu vực này");
+                return;
+            }
+            if (AncientCastleService.gI().isZoneLocked(pl)) {
+                NpcService.gI().createTutorial(pl, -1, "Không thể đổi khu trong lượt Thành cổ.");
                 return;
             }
             if (MapService.gI().isMapMaBu(pl.zone.map.mapId)) {
@@ -471,12 +486,22 @@ public class ChangeMapService {
         if (zoneJoin == null) {
             wp = MapService.gI().getWaypointPlayerIn(player);
             if (wp != null) {
-                zoneJoin = MapService.gI().getMapCanJoin(player, wp.goMap, -1);
+                int zoneId = MapService.gI().isMapThanhCo(player.zone.map.mapId)
+                        && MapService.gI().isMapThanhCo(wp.goMap) ? player.zone.zoneId : -1;
+                zoneJoin = MapService.gI().getMapCanJoin(player, wp.goMap, zoneId);
                 if (zoneJoin != null) {
                     xGo = wp.goX;
                     yGo = wp.goY;
                 }
             }
+        }
+        if (isBlockedByThanhCoBoss(player, zoneJoin)) {
+            resetPoint(player);
+            Service.gI().sendThongBao(player, "Hãy hạ hết boss ở Thành cổ 1 trước.");
+            return;
+        }
+        if (AncientCastleService.gI().handleWaypoint(player, zoneJoin, xGo, yGo)) {
+            return;
         }
         if (zoneJoin != null) {
 
@@ -511,6 +536,21 @@ public class ChangeMapService {
             Service.gI().sendThongBao(player, "Bạn chưa thể đến khu vực này");
         }
 
+    }
+
+    private boolean isBlockedByThanhCoBoss(Player player, Zone zoneJoin) {
+        if (player.zone == null || zoneJoin == null) {
+            return false;
+        }
+        if (player.zone.map.mapId != ConstMap.THANH_CO_1 || zoneJoin.map.mapId != ConstMap.THANH_CO_2) {
+            return false;
+        }
+        for (Player boss : player.zone.getBosses()) {
+            if (boss != null && !boss.isDie()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void resetPoint(Player player) {

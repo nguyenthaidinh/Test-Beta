@@ -59,6 +59,7 @@ import nro.models.npc_list.GokuSSJ2;
 import nro.models.services.ClanService;
 import nro.models.services.Service;
 import nro.models.services.ItemService;
+import nro.models.services_dungeon.AncientCastleService;
 import nro.models.services_dungeon.NgocRongNamecService;
 import nro.models.services.IntrinsicService;
 import nro.models.services.InventoryService;
@@ -326,6 +327,9 @@ public class NpcFactory {
                         // Không làm gì
                     }
 
+                    case ConstNpc.MENU_THANH_CO_CLONE -> {
+                        AncientCastleService.gI().selectCloneMenu(player, select);
+                    }
                     case ConstNpc.SUMMON_SHENRON_EVENT -> {
                         if (select == 0) {
                             Shenron_Service.gI().summonShenron(player);

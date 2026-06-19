@@ -1,6 +1,7 @@
 package nro.models.boss;
 
 import nro.models.consts.AppearType;
+import nro.models.consts.ConstMap;
 import nro.models.consts.ConstPlayer;
 import nro.models.skill.Skill;
 import nro.models.utils.Util;
@@ -2062,6 +2063,23 @@ public class BossesData {
             REST_15_M // second rest
     );
 
+    public static final BossData KHIDOT_THANH_CO = new BossData(
+            "Khỉ đột", // name
+            ConstPlayer.XAYDA, // gender
+            new short[] { 198, 193, 194, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            100000, // dame
+            new int[] { 100000000 }, // hp
+            new int[] { ConstMap.THANH_CO_1 }, // map join
+            new int[][] {
+                    { Skill.GALICK, 7, 1000 },
+                    { Skill.ANTOMIC, 7, 3000 },
+                    { Skill.BIEN_KHI, 7, 60000 }, }, // skill
+            new String[] {}, // text chat 1
+            new String[] {}, // text chat 2
+            new String[] {}, // text chat 3
+            REST_15_M // second rest
+    );
+
     public static final BossData NGUYETTHAN = new BossData(
             "Nguyệt thần", // name
             ConstPlayer.XAYDA, // gender
@@ -2309,6 +2327,23 @@ public class BossesData {
                     29, 30, 31, 32, 33, 34, 35, 36, 37, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 79,
                     80, 81, 82, 83, 84, 92, 93, 94, 96, 97, 98, 99, 100, 102, 103, 104, 105, 106, 107, 108, 109, 110 }, // map
                                                                                                                         // join
+            new int[][] {
+                    { Skill.GALICK, 1, 2000 },
+                    { Skill.ANTOMIC, 1, 6000 }, },
+            new String[] {}, // text chat 1
+            new String[] { "|-1|Trả Mị Nương lại cho ta",
+                    "|-1|Ta cho nước dâng chìm cả lũ bây giờ" }, // text chat 2
+            new String[] {}, // text chat 3
+            REST_15_M, // second rest
+            new int[] { BossID.SON_TINH });
+
+    public static final BossData THUY_TINH_THANH_CO = new BossData(
+            "Thủy Tinh", // name
+            ConstPlayer.XAYDA, // gender
+            new short[] { 1686, 1687, 1688, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            1000, // dame
+            new int[] { 50000000 }, // hp
+            new int[] { ConstMap.THANH_CO_1 }, // map join
             new int[][] {
                     { Skill.GALICK, 1, 2000 },
                     { Skill.ANTOMIC, 1, 6000 }, },

@@ -2,9 +2,12 @@ package nro.models.boss.event_hung_vuong;
 
 
 import nro.models.boss.Boss;
+import nro.models.boss.BossData;
 import nro.models.boss.BossesData;
 import nro.models.boss.BossID;
+import nro.models.boss.Boss_Manager.HungVuongEventManager;
 import nro.models.consts.BossStatus;
+import nro.models.consts.ConstMap;
 import static nro.models.consts.BossType.HUNGVUONG_EVENT;
 import nro.models.item.Item;
 import java.util.ArrayList;
@@ -15,6 +18,7 @@ import nro.models.services.EffectSkillService;
 import nro.models.services.PlayerService;
 import nro.models.services.Service;
 import nro.models.services.SkillService;
+import nro.models.services_dungeon.AncientCastleService;
 import nro.models.map.service.ChangeMapService;
 import nro.models.utils.Util;
 
@@ -29,7 +33,11 @@ public class ThuyTinh extends Boss {
     private long lastTimeReward;
 
     public ThuyTinh() throws Exception {
-        super(HUNGVUONG_EVENT, BossID.THUY_TINH, true, false, BossesData.THUY_TINH);
+        this(BossID.THUY_TINH, BossesData.THUY_TINH);
+    }
+
+    public ThuyTinh(int bossId, BossData bossData) throws Exception {
+        super(HUNGVUONG_EVENT, bossId, true, false, bossData);
     }
 
     @Override
@@ -37,6 +45,7 @@ public class ThuyTinh extends Boss {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
+        AncientCastleService.gI().dropCastleBossReward(this, plKill);
         for (Boss boss : this.bossAppearTogether[this.currentLevel]) {
             boss.playerReward = plKill;
             boss.changeStatus(BossStatus.AFK);
@@ -199,11 +208,26 @@ public class ThuyTinh extends Boss {
 
     @Override
     public void leaveMap() {
+        if (isThanhCoBoss()) {
+            ChangeMapService.gI().exitMap(this);
+            this.lastZone = null;
+            this.lastTimeRest = System.currentTimeMillis();
+            this.isReward = false;
+            this.playerReward = null;
+            this.changeStatus(BossStatus.REST);
+            HungVuongEventManager.gI().removeBoss(this);
+            this.dispose();
+            return;
+        }
         ChangeMapService.gI().exitMap(this);
         this.lastZone = null;
         this.lastTimeRest = System.currentTimeMillis();
         this.isReward = false;
         this.playerReward = null;
         this.changeStatus(BossStatus.REST);
+    }
+
+    private boolean isThanhCoBoss() {
+        return this.zone != null && this.zone.map != null && this.zone.map.mapId == ConstMap.THANH_CO_1;
     }
 }

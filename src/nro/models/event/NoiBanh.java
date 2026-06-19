@@ -10,6 +10,7 @@ import nro.models.player.Player;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
 import nro.models.services.Service;
+import nro.models.services_dungeon.AncientCastleService;
 
 public class NoiBanh extends Npc {
 
@@ -34,6 +35,7 @@ public class NoiBanh extends Npc {
                 "Bánh 2 Trứng\n(" + COST_BTT2 + " Đuôi Khỉ)",
                 "Bánh Đặc Biệt\n(" + COST_BTTDB + " Đuôi Khỉ)",
                 "Xem hiệu ứng",
+                "Muốn\nthử thách\nhả",
                 "Từ chối");
     }
 
@@ -50,6 +52,7 @@ public class NoiBanh extends Npc {
                         case 2 -> doiVaAnBanh(pl, COST_BTTDB, ConstItem.BANH_TRUNG_THU_DAC_BIET,
                                 "Bánh Trung Thu Đặc Biệt", 3);
                         case 3 -> showInfo(pl);
+                        case 4 -> enterAncientCastle(pl);
                         default -> {
                         }
                     }
@@ -107,6 +110,10 @@ public class NoiBanh extends Npc {
 
         Service.gI().point(pl);
         Service.gI().sendThongBao(pl, thongBao);
+    }
+
+    private void enterAncientCastle(Player pl) {
+        AncientCastleService.gI().startOrRejoin(pl);
     }
 
     private void showInfo(Player pl) {

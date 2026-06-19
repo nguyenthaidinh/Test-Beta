@@ -528,12 +528,16 @@ public class MapService {
         return mapId >= 160 && mapId <= 163;
     }
 
+    public boolean isMapThanhCo(int mapId) {
+        return mapId >= ConstMap.THANH_CO_1 && mapId <= ConstMap.DAU_TRUONG_THANH_CO;
+    }
+
     public boolean isMapNguHanhSon(int mapId) {
         return mapId >= 122 && mapId <= 124;
     }
 
     public boolean AllMap(int mapId) {
-        return mapId >= 0 && mapId <= 163;
+        return (mapId >= 0 && mapId <= 163) || isMapThanhCo(mapId);
     }
 
     public boolean shouldChangeMap(int currentMapId, int newMapId) {
@@ -543,7 +547,8 @@ public class MapService {
     }
 
     public boolean isMapPhoBan(int mapId) {
-        return isMapBanDoKhoBau(mapId) || isMapDoanhTrai(mapId) || isMapConDuongRanDoc(mapId) || isMapKhiGasHuyDiet(mapId);
+        return isMapBanDoKhoBau(mapId) || isMapDoanhTrai(mapId) || isMapConDuongRanDoc(mapId)
+                || isMapKhiGasHuyDiet(mapId) || isMapThanhCo(mapId);
     }
 
     public boolean isskh(int mapId) {
@@ -563,7 +568,7 @@ public class MapService {
     }
 
     public boolean isMapEventHungVuong(int mapId) {
-        return mapId >= 1 && mapId <= 163;
+        return (mapId >= 1 && mapId <= 163) || isMapThanhCo(mapId);
     }
 
     public boolean isMapUpSKH(int mapId) {

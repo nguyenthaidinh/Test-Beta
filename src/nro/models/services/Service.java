@@ -2239,6 +2239,10 @@ public class Service {
     }
 
     public void callNhanBan(Player player) {
+        callNhanBan(player, 10, 300000, true);
+    }
+
+    public boolean callNhanBan(Player player, int multiplier, int pkMillis, boolean updateCommesonTime) {
         List<Skill> skillList = new ArrayList<>();
         for (byte i = 0; i < player.playerSkill.skills.size(); i++) {
             Skill skill = player.playerSkill.skills.get(i);
@@ -2255,12 +2259,13 @@ public class Service {
                 skillTemp[i][2] = skill.coolDown;
             }
         }
+        multiplier = Math.max(1, multiplier);
         BossData bossDataClone = new BossData(
                 player.name,
                 player.gender,
                 new short[]{player.getHead(), player.getBody(), player.getLeg(), player.getFlagBag(), player.getAura(), player.getEffFront()},
-                Functions.maxint(player.nPoint.dame * 10L),
-                new int[]{Functions.maxint(player.nPoint.hpMax * 10L)},
+                Functions.maxint(player.nPoint.dame * (long) multiplier),
+                new int[]{Functions.maxint(player.nPoint.hpMax * (long) multiplier)},
                 new int[]{140},
                 skillTemp,
                 new String[]{"|-2|Boss nhân bản đã xuất hiện rồi"}, //text chat 1
@@ -2271,11 +2276,15 @@ public class Service {
 
         try {
             new NhanBan(player, bossDataClone);
-            EffectSkillService.gI().setPKCommeson(player, 300000);
-            player.lastPkCommesonTime = System.currentTimeMillis();
+            EffectSkillService.gI().setPKCommeson(player, pkMillis);
+            if (updateCommesonTime) {
+                player.lastPkCommesonTime = System.currentTimeMillis();
+            }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public void sendBigBoss(Zone zone, int action, int size, int id, int dame) {

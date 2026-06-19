@@ -4,6 +4,7 @@ import nro.models.boss.Boss;
 import nro.models.boss.BossData;
 import nro.models.boss.BossID;
 import nro.models.consts.BossStatus;
+import nro.models.consts.ConstMap;
 import nro.models.consts.ConstPlayer;
 import nro.models.boss.Boss_Manager.RedRibbonHQManager;
 import static nro.models.consts.BossType.PHOBANDT;
@@ -13,6 +14,7 @@ import nro.models.player.Player;
 import nro.models.skill.Skill;
 import nro.models.services.EffectSkillService;
 import nro.models.services.Service;
+import nro.models.services_dungeon.AncientCastleService;
 import nro.models.map.service.ChangeMapService;
 import nro.models.utils.Util;
 
@@ -47,6 +49,7 @@ public class TrungUyXanhLo extends Boss {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
+        AncientCastleService.gI().dropCastleBossReward(this, plKill);
         // Xác suất rơi item 1560 (50%)
         if (Util.isTrue(50, 100)) {
             ItemMap it = new ItemMap(
@@ -116,14 +119,18 @@ public class TrungUyXanhLo extends Boss {
 
     @Override
     public void joinMap() {
-        ChangeMapService.gI().changeMap(this, this.zone, 1210, 384);
+        int x = isAncientCastleFinal() ? 340 : 1210;
+        int y = isAncientCastleFinal() ? getCastleY(x) : 384;
+        ChangeMapService.gI().changeMap(this, this.zone, x, y);
         this.changeStatus(BossStatus.CHAT_S);
     }
 
     @Override
     public void doneChatS() {
         this.changeStatus(BossStatus.AFK);
-        Service.gI().setPos(this, 1210, 384);
+        int x = isAncientCastleFinal() ? 340 : 1210;
+        int y = isAncientCastleFinal() ? getCastleY(x) : 384;
+        Service.gI().setPos(this, x, y);
     }
 
     @Override
@@ -143,6 +150,14 @@ public class TrungUyXanhLo extends Boss {
             reward(plKill);
         }
         this.changeStatus(BossStatus.DIE);
+    }
+
+    private boolean isAncientCastleFinal() {
+        return this.zone != null && this.zone.map != null && this.zone.map.mapId == ConstMap.DAU_TRUONG_THANH_CO;
+    }
+
+    private int getCastleY(int x) {
+        return this.zone.map.yPhysicInTop(x, 100);
     }
 
     @Override

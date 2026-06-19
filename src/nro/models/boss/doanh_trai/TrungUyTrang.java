@@ -4,6 +4,7 @@ import nro.models.boss.Boss;
 import nro.models.boss.BossData;
 import nro.models.boss.BossID;
 import nro.models.consts.BossStatus;
+import nro.models.consts.ConstMap;
 import nro.models.consts.ConstPlayer;
 import nro.models.boss.Boss_Manager.RedRibbonHQManager;
 import static nro.models.consts.BossType.PHOBANDT;
@@ -17,6 +18,7 @@ import nro.models.services.PlayerService;
 import nro.models.services.Service;
 import nro.models.services.SkillService;
 import nro.models.services.TaskService;
+import nro.models.services_dungeon.AncientCastleService;
 import nro.models.map.service.ChangeMapService;
 import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
@@ -53,6 +55,7 @@ public class TrungUyTrang extends Boss {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
+        AncientCastleService.gI().dropCastleBossReward(this, plKill);
         if (Util.isTrue(50, 100)) {
             ItemMap it = new ItemMap(this.zone, 17, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
                     this.location.y - 24), plKill.id);
@@ -73,7 +76,9 @@ public class TrungUyTrang extends Boss {
 
     @Override
     public void joinMap() {
-        ChangeMapService.gI().changeMap(this, this.zone, 198, 456);
+        int x = isAncientCastleFinal() ? 220 : 198;
+        int y = isAncientCastleFinal() ? getCastleY(x) : 456;
+        ChangeMapService.gI().changeMap(this, this.zone, x, y);
         this.changeStatus(BossStatus.CHAT_S);
     }
 
@@ -84,7 +89,9 @@ public class TrungUyTrang extends Boss {
 
     @Override
     public void doneChatS() {
-        Service.gI().setPos(this, 198, 456);
+        int x = isAncientCastleFinal() ? 220 : 198;
+        int y = isAncientCastleFinal() ? getCastleY(x) : 456;
+        Service.gI().setPos(this, x, y);
         this.zone.isTUTAlive = true;
     }
 
@@ -104,6 +111,10 @@ public class TrungUyTrang extends Boss {
 
     @Override
     public void attack() {
+        if (isAncientCastleFinal()) {
+            super.attack();
+            return;
+        }
         try {
             Player playerAtt = getPlayerAttack();
             if (playerAtt == null || playerAtt.isDie() || playerAtt.location.x < 755 || playerAtt.location.x > 1060) {
@@ -133,7 +144,7 @@ public class TrungUyTrang extends Boss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
-        if (!this.isDie() && !this.zone.isbulon1Alive && !this.zone.isbulon2Alive) {
+        if (!this.isDie() && (isAncientCastleFinal() || (!this.zone.isbulon1Alive && !this.zone.isbulon2Alive))) {
             if (!piercing && Util.isTrue(20, 100)) {
                 this.chat("Xí hụt");
                 return 0;
@@ -162,6 +173,14 @@ public class TrungUyTrang extends Boss {
             reward(plKill);
         }
         this.changeStatus(BossStatus.DIE);
+    }
+
+    private boolean isAncientCastleFinal() {
+        return this.zone != null && this.zone.map != null && this.zone.map.mapId == ConstMap.DAU_TRUONG_THANH_CO;
+    }
+
+    private int getCastleY(int x) {
+        return this.zone.map.yPhysicInTop(x, 100);
     }
 
     @Override

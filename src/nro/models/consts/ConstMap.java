@@ -159,6 +159,9 @@ public class ConstMap {
     public static final int BIA_RUNG_NGUYEN_THUY = 161;
     public static final int RUNG_NGUYEN_THUY = 162;
     public static final int LANG_PLANT_NGUYEN_THUY = 163;
+    public static final int THANH_CO_1 = 183;
+    public static final int THANH_CO_2 = 184;
+    public static final int DAU_TRUONG_THANH_CO = 185;
     //type change map
     public static final int CHANGE_CAPSULE = 500;
     public static final int CHANGE_BLACK_BALL = 501;

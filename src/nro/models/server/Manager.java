@@ -878,6 +878,7 @@ public final class Manager {
                         dtwp.clear();
                     }
                     dataArray.clear();
+                    applyAncientCastleWaypoints(mapTemplate);
                     //load mobs
                     dataArray = (JSONArray) JSONValue.parse(rs.getString("mobs").replaceAll("\\\"", ""));
                     mapTemplate.mobTemp = new byte[dataArray.size()];
@@ -1116,6 +1117,42 @@ public final class Manager {
         if ((value = properties.get("server.daoautoupdater")) != null) {
             DAO_AUTO_UPDATER = String.valueOf(value).equalsIgnoreCase("true");
         }
+    }
+
+    private void applyAncientCastleWaypoints(MapTemplate mapTemplate) {
+        switch (mapTemplate.id) {
+            case ConstMap.THANH_CO_1 -> {
+                mapTemplate.wayPoints.clear();
+                mapTemplate.wayPoints.add(createWaypoint("Thành cổ 2", 984, 432, 1008, 528,
+                        ConstMap.THANH_CO_2, 80, 624));
+            }
+            case ConstMap.THANH_CO_2 -> {
+                mapTemplate.wayPoints.clear();
+                mapTemplate.wayPoints.add(createWaypoint("Thành cổ 1", 0, 576, 24, 672,
+                        ConstMap.THANH_CO_1, 940, 480));
+                mapTemplate.wayPoints.add(createWaypoint("Đấu trường thành cổ", 984, 576, 1008, 672,
+                        ConstMap.DAU_TRUONG_THANH_CO, 80, 672));
+            }
+            case ConstMap.DAU_TRUONG_THANH_CO -> {
+                mapTemplate.wayPoints.clear();
+                mapTemplate.wayPoints.add(createWaypoint("Thành cổ 2", 0, 624, 24, 720,
+                        ConstMap.THANH_CO_2, 940, 624));
+            }
+        }
+    }
+
+    private WayPoint createWaypoint(String name, int minX, int minY, int maxX, int maxY,
+            int goMap, int goX, int goY) {
+        WayPoint wp = new WayPoint();
+        wp.name = name;
+        wp.minX = (short) minX;
+        wp.minY = (short) minY;
+        wp.maxX = (short) maxX;
+        wp.maxY = (short) maxY;
+        wp.goMap = goMap;
+        wp.goX = (short) goX;
+        wp.goY = (short) goY;
+        return wp;
     }
 
     /**

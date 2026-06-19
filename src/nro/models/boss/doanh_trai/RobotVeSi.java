@@ -4,6 +4,7 @@ import nro.models.boss.Boss;
 import nro.models.boss.BossData;
 import nro.models.boss.BossID;
 import nro.models.consts.BossStatus;
+import nro.models.consts.ConstMap;
 import nro.models.consts.ConstPlayer;
 import nro.models.boss.Boss_Manager.RedRibbonHQManager;
 import static nro.models.consts.BossType.PHOBANDT;
@@ -13,10 +14,13 @@ import nro.models.player.Player;
 import nro.models.skill.Skill;
 import nro.models.services.EffectSkillService;
 import nro.models.services.Service;
+import nro.models.services_dungeon.AncientCastleService;
 import nro.models.map.service.ChangeMapService;
 import nro.models.utils.Util;
 
 public class RobotVeSi extends Boss {
+
+    private final int robotIndex;
 
     public RobotVeSi(Zone zone, int id, int dame, int hp) throws Exception {
         super(PHOBANDT, BossID.ROBOT_VE_SI - id, new BossData(
@@ -39,6 +43,7 @@ public class RobotVeSi extends Boss {
         ));
 
         this.zone = zone;
+        this.robotIndex = id;
     }
 
     @Override
@@ -46,6 +51,7 @@ public class RobotVeSi extends Boss {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
+        AncientCastleService.gI().dropCastleBossReward(this, plKill);
         if (Util.isTrue(30, 100)) {
             ItemMap it = new ItemMap(this.zone, 17, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
                     this.location.y - 24), plKill.id);
@@ -65,7 +71,9 @@ public class RobotVeSi extends Boss {
 
     @Override
     public void joinMap() {
-        ChangeMapService.gI().changeMap(this, this.zone, 300, 312);
+        int x = isAncientCastleFinal() ? getCastleX() : 300;
+        int y = isAncientCastleFinal() ? getCastleY(x) : 312;
+        ChangeMapService.gI().changeMap(this, this.zone, x, y);
         this.changeStatus(BossStatus.CHAT_S);
     }
 
@@ -77,13 +85,21 @@ public class RobotVeSi extends Boss {
     @Override
     public void doneChatS() {
         this.changeStatus(BossStatus.AFK);
-        Service.gI().setPos(this, 300, 312);
+        int x = isAncientCastleFinal() ? getCastleX() : 300;
+        int y = isAncientCastleFinal() ? getCastleY(x) : 312;
+        Service.gI().setPos(this, x, y);
     }
 
     @Override
     public void afk() {
         Player pl = getPlayerAttack();
         if (pl == null || pl.isDie()) {
+            return;
+        }
+        if (isAncientCastleFinal()) {
+            int x = pl.location.x + Util.nextInt(-100, 100);
+            Service.gI().setPos(this, x, getCastleY(x));
+            this.changeStatus(BossStatus.ACTIVE);
             return;
         }
         Service.gI().setPos(this, pl.location.x + Util.nextInt(-100, 100), 0);
@@ -121,6 +137,18 @@ public class RobotVeSi extends Boss {
             reward(plKill);
         }
         this.changeStatus(BossStatus.DIE);
+    }
+
+    private boolean isAncientCastleFinal() {
+        return this.zone != null && this.zone.map != null && this.zone.map.mapId == ConstMap.DAU_TRUONG_THANH_CO;
+    }
+
+    private int getCastleX() {
+        return 700 + this.robotIndex * 55;
+    }
+
+    private int getCastleY(int x) {
+        return this.zone.map.yPhysicInTop(x, 100);
     }
 
     @Override

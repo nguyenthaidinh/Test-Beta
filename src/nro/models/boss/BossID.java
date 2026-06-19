@@ -151,6 +151,7 @@ public class BossID {
     public static final int KHIDOT = -344;
     public static final int NGUYETTHAN = -345;
     public static final int NHATTHAN = -346;
+    public static final int KHIDOT_THANH_CO = -347;
 
     //========================BOSS 21H========================
     public static final int GOLDEN_FRIEZA = -502;
@@ -177,6 +178,7 @@ public class BossID {
     //========================HUNGVUONG EVENT========================
     public static final int SON_TINH = -354;
     public static final int THUY_TINH = -355;
+    public static final int THUY_TINH_THANH_CO = -356;
     //========================TET EVENT========================
     public static final int LAN_CON = -371;
 

@@ -15,6 +15,7 @@ import nro.models.server.ServerNotify;
 import nro.models.services.PlayerService;
 import nro.models.services.Service;
 import nro.models.services.SkillService;
+import nro.models.services_dungeon.AncientCastleService;
 import nro.models.map.service.ChangeMapService;
 import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
@@ -100,10 +101,19 @@ public class NhanBan extends Boss {
 
     @Override
     public void die(Player plKill) {
+        boolean isAncientCastleClone = AncientCastleService.gI().isInCloneStage(playerAtt);
         if (plKill != null) {
-            reward(plKill);
-            ServerNotify.gI().notify(plKill.name + " đã đánh bại bản sao Commeson, mọi người đều ngưỡng mộ");
+            if (!isAncientCastleClone) {
+                reward(plKill);
+            }
+            if (isAncientCastleClone) {
+                AncientCastleService.gI().dropCastleBossReward(this, plKill);
+                ServerNotify.gI().notify(plKill.name + " đã đánh bại bản sao Thành cổ");
+            } else {
+                ServerNotify.gI().notify(plKill.name + " đã đánh bại bản sao Commeson, mọi người đều ngưỡng mộ");
+            }
         }
+        AncientCastleService.gI().onCloneKilled(playerAtt);
         this.changeStatus(BossStatus.DIE);
     }
 
@@ -114,6 +124,11 @@ public class NhanBan extends Boss {
             return;
         }
         if (!playerAtt.effectSkill.isPKCommeson) {
+            if (AncientCastleService.gI().isInCloneStage(playerAtt)) {
+                AncientCastleService.gI().onCloneLeft(playerAtt);
+                this.leaveMap();
+                return;
+            }
             Service.gI().sendThongBao(playerAtt, "Bạn đã thất bại, ngày mai hãy thử sức tiếp");
             this.leaveMap();
         }
