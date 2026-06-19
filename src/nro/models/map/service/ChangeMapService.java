@@ -134,7 +134,8 @@ public class ChangeMapService {
                 return;
             }
         }
-        if (!pl.isAdmin() && AncientCastleService.gI().isZoneLocked(pl)) {
+        if (!pl.isAdmin() && AncientCastleService.gI().isZoneLocked(pl)
+                && !AncientCastleService.gI().canOpenStage1ZoneUI(pl)) {
             Service.gI().sendThongBaoOK(pl, "Không thể đổi khu trong lượt Thành cổ.");
             return;
         }
@@ -188,7 +189,8 @@ public class ChangeMapService {
                 NpcService.gI().createTutorial(pl, -1, "Không thể đến khu vực này");
                 return;
             }
-            if (AncientCastleService.gI().isZoneLocked(pl)) {
+            if (AncientCastleService.gI().isZoneLocked(pl)
+                    && !AncientCastleService.gI().canChangeStage1Zone(pl, zoneId)) {
                 NpcService.gI().createTutorial(pl, -1, "Không thể đổi khu trong lượt Thành cổ.");
                 return;
             }
@@ -545,12 +547,7 @@ public class ChangeMapService {
         if (player.zone.map.mapId != ConstMap.THANH_CO_1 || zoneJoin.map.mapId != ConstMap.THANH_CO_2) {
             return false;
         }
-        for (Player boss : player.zone.getBosses()) {
-            if (boss != null && !boss.isDie()) {
-                return true;
-            }
-        }
-        return false;
+        return AncientCastleService.gI().hasLiveStage1Boss(player);
     }
 
     public void resetPoint(Player player) {

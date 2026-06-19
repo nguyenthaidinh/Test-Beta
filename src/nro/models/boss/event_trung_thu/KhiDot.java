@@ -70,6 +70,9 @@ public class KhiDot extends Boss {
 
     @Override
     public void autoLeaveMap() {
+        if (isThanhCoBoss()) {
+            return;
+        }
         if (Util.canDoWithTime(st, 900000)) {
             this.leaveMapNew();
         }

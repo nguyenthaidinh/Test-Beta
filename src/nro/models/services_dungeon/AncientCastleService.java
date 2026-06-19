@@ -33,6 +33,7 @@ import nro.models.server.Manager;
 import nro.models.server.ServerManager;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
+import nro.models.services.ItemTimeService;
 import nro.models.services.Service;
 import nro.models.shop.ItemShop;
 import nro.models.shop.Shop;
@@ -42,7 +43,7 @@ import nro.models.utils.Util;
 public class AncientCastleService implements Runnable {
 
     private static final int DAILY_LIMIT = 2;
-    private static final int STAGE_1_ZONE_LIMIT = 4;
+    private static final int STAGE_1_COMBO_COUNT = 4;
     private static final int FIGHT_COST = 10;
     private static final int CLONE_MULTIPLIER = 50;
     private static final long TIME_LIMIT = 90L * 60L * 1000L;
@@ -114,15 +115,15 @@ public class AncientCastleService implements Runnable {
             }
         }
 
-        int zone1Id = findFreeZoneId(map1, usedZone1Ids(), STAGE_1_ZONE_LIMIT);
+        List<Integer> zone1Ids = findRandomFreeZoneIds(map1, STAGE_1_COMBO_COUNT, usedZone1Ids());
         int zone3Id = findFreeZoneId(map3, usedZone3Ids());
         List<Integer> zone2Ids = findFreeZoneIds(map2, members.size(), usedZone2Ids());
-        if (zone1Id == -1 || zone3Id == -1 || zone2Ids.size() < members.size()) {
+        if (zone1Ids.size() < STAGE_1_COMBO_COUNT || zone3Id == -1 || zone2Ids.size() < members.size()) {
             Service.gI().sendThongBao(player, "Thành cổ đang đầy, hãy quay lại sau.");
             return;
         }
 
-        CastleRun run = new CastleRun(nextRunId++, zone1Id, zone3Id);
+        CastleRun run = new CastleRun(nextRunId++, zone1Ids, zone3Id);
         for (int i = 0; i < members.size(); i++) {
             Player member = members.get(i);
             run.memberIds.add(member.id);
@@ -139,11 +140,13 @@ public class AncientCastleService implements Runnable {
         }
         ensureUpdater();
 
-        Zone zoneJoin = map1.zones.get(zone1Id);
-        prepareStage1Bosses(zoneJoin);
+        Zone zoneJoin = map1.zones.get(run.zone1Id);
+        prepareStage1Bosses(run);
         for (Player member : members) {
             Service.gI().sendThongBao(member, "Thử thách Thành cổ bắt đầu! Thời gian: 1 tiếng 30 phút.");
+            Service.gI().sendThongBao(member, "4 cum boss Thanh co 1 da xuat hien o khu " + getStage1ZoneText(run) + ". Hay ha het de sang Thanh co 2.");
             ChangeMapService.gI().changeMapInYard(member, zoneJoin, JOIN_X);
+            sendChallengeTime(member, run);
         }
     }
 
@@ -162,6 +165,11 @@ public class AncientCastleService implements Runnable {
         int fromMap = player.zone.map.mapId;
         int toMap = zoneJoin.map.mapId;
         if (fromMap == ConstMap.THANH_CO_1 && toMap == ConstMap.THANH_CO_2) {
+            if (hasLiveStage1Boss(run)) {
+                ChangeMapService.gI().resetPoint(player);
+                Service.gI().sendThongBao(player, "Hay ha het boss o Thanh co 1 truoc.");
+                return true;
+            }
             enterCloneStage(player, run);
             return true;
         }
@@ -180,6 +188,7 @@ public class AncientCastleService implements Runnable {
             spawnFinalBosses(run);
             Zone finalZone = MapService.gI().getMapById(ConstMap.DAU_TRUONG_THANH_CO).zones.get(run.zone3Id);
             ChangeMapService.gI().changeMap(player, finalZone, MAP3_X, finalZone.map.yPhysicInTop(MAP3_X, 100));
+            sendChallengeTime(player, run);
             return true;
         }
         return false;
@@ -191,6 +200,21 @@ public class AncientCastleService implements Runnable {
         }
         CastleRun run = activeRuns.get(player.id);
         return run != null && !run.finished && MapService.gI().isMapThanhCo(player.zone.map.mapId);
+    }
+
+    public synchronized boolean canOpenStage1ZoneUI(Player player) {
+        CastleRun run = player != null ? activeRuns.get(player.id) : null;
+        return run != null && !run.finished && isInStage1(player);
+    }
+
+    public synchronized boolean canChangeStage1Zone(Player player, int zoneId) {
+        CastleRun run = player != null ? activeRuns.get(player.id) : null;
+        return run != null && !run.finished && isInStage1(player) && run.stage1ZoneIds.contains(zoneId);
+    }
+
+    public synchronized boolean hasLiveStage1Boss(Player player) {
+        CastleRun run = player != null ? activeRuns.get(player.id) : null;
+        return run != null && !run.finished && hasLiveStage1Boss(run);
     }
 
     public synchronized void selectCloneMenu(Player player, int select) {
@@ -294,6 +318,7 @@ public class AncientCastleService implements Runnable {
                     iterator.remove();
                     continue;
                 }
+                checkStage1Cleared(run);
                 checkUnlockFinal(run);
                 if (run.finalUnlocked && !run.finalBossSpawned) {
                     spawnFinalBosses(run);
@@ -311,10 +336,12 @@ public class AncientCastleService implements Runnable {
             return;
         }
         if (run.surrendered.contains(player.id)) {
+            removeChallengeTime(player);
             Service.gI().sendThongBao(player, "Bạn đã đầu hàng lượt Thành cổ này, không thể vào lại.");
             return;
         }
         if (run.clearCompleted) {
+            removeChallengeTime(player);
             Service.gI().sendThongBao(player, "Thành cổ đã được chinh phục, capsule sẽ đưa cả đội về sau ít giây.");
             return;
         }
@@ -322,6 +349,7 @@ public class AncientCastleService implements Runnable {
             spawnFinalBosses(run);
             Zone zone = MapService.gI().getMapById(ConstMap.DAU_TRUONG_THANH_CO).zones.get(run.zone3Id);
             ChangeMapService.gI().changeMapInYard(player, zone, MAP3_X);
+            sendChallengeTime(player, run);
             return;
         }
         if (run.cloneStageEntered.contains(player.id)) {
@@ -330,6 +358,8 @@ public class AncientCastleService implements Runnable {
         }
         Zone zone = MapService.gI().getMapById(ConstMap.THANH_CO_1).zones.get(run.zone1Id);
         ChangeMapService.gI().changeMapInYard(player, zone, JOIN_X);
+        sendChallengeTime(player, run);
+        Service.gI().sendThongBao(player, "Boss Thanh co 1 dang o khu " + getStage1ZoneText(run) + ".");
         Service.gI().sendThongBao(player, "Bạn đã quay lại lượt Thành cổ đang chạy.");
     }
 
@@ -346,6 +376,7 @@ public class AncientCastleService implements Runnable {
         run.cloneStageEntered.add(player.id);
         Zone cloneZone = MapService.gI().getMapById(ConstMap.THANH_CO_2).zones.get(zoneId);
         ChangeMapService.gI().changeMapInYard(player, cloneZone, MAP2_X);
+        sendChallengeTime(player, run);
         showCloneChoice(player);
     }
 
@@ -369,6 +400,7 @@ public class AncientCastleService implements Runnable {
             return;
         }
         run.surrendered.add(player.id);
+        ItemTimeService.gI().removeTextThachThucGioiHan(player);
         Service.gI().sendThongBao(player, "Bạn đã đầu hàng và không thể vào lại lượt Thành cổ này.");
         ChangeMapService.gI().changeMapBySpaceShip(player, 21 + player.gender, -1, -1);
         if (allMembersSurrendered(run)) {
@@ -422,6 +454,18 @@ public class AncientCastleService implements Runnable {
         spawnFinalBosses(run);
         for (Player member : getOnlineMembers(run)) {
             Service.gI().sendThongBao(member, "Cả đội đã hạ hết bản sao. Đấu trường Thành cổ đã mở!");
+        }
+    }
+
+    private void checkStage1Cleared(CastleRun run) {
+        if (run.stage1Cleared || hasLiveStage1Boss(run)) {
+            return;
+        }
+        run.stage1Cleared = true;
+        for (Player member : getOnlineMembers(run)) {
+            if (member.zone != null && member.zone.map != null && member.zone.map.mapId == ConstMap.THANH_CO_1) {
+                Service.gI().sendThongBao(member, "Da ha het boss Thanh co 1. Co the sang Thanh co 2.");
+            }
         }
     }
 
@@ -490,6 +534,7 @@ public class AncientCastleService implements Runnable {
         run.clearCompleted = true;
         run.clearCompleteTime = System.currentTimeMillis();
         for (Player member : getOnlineMembers(run)) {
+            removeChallengeTime(member);
             if (member.zone != null && MapService.gI().isMapThanhCo(member.zone.map.mapId)) {
                 Service.gI().sendThongBao(member, "Cả đội đã chinh phục Đấu trường Thành cổ. Capsule sẽ đưa bạn về sau 30 giây.");
             }
@@ -566,11 +611,13 @@ public class AncientCastleService implements Runnable {
             return;
         }
         run.finished = true;
+        clearStage1Bosses(run);
         clearFinalBosses(run);
         for (long memberId : run.memberIds) {
             activeRuns.remove(memberId);
         }
         for (Player member : getOnlineMembers(run)) {
+            removeChallengeTime(member);
             if (member.zone != null && MapService.gI().isMapThanhCo(member.zone.map.mapId)) {
                 if (timeout) {
                     Service.gI().sendThongBao(member, "Đã hết 1 tiếng 30 phút, bạn sẽ được đưa về nhà.");
@@ -593,25 +640,32 @@ public class AncientCastleService implements Runnable {
         ChangeMapService.gI().changeMapBySpaceShip(member, returnPoint.mapId, returnPoint.zoneId, returnPoint.x);
     }
 
-    private void prepareStage1Bosses(Zone zone) {
-        if (zone == null) {
+    private void prepareStage1Bosses(CastleRun run) {
+        nro.models.map.Map map = MapService.gI().getMapById(ConstMap.THANH_CO_1);
+        if (run == null || map == null) {
             return;
         }
-        if (!hasLiveBoss(zone, BossID.THUY_TINH_THANH_CO) || !hasLiveBoss(zone, BossID.SON_TINH)) {
-            Boss boss = BossManager.gI().createBoss(BossID.THUY_TINH_THANH_CO);
-            if (boss != null) {
-                spawnBossNow(boss, zone);
+        for (int zoneId : run.stage1ZoneIds) {
+            if (zoneId < 0 || zoneId >= map.zones.size()) {
+                continue;
             }
-        }
-        if (!hasLiveBoss(zone, BossID.KHIDOT_THANH_CO)) {
-            Boss boss = BossManager.gI().createBoss(BossID.KHIDOT_THANH_CO);
-            if (boss != null) {
-                spawnBossNow(boss, zone);
-            }
+            spawnStage1Combo(run, map.zones.get(zoneId));
         }
     }
 
-    private void spawnBossNow(Boss boss, Zone zone) {
+    private void spawnStage1Combo(CastleRun run, Zone zone) {
+        if (run == null || zone == null) {
+            return;
+        }
+        spawnBossNow(run, BossManager.gI().createBoss(BossID.THUY_TINH_THANH_CO), zone);
+        spawnBossNow(run, BossManager.gI().createBoss(BossID.KHIDOT_THANH_CO), zone);
+    }
+
+    private void spawnBossNow(CastleRun run, Boss boss, Zone zone) {
+        if (boss == null || zone == null) {
+            return;
+        }
+        addStage1Boss(run, boss);
         boss.zoneFinal = zone;
         boss.respawn();
         boss.joinMap();
@@ -621,21 +675,59 @@ public class AncientCastleService implements Runnable {
             return;
         }
         for (Boss child : boss.bossAppearTogether[boss.currentLevel]) {
-            if (child != null && child.zone == null) {
+            if (child != null) {
+                addStage1Boss(run, child);
                 child.zoneFinal = zone;
-                child.respawn();
-                child.joinMap();
+                if (child.zone == null) {
+                    child.respawn();
+                    child.joinMap();
+                }
             }
         }
     }
 
-    private boolean hasLiveBoss(Zone zone, int bossId) {
-        for (Player boss : zone.getBosses()) {
-            if (boss != null && boss.id == bossId && !boss.isDie()) {
+    private void addStage1Boss(CastleRun run, Boss boss) {
+        if (run != null && boss != null && !run.stage1Bosses.contains(boss)) {
+            run.stage1Bosses.add(boss);
+        }
+    }
+
+    private void clearStage1Bosses(CastleRun run) {
+        for (Boss boss : run.stage1Bosses) {
+            if (boss != null && boss.zone != null && boss.zone.map != null && boss.zone.map.mapId == ConstMap.THANH_CO_1) {
+                boss.changeStatus(BossStatus.LEAVE_MAP);
+            }
+        }
+        run.stage1Bosses.clear();
+    }
+
+    private boolean hasLiveStage1Boss(CastleRun run) {
+        if (run == null || run.stage1Bosses.isEmpty()) {
+            return false;
+        }
+        for (Boss boss : run.stage1Bosses) {
+            if (isStage1BossFighting(boss)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean isStage1BossFighting(Boss boss) {
+        return boss != null
+                && boss.zone != null
+                && boss.zone.map != null
+                && boss.zone.map.mapId == ConstMap.THANH_CO_1
+                && (boss.bossStatus == BossStatus.RESPAWN
+                || boss.bossStatus == BossStatus.JOIN_MAP
+                || boss.bossStatus == BossStatus.CHAT_S
+                || boss.bossStatus == BossStatus.AFK
+                || boss.bossStatus == BossStatus.ACTIVE);
+    }
+
+    private boolean isInStage1(Player player) {
+        return player != null && player.zone != null && player.zone.map != null
+                && player.zone.map.mapId == ConstMap.THANH_CO_1;
     }
 
     private List<Player> collectMembers(Player leader) {
@@ -695,14 +787,40 @@ public class AncientCastleService implements Runnable {
         return zoneIds;
     }
 
+    private List<Integer> findRandomFreeZoneIds(nro.models.map.Map map, int amount, Set<Integer> usedZoneIds) {
+        List<Integer> candidates = new ArrayList<>();
+        for (Zone zone : map.zones) {
+            if (!usedZoneIds.contains(zone.zoneId) && zone.getPlayers().isEmpty() && zone.getBosses().isEmpty()) {
+                candidates.add(zone.zoneId);
+            }
+        }
+        List<Integer> zoneIds = new ArrayList<>();
+        while (!candidates.isEmpty() && zoneIds.size() < amount) {
+            int index = Util.nextInt(candidates.size());
+            zoneIds.add(candidates.remove(index));
+        }
+        return zoneIds;
+    }
+
     private Set<Integer> usedZone1Ids() {
         Set<Integer> used = new HashSet<>();
         for (CastleRun run : runs) {
             if (!run.finished) {
-                used.add(run.zone1Id);
+                used.addAll(run.stage1ZoneIds);
             }
         }
         return used;
+    }
+
+    private String getStage1ZoneText(CastleRun run) {
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < run.stage1ZoneIds.size(); i++) {
+            if (i > 0) {
+                text.append(", ");
+            }
+            text.append(run.stage1ZoneIds.get(i));
+        }
+        return text.toString();
     }
 
     private Set<Integer> usedZone2Ids() {
@@ -769,6 +887,20 @@ public class AncientCastleService implements Runnable {
 
     private boolean isExpired(CastleRun run) {
         return Util.canDoWithTime(run.startTime, TIME_LIMIT);
+    }
+
+    private void sendChallengeTime(Player player, CastleRun run) {
+        if (player == null || run == null || run.finished) {
+            return;
+        }
+        int secondsLeft = (int) ((TIME_LIMIT - (System.currentTimeMillis() - run.startTime)) / 1000);
+        ItemTimeService.gI().sendTextThachThucGioiHan(player, secondsLeft);
+    }
+
+    private void removeChallengeTime(Player player) {
+        if (player != null) {
+            ItemTimeService.gI().removeTextThachThucGioiHan(player);
+        }
     }
 
     private void ensureUpdater() {
@@ -852,6 +984,7 @@ public class AncientCastleService implements Runnable {
         private final int zone1Id;
         private final int zone3Id;
         private final long startTime;
+        private final List<Integer> stage1ZoneIds = new ArrayList<>();
         private final List<Long> memberIds = new ArrayList<>();
         private final Map<Long, String> memberNames = new HashMap<>();
         private final Map<Long, Integer> cloneZoneIds = new HashMap<>();
@@ -861,7 +994,9 @@ public class AncientCastleService implements Runnable {
         private final Set<Long> cloneKilled = new HashSet<>();
         private final Set<Long> surrendered = new HashSet<>();
         private final Set<Long> clearWinners = new HashSet<>();
+        private final List<Boss> stage1Bosses = new ArrayList<>();
         private final List<Boss> finalBosses = new ArrayList<>();
+        private boolean stage1Cleared;
         private boolean finalUnlocked;
         private boolean finalBossSpawned;
         private boolean clearCompleted;
@@ -869,9 +1004,10 @@ public class AncientCastleService implements Runnable {
         private boolean clearRewardGiven;
         private boolean finished;
 
-        private CastleRun(int id, int zone1Id, int zone3Id) {
+        private CastleRun(int id, List<Integer> zone1Ids, int zone3Id) {
             this.id = id;
-            this.zone1Id = zone1Id;
+            this.zone1Id = zone1Ids.get(0);
+            this.stage1ZoneIds.addAll(zone1Ids);
             this.zone3Id = zone3Id;
             this.startTime = System.currentTimeMillis();
         }

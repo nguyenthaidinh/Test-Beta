@@ -20,6 +20,8 @@ import nro.models.utils.Logger;
  */
 public class ItemTimeService {
 
+    private static final String LIMITED_CHALLENGE_TEXT = "Thách thức giới hạn:";
+
     private static ItemTimeService i;
 
     public static ItemTimeService gI() {
@@ -201,6 +203,14 @@ public class ItemTimeService {
         }
     }
 
+    public void sendTextThachThucGioiHan(Player player, int secondsLeft) {
+        if (secondsLeft <= 0) {
+            removeTextThachThucGioiHan(player);
+            return;
+        }
+        sendTextTime(player, THACH_THUC_GIOI_HAN, LIMITED_CHALLENGE_TEXT, secondsLeft);
+    }
+
     public void sendTextBanDoKhoBau(Player player) {
         if (player.clan != null
                 && player.clan.lastTimeOpenBanDoKhoBau != 0) {
@@ -259,6 +269,10 @@ public class ItemTimeService {
 
     public void removeTextKhiGasHuyDiet(Player player) {
         removeTextTime(player, KHI_GAS_HUY_DIET);
+    }
+
+    public void removeTextThachThucGioiHan(Player player) {
+        removeTextTime(player, THACH_THUC_GIOI_HAN);
     }
 
     public void removeTextTime(Player player, byte id) {
