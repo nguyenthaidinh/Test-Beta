@@ -28,7 +28,8 @@ public class RewardService {
     };
     private static final short[] LUCKY_ROUND_FRAGMENT_IDS = {1792, 1791, 1204};
     private static final short[] LUCKY_ROUND_SUPPORT_ITEM_IDS = {1152, 1150, 1153, 1151, 1154};
-    private static final short[] LUCKY_ROUND_DRAGON_BALL_IDS = {16, 17, 18};
+    private static final short FOUR_STAR_DRAGON_BALL_ID = 17;
+    private static final short FIVE_STAR_DRAGON_BALL_ID = 18;
     private static final short[] LUCKY_ROUND_UPGRADE_STONE_IDS = {220, 223, 224, 221, 222};
     private static final int[] LUCKY_ROUND_DEFAULT_EVENT_ITEMS = {999, 1000, 1001};
 
@@ -236,7 +237,7 @@ public class RewardService {
     }
 
     private Item createLuckyRoundDragonBallItem() {
-        short itemId = LUCKY_ROUND_DRAGON_BALL_IDS[Util.nextInt(LUCKY_ROUND_DRAGON_BALL_IDS.length)];
+        short itemId = Util.isTrue(1, 4) ? FOUR_STAR_DRAGON_BALL_ID : FIVE_STAR_DRAGON_BALL_ID;
         return ItemService.gI().createNewItem(itemId);
     }
 
