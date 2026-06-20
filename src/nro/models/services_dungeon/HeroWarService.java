@@ -40,9 +40,10 @@ public class HeroWarService implements Runnable {
     private static final int RETURN_Y = 336;
     private static final String OPEN_TIME_TEXT = "21h00 đến 22h00";
     private static final int HISTORY_LIMIT = 20;
-    private static final int COST_X100 = 20;
-    private static final int[] FRIEND_POWER_MULTIPLIERS = {10, 20, 30, 40, 50};
-    private static final int[] FRIEND_POWER_COSTS = {2, 5, 8, 10, 15};
+    private static final int HOLDER_POWER_MULTIPLIER = 10;
+    private static final int HOLDER_POWER_COST = 20;
+    private static final int[] FRIEND_POWER_MULTIPLIERS = {1, 2, 3, 5};
+    private static final int[] FRIEND_POWER_COSTS = {2, 5, 8, 10};
 
     private static HeroWarService instance;
     private final Set<Long> changingZoneHolders = ConcurrentHashMap.newKeySet();
@@ -61,7 +62,7 @@ public class HeroWarService implements Runnable {
     public String getFriendPowerMenuText(Player player) {
         String text = "Sức mạnh tình bạn sẽ tăng HP, KI và sức đánh trong Đại chiến Anh Hùng.";
         if (player != null && player.idMark != null && player.idMark.isHoldBlackBall()) {
-            text += "\nNgười đang giữ Ngọc Rồng Đen có thể dùng x100.";
+            text += "\nNgười đang giữ Ngọc Rồng Đen có thể dùng x" + HOLDER_POWER_MULTIPLIER + ".";
         }
         return text;
     }
@@ -72,7 +73,7 @@ public class HeroWarService implements Runnable {
             options.add("x" + multiplier + "\n" + getFriendPowerCost(multiplier) + " TV");
         }
         if (player != null && player.idMark != null && player.idMark.isHoldBlackBall()) {
-            options.add("x100\n" + getFriendPowerCost(100) + " TV");
+            options.add("x" + HOLDER_POWER_MULTIPLIER + "\n" + getFriendPowerCost(HOLDER_POWER_MULTIPLIER) + " TV");
         }
         options.add("Từ chối");
         return options.toArray(new String[0]);
@@ -87,7 +88,7 @@ public class HeroWarService implements Runnable {
             return;
         }
         if (player.idMark != null && player.idMark.isHoldBlackBall()) {
-            useFriendPower(player, 100);
+            useFriendPower(player, HOLDER_POWER_MULTIPLIER);
         }
     }
 
@@ -104,20 +105,22 @@ public class HeroWarService implements Runnable {
             return;
         }
         boolean holder = player.idMark != null && player.idMark.isHoldBlackBall();
-        if (!isFriendPowerMultiplier(multiplier) && multiplier != 100) {
+        if (!isFriendPowerMultiplier(multiplier) && multiplier != HOLDER_POWER_MULTIPLIER) {
             return;
         }
-        if (multiplier == 100 && !holder) {
-            Service.gI().sendThongBao(player, "Chỉ người đang giữ Ngọc Rồng Đen mới dùng được x100.");
+        if (multiplier == HOLDER_POWER_MULTIPLIER && !holder) {
+            Service.gI().sendThongBao(player, "Chỉ người đang giữ Ngọc Rồng Đen mới dùng được x" + HOLDER_POWER_MULTIPLIER + ".");
             return;
         }
         boolean hasBuff = player.effectSkin.xHPKI > 1 || player.effectSkin.xDame > 1;
-        if (hasBuff && multiplier != 100) {
+        if (hasBuff && multiplier != HOLDER_POWER_MULTIPLIER) {
             Service.gI().sendThongBao(player, "Bạn đang có Sức mạnh tình bạn, chết rồi hồi sinh mới có thể x lại.");
             return;
         }
-        if (multiplier == 100 && player.effectSkin.xHPKI == 100 && player.effectSkin.xDame == 100) {
-            Service.gI().sendThongBao(player, "Bạn đang có Sức mạnh tình bạn x100 rồi.");
+        if (multiplier == HOLDER_POWER_MULTIPLIER
+                && player.effectSkin.xHPKI == HOLDER_POWER_MULTIPLIER
+                && player.effectSkin.xDame == HOLDER_POWER_MULTIPLIER) {
+            Service.gI().sendThongBao(player, "Bạn đang có Sức mạnh tình bạn x" + HOLDER_POWER_MULTIPLIER + " rồi.");
             return;
         }
 
@@ -153,8 +156,8 @@ public class HeroWarService implements Runnable {
     }
 
     private int getFriendPowerCost(int multiplier) {
-        if (multiplier == 100) {
-            return COST_X100;
+        if (multiplier == HOLDER_POWER_MULTIPLIER) {
+            return HOLDER_POWER_COST;
         }
         for (int i = 0; i < FRIEND_POWER_MULTIPLIERS.length; i++) {
             if (FRIEND_POWER_MULTIPLIERS[i] == multiplier) {
