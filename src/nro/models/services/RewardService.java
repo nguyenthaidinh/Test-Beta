@@ -27,6 +27,9 @@ public class RewardService {
         1541, 1563, 1573, 1724, 1733, 1734, 1749
     };
     private static final short[] LUCKY_ROUND_FRAGMENT_IDS = {1792, 1791, 1204};
+    private static final short[] LUCKY_ROUND_SUPPORT_ITEM_IDS = {1152, 1150, 1153, 1151, 1154};
+    private static final short[] LUCKY_ROUND_DRAGON_BALL_IDS = {16, 17, 18};
+    private static final short[] LUCKY_ROUND_UPGRADE_STONE_IDS = {220, 223, 224, 221, 222};
     private static final int[] LUCKY_ROUND_DEFAULT_EVENT_ITEMS = {999, 1000, 1001};
 
     private static final int[][][] ACTIVATION_SET = {
@@ -99,8 +102,15 @@ public class RewardService {
                         it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10))); // HSD
                     }
                     it.quantity = 1;
-                } else if (Util.isTrue(1, 200)) {
+                // Compensate for earlier reward checks so the overall fragment rate stays near 1%.
+                } else if (Util.isTrue(124, 10000)) {
                     it = createLuckyRoundFragmentItem();
+                } else if (Util.isTrue(5, 100)) {
+                    it = createLuckyRoundSupportItem();
+                } else if (Util.isTrue(5, 100)) {
+                    it = createLuckyRoundDragonBallItem();
+                } else if (Util.isTrue(15, 100)) {
+                    it = createLuckyRoundUpgradeStoneItem();
                 } else if (Util.isTrue(5, 100)) {
                     it = ItemService.gI().createNewItem((short) 956);// Đá bảo vệ
                     it.itemOptions.clear();
@@ -218,6 +228,21 @@ public class RewardService {
         item.info = item.getInfo();
         item.content = item.getContent();
         return item;
+    }
+
+    private Item createLuckyRoundSupportItem() {
+        short itemId = LUCKY_ROUND_SUPPORT_ITEM_IDS[Util.nextInt(LUCKY_ROUND_SUPPORT_ITEM_IDS.length)];
+        return ItemService.gI().createNewItem(itemId);
+    }
+
+    private Item createLuckyRoundDragonBallItem() {
+        short itemId = LUCKY_ROUND_DRAGON_BALL_IDS[Util.nextInt(LUCKY_ROUND_DRAGON_BALL_IDS.length)];
+        return ItemService.gI().createNewItem(itemId);
+    }
+
+    private Item createLuckyRoundUpgradeStoneItem() {
+        short itemId = LUCKY_ROUND_UPGRADE_STONE_IDS[Util.nextInt(LUCKY_ROUND_UPGRADE_STONE_IDS.length)];
+        return ItemService.gI().createNewItem(itemId, Util.nextInt(1, 5));
     }
 
 // Phương thức itemRand sẽ trả về vật phẩm mặc định nếu không thành công
