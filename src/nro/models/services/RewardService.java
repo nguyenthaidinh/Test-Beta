@@ -174,7 +174,7 @@ public class RewardService {
         item.itemOptions.add(new ItemOption(96, Util.nextInt(15, 30)));
         item.itemOptions.add(new ItemOption(106, 0));
         item.itemOptions.add(new Item.ItemOption(154, 0));
-        if (Util.isTrue(10, 100)) {
+        if (Util.isTrue(5, 100)) {
             item.itemOptions.add(new Item.ItemOption(73, 0));
         } else {
             item.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10)));
@@ -209,7 +209,7 @@ public class RewardService {
             item.itemOptions.add(new ItemOption(5, Util.nextInt(10, 20)));
         }
         item.itemOptions.add(new Item.ItemOption(154, 0));
-        if (Util.isTrue(10, 100)) {
+        if (Util.isTrue(5, 100)) {
             item.itemOptions.add(new Item.ItemOption(73, 0));
         } else {
             item.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10)));

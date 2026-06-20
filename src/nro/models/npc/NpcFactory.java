@@ -631,6 +631,27 @@ public class NpcFactory {
                         break;
                     }
 
+                    case ConstNpc.CONFIRM_REMOVE_HSD_ITEM_LUCKY_ROUND -> {
+                        if (select == 0) {
+                            int oldSize = player.inventory.itemsBoxCrackBall.size();
+                            player.inventory.itemsBoxCrackBall.removeIf(item -> item != null
+                                    && item.isNotNullItem()
+                                    && item.getOptionById(93) != null
+                                    && (item.template.type == 5
+                                    || item.template.type == 23
+                                    || item.template.type == 24
+                                    || item.template.type == 27));
+                            int removed = oldSize - player.inventory.itemsBoxCrackBall.size();
+                            if (removed > 0) {
+                                Service.gI().sendThongBao(player, "Đã xóa " + removed
+                                        + " vật phẩm HSD. Vật phẩm vĩnh viễn được giữ lại.");
+                            } else {
+                                Service.gI().sendThongBao(player,
+                                        "Không có cải trang, pet hoặc ván bay HSD trong rương phụ.");
+                            }
+                        }
+                    }
+
                     case ConstNpc.CONFIRM_REMOVE_ALL_ITEM_LUCKY_ROUND -> {
                         if (select == 0) {
                             for (int i = 0; i < player.inventory.itemsBoxCrackBall.size(); i++) {

@@ -106,6 +106,7 @@ public class ThuongDe extends Npc {
                                         + (player.inventory.itemsBoxCrackBall.size()
                                         - InventoryService.gI().getCountEmptyListItem(player.inventory.itemsBoxCrackBall))
                                         + " món)",
+                                        "Xóa đồ\nHSD",
                                         "Xóa hết\ntrong rương", "Đóng");
                         }
                     } else if (player.idMark.getIndexMenu() == 2001) {
@@ -150,6 +151,12 @@ public class ThuongDe extends Npc {
                             case 4 ->
                                 ShopService.gI().opendShop(player, "ITEMS_LUCKY_ROUND", true);
                             case 5 ->
+                                NpcService.gI().createMenuConMeo(player,
+                                        ConstNpc.CONFIRM_REMOVE_HSD_ITEM_LUCKY_ROUND, this.avartar,
+                                        "Xóa toàn bộ cải trang, pet và ván bay có hạn sử dụng trong rương phụ? "
+                                        + "Vật phẩm vĩnh viễn sẽ được giữ lại.",
+                                        "Đồng ý", "Hủy bỏ");
+                            case 6 ->
                                 NpcService.gI().createMenuConMeo(player,
                                         ConstNpc.CONFIRM_REMOVE_ALL_ITEM_LUCKY_ROUND, this.avartar,
                                         "Con có chắc muốn xóa hết vật phẩm trong rương phụ? Sau khi xóa "
