@@ -70,7 +70,7 @@ public class MaTroi extends Boss {
                 if (pl == null || pl.isDie()) {
                     return;
                 }
-                this.nPoint.dame = pl.nPoint.hpMax / Util.nextInt(30, 50);
+                this.nPoint.dame = (int) Math.min(pl.nPoint.hpMax / Util.nextInt(30, 50), Integer.MAX_VALUE);
                 this.playerSkill.skillSelect = this.playerSkill.skills.get(Util.nextInt(0, this.playerSkill.skills.size() - 1));
                 if (Util.getDistance(this, pl) <= this.getRangeCanAttackWithSkillSelect()) {
                     if (Util.isTrue(5, 20)) {

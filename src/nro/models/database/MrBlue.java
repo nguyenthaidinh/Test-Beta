@@ -175,7 +175,7 @@ public class MrBlue {
     private static Player loadPlayer(LocalResultSet rs, boolean isOffline) throws Exception {
         Player player = null;
         try {
-            int plHp;
+            long plHp;
             int plMp;
             JSONArray dataArray;
 
@@ -307,14 +307,14 @@ public class MrBlue {
             player.nPoint.tiemNang = Long.parseLong(String.valueOf(dataArray.get(2)));
             player.nPoint.stamina = Short.parseShort(String.valueOf(dataArray.get(3)));
             player.nPoint.maxStamina = Short.parseShort(String.valueOf(dataArray.get(4)));
-            player.nPoint.hpg = Integer.parseInt(String.valueOf(dataArray.get(5)));
+            player.nPoint.hpg = Long.parseLong(String.valueOf(dataArray.get(5)));
             player.nPoint.mpg = Integer.parseInt(String.valueOf(dataArray.get(6)));
             player.nPoint.dameg = Integer.parseInt(String.valueOf(dataArray.get(7)));
             player.nPoint.defg = Integer.parseInt(String.valueOf(dataArray.get(8)));
             player.nPoint.critg = Byte.parseByte(String.valueOf(dataArray.get(9)));
             player.nPoint.critdragon = Byte.parseByte(String.valueOf(dataArray.get(10)));
             dataArray.get(11); //** Năng động
-            plHp = Integer.parseInt(String.valueOf(dataArray.get(12)));
+            plHp = Long.parseLong(String.valueOf(dataArray.get(12)));
             plMp = Integer.parseInt(String.valueOf(dataArray.get(13)));
             dataArray.clear();
 
@@ -823,12 +823,12 @@ public class MrBlue {
                 pet.nPoint.tiemNang = Long.parseLong(String.valueOf(dataArray.get(2)));
                 pet.nPoint.stamina = Short.parseShort(String.valueOf(dataArray.get(3)));
                 pet.nPoint.maxStamina = Short.parseShort(String.valueOf(dataArray.get(4)));
-                pet.nPoint.hpg = Integer.parseInt(String.valueOf(dataArray.get(5)));
+                pet.nPoint.hpg = Long.parseLong(String.valueOf(dataArray.get(5)));
                 pet.nPoint.mpg = Integer.parseInt(String.valueOf(dataArray.get(6)));
                 pet.nPoint.dameg = Integer.parseInt(String.valueOf(dataArray.get(7)));
                 pet.nPoint.defg = Integer.parseInt(String.valueOf(dataArray.get(8)));
                 pet.nPoint.critg = Integer.parseInt(String.valueOf(dataArray.get(9)));
-                int hp = Integer.parseInt(String.valueOf(dataArray.get(10)));
+                long hp = Long.parseLong(String.valueOf(dataArray.get(10)));
                 int mp = Integer.parseInt(String.valueOf(dataArray.get(11)));
 
                 //data body

@@ -592,9 +592,9 @@ public class Service {
         try {
             msg = Service.gI().messageSubCommand((byte) 14);//Cập nhật máu
             msg.writer().writeInt((int) pl.id);
-            msg.writer().writeInt(pl.nPoint.hp);
+            msg.writer().writeInt(pl.nPoint.getClientHp());
             msg.writer().writeByte(0);//Hiệu ứng Ăn Đậu
-            msg.writer().writeInt(pl.nPoint.hpMax);
+            msg.writer().writeInt(pl.nPoint.getClientHpMax());
             sendMessAnotherNotMeInMap(pl, msg);
             msg.cleanup();
         } catch (Exception e) {
@@ -608,9 +608,9 @@ public class Service {
         try {
             msg = Service.gI().messageSubCommand((byte) 14);//Cập nhật máu
             msg.writer().writeInt((int) pl.id);
-            msg.writer().writeInt(pl.nPoint.hp);
+            msg.writer().writeInt(pl.nPoint.getClientHp());
             msg.writer().writeByte(2);
-            msg.writer().writeInt(pl.nPoint.hpMax);
+            msg.writer().writeInt(pl.nPoint.getClientHpMax());
             sendMessAnotherNotMeInMap(pl, msg);
             msg.cleanup();
         } catch (Exception e) {
@@ -624,9 +624,9 @@ public class Service {
         try {
             msg = Service.gI().messageSubCommand((byte) 14);
             msg.writer().writeInt((int) pl.id);
-            msg.writer().writeInt(pl.nPoint.hp);
+            msg.writer().writeInt(pl.nPoint.getClientHp());
             msg.writer().writeByte(1);
-            msg.writer().writeInt(pl.nPoint.hpMax);
+            msg.writer().writeInt(pl.nPoint.getClientHpMax());
             sendMessAnotherNotMeInMap(pl, msg);
             msg.cleanup();
         } catch (Exception e) {
@@ -640,8 +640,8 @@ public class Service {
         try {
             msg = messageSubCommand((byte) 9);
             msg.writer().writeInt((int) pl.id);
-            msg.writer().writeInt(pl.nPoint.hp);
-            msg.writer().writeInt(pl.nPoint.hpMax);
+            msg.writer().writeInt(pl.nPoint.getClientHp());
+            msg.writer().writeInt(pl.nPoint.getClientHpMax());
             sendMessAnotherNotMeInMap(pl, msg);
         } catch (Exception e) {
             e.printStackTrace();
@@ -773,12 +773,12 @@ public class Service {
             Message msg;
             try {
                 msg = new Message(-42);
-                msg.writer().writeInt(player.nPoint.hpg);
+                msg.writer().writeInt(player.nPoint.getClientHpg());
                 msg.writer().writeInt(player.nPoint.mpg);
                 msg.writer().writeInt(player.nPoint.dameg);
-                msg.writer().writeInt(player.nPoint.hpMax);
+                msg.writer().writeInt(player.nPoint.getClientHpMax());
                 msg.writer().writeInt(player.nPoint.mpMax);
-                msg.writer().writeInt(player.nPoint.hp);
+                msg.writer().writeInt(player.nPoint.getClientHp());
                 msg.writer().writeInt(player.nPoint.mp);
                 msg.writer().writeByte(player.nPoint.speed);
                 msg.writer().writeByte(20);
@@ -1099,7 +1099,7 @@ public class Service {
         return 19;
     }
 
-    public void hsChar(Player pl, int hp, int mp) {
+    public void hsChar(Player pl, long hp, int mp) {
         Message msg;
         try {
             if (pl.isPl() && pl.effectSkill != null && pl.effectSkill.isBodyChangeTechnique) {
@@ -1117,7 +1117,7 @@ public class Service {
 
             msg = messageSubCommand((byte) 15);
             msg.writer().writeInt((int) pl.id);
-            msg.writer().writeInt(hp);
+            msg.writer().writeInt(pl.nPoint.getClientHp());
             msg.writer().writeInt(mp);
             msg.writer().writeShort(pl.location.x);
             msg.writer().writeShort(pl.location.y);
@@ -1596,8 +1596,8 @@ public class Service {
                     }
                 }
 
-                msg.writer().writeInt(pl.pet.nPoint.hp); //hp
-                msg.writer().writeInt(pl.pet.nPoint.hpMax); //hpfull
+                msg.writer().writeInt(pl.pet.nPoint.getClientHp()); //hp
+                msg.writer().writeInt(pl.pet.nPoint.getClientHpMax()); //hpfull
                 msg.writer().writeInt(pl.pet.nPoint.mp); //mp
                 msg.writer().writeInt(pl.pet.nPoint.mpMax); //mpfull
                 msg.writer().writeInt(pl.pet.nPoint.dame); //damefull
@@ -2568,8 +2568,8 @@ public class Service {
             msg.writer().writeByte(pl.gender);
             msg.writer().writeShort(plHead);
             msg.writer().writeUTF(plName);
-            msg.writer().writeInt(pl.nPoint.hp);
-            msg.writer().writeInt(pl.nPoint.hpMax);
+            msg.writer().writeInt(pl.nPoint.getClientHp());
+            msg.writer().writeInt(pl.nPoint.getClientHpMax());
             msg.writer().writeShort(plBody);
             msg.writer().writeShort(plLeg);
             int flagbag = pl.getFlagBag();
@@ -2787,8 +2787,8 @@ public class Service {
 
             msg.writer().writeShort(bot.head);
             msg.writer().writeUTF(bot.name);
-            msg.writer().writeInt(bot.nPoint.hp);
-            msg.writer().writeInt(bot.nPoint.hpMax);
+            msg.writer().writeInt(bot.nPoint.getClientHp());
+            msg.writer().writeInt(bot.nPoint.getClientHpMax());
             msg.writer().writeShort(bot.body);
             msg.writer().writeShort(bot.leg);
 
@@ -2883,8 +2883,8 @@ public class Service {
             msg.writer().writeByte(player.gender);
             msg.writer().writeShort(player.getHead());
             msg.writer().writeUTF(player.name);
-            msg.writer().writeInt(player.nPoint.hp);
-            msg.writer().writeInt(player.nPoint.hpMax);
+            msg.writer().writeInt(player.nPoint.getClientHp());
+            msg.writer().writeInt(player.nPoint.getClientHpMax());
             msg.writer().writeShort(player.getBody());
             msg.writer().writeShort(player.getLeg());
             msg.writer().writeByte(player.getFlagBag());

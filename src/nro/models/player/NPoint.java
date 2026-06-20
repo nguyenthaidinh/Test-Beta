@@ -35,6 +35,7 @@ import nro.models.utils.TimeUtil;
 public class NPoint {
 
     public static final byte MAX_LIMIT = 12;
+    public static final long MAX_PLAYER_HP = 20_000_000_000L;
 
     @Setter
     private Player player;
@@ -67,7 +68,7 @@ public class NPoint {
     public long power;
     public long tiemNang;
 
-    public int hp, hpMax, hpg;
+    public long hp, hpMax, hpg;
     public int mp, mpMax, mpg;
     public int dame, dameg;
     public int def, defg;
@@ -81,7 +82,8 @@ public class NPoint {
     /**
      * Chỉ số cộng thêm
      */
-    public int hpAdd, mpAdd, dameAdd, defAdd, critAdd, hpHoiAdd, mpHoiAdd;
+    public long hpAdd;
+    public int mpAdd, dameAdd, defAdd, critAdd, hpHoiAdd, mpHoiAdd;
 
     /**
      * //+#% sức đánh chí mạng
@@ -108,7 +110,8 @@ public class NPoint {
     /**
      * Lượng hp, mp hồi mỗi 30s, mp hồi cho người khác
      */
-    public int hpHoi, mpHoi, mpHoiCute;
+    public long hpHoi;
+    public int mpHoi, mpHoiCute;
 
     /**
      * Tỉ lệ hp, mp hồi cộng thêm
@@ -260,7 +263,7 @@ public class NPoint {
                             this.dameAdd += io.param;
                             break;
                         case 2: //HP, KI+#000
-                            this.hpAdd += io.param * 1000;
+                            this.hpAdd += io.param * 1000L;
                             this.mpAdd += io.param * 1000;
                             break;
                         case 3:// vô hiệu chưởng
@@ -294,7 +297,7 @@ public class NPoint {
                             this.tlDameAttMob.add(io.param);
                             break;
                         case 22: //HP+#K
-                            this.hpAdd += io.param * 1000;
+                            this.hpAdd += io.param * 1000L;
                             break;
                         case 23: //MP+#K
                             this.mpAdd += io.param * 1000;
@@ -492,7 +495,7 @@ public class NPoint {
                 this.dameAdd += io.param;
                 break;
             case 2: //HP, KI+#000
-                this.hpAdd += io.param * 1000;
+                this.hpAdd += io.param * 1000L;
                 this.mpAdd += io.param * 1000;
                 break;
             case 3:// vô hiệu chưởng
@@ -526,7 +529,7 @@ public class NPoint {
                 this.tlDameAttMob.add(io.param);
                 break;
             case 22: //HP+#K
-                this.hpAdd += io.param * 1000;
+                this.hpAdd += io.param * 1000L;
                 break;
             case 23: //MP+#K
                 this.mpAdd += io.param * 1000;
@@ -1031,11 +1034,11 @@ public class NPoint {
             }
         }
 
-        if (hpMax > 2_147_483_647) {
-            hpMax = 2_147_483_647;
+        if (hpMax > MAX_PLAYER_HP) {
+            hpMax = MAX_PLAYER_HP;
         }
 
-        this.hpMax = (int) hpMax;
+        this.hpMax = hpMax;
     }
 
     private void setHp() {
@@ -1171,16 +1174,35 @@ public class NPoint {
         this.mp = Math.min(this.mp, this.mpMax);
     }
 
-    public int getHP() {
+    public long getHP() {
         return Math.min(this.hp, this.hpMax);
     }
 
     public void setHP(long hp) {
         if (hp > 0) {
-            this.hp = (int) (hp <= this.hpMax ? hp : this.hpMax);
+            this.hp = hp <= this.hpMax ? hp : this.hpMax;
         } else {
             player.setDie();
         }
+    }
+
+    public static int toClientStat(long value) {
+        if (value <= 0) {
+            return 0;
+        }
+        return (int) Math.min(value, Integer.MAX_VALUE);
+    }
+
+    public int getClientHp() {
+        return toClientStat(this.hp);
+    }
+
+    public int getClientHpMax() {
+        return toClientStat(this.hpMax);
+    }
+
+    public int getClientHpg() {
+        return toClientStat(this.hpg);
     }
 
     public int getMP() {
@@ -1483,11 +1505,11 @@ public class NPoint {
 
     public void addHp(long hp) {
         if (hp > 0) {
-            long potentialHp = (long) this.hp + hp;
+            long potentialHp = this.hp + hp;
             if (potentialHp > this.hpMax) {
                 this.hp = this.hpMax;
             } else {
-                this.hp = (int) Math.min(potentialHp, 2_147_483_647);
+                this.hp = Math.min(potentialHp, MAX_PLAYER_HP);
             }
         }
     }
@@ -1508,7 +1530,7 @@ public class NPoint {
         if (hp < 0) {
             this.hp = 0;
         } else {
-            this.hp = (int) Math.min(hp, 2_147_483_647);
+            this.hp = Math.min(hp, MAX_PLAYER_HP);
         }
     }
 
@@ -1724,7 +1746,7 @@ public class NPoint {
         if (this.hpMax == 0) {
             return 100;
         }
-        return (int) ((long) this.hp * 100 / this.hpMax);
+        return (int) (this.hp * 100 / this.hpMax);
     }
 
     public int getCurrPercentMP() {
@@ -2177,10 +2199,10 @@ public class NPoint {
         long tnhp = 0, tnki = 0, tnsd = 0, tng = 0, tncm = 0;
 
         if (hpg > 0) {
-            tnhp = (((hpg / 20L) * (50L + (50L + (hpg / 20L) - 1L)) / 2L) * 20L);
+            tnhp = calHpMpTiemNang(hpg);
         }
         if (mpg > 0) {
-            tnki = (((mpg / 20L) * (50L + (50L + (mpg / 20L) - 1L)) / 2L) * 20L);
+            tnki = calHpMpTiemNang(mpg);
         }
         if (dameg > 0) {
             tnsd = ((dameg * (dameg - 1L) * 100L) / 2L);
@@ -2191,7 +2213,31 @@ public class NPoint {
         if (critg > 0) {
             tncm = ((50L * (((long) Math.pow(5L, critg) - 1L)) / (5L - 1L) * 1000000L));
         }
-        return tnhp + tnki + tnsd + tng + tncm;
+        return safeAdd(safeAdd(safeAdd(safeAdd(tnhp, tnki), tnsd), tng), tncm);
+    }
+
+    private long calHpMpTiemNang(long basePoint) {
+        long point = basePoint / 20L;
+        long last = 50L + point - 1L;
+        long sum = safeMul(point, 50L + last) / 2L;
+        return safeMul(sum, 20L);
+    }
+
+    private long safeAdd(long a, long b) {
+        if (a > Long.MAX_VALUE - b) {
+            return Long.MAX_VALUE;
+        }
+        return a + b;
+    }
+
+    private long safeMul(long a, long b) {
+        if (a == 0 || b == 0) {
+            return 0;
+        }
+        if (a > Long.MAX_VALUE / b) {
+            return Long.MAX_VALUE;
+        }
+        return a * b;
     }
 
     //--------------------------------------------------------------------------
@@ -2207,8 +2253,8 @@ public class NPoint {
                     long hpRecovered = hpMax / 100 * tiLeHoiPhuc;
                     long mpRecovered = mpMax / 100 * tiLeHoiPhuc;
 
-                    if (hp + hpRecovered > 2_147_483_647) {
-                        hpRecovered = 2_147_483_647 - hp;
+                    if (hp + hpRecovered > hpMax) {
+                        hpRecovered = hpMax - hp;
                     }
                     if (mp + mpRecovered > 2_147_483_647) {
                         mpRecovered = 2_147_483_647 - mp;

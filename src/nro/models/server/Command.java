@@ -172,7 +172,7 @@ parameterizedCommands.put("dm", (player, text) -> {
 // hpg <value>
 parameterizedCommands.put("hp", (player, text) -> {
     try {
-        int hpg = Integer.parseInt(text.replace("hp", "").trim());
+        long hpg = Long.parseLong(text.replace("hp", "").trim());
         player.nPoint.hpg = hpg;
         Service.gI().point(player);
         Service.gI().sendThongBao(player, "SET HP GỐC = " + hpg);

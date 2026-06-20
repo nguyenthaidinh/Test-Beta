@@ -56,7 +56,7 @@ public class Broly extends Boss {
         this.name = "Broly " + Util.nextInt(10, 100);
         this.nPoint.hpMax = Util.nextInt(500, 100000);
         this.nPoint.hp = this.nPoint.hpMax;
-        this.nPoint.dame = this.nPoint.hpMax / 100;
+        this.nPoint.dame = (int) Math.min(this.nPoint.hpMax / 100, Integer.MAX_VALUE);
         this.nPoint.crit = Util.nextInt(50);
         this.joinMap2();
         st = System.currentTimeMillis();
@@ -178,11 +178,11 @@ public class Broly extends Boss {
     }
 
     private void tangChiSo() {
-        int hpMax = this.nPoint.hpMax;
+        long hpMax = this.nPoint.hpMax;
         int rand = Util.nextInt(10, 100);
         hpMax = hpMax + hpMax / rand < 16_070_777 ? hpMax + hpMax / rand : 16_070_777;
         this.nPoint.hpMax = hpMax;
-        this.nPoint.dame = hpMax / 10;
+        this.nPoint.dame = (int) (hpMax / 10);
     }
 
     @Override

@@ -51,7 +51,7 @@ public class SummonDragon {
             + "Để gọi rồng 3 sao cần ngọc từ 3 sao đến 7sao\n"
             + "Điều ước rồng 3 sao: Capsule 3 sao, hoặc 2 triệu sức mạnh, hoặc 200k vàng\n"
             + "Điều ước rồng 2 sao: Capsule 2 sao, hoặc 20 triệu sức mạnh, hoặc 2 triệu vàng\n"
-            + "Điều ước rồng 1 sao: Capsule 1 sao, hoặc 20 triệu vàng, hoặc đẹp trai, hoặc....\n"
+            + "Điều ước rồng 1 sao: Capsule 1 sao, hoặc 20 triệu vàng, hoặc đẹp trai, hoặc 200 triệu sức mạnh\n"
             + "Ngọc rồng sẽ mất ngay khi gọi rồng dù bạn có ước hay không\n"
             + "Quá 5 phút nếu không ước rồng thần sẽ bay mất";
     public static final String SHENRON_SAY
@@ -63,6 +63,7 @@ public class SummonDragon {
     public static final String[] SHENRON_1_STAR_WISHES_2
             = new String[]{"Đẹp trai\nnhất\nVũ trụ", "Giàu có\n+10K\nNgọc",
                 "Găng tay đệ\nđang mang\nlên 1 cấp",
+                "+200 Tr\nSức mạnh\nvà tiềm năng",
                 "Điều ước\nkhác"};
     public static final String[] SHENRON_1_STAR_WISHES_3
             = new String[]{"Quần\nđang mang\nlên 1 cấp", "Quần đệ\nđang mang\nlên 1 cấp",
@@ -419,6 +420,9 @@ public class SummonDragon {
                             reOpenShenronWishes(playerSummonShenron);
                             return;
                         }
+                        break;
+                    case 3: //+200 tr smtn
+                        Service.gI().addSMTN(this.playerSummonShenron, (byte) 2, 200000000, false);
                         break;
                 }
                 break;

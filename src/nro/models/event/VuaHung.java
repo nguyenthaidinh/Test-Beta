@@ -12,6 +12,7 @@ import nro.models.player.Player;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
 import nro.models.services.Service;
+import nro.models.services_dungeon.AncientCastleService;
 
 /**
  *
@@ -42,6 +43,9 @@ public class VuaHung extends Npc {
 
     @Override
     public void openBaseMenu(Player player) {
+        if (AncientCastleService.gI().openCloneMenu(player)) {
+            return;
+        }
         long now = System.currentTimeMillis();
         long elapsed = now - START_TIME;
         long phaseStartTime = START_TIME + (elapsed / (60 * 60 * 1000)) * (60 * 60 * 1000);

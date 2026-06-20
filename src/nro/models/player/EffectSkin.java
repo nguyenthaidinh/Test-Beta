@@ -183,7 +183,7 @@ public class EffectSkin {
                             }
                         }
                         for (Player pl : players) {
-                            int subHp = (int) ((long) pl.nPoint.hpMax * param / 100);
+                            long subHp = pl.nPoint.hpMax * param / 100;
                             int subMp = (int) ((long) pl.nPoint.mpMax * param / 100);
                             if (subHp >= pl.nPoint.hp) {
                                 subHp = pl.nPoint.hp - 1;
@@ -191,7 +191,7 @@ public class EffectSkin {
                             if (subMp >= pl.nPoint.mp) {
                                 subMp = pl.nPoint.mp - 1;
                             }
-                            hpHut += subHp;
+                            hpHut += (int) Math.min(subHp, Integer.MAX_VALUE);
                             mpHut += subMp;
                             PlayerService.gI().sendInfoHpMpMoney(pl);
                             Service.gI().Send_Info_NV(pl);
@@ -221,7 +221,7 @@ public class EffectSkin {
                             Player pl = playersMap.get(i);
                             if (pl != null && pl.nPoint != null && !this.player.equals(pl) && !pl.isBoss && !pl.isDie()
                                     && Util.getDistance(this.player, pl) <= 200) {
-                                int subHp = (int) ((long) pl.nPoint.hpMax * param / 100);
+                                long subHp = pl.nPoint.hpMax * param / 100;
                                 if (subHp >= pl.nPoint.hp) {
                                     subHp = pl.nPoint.hp - 1;
                                 }
@@ -410,7 +410,7 @@ public class EffectSkin {
             if (this.player.effectSkill != null && this.player.effectSkill.isBinh && this.player.effectSkill.playerUseMafuba != null) {
                 if (Util.canDoWithTime(lastTimeMaPhongBa, 500) && this.player.effectSkill.playerUseMafuba.playerSkill != null) {
                     double param = this.player.effectSkill.playerUseMafuba.playerSkill.getSkillbyId(Skill.MA_PHONG_BA).point * (this.player.effectSkill.typeBinh == 0 ? 1 : 2);
-                    int subHp = (int) ((long) this.player.effectSkill.playerUseMafuba.nPoint.hpMax * param / 100);
+                    long subHp = (long) (this.player.effectSkill.playerUseMafuba.nPoint.hpMax * param / 100);
                     if (subHp >= this.player.nPoint.hp) {
                         subHp = Math.abs(this.player.nPoint.hp - 100);
                     }

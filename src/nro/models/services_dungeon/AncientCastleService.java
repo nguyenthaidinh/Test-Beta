@@ -217,6 +217,49 @@ public class AncientCastleService implements Runnable {
         return run != null && !run.finished && hasLiveStage1Boss(run);
     }
 
+    public synchronized boolean openCloneMenu(Player player) {
+        if (player == null || player.zone == null || player.zone.map == null
+                || player.zone.map.mapId != ConstMap.THANH_CO_2) {
+            return false;
+        }
+        CastleRun run = activeRuns.get(player.id);
+        if (run == null) {
+            Service.gI().sendThongBao(player, "Ban khong co luot Thanh co dang chay.");
+            return true;
+        }
+        if (run.finished || isExpired(run)) {
+            finishRun(run, true);
+            return true;
+        }
+        if (run.surrendered.contains(player.id)) {
+            Service.gI().sendThongBao(player, "Ban da dau hang luot Thanh co nay.");
+            return true;
+        }
+        if (hasLiveStage1Boss(run)) {
+            Service.gI().sendThongBao(player, "Hay ha het boss o Thanh co 1 truoc.");
+            return true;
+        }
+        Integer zoneId = run.cloneZoneIds.get(player.id);
+        if (zoneId == null) {
+            Service.gI().sendThongBao(player, "Ban khong thuoc luot Thanh co nay.");
+            return true;
+        }
+        if (player.zone.zoneId != zoneId) {
+            Service.gI().sendThongBao(player, "Hay ve dung khu ban sao cua minh: khu " + zoneId + ".");
+            return true;
+        }
+        if (run.cloneKilled.contains(player.id)) {
+            Service.gI().sendThongBao(player, run.finalUnlocked
+                    ? "Ban da ha ban sao. Hay vao Dau truong Thanh co."
+                    : "Ban da ha ban sao. Hay cho dong doi hoan thanh.");
+            return true;
+        }
+        run.cloneStageEntered.add(player.id);
+        sendChallengeTime(player, run);
+        showCloneChoice(player);
+        return true;
+    }
+
     public synchronized void selectCloneMenu(Player player, int select) {
         if (select == 0) {
             surrender(player);

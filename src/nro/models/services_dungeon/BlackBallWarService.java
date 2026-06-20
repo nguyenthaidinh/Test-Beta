@@ -144,7 +144,7 @@ public class BlackBallWarService {
             player.effectSkin.lastTimeXHPKI = System.currentTimeMillis();
             player.effectSkin.xHPKI = x;
             player.nPoint.calPoint();
-            player.nPoint.setHp((int) player.nPoint.hp * x);
+            player.nPoint.setHp(player.nPoint.hp * x);
             player.nPoint.setMp((int) player.nPoint.mp * x);
             PlayerService.gI().sendInfoHpMp(player);
             Service.gI().point(player);
@@ -173,7 +173,7 @@ public class BlackBallWarService {
             player.effectSkin.lastTimeXDame = System.currentTimeMillis();
             player.effectSkin.xDame = x;
             player.nPoint.calPoint();
-            player.nPoint.setHp((int) player.nPoint.hp * x);
+            player.nPoint.setHp(player.nPoint.hp * x);
             player.nPoint.setMp((int) player.nPoint.mp * x);
             PlayerService.gI().sendInfoHpMp(player);
             Service.gI().point(player);

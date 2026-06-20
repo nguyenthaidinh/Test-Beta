@@ -26,7 +26,7 @@ public class ItemService {
     private static final short COSTUME_TRUM_TOP_1_ID = 1870;
     private static final String COSTUME_TRUM_TOP_1_NAME = "Trùm Top 1";
     private static final String COSTUME_TRUM_TOP_1_DESCRIPTION = "Cải trang Trùm Top 1";
-    private static final int[] TRUM_TOP_1_CONTROLLED_OPTIONS = {38, 50, 77, 103, 204, 106, 95, 96};
+    private static final int[] TRUM_TOP_1_CONTROLLED_OPTIONS = {38, 50, 77, 103, 204, 106, 94, 108, 95, 96};
     private static final short TRAIN_ARMOR_5_ID = 1869;
     private static final byte TRAIN_ARMOR_TYPE = 32;
     private static final int TRAIN_ARMOR_5_POWER_REQUIRE = 1_500_000;
@@ -136,10 +136,10 @@ public class ItemService {
         options.add(new ItemOption(50, 30));
         options.add(new ItemOption(77, 60));
         options.add(new ItemOption(103, 60));
+        options.add(new ItemOption(94, 20));
+        options.add(new ItemOption(108, 20));
         options.add(new ItemOption(204, 50));
         options.add(new ItemOption(106, 0));
-        options.add(new ItemOption(95, 10));
-        options.add(new ItemOption(96, 10));
         return options;
     }
 

@@ -451,7 +451,7 @@ public class Mob {
             msg = new Message(-10);
             msg.writer().writeByte(this.id);
             msg.writer().writeInt((int) player.id);
-            msg.writer().writeInt(player.nPoint.hp);
+            msg.writer().writeInt(player.nPoint.getClientHp());
             Service.gI().sendMessAnotherNotMeInMap(player, msg);
             msg.cleanup();
         } catch (Exception e) {

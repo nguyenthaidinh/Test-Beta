@@ -222,7 +222,7 @@ public class BotAttackplayer extends Bot {
             return;
         }
 
-        int damePST = (int) (dame * percentPST / 100L);
+        long damePST = dame * percentPST / 100L;
         if (damePST >= attacker.nPoint.hp) {
             damePST = attacker.nPoint.hp - 1;
         }
@@ -231,9 +231,9 @@ public class BotAttackplayer extends Bot {
         try {
             msg = new Message(56);
             msg.writer().writeInt((int) attacker.id);
-            damePST = attacker.injured(attacker, damePST, true, false);
-            msg.writer().writeInt(attacker.nPoint.hp);
-            msg.writer().writeInt(damePST);
+            int damePSTHit = attacker.injured(attacker, damePST, true, false);
+            msg.writer().writeInt(attacker.nPoint.getClientHp());
+            msg.writer().writeInt(damePSTHit);
             msg.writer().writeBoolean(false);
             msg.writer().writeByte(36);
             Service.gI().sendMessAllPlayerInMap(attacker, msg);

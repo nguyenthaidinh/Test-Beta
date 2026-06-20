@@ -465,7 +465,7 @@ public class Player implements Runnable {
                             && Util.canDoWithTime(this.lastTimeLioDepTraiHeal, 30000)) {
                         long hoiHp = this.nPoint.hpMax * 5 / 100;
                         if (this.nPoint.hp < this.nPoint.hpMax) {
-                            this.nPoint.hp = (int) Math.min(this.nPoint.hp + hoiHp, this.nPoint.hpMax);
+                            this.nPoint.hp = Math.min(this.nPoint.hp + hoiHp, this.nPoint.hpMax);
                             PlayerService.gI().sendInfoHp(this);
                         }
                         this.lastTimeLioDepTraiHeal = System.currentTimeMillis();

@@ -211,7 +211,7 @@ public class Shenron_Event {
                         player.itemTime.lastTimeUseRX = System.currentTimeMillis();
                         ItemTimeService.gI().sendItemTime(player, 6581, timeRX);
                         player.nPoint.calPoint();
-                        player.nPoint.setHp((int) player.nPoint.hpMax);
+                        player.nPoint.setHp(player.nPoint.hpMax);
                         player.nPoint.setMp((int) player.nPoint.mpMax);
                         Service.gI().point(player);
                         Service.gI().Send_Info_NV(player);

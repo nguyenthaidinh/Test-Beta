@@ -182,7 +182,7 @@ public class ThuyTinh extends Boss {
                         move(pl.location.x + (Util.nextInt(0, 1) == 1 ? move : -move), this.location.y);
                     }
                     if (pl.isPl()) {
-                        this.nPoint.dame = pl.nPoint.hpMax / 30;
+                        this.nPoint.dame = (int) Math.min(pl.nPoint.hpMax / 30, Integer.MAX_VALUE);
                     } else {
                         this.nPoint.dame = 10000;
                     }

@@ -47,7 +47,7 @@ public final class MobMe extends Mob {
                     msg.writer().writeInt(this.id);
                     msg.writer().writeInt((int) pl.id);
                     msg.writer().writeInt(dameHit);
-                    msg.writer().writeInt(pl.nPoint.hp);
+                    msg.writer().writeInt(pl.nPoint.getClientHp());
                     Service.gI().sendMessAllPlayerInMap(this.player, msg);
                     msg.cleanup();
                 }

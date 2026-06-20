@@ -65,7 +65,7 @@ public class SuperBroly extends Boss {
         this.name = "Super Broly " + Util.nextInt(10, 100);
         this.nPoint.hpMax = Util.nextInt(1_500_000, 16_070_777);
         this.nPoint.hp = this.nPoint.hpMax;
-        this.nPoint.dame = this.nPoint.hpMax / 100;
+        this.nPoint.dame = (int) Math.min(this.nPoint.hpMax / 100, Integer.MAX_VALUE);
         this.nPoint.crit = Util.nextInt(50);
         if (this.zone != null) {
             ChangeMapService.gI().changeMap(this, this.zone, this.location.x, this.location.y);
@@ -158,11 +158,11 @@ public class SuperBroly extends Boss {
     }
 
     private void tangChiSo() {
-        int hpMax = this.nPoint.hpMax;
+        long hpMax = this.nPoint.hpMax;
         int rand = Util.nextInt(80, 100);
         hpMax = hpMax + hpMax / rand < 16_070_777 ? hpMax + hpMax / rand : 16_070_777;
         this.nPoint.hpMax = hpMax;
-        this.nPoint.dame = hpMax / 10;
+        this.nPoint.dame = (int) (hpMax / 10);
     }
 
     @Override

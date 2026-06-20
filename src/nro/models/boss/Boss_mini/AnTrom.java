@@ -179,7 +179,7 @@ public class AnTrom extends Boss {
         this.name = "Ăn Trộm " + Util.nextInt(1, 49);
         this.nPoint.hpMax = Util.nextInt(100);
         this.nPoint.hp = this.nPoint.hpMax;
-        this.nPoint.dameg = this.nPoint.hpMax / 10;
+        this.nPoint.dameg = (int) Math.min(this.nPoint.hpMax / 10, Integer.MAX_VALUE);
         goldAnTrom = 0;
         this.joinMap2();
         st = System.currentTimeMillis();
