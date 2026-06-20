@@ -353,11 +353,7 @@ public class MrBlue {
                 if (tempId != -1) {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
-                    for (int j = 0; j < options.size(); j++) {
-                        JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(options.get(j)));
-                        item.itemOptions.add(new Item.ItemOption(Integer.parseInt(String.valueOf(opt.get(0))),
-                                Integer.parseInt(String.valueOf(opt.get(1)))));
-                    }
+                    loadItemOptions(item, options);
                     item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                     if (ItemService.gI().isOutOfDateTime(item)) {
                         item = ItemService.gI().createItemNull();
@@ -381,11 +377,7 @@ public class MrBlue {
                 if (tempId != -1) {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
-                    for (int j = 0; j < options.size(); j++) {
-                        JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(options.get(j)));
-                        item.itemOptions.add(new Item.ItemOption(Integer.parseInt(String.valueOf(opt.get(0))),
-                                Integer.parseInt(String.valueOf(opt.get(1)))));
-                    }
+                    loadItemOptions(item, options);
                     item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                     if (ItemService.gI().isOutOfDateTime(item)) {
                         item = ItemService.gI().createItemNull();
@@ -406,11 +398,7 @@ public class MrBlue {
                 if (tempId != -1) {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
-                    for (int j = 0; j < options.size(); j++) {
-                        JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(options.get(j)));
-                        item.itemOptions.add(new Item.ItemOption(Integer.parseInt(String.valueOf(opt.get(0))),
-                                Integer.parseInt(String.valueOf(opt.get(1)))));
-                    }
+                    loadItemOptions(item, options);
                     item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                     if (item.template.id == 2132) {
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -445,11 +433,7 @@ public class MrBlue {
                 if (tempId != -1) {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
-                    for (int j = 0; j < options.size(); j++) {
-                        JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(options.get(j)));
-                        item.itemOptions.add(new Item.ItemOption(Integer.parseInt(String.valueOf(opt.get(0))),
-                                Integer.parseInt(String.valueOf(opt.get(1)))));
-                    }
+                    loadItemOptions(item, options);
                     player.inventory.itemsBoxCrackBall.add(item);
                 }
             }
@@ -464,11 +448,7 @@ public class MrBlue {
                 if (tempId != -1) {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
-                    for (int j = 0; j < options.size(); j++) {
-                        JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(options.get(j)));
-                        item.itemOptions.add(new Item.ItemOption(Integer.parseInt(String.valueOf(opt.get(0))),
-                                Integer.parseInt(String.valueOf(opt.get(1)))));
-                    }
+                    loadItemOptions(item, options);
                     item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                     if (item.template.id == 2322) {
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -840,11 +820,7 @@ public class MrBlue {
                     if (tempId != -1) {
                         item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                         JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
-                        for (int j = 0; j < options.size(); j++) {
-                            JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(options.get(j)));
-                            item.itemOptions.add(new Item.ItemOption(Integer.parseInt(String.valueOf(opt.get(0))),
-                                    Integer.parseInt(String.valueOf(opt.get(1)))));
-                        }
+                        loadItemOptions(item, options);
                         item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                         if (item.template.id == 2132) {
                             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -1332,6 +1308,19 @@ public class MrBlue {
             e.printStackTrace();
         }
         return player;
+    }
+
+    private static void loadItemOptions(Item item, JSONArray options) {
+        if (item == null || options == null || options.isEmpty()) {
+            return;
+        }
+        item.itemOptions.clear();
+        for (Object option : options) {
+            JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(option));
+            item.itemOptions.add(new Item.ItemOption(Integer.parseInt(String.valueOf(opt.get(0))),
+                    Integer.parseInt(String.valueOf(opt.get(1)))));
+        }
+        ItemService.gI().normalizeLuckyRoundPetOptions(item);
     }
 
     public static List<OptionCard> loadOptionCard(JSONArray json) {

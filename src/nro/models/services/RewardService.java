@@ -26,6 +26,7 @@ public class RewardService {
         1620, 1629, 1668, 1748, 1750, 1729, 1727, 1714, 1682,
         1541, 1563, 1573, 1724, 1733, 1734, 1749
     };
+    private static final short[] LUCKY_ROUND_FRAGMENT_IDS = {1792, 1791, 1204};
     private static final int[] LUCKY_ROUND_DEFAULT_EVENT_ITEMS = {999, 1000, 1001};
 
     private static final int[][][] ACTIVATION_SET = {
@@ -98,6 +99,8 @@ public class RewardService {
                         it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10))); // HSD
                     }
                     it.quantity = 1;
+                } else if (Util.isTrue(1, 200)) {
+                    it = createLuckyRoundFragmentItem();
                 } else if (Util.isTrue(5, 100)) {
                     it = ItemService.gI().createNewItem((short) 956);// Đá bảo vệ
                     it.itemOptions.clear();
@@ -179,10 +182,10 @@ public class RewardService {
         item.itemOptions.add(new ItemOption(77, itemId == PET_KHUNG_LONG_NGOK_ID ? Util.nextInt(10, 30) : Util.nextInt(10, 25)));
         item.itemOptions.add(new ItemOption(103, itemId == SANTA_TANK_ID ? Util.nextInt(10, 40) : Util.nextInt(10, 25)));
         if (itemId == MOTO_BUN_MA_ID) {
-            item.itemOptions.add(new ItemOption(47, Util.nextInt(10, 20)));
+            item.itemOptions.add(new ItemOption(94, Util.nextInt(10, 20)));
         }
         if (itemId == PET_BABY_SHARK_ID) {
-            item.itemOptions.add(new ItemOption(47, Util.nextInt(5, 15)));
+            item.itemOptions.add(new ItemOption(94, Util.nextInt(5, 15)));
         }
         if (itemId == PET_CAPYBARA_BACKPACK_ID) {
             item.itemOptions.add(new ItemOption(5, Util.nextInt(10, 25)));
@@ -200,6 +203,17 @@ public class RewardService {
         } else {
             item.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10)));
         }
+        item.quantity = 1;
+        item.info = item.getInfo();
+        item.content = item.getContent();
+        return item;
+    }
+
+    private Item createLuckyRoundFragmentItem() {
+        short itemId = LUCKY_ROUND_FRAGMENT_IDS[Util.nextInt(LUCKY_ROUND_FRAGMENT_IDS.length)];
+        Item item = ItemService.gI().createNewItem(itemId);
+        item.itemOptions.clear();
+        item.itemOptions.add(new ItemOption(30, 0));
         item.quantity = 1;
         item.info = item.getInfo();
         item.content = item.getContent();

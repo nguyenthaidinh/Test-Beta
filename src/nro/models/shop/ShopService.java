@@ -443,6 +443,8 @@ public class ShopService {
             msg.writer().writeUTF("Phần\nthưởng");
             msg.writer().writeByte(items.size());
             for (Item item : items) {
+                ItemService.gI().normalizeGokuNgayXuaOptions(item);
+                ItemService.gI().normalizeLuckyRoundPetOptions(item);
                 msg.writer().writeShort(item.template.id);
                 msg.writer().writeUTF("|7| LUCKY REWARD");
                 msg.writer().writeByte(item.itemOptions.size() + 1);

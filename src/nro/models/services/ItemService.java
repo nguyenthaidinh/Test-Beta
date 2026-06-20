@@ -34,6 +34,8 @@ public class ItemService {
     private static final short TRAIN_ARMOR_5_ID = 1869;
     private static final byte TRAIN_ARMOR_TYPE = 32;
     private static final int TRAIN_ARMOR_5_POWER_REQUIRE = 1_500_000;
+    private static final short MOTO_BUN_MA_ID = 1541;
+    private static final short PET_BABY_SHARK_ID = 1620;
 
     public static ItemService gI() {
         if (i == null) {
@@ -132,6 +134,8 @@ public class ItemService {
         }
         if (!hasGokuNgayXuaControlledOption(item)) {
             item.itemOptions.addAll(getGokuNgayXuaOptions());
+        } else {
+            removeDuplicateGokuNgayXuaControlledOptions(item);
         }
         item.info = item.getInfo();
         item.content = item.getContent();
@@ -143,6 +147,20 @@ public class ItemService {
         }
         template.name = COSTUME_GOKU_NGAY_XUA_NAME;
         template.description = COSTUME_GOKU_NGAY_XUA_DESCRIPTION;
+    }
+
+    public void normalizeLuckyRoundPetOptions(Item item) {
+        if (item == null || item.template == null || item.itemOptions == null
+                || (item.template.id != MOTO_BUN_MA_ID && item.template.id != PET_BABY_SHARK_ID)) {
+            return;
+        }
+        for (ItemOption option : item.itemOptions) {
+            if (option != null && option.optionTemplate != null && option.optionTemplate.id == 47) {
+                option.optionTemplate = getItemOptionTemplate(94);
+            }
+        }
+        item.info = item.getInfo();
+        item.content = item.getContent();
     }
 
     public void normalizeTrainArmorTemplate(Template.ItemTemplate template) {
@@ -219,6 +237,22 @@ public class ItemService {
             }
         }
         return false;
+    }
+
+    private void removeDuplicateGokuNgayXuaControlledOptions(Item item) {
+        Set<Integer> seen = new HashSet<>();
+        for (int i = item.itemOptions.size() - 1; i >= 0; i--) {
+            ItemOption option = item.itemOptions.get(i);
+            if (option == null || option.optionTemplate == null || !isGokuNgayXuaControlledOption(option)) {
+                continue;
+            }
+            int optionId = option.optionTemplate.id;
+            if (seen.contains(optionId)) {
+                item.itemOptions.remove(i);
+            } else {
+                seen.add(optionId);
+            }
+        }
     }
 
     public Item otpts(short tempId, int quantity) {
