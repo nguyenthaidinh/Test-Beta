@@ -6827,7 +6827,7 @@ INSERT INTO `item_template` (`id`, `TYPE`, `gender`, `NAME`, `description`, `lev
 (1865, 5, 3, 'Cải trang Gốc 6', 'Cải trang Gốc', 0, 16862, -1, 0, 1500000, 0, 0, 1962, 1963, 1964),
 (1866, 5, 3, 'Cải trang Gốc 7', 'Cải trang Gốc', 0, 16891, -1, 0, 1500000, 0, 0, 1965, 1966, 1967),
 (1867, 5, 3, 'Cải trang Gốc 8', 'Cải trang Gốc', 0, 16064, -1, 0, 1500000, 0, 0, 1974, 1975, 1976),
-(1868, 5, 3, 'Cải trang Gốc 9', 'Cải trang Gốc', 0, 16482, -1, 0, 1500000, 0, 0, 1977, 1978, 1979),
+(1868, 5, 3, 'Goku Ngày Xưa', 'Cải trang Goku Ngày Xưa', 0, 16482, -1, 0, 1500000, 0, 0, 1977, 1978, 1979),
 (1869, 32, 3, 'Giáp tập luyện cấp 5', 'Khi mặc vào sẽ đánh yếu hơn bình thường 50%, khi cởi ra sẽ tăng sức đánh 50', 0, 14260, -1, 0, 1500000, 0, 0, -1, -1, -1),
 (1870, 5, 3, 'Trùm Top 1', 'Cải trang Trùm Top 1', 0, 16976, -1, 0, 1500000, 0, 0, 1980, 1981, 1982),
 (1871, 75, 3, '', '', 0, 0, 0, 0, 0, 0, 0, -1, -1, -1),
@@ -9918,7 +9918,7 @@ INSERT INTO `radar` (`id`, `iconId`, `rank`, `max`, `type`, `mob_id`, `body`, `n
 (1204, 11048, 5, 120, 0, 27, '[{\"head\":-1, \"body\":-1, \"leg\":-1, \"bag\":-1}]', 'Thẻ Rồng Thần Namek', 'Rồng thần của Namếc do trưởng lão hành tinh này tạ...', '[{\"id\": 50, \"param\": 5, \"activeCard\": 0},\r\n{\"id\": 77, \"param\": 5, \"activeCard\": 1},\r\n{\"id\": 103, \"param\": 5, \"activeCard\": 2}]', -1, 0, -1),
 (1791, 14247, 5, 120, 1, -1, '[{\"head\":1727, \"body\":1728, \"leg\":1729, \"bag\":-1}]', 'Thẻ Oozaru', 'Oorazu là một sinh vật khổng lồ, đó chính là hình dáng của người xayda khi họ nhìn thấy trăng tròn và biến đổi', '[{\"id\": 14, \"param\": 5, \"activeCard\": 0},\r\n{\"id\": 50, \"param\": 5, \"activeCard\": 1},\r\n{\"id\": 77, \"param\": 10, \"activeCard\": 2},\r\n{\"id\": 103, \"param\": 5, \"activeCard\": 2},\r\n{\"id\": 94, \"param\": 3, \"activeCard\": 2}]', -1, 0, 2),
 (1792, 14248, 6, 120, 1, -1, '[{\"head\":1730, \"body\":1731, \"leg\":1732, \"bag\":-1}]', 'Thẻ Oozarun 1', 'Oorazu là một sinh vật khổng lồ, đó chính là hình dáng của người xayda khi họ nhìn thấy trăng tròn và biến đổi', '[{\"id\": 14, \"param\": 5, \"activeCard\": 0},\r\n{\"id\": 50, \"param\": 7, \"activeCard\": 1},\r\n{\"id\": 77, \"param\": 12, \"activeCard\": 2},\r\n{\"id\": 103, \"param\": 7, \"activeCard\": 2},\r\n{\"id\": 94, \"param\": 7, \"activeCard\": 2}]', -1, 0, 3),
-(1793, 14249, 6, 120, 1, -1, '[{\"head\":1733, \"body\":1734, \"leg\":1735, \"bag\":-1}]', 'Thẻ Oozarun 2', 'Oorazu là một sinh vật khổng lồ, đó chính là hình dáng của người xayda khi họ nhìn thấy trăng tròn và biến đổi', '[{\"id\": 14, \"param\": 5, \"activeCard\": 0},\r\n{\"id\": 50, \"param\": 10, \"activeCard\": 1},\r\n{\"id\": 77, \"param\": 15, \"activeCard\": 2},\r\n{\"id\": 103, \"param\": 10, \"activeCard\": 2},\r\n{\"id\": 94, \"param\": 7, \"activeCard\": 2}]', -1, 0, 4);
+(1793, 14249, 6, 120, 1, -1, '[{\"head\":1733, \"body\":1734, \"leg\":1735, \"bag\":-1}]', 'Thẻ Oozarun 2', 'Oorazu là một sinh vật khổng lồ, đó chính là hình dáng của người xayda khi họ nhìn thấy trăng tròn và biến đổi', '[{\"id\": 14, \"param\": 5, \"activeCard\": 0},\r\n{\"id\": 50, \"param\": 10, \"activeCard\": 1},\r\n{\"id\": 77, \"param\": 15, \"activeCard\": 2},\r\n{\"id\": 103, \"param\": 10, \"activeCard\": 2},\r\n{\"id\": 94, \"param\": 7, \"activeCard\": 2}]', 1792, 2, 4);
 
 -- --------------------------------------------------------
 

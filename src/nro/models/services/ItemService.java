@@ -27,6 +27,10 @@ public class ItemService {
     private static final String COSTUME_TRUM_TOP_1_NAME = "Trùm Top 1";
     private static final String COSTUME_TRUM_TOP_1_DESCRIPTION = "Cải trang Trùm Top 1";
     private static final int[] TRUM_TOP_1_CONTROLLED_OPTIONS = {38, 50, 77, 103, 204, 106, 94, 108, 95, 96};
+    private static final short COSTUME_GOKU_NGAY_XUA_ID = 1868;
+    private static final String COSTUME_GOKU_NGAY_XUA_NAME = "Goku Ng\u00e0y X\u01b0a";
+    private static final String COSTUME_GOKU_NGAY_XUA_DESCRIPTION = "C\u1ea3i trang Goku Ng\u00e0y X\u01b0a";
+    private static final int[] GOKU_NGAY_XUA_CONTROLLED_OPTIONS = {101, 50, 95, 96, 106};
     private static final short TRAIN_ARMOR_5_ID = 1869;
     private static final byte TRAIN_ARMOR_TYPE = 32;
     private static final int TRAIN_ARMOR_5_POWER_REQUIRE = 1_500_000;
@@ -61,6 +65,9 @@ public class ItemService {
         for (Item.ItemOption io : itemShop.options) {
             item.itemOptions.add(new Item.ItemOption(io));
         }
+        normalizeGokuNgayXuaOptions(item);
+        item.content = item.getContent();
+        item.info = item.getInfo();
         return item;
     }
 
@@ -86,9 +93,11 @@ public class ItemService {
         Item item = new Item();
         item.template = getTemplate(tempId);
         normalizeTrainArmorTemplate(item.template);
+        normalizeGokuNgayXuaTemplate(item.template);
         item.quantity = quantity;
         item.createTime = System.currentTimeMillis();
 
+        normalizeGokuNgayXuaOptions(item);
         item.content = item.getContent();
         item.info = item.getInfo();
         return item;
@@ -111,6 +120,29 @@ public class ItemService {
         }
         template.name = COSTUME_TRUM_TOP_1_NAME;
         template.description = COSTUME_TRUM_TOP_1_DESCRIPTION;
+    }
+
+    public void normalizeGokuNgayXuaOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != COSTUME_GOKU_NGAY_XUA_ID) {
+            return;
+        }
+        normalizeGokuNgayXuaTemplate(item.template);
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        if (!hasGokuNgayXuaControlledOption(item)) {
+            item.itemOptions.addAll(getGokuNgayXuaOptions());
+        }
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    public void normalizeGokuNgayXuaTemplate(Template.ItemTemplate template) {
+        if (template == null || template.id != COSTUME_GOKU_NGAY_XUA_ID) {
+            return;
+        }
+        template.name = COSTUME_GOKU_NGAY_XUA_NAME;
+        template.description = COSTUME_GOKU_NGAY_XUA_DESCRIPTION;
     }
 
     public void normalizeTrainArmorTemplate(Template.ItemTemplate template) {
@@ -143,12 +175,46 @@ public class ItemService {
         return options;
     }
 
+    public List<ItemOption> getGokuNgayXuaOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(101, 100));
+        options.add(new ItemOption(50, 50));
+        options.add(new ItemOption(95, 30));
+        options.add(new ItemOption(96, 30));
+        options.add(new ItemOption(106, 0));
+        return options;
+    }
+
     private boolean isTrumTop1ControlledOption(ItemOption io) {
         if (io == null || io.optionTemplate == null) {
             return false;
         }
         for (int optionId : TRUM_TOP_1_CONTROLLED_OPTIONS) {
             if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isGokuNgayXuaControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : GOKU_NGAY_XUA_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasGokuNgayXuaControlledOption(Item item) {
+        if (item == null || item.itemOptions == null) {
+            return false;
+        }
+        for (ItemOption io : item.itemOptions) {
+            if (isGokuNgayXuaControlledOption(io)) {
                 return true;
             }
         }

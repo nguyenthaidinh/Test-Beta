@@ -464,6 +464,7 @@ public class NPoint {
                     teleport = true;
                 }
                 ItemService.gI().normalizeTrumTop1Options(item);
+                ItemService.gI().normalizeGokuNgayXuaOptions(item);
                 if (item.template.id != 1815 && isBodyItemOptionActive(item)) {
                     for (ItemOption io : item.itemOptions) {
                         addOption(io);

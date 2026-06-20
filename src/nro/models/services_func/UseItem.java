@@ -591,6 +591,16 @@ public class UseItem {
                                 PetService.Pet2(pl, 1572, 1573, 1574);
                                 Service.gI().point(pl);
                                 break;
+                            case 1714:
+                                InventoryService.gI().itemBagToBody(pl, indexBag);
+                                PetService.Pet2(pl, 1600, 1601, 1602);
+                                Service.gI().point(pl);
+                                break;
+                            case 1748:
+                                InventoryService.gI().itemBagToBody(pl, indexBag);
+                                PetService.Pet2(pl, 1650, 1651, 1652);
+                                Service.gI().point(pl);
+                                break;
                             case 1750:
                                 InventoryService.gI().itemBagToBody(pl, indexBag);
                                 PetService.Pet2(pl, 1464, 1465, 1466);

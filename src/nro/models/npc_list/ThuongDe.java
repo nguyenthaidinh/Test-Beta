@@ -99,6 +99,7 @@ public class ThuongDe extends Npc {
                                 this.createOtherMenu(player, ConstNpc.MENU_CHOOSE_LUCKY_ROUND,
                                         "Con muốn làm gì nào?", "Quay bằng\nvàng",
                                         "Vòng quay\nđặc biệt",
+                                        "Quay 100\nlần\n200 TV",
                                         "Rương phụ\n("
                                         + (player.inventory.itemsBoxCrackBall.size()
                                         - InventoryService.gI().getCountEmptyListItem(player.inventory.itemsBoxCrackBall))
@@ -137,10 +138,12 @@ public class ThuongDe extends Npc {
                             case 0 ->
                                 LuckyRound.gI().openCrackBallUI(player, LuckyRound.USING_GOLD);
                             case 1 ->
-                                LuckyRound.gI().openCrackBallVipUI(player, LuckyRound.USING_GOLD);
+                                LuckyRound.gI().openCrackBallVipUI(player, LuckyRound.USING_GOLD_BAR);
                             case 2 ->
-                                ShopService.gI().opendShop(player, "ITEMS_LUCKY_ROUND", true);
+                                LuckyRound.gI().openGoldBarBall(player, 100);
                             case 3 ->
+                                ShopService.gI().opendShop(player, "ITEMS_LUCKY_ROUND", true);
+                            case 4 ->
                                 NpcService.gI().createMenuConMeo(player,
                                         ConstNpc.CONFIRM_REMOVE_ALL_ITEM_LUCKY_ROUND, this.avartar,
                                         "Con có chắc muốn xóa hết vật phẩm trong rương phụ? Sau khi xóa "

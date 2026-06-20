@@ -336,6 +336,7 @@ public class InventoryService {
             return sItem;
         }
         ItemService.gI().normalizeTrumTop1Options(item);
+        ItemService.gI().normalizeGokuNgayXuaOptions(item);
         handleOption210(item);
         checkOption231(item);
         int index = -1;
@@ -582,6 +583,7 @@ public class InventoryService {
                 if (!item.isNotNullItem()) {
                     continue;
                 }
+                ItemService.gI().normalizeGokuNgayXuaOptions(item);
                 msg.writer().writeShort(item.template.id);
                 msg.writer().writeInt(item.quantity);
                 msg.writer().writeUTF(item.getInfo());
@@ -624,6 +626,7 @@ public class InventoryService {
                 if (!item.isNotNullItem()) {
                     msg.writer().writeShort(-1);
                 } else {
+                    ItemService.gI().normalizeGokuNgayXuaOptions(item);
                     msg.writer().writeShort(item.template.id);
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
@@ -666,6 +669,7 @@ public class InventoryService {
             for (Item it : player.inventory.itemsBox) {
                 msg.writer().writeShort(it.isNotNullItem() ? it.template.id : -1);
                 if (it.isNotNullItem()) {
+                    ItemService.gI().normalizeGokuNgayXuaOptions(it);
                     msg.writer().writeInt(it.quantity);
                     msg.writer().writeUTF(it.getInfo());
                     msg.writer().writeUTF(it.getContent());

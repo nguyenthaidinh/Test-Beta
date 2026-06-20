@@ -14,6 +14,20 @@ import java.util.List;
  */
 public class RewardService {
 
+    private static final short GOKU_NGAY_XUA_ID = 1868;
+    private static final short MOTO_BUN_MA_ID = 1541;
+    private static final short PET_BABY_SHARK_ID = 1620;
+    private static final short PET_CAPYBARA_BACKPACK_ID = 1629;
+    private static final short PET_CAPYBARA_PINK_ID = 1668;
+    private static final short PET_KHUNG_LONG_NGOK_ID = 1750;
+    private static final short PHONG_XICH_LAN_ID = 1734;
+    private static final short SANTA_TANK_ID = 1573;
+    private static final short[] LUCKY_ROUND_PET_AND_MOUNT_IDS = {
+        1620, 1629, 1668, 1748, 1750, 1729, 1727, 1714, 1682,
+        1541, 1563, 1573, 1724, 1733, 1734, 1749
+    };
+    private static final int[] LUCKY_ROUND_DEFAULT_EVENT_ITEMS = {999, 1000, 1001};
+
     private static final int[][][] ACTIVATION_SET = {
         {{129, 141, 1, 1000}, {127, 139, 1, 1000}, {128, 140, 1, 1000}}, // songoku - thien xin hang - kirin
         {{131, 143, 1, 1000}, {132, 144, 1, 1000}, {130, 142, 1, 1000}}, // oc tieu - pikkoro daimao -
@@ -41,58 +55,25 @@ public class RewardService {
             it.quantity = Util.nextInt(5, 50) * 1000;
             boolean success = Util.isTrue(1, 2);
 
-            if (Util.isTrue(1, 2)) {
+            if (vip || Util.isTrue(1, 2)) {
                 // VIP - Thay thế vật phẩm nếu thỏa mãn điều kiện
                 if (Util.isTrue(5, 100)) {
-                    it = ItemService.gI().createNewItem((short) 1208); // Ả Rập
-                    it.itemOptions.clear();
-                    it.itemOptions.add(new ItemOption(50, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new ItemOption(77, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new ItemOption(103, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new Item.ItemOption(154, 0)); // Không bán lại
-                    // Xác suất 99% thêm option 93
-                    if (!Util.isTrue(1, 100)) {
-                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(3, 15))); // HSD
-                    }
-                    it.quantity = 1;
-                } else if (Util.isTrue(5, 100)) {
-                    it = ItemService.gI().createNewItem((short) 1209); // Ả Rập
-                    it.itemOptions.clear();
-                    it.itemOptions.add(new ItemOption(50, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new ItemOption(77, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new ItemOption(103, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new Item.ItemOption(154, 0)); // Không bán lại
-                    // Xác suất 99% thêm option 93
-                    if (!Util.isTrue(1, 100)) {
-                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(3, 15))); // HSD
-                    }
-                    it.quantity = 1;
-                } else if (Util.isTrue(5, 100)) {
-                    it = ItemService.gI().createNewItem((short) 1210); // Ả Rập
-                    it.itemOptions.clear();
-                    it.itemOptions.add(new ItemOption(50, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new ItemOption(77, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new ItemOption(103, Util.nextInt(20, 25)));
-                    it.itemOptions.add(new Item.ItemOption(154, 0)); // Không bán lại
-                    // Xác suất 99% thêm option 93
-                    if (!Util.isTrue(1, 100)) {
-                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(3, 15))); // HSD
-                    }
-                    it.quantity = 1;
-
-                } else if (Util.isTrue(5, 100)) {
                     it = ItemService.gI().createNewItem((short) 884);// hit
                     it.itemOptions.clear();
-                    it.itemOptions.add(new ItemOption(50, Util.nextInt(20)));
-                    it.itemOptions.add(new ItemOption(77, Util.nextInt(20)));
-                    it.itemOptions.add(new ItemOption(103, Util.nextInt(20)));
+                    it.itemOptions.add(new ItemOption(50, 40));
+                    it.itemOptions.add(new ItemOption(77, 40));
+                    it.itemOptions.add(new ItemOption(103, 40));
                     it.itemOptions.add(new ItemOption(5, Util.nextInt(30)));
                     it.itemOptions.add(new Item.ItemOption(154, 0)); // Không bán lại
                     // Xác suất 99% thêm option 93
                     if (!Util.isTrue(1, 100)) {
-                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(3, 15))); // HSD
+                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10))); // HSD
                     }
                     it.quantity = 1;
+                } else if (Util.isTrue(5, 100)) {
+                    it = createGokuNgayXuaLuckyRoundItem();
+                } else if (Util.isTrue(5, 100)) {
+                    it = createLuckyRoundPetOrMountItem();
                 } else if (Util.isTrue(5, 100)) {
                     it = ItemService.gI().createNewItem((short) 860); //mị nương
                     it.itemOptions.clear();
@@ -102,7 +83,7 @@ public class RewardService {
                     it.itemOptions.add(new Item.ItemOption(154, 0)); // Không bán lại
                     // Xác suất 99% thêm option 93
                     if (!Util.isTrue(1, 100)) {
-                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(3, 15))); // HSD
+                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10))); // HSD
                     }
                     it.quantity = 1;
                 } else if (Util.isTrue(1, 100)) {
@@ -114,7 +95,7 @@ public class RewardService {
                     it.itemOptions.add(new Item.ItemOption(103, Util.nextInt(1, 10))); // Ki
                     // Xác suất 99% thêm option 93
                     if (!Util.isTrue(1, 100)) {
-                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(3, 15))); // HSD
+                        it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10))); // HSD
                     }
                     it.quantity = 1;
                 } else if (Util.isTrue(5, 100)) {
@@ -131,11 +112,9 @@ public class RewardService {
                 // Không VIP
                 if (Util.isTrue(1, 2)) {
                     // Các item mặc định khi không có item VIP
-                    int[] itemId = {467, 468, 469, 470, 471, 741, 745, 800, 801, 803, 804, 1000};
-                    int itemid = itemId[Util.nextInt(itemId.length)];
+                    int itemid = LUCKY_ROUND_DEFAULT_EVENT_ITEMS[Util.nextInt(LUCKY_ROUND_DEFAULT_EVENT_ITEMS.length)];
                     if (Util.isTrue(20, 100)) {
-                        int[] itemId2 = {467, 468, 469, 470, 471, 741, 745, 800, 801, 803, 804, 999, 1000, 1001};
-                        itemid = itemId2[Util.nextInt(itemId2.length)];
+                        itemid = LUCKY_ROUND_DEFAULT_EVENT_ITEMS[Util.nextInt(LUCKY_ROUND_DEFAULT_EVENT_ITEMS.length)];
                     }
                     byte[] option = {77, 80, 81, 103, 50, 94, 5};
                     byte optionid;
@@ -170,6 +149,61 @@ public class RewardService {
             list.add(it);
         }
         return list;
+    }
+
+    private Item createGokuNgayXuaLuckyRoundItem() {
+        Item item = ItemService.gI().createNewItem(GOKU_NGAY_XUA_ID);
+        item.itemOptions.clear();
+        item.itemOptions.add(new ItemOption(101, Util.nextInt(50, 100)));
+        item.itemOptions.add(new ItemOption(50, Util.nextInt(15, 30)));
+        item.itemOptions.add(new ItemOption(95, Util.nextInt(15, 30)));
+        item.itemOptions.add(new ItemOption(96, Util.nextInt(15, 30)));
+        item.itemOptions.add(new ItemOption(106, 0));
+        item.itemOptions.add(new Item.ItemOption(154, 0));
+        if (Util.isTrue(10, 100)) {
+            item.itemOptions.add(new Item.ItemOption(73, 0));
+        } else {
+            item.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10)));
+        }
+        item.quantity = 1;
+        item.info = item.getInfo();
+        item.content = item.getContent();
+        return item;
+    }
+
+    private Item createLuckyRoundPetOrMountItem() {
+        short itemId = LUCKY_ROUND_PET_AND_MOUNT_IDS[Util.nextInt(LUCKY_ROUND_PET_AND_MOUNT_IDS.length)];
+        Item item = ItemService.gI().createNewItem(itemId);
+        item.itemOptions.clear();
+        item.itemOptions.add(new ItemOption(50, Util.nextInt(10, 25)));
+        item.itemOptions.add(new ItemOption(77, itemId == PET_KHUNG_LONG_NGOK_ID ? Util.nextInt(10, 30) : Util.nextInt(10, 25)));
+        item.itemOptions.add(new ItemOption(103, itemId == SANTA_TANK_ID ? Util.nextInt(10, 40) : Util.nextInt(10, 25)));
+        if (itemId == MOTO_BUN_MA_ID) {
+            item.itemOptions.add(new ItemOption(47, Util.nextInt(10, 20)));
+        }
+        if (itemId == PET_BABY_SHARK_ID) {
+            item.itemOptions.add(new ItemOption(47, Util.nextInt(5, 15)));
+        }
+        if (itemId == PET_CAPYBARA_BACKPACK_ID) {
+            item.itemOptions.add(new ItemOption(5, Util.nextInt(10, 25)));
+        }
+        if (itemId == PET_CAPYBARA_PINK_ID) {
+            item.itemOptions.add(new ItemOption(5, Util.nextInt(10, 20)));
+            item.itemOptions.add(new ItemOption(14, Util.nextInt(10, 15)));
+        }
+        if (itemId == PHONG_XICH_LAN_ID) {
+            item.itemOptions.add(new ItemOption(5, Util.nextInt(10, 20)));
+        }
+        item.itemOptions.add(new Item.ItemOption(154, 0));
+        if (Util.isTrue(10, 100)) {
+            item.itemOptions.add(new Item.ItemOption(73, 0));
+        } else {
+            item.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10)));
+        }
+        item.quantity = 1;
+        item.info = item.getInfo();
+        item.content = item.getContent();
+        return item;
     }
 
 // Phương thức itemRand sẽ trả về vật phẩm mặc định nếu không thành công

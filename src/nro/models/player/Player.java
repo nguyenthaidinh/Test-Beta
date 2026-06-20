@@ -1609,6 +1609,14 @@ public class Player implements Runnable {
                         PetService.Pet2(this, 1572, 1573, 1574);
                         Service.gI().point(this);
                     }
+                    case 1714 -> {
+                        PetService.Pet2(this, 1600, 1601, 1602);
+                        Service.gI().point(this);
+                    }
+                    case 1748 -> {
+                        PetService.Pet2(this, 1650, 1651, 1652);
+                        Service.gI().point(this);
+                    }
                     case 1750 -> {
                         PetService.Pet2(this, 1464, 1465, 1466);
                         Service.gI().point(this);

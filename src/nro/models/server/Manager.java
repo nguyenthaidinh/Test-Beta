@@ -668,6 +668,7 @@ public final class Manager {
                         itemTemp.leg = rs.getInt("leg");
 
                         ItemService.gI().normalizeTrainArmorTemplate(itemTemp);
+                        ItemService.gI().normalizeGokuNgayXuaTemplate(itemTemp);
                         ITEM_TEMPLATES.add(itemTemp);
                     } while (rs.next());
                     offset += batchSize;

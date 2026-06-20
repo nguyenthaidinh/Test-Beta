@@ -4,6 +4,7 @@ import nro.models.consts.ConstAchievement;
 import nro.models.item.Item;
 import nro.models.player.Inventory;
 import nro.models.player.Player;
+import nro.models.radar.Card;
 import nro.models.shop.ItemShop;
 import nro.models.shop.Shop;
 import nro.models.shop.TabShop;
@@ -50,6 +51,9 @@ public class ShopService {
     private static final short TRUM_TOP_1_ITEM_ID = 1870;
     private static final int TRUM_TOP_1_GEM_COST = 1_200_000;
     private static final long BADGE_GOLD_COST = 16_000_000_000L;
+    private static final short OOZARUN_1_CARD_ID = 1792;
+    private static final short OOZARUN_2_CARD_ID = 1793;
+    private static final byte RADAR_CARD_MAX_LEVEL = 2;
     private int eventPointPrice;
 
     private static ShopService I;
@@ -861,6 +865,7 @@ public class ShopService {
                     capsuleClanPointPrice = 3;
                     break;
                 case 1792:
+                case OOZARUN_2_CARD_ID:
                     capsuleClanPointPrice = 4;
                     break;
                 case 1634:
@@ -901,6 +906,11 @@ public class ShopService {
 
             if (player.clan == null) {
                 Service.gI().sendThongBao(player, "Bạn không có trong bang hội!");
+                return;
+            }
+
+            if (is.temp.id == OOZARUN_2_CARD_ID && !hasMaxedOozarun1Card(player)) {
+                Service.gI().sendThongBao(player, "Bạn cần sưu tầm Thẻ Oozarun 1 đạt cấp tối đa mới có thể đổi Thẻ Oozarun 2.");
                 return;
             }
 
@@ -964,6 +974,17 @@ public class ShopService {
             updateAutoTrainPurchase(player, itemTempId);
             Service.gI().sendThongBao(player, "Mua thành công " + is.temp.name);
         }
+    }
+
+    private boolean hasMaxedOozarun1Card(Player player) {
+        if (player.Cards == null) {
+            return false;
+        }
+        Card oozarun1Card = player.Cards.stream()
+                .filter(card -> card != null && card.Id == OOZARUN_1_CARD_ID)
+                .findFirst()
+                .orElse(null);
+        return oozarun1Card != null && oozarun1Card.Level >= RADAR_CARD_MAX_LEVEL;
     }
 
     private boolean checkAutoTrainPurchase(Player player, int itemTempId) {
