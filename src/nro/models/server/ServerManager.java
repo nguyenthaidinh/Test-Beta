@@ -167,7 +167,8 @@ public class ServerManager {
                 || Manager.isTopSukienChanged
                 || Manager.isTopSukien1Changed
                 || Manager.isTopSukien2Changed
-                || Manager.isTopWhisChanged;
+                || Manager.isTopWhisChanged
+                || Manager.isTopLuckyRoundChanged;
     }
 
     private void stopTopUpdater() {
@@ -193,6 +194,9 @@ public class ServerManager {
             }
             if (Manager.isTopWhisChanged) {
                 Manager.Topwhis = Manager.realTop(Manager.queryTopwhis, con);
+            }
+            if (Manager.isTopLuckyRoundChanged) {
+                Manager.TopLuckyRound = Manager.realTop(Manager.queryTopLuckyRound, con);
             }
 
             Manager.resetTopFlags();

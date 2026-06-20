@@ -11,6 +11,7 @@ import nro.models.services.Service;
 import nro.models.map.service.ChangeMapService;
 import nro.models.services_func.LuckyRound;
 import nro.models.shop.ShopService;
+import nro.models.server.Manager;
 
 public class ThuongDe extends Npc {
 
@@ -100,6 +101,7 @@ public class ThuongDe extends Npc {
                                         "Con muốn làm gì nào?", "Quay bằng\nvàng",
                                         "Vòng quay\nđặc biệt",
                                         "Quay 100\nlần\n200 TV",
+                                        "Top\nvòng quay",
                                         "Rương phụ\n("
                                         + (player.inventory.itemsBoxCrackBall.size()
                                         - InventoryService.gI().getCountEmptyListItem(player.inventory.itemsBoxCrackBall))
@@ -141,9 +143,13 @@ public class ThuongDe extends Npc {
                                 LuckyRound.gI().openCrackBallVipUI(player, LuckyRound.USING_GOLD_BAR);
                             case 2 ->
                                 LuckyRound.gI().openGoldBarBall(player, 100);
-                            case 3 ->
-                                ShopService.gI().opendShop(player, "ITEMS_LUCKY_ROUND", true);
+                            case 3 -> {
+                                Manager.refreshTopLuckyRound();
+                                Service.gI().showListTop(player, Manager.TopLuckyRound);
+                            }
                             case 4 ->
+                                ShopService.gI().opendShop(player, "ITEMS_LUCKY_ROUND", true);
+                            case 5 ->
                                 NpcService.gI().createMenuConMeo(player,
                                         ConstNpc.CONFIRM_REMOVE_ALL_ITEM_LUCKY_ROUND, this.avartar,
                                         "Con có chắc muốn xóa hết vật phẩm trong rương phụ? Sau khi xóa "

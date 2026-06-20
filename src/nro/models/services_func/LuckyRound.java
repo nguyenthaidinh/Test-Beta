@@ -11,6 +11,7 @@ import nro.models.services.Service;
 import java.util.List;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
+import nro.models.services.LuckyRoundTopService;
 
 /**
  *
@@ -175,6 +176,7 @@ public class LuckyRound {
                 InventoryService.gI().sendItemBags(player);
                 List<Item> list = RewardService.gI().getListItemLuckyRound(player, count, true);
                 addItemToBox(player, list);
+                LuckyRoundTopService.gI().addPoint(player, count);
                 sendReward(player, list);
                 if (count >= 100) {
                     Service.gI().sendThongBao(player, "Đã quay " + count + " lần, phần thưởng đã vào rương phụ.");

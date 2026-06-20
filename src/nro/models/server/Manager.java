@@ -114,11 +114,13 @@ public final class Manager {
     public static List<TOP> Topsukien2 = new ArrayList<>();
     public static List<TOP> Topwhis;
     public static List<TOP> Topmaydam;
+    public static List<TOP> TopLuckyRound = new ArrayList<>();
     public static final String queryTopmaydam = "SELECT id, point_maydam, total_damage_maydam FROM player ORDER BY point_maydam DESC LIMIT 100";
     public static final String queryTopsukien1 = "SELECT id, point_sukien1 FROM player ORDER BY point_sukien1 DESC LIMIT 100";
     public static final String queryTopsukien2 = "SELECT id, point_sukien2 FROM player ORDER BY point_sukien2 DESC LIMIT 100";
     public static final String queryTopwhis = "SELECT id, thachdauwhis FROM player ORDER BY thachdauwhis DESC LIMIT 100";
     public static final String queryTopsukien = "SELECT id, point_sukien FROM player ORDER BY point_sukien DESC LIMIT 100";
+    public static final String queryTopLuckyRound = "SELECT l.player_id AS id, l.point AS lucky_round_point FROM lucky_round_top l INNER JOIN player p ON p.id = l.player_id WHERE l.point > 0 ORDER BY l.point DESC, l.player_id ASC LIMIT 100";
     private static final short RADAR_NAMEK_DRAGON_CARD_ID = 1204;
     private static final short MOB_NAMEK_DRAGON_ID = 27;
     public static boolean isTopMaydamChanged = false;
@@ -126,6 +128,7 @@ public final class Manager {
     public static boolean isTopSukien1Changed = false;
     public static boolean isTopSukien2Changed = false;
     public static boolean isTopWhisChanged = false;
+    public static boolean isTopLuckyRoundChanged = false;
 
     public static Manager gI() {
         if (instance == null) {
@@ -135,7 +138,7 @@ public final class Manager {
     }
 
     public static boolean hasNewTopScores() {
-        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopWhisChanged;
+        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopWhisChanged || isTopLuckyRoundChanged;
     }
 
     public static void resetTopFlags() {
@@ -144,6 +147,16 @@ public final class Manager {
         isTopSukien1Changed = false;
         isTopSukien2Changed = false;
         isTopWhisChanged = false;
+        isTopLuckyRoundChanged = false;
+    }
+
+    public static void refreshTopLuckyRound() {
+        try (Connection con = LocalManager.getConnection()) {
+            TopLuckyRound = realTop(queryTopLuckyRound, con);
+            isTopLuckyRoundChanged = false;
+        } catch (Exception e) {
+            Logger.logException(Manager.class, e, "Cannot refresh top lucky round");
+        }
     }
 
     private static void normalizeRadarTemplate(RadarCard radar) {
@@ -1001,6 +1014,8 @@ public final class Manager {
             Topwhis = realTop(queryTopwhis, ConnectionDatabase);
             Logger.success(Logger.RED + "Successfully top Thach Dau Whis (" + Topwhis.size() + ")\n");
             Topmaydam = realTop(queryTopmaydam, ConnectionDatabase);
+            TopLuckyRound = realTop(queryTopLuckyRound, ConnectionDatabase);
+            Logger.success(Logger.PURPLE + "Successfully top Lucky Round (" + TopLuckyRound.size() + ")\n");
             Manager.timeRealTop = System.currentTimeMillis();
 
         } catch (Exception e) {
@@ -1050,6 +1065,10 @@ public final class Manager {
                     int whis = rs.getInt("thachdauwhis");
                     top.setInfo1(whis + " Level");
                     top.setInfo2(whis + " Level");
+
+                } else if (query.equals(Manager.queryTopLuckyRound)) {
+                    top.setInfo1("Hạng: " + (tops.size() + 1));
+                    top.setInfo2("");
 
                 } else if (query.equals(Manager.queryTopmaydam)) {
                     int maydam = rs.getInt("point_maydam");
