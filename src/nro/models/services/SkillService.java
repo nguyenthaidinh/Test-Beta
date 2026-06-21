@@ -74,21 +74,20 @@ public class SkillService {
             } catch (IOException e) {
             }
         }
-        if (player.effectSkill != null && player.effectSkill.isHaveEffectSkill()) {
+        if (player.playerSkill == null || player.playerSkill.skillSelect == null || player.playerSkill.skillSelect.template == null) {
             return false;
         }
-        if (player.playerSkill == null) {
+        if (player.effectSkill != null && player.effectSkill.isHaveEffectSkill()
+                && player.playerSkill.skillSelect.template.id != Skill.TU_SAT
+                && player.playerSkill.skillSelect.template.id != Skill.QUA_CAU_KENH_KHI
+                && player.playerSkill.skillSelect.template.id != Skill.MAKANKOSAPPO) {
             return false;
         }
         if (player.playerSkill.skillSelect.template.type == 2 && canUseSkillWithMana(player) && canUseSkillWithCooldown(player)) {
             useSkillBuffToPlayer(player, plTarget);
             return true;
         }
-        if ((player.effectSkill != null && player.effectSkill.isHaveEffectSkill()
-                && (player.playerSkill.skillSelect.template.id != Skill.TU_SAT
-                && player.playerSkill.skillSelect.template.id != Skill.QUA_CAU_KENH_KHI
-                && player.playerSkill.skillSelect.template.id != Skill.MAKANKOSAPPO))
-                || (plTarget != null && !canAttackPlayer(player, plTarget))
+        if ((plTarget != null && !canAttackPlayer(player, plTarget))
                 || (mobTarget != null && mobTarget.isDie())
                 || !canUseSkillWithMana(player) || !canUseSkillWithCooldown(player)) {
             return false;
@@ -725,71 +724,81 @@ public class SkillService {
                 break;
             case Skill.TU_SAT:
                 if (!player.playerSkill.prepareTuSat) {
-                    //gồng tự sát
+                    Skill tuSatSkill = player.playerSkill.skillSelect;
                     player.playerSkill.prepareTuSat = true;
                     player.playerSkill.lastTimePrepareTuSat = System.currentTimeMillis();
                     sendPlayerPrepareBom(player, 2000);
-                } else {
-                    if (!player.isBoss && !player.isPet && !Util.canDoWithTime(player.playerSkill.lastTimePrepareTuSat, 1500)) {
-                        player.playerSkill.skillSelect.lastTimeUseThisSkill = System.currentTimeMillis();
-                        player.playerSkill.prepareTuSat = false;
-                        return;
-                    }
-                    if (player.isBoss || player.isPet) {
-                        try {
-                            Thread.sleep(1500);
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                    //nổ
-                    player.playerSkill.prepareTuSat = !player.playerSkill.prepareTuSat;
-                    int rangeBom = SkillUtil.getRangeBom(player.playerSkill.skillSelect.point);
-                    if (player.setClothes.cadicM == 2) {
-                        rangeBom = SkillUtil.getRangeBom(player.playerSkill.skillSelect.point) + 200;
-                    }
-                    long dame = player.nPoint.hp;
-                    if (player.setClothes.cadicM == 4) {
-                        dame += player.nPoint.hpMax * 20 / 100;
-                    } else if (player.setClothes.cadicM == 5) {
-                        dame += player.nPoint.hpMax * 50 / 100;
-                    }
-                    if (!player.isBoss) {
-                        for (Mob mob : player.zone.mobs) {
-                            if (Util.getDistance(player, mob) <= rangeBom) { //khoảng cách có tác dụng bom
-                                mob.injured(player, dame, true);
-                            }
-                        }
-                    }
-                    List<Player> playersMap;
-                    if (player.isBoss) {
-                        playersMap = player.zone.getNotBosses();
-                    } else {
-                        playersMap = player.zone.getHumanoids();
-                    }
-                    if (!MapService.gI().isMapOffline(player.zone.map.mapId)) {
-                        for (Player pl : playersMap) {
-                            if (!player.equals(pl) && canAttackPlayer(player, pl) && Util.getDistance(player, pl) <= rangeBom) {
-                                long damePlayer = dame;
-                                if (pl.isBoss) {
-                                    damePlayer = applyDameBoss(player, pl, damePlayer);
-                                    damePlayer = player.effectSkill.isMonkey ? damePlayer / 3 : damePlayer / 2;
-                                }
-                                pl.injured(player, limitDame(damePlayer), MapService.gI().isMapYardart(player.zone.map.mapId), false);
-                                PlayerService.gI().sendInfoHpMpMoney(pl);
-                                Service.gI().Send_Info_NV(pl);
-                            }
-                        }
-                    }
-                    affterUseSkill(player, player.playerSkill.skillSelect.template.id);
-                    if (!player.isBoss && !player.isPet) {
-                        player.setDie();
-                    }
-                    if (player.effectSkill.tiLeHPHuytSao != 0) {
-                        player.effectSkill.tiLeHPHuytSao = 0;
-                        EffectSkillService.gI().removeHuytSao(player);
-                    }
+                    scheduleTuSat(player, tuSatSkill, player.playerSkill.lastTimePrepareTuSat);
                 }
                 break;
+        }
+    }
+
+    private void scheduleTuSat(Player player, Skill tuSatSkill, long prepareTime) {
+        Util.threadPool(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            explodeTuSat(player, tuSatSkill, prepareTime);
+        });
+    }
+
+    private void explodeTuSat(Player player, Skill tuSatSkill, long prepareTime) {
+        if (player == null || tuSatSkill == null || tuSatSkill.template == null
+                || tuSatSkill.template.id != Skill.TU_SAT || player.playerSkill == null
+                || player.nPoint == null || player.zone == null || player.zone.map == null) {
+            return;
+        }
+        if (!player.playerSkill.prepareTuSat || player.playerSkill.lastTimePrepareTuSat != prepareTime || player.isDie()) {
+            return;
+        }
+
+        player.playerSkill.skillSelect = tuSatSkill;
+        player.playerSkill.prepareTuSat = false;
+        int rangeBom = SkillUtil.getRangeBom(tuSatSkill.point);
+        if (player.setClothes.cadicM == 2) {
+            rangeBom += 200;
+        }
+        long dame = player.nPoint.hp;
+        if (player.setClothes.cadicM == 4) {
+            dame += player.nPoint.hpMax * 20 / 100;
+        } else if (player.setClothes.cadicM == 5) {
+            dame += player.nPoint.hpMax * 50 / 100;
+        }
+        if (!player.isBoss && player.zone.mobs != null) {
+            for (Mob mob : new ArrayList<>(player.zone.mobs)) {
+                if (mob != null && !mob.isDie() && Util.getDistance(player, mob) <= rangeBom) {
+                    mob.injured(player, dame, true);
+                }
+            }
+        }
+        List<Player> playersMap = player.isBoss
+                ? new ArrayList<>(player.zone.getNotBosses())
+                : new ArrayList<>(player.zone.getHumanoids());
+        if (!MapService.gI().isMapOffline(player.zone.map.mapId)) {
+            for (Player pl : playersMap) {
+                if (pl != null && !player.equals(pl) && canAttackPlayer(player, pl) && Util.getDistance(player, pl) <= rangeBom) {
+                    long damePlayer = dame;
+                    if (pl.isBoss) {
+                        damePlayer = applyDameBoss(player, pl, damePlayer);
+                        damePlayer = player.effectSkill.isMonkey ? damePlayer / 3 : damePlayer / 2;
+                    }
+                    pl.injured(player, limitDame(damePlayer), MapService.gI().isMapYardart(player.zone.map.mapId), false);
+                    PlayerService.gI().sendInfoHpMpMoney(pl);
+                    Service.gI().Send_Info_NV(pl);
+                }
+            }
+        }
+        affterUseSkill(player, Skill.TU_SAT);
+        if (!player.isBoss && !player.isPet && !player.isDie()) {
+            player.setDie();
+        }
+        if (player.effectSkill != null && player.effectSkill.tiLeHPHuytSao != 0) {
+            player.effectSkill.tiLeHPHuytSao = 0;
+            EffectSkillService.gI().removeHuytSao(player);
         }
     }
 
@@ -799,15 +808,20 @@ public class SkillService {
             List<Player> players = new ArrayList<>();
             int percentTriThuong = SkillUtil.getPercentTriThuong(player.playerSkill.skillSelect.point);
             int point = player.playerSkill.skillSelect.point;
-            if (canHsPlayer(player, plTarget)) {
+            if (canHsPlayer(player, plTarget) && plTarget.nPoint != null && player.zone != null) {
                 players.add(plTarget);
-                List<Player> playersMap = player.zone.getNotBosses();
+                List<Player> playersMap = new ArrayList<>(player.zone.getNotBosses());
                 for (Player pl : playersMap) {
-                    if (!pl.equals(plTarget) && point > 1) {
-                        if (canHsPlayer(player, plTarget) && Util.getDistance(player, pl) <= 300) {
+                    if (pl != null && !pl.equals(player) && !pl.equals(plTarget) && point > 1) {
+                        if (canHsPlayer(player, pl) && pl.nPoint != null && Util.getDistance(player, pl) <= 300) {
                             players.add(pl);
                         }
                     }
+                }
+                if (!players.contains(player)) {
+                    player.nPoint.setHP(player.nPoint.getHP() + (player.nPoint.hpMax * percentTriThuong / 100));
+                    Service.gI().Send_Info_NV(player);
+                    PlayerService.gI().sendInfoHpMp(player);
                 }
                 for (Player pl : players) {
                     try {
@@ -819,7 +833,6 @@ public class SkillService {
                         msg.writer().writeByte(0); //read continue
                         Service.gI().sendMessAllPlayerInMap(pl, msg);
                         boolean isDie = pl.isDie();
-                        player.nPoint.setHP(player.nPoint.getHP() + (player.nPoint.hpMax * percentTriThuong / 100));
                         pl.nPoint.setHP(pl.nPoint.getHP() + (pl.nPoint.hpMax * percentTriThuong / 100));
                         pl.nPoint.setMP(pl.nPoint.getMP() + ((int) pl.nPoint.mpMax * percentTriThuong / 100));
                         if (isDie) {
@@ -844,8 +857,8 @@ public class SkillService {
                         }
                     }
                 }
+                affterUseSkill(player, player.playerSkill.skillSelect.template.id);
             }
-            affterUseSkill(player, player.playerSkill.skillSelect.template.id);
         }
     }
 
