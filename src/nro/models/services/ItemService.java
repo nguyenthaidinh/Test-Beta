@@ -466,9 +466,9 @@ public class ItemService {
     public int[] getOptionIdsBySKH(int skhId) {
         switch (skhId) {
             case 127:
-                return new int[]{140};
-            case 128:
                 return new int[]{139};
+            case 128:
+                return new int[]{140};
             case 129:
                 return new int[]{141};
             case 130:
@@ -1262,6 +1262,152 @@ public class ItemService {
         it.options.clear();
         it.options.addAll(itemoptions);
         return it;
+    }
+
+    public Item createDoThanLinh() {
+        short idTempTL = randomDoThanLinhTemplateId();
+        Item item = createItemSetKichHoat(idTempTL, 1);
+        item.itemOptions.clear();
+        addDoThanLinhOptions(item.itemOptions, idTempTL, 207);
+        item.content = item.getContent();
+        item.info = item.getInfo();
+        return item;
+    }
+
+    public Item createDoThanLinhKichHoat(int gender, int skhId) {
+        short idTempTL = randomDoThanLinhTemplateId(gender);
+        Item item = createItemSetKichHoat(idTempTL, 1);
+        item.itemOptions.clear();
+        addDoThanLinhOptions(item.itemOptions, idTempTL, 207);
+        item.itemOptions.add(new ItemOption(skhId, 1));
+        for (int subId : getOptionIdsBySKH(skhId)) {
+            item.itemOptions.add(new ItemOption(subId, 1));
+        }
+        item.itemOptions.add(new ItemOption(30, 1));
+        item.content = item.getContent();
+        item.info = item.getInfo();
+        return item;
+    }
+
+    private short randomDoThanLinhTemplateId() {
+        short[] ao = {555, 557, 559};
+        short[] quan = {556, 558, 560};
+        short[] gang = {562, 564, 566};
+        short[] giay = {563, 565, 567};
+        if (Util.isTrue(10, 100)) {
+            return 561;
+        } else if (Util.isTrue(25, 100)) {
+            return gang[Util.nextInt(3)];
+        } else if (Util.isTrue(45, 100)) {
+            return quan[Util.nextInt(3)];
+        } else if (Util.isTrue(75, 100)) {
+            return ao[Util.nextInt(3)];
+        }
+        return giay[Util.nextInt(3)];
+    }
+
+    private short randomDoThanLinhTemplateId(int gender) {
+        int race = Math.max(0, Math.min(gender, 2));
+        short[] ao = {555, 557, 559};
+        short[] quan = {556, 558, 560};
+        short[] gang = {562, 564, 566};
+        short[] giay = {563, 565, 567};
+        if (Util.isTrue(10, 100)) {
+            return 561;
+        } else if (Util.isTrue(25, 100)) {
+            return gang[race];
+        } else if (Util.isTrue(45, 100)) {
+            return quan[race];
+        } else if (Util.isTrue(75, 100)) {
+            return ao[race];
+        }
+        return giay[race];
+    }
+
+    private void addDoThanLinhOptions(List<ItemOption> itemoptions, short idTempTL, int rareOptionId) {
+        int tiLe = Util.nextInt(100, 115);
+        switch (idTempTL) {
+            case 555:
+                itemoptions.add(new ItemOption(47, 800 * tiLe / 100));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            case 557:
+                itemoptions.add(new ItemOption(47, 850 * tiLe / 100));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            case 559:
+                itemoptions.add(new ItemOption(47, 900 * tiLe / 100));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            case 556: {
+                int chiso = 52000 * tiLe / 100;
+                itemoptions.add(new ItemOption(22, chiso / 1000));
+                itemoptions.add(new ItemOption(27, chiso / 20));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            }
+            case 558: {
+                int chiso = 50000 * tiLe / 100;
+                itemoptions.add(new ItemOption(22, chiso / 1000));
+                itemoptions.add(new ItemOption(27, chiso / 20));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            }
+            case 560: {
+                int chiso = 48000 * tiLe / 100;
+                itemoptions.add(new ItemOption(22, chiso / 1000));
+                itemoptions.add(new ItemOption(27, chiso / 20));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            }
+            case 562:
+                itemoptions.add(new ItemOption(0, 4400 * tiLe / 100));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            case 564:
+                itemoptions.add(new ItemOption(0, 4300 * tiLe / 100));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            case 566:
+                itemoptions.add(new ItemOption(0, 4500 * tiLe / 100));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            case 563: {
+                int chiso = 48000 * tiLe / 100;
+                itemoptions.add(new ItemOption(23, chiso / 1000));
+                itemoptions.add(new ItemOption(28, chiso / 20));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            }
+            case 565: {
+                int chiso = 50000 * tiLe / 100;
+                itemoptions.add(new ItemOption(23, chiso / 1000));
+                itemoptions.add(new ItemOption(28, chiso / 20));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            }
+            case 567: {
+                int chiso = 46000 * tiLe / 100;
+                itemoptions.add(new ItemOption(23, chiso / 1000));
+                itemoptions.add(new ItemOption(28, chiso * 150 / 1000));
+                addRareDoThanLinhOption(itemoptions, rareOptionId, tiLe);
+                break;
+            }
+            case 561:
+                itemoptions.add(new ItemOption(14, 14 * tiLe / 100));
+                break;
+        }
+        if (Util.isTrue(30, 100)) {
+            short[] options = {86, 87};
+            itemoptions.add(new ItemOption(options[Util.nextInt(options.length)], 0));
+        }
+        itemoptions.add(new ItemOption(21, Util.nextInt(15, 17)));
+    }
+
+    private void addRareDoThanLinhOption(List<ItemOption> itemoptions, int rareOptionId, int tiLe) {
+        if (tiLe > 100) {
+            itemoptions.add(new ItemOption(rareOptionId, tiLe - 100));
+        }
     }
 
     public Item DoThienSu(int itemId, int gender) {

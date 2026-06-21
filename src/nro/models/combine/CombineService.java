@@ -56,6 +56,7 @@ public class CombineService {
     public static final int NHAP_NGOC_RONG = 513;
     public static final int PHAN_RA_DO_THAN_LINH = 514;
     public static final int CHE_TAO_TRANG_BI_THIEN_SU = 515;
+    public static final int TAI_HIEN_THANH_THAN = 516;
     public static final int NANG_CHI_SO_BONG_TAI = 517;
     public static final int NANG_CAP_BONG_TAI3 = 455;
     public static final int NANG_CHI_SO_BONG_TAI3 = 457;
@@ -169,6 +170,9 @@ public class CombineService {
             case CHE_TAO_TRANG_BI_THIEN_SU:
                 CheTaoTrangBiThienSu.showInfoCombine(player);
                 break;
+            case TAI_HIEN_THANH_THAN:
+                TaiHienThanhThan.showInfoCombine(player);
+                break;
             case DUI_DUC:
                 CheTaoDuiDuc.showInfoCombine(player);
                 break;
@@ -256,6 +260,9 @@ public class CombineService {
                 break;
             case CHE_TAO_TRANG_BI_THIEN_SU:
                 CheTaoTrangBiThienSu.CheTaoTS(player);
+                break;
+            case TAI_HIEN_THANH_THAN:
+                TaiHienThanhThan.taiHien(player);
                 break;
             case DUI_DUC:
                 CheTaoDuiDuc.CheTaoDuiDuc(player);
@@ -678,6 +685,8 @@ public class CombineService {
                 return "Ta sẽ phù phép\nphân rã sách đó cho ngươi";
             case CHE_TAO_TRANG_BI_THIEN_SU:
                 return "Chế tạo\ntrang bị thiên sứ";
+            case TAI_HIEN_THANH_THAN:
+                return "Tái hiện\ntrang bị Thần Linh";
             case LAM_PHEP_NHAP_DA:
                 return "Ta sẽ phù phép\n"
                         + "cho 10 mảnh đá vụn\n"
@@ -717,6 +726,8 @@ public class CombineService {
                 return "vào hành trang\nChọn 1 công thức và công thức Vip\nkèm 1 đá nâng, 1 đá may mắn\n và 999 mảnh thiên sứ\n "
                         + "Ta sẽ cho ra đồ thiên sứ từ 0-15% chỉ số\n"
                         + "Sau đó chọn 'Nâng Cấp'";
+            case TAI_HIEN_THANH_THAN:
+                return "Vào hành trang\nChọn 5 trang bị Hủy Diệt cùng hành tinh\nvà 5 trang bị Kích Hoạt cùng hành tinh\nSau đó chọn 'Tái hiện'";
             case NANG_CAP_BONG_TAI:
                 return "Vào hành trang\nChọn bông tai Porata\nChọn mảnh bông tai để nâng cấp, Số lượng 9999 cái"
                         + "\nSau đó chọn 'Nâng cấp'";

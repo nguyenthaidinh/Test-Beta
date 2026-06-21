@@ -233,6 +233,20 @@ public class SetClothes {
         return true;
     }
 
+    public boolean checkSetAngel() {
+        for (int i = 0; i < 5; i++) {
+            Item item = this.player.inventory.itemsBody.get(i);
+            if (item.isNotNullItem()) {
+                if (item.template.id < 1048 || item.template.id > 1062) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void dispose() {
         this.player = null;
     }

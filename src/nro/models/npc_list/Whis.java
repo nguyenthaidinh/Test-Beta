@@ -66,6 +66,11 @@ public class Whis extends Npc {
                         CombineService.gI().startCombine(player);
                     }
                 }
+                case CombineService.TAI_HIEN_THANH_THAN -> {
+                    if (select == 0) {
+                        CombineService.gI().startCombine(player);
+                    }
+                }
                 case 6 ->
                     handleHocTuyetKy(player, select);
             }
@@ -80,7 +85,7 @@ public class Whis extends Npc {
                 if (this.mapId == 154) {
                     createOtherMenu(player, 5,
                             "Ta sẽ giúp ngươi chế tạo trang bị thiên sứ",
-                            "Shop thiên sứ", "Chế tạo", "Từ chối");
+                            "Shop thiên sứ", "Chế tạo", "Tái hiện\nThánh Thần", "Từ chối");
                 } else if (this.mapId == 164) {
                     ChangeMapService.gI().changeMapInYard(player, 154, -1, 758);
                 } else if (this.mapId == 48) {
@@ -117,6 +122,14 @@ public class Whis extends Npc {
                             "Ngươi hãy trang bị đủ 5 món trang bị Hủy Diệt rồi ta nói chuyện tiếp.", "OK");
                 } else {
                     CombineService.gI().openTabCombine(player, CombineService.CHE_TAO_TRANG_BI_THIEN_SU);
+                }
+            }
+            case 2 -> {
+                if (player.setClothes == null || !player.setClothes.checkSetAngel()) {
+                    createOtherMenu(player, ConstNpc.IGNORE_MENU,
+                            "Ngươi hãy trang bị đủ 5 món trang bị Thiên Sứ rồi ta mới có thể tái hiện Thánh Thần.", "OK");
+                } else {
+                    CombineService.gI().openTabCombine(player, CombineService.TAI_HIEN_THANH_THAN);
                 }
             }
         }
