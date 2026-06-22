@@ -556,22 +556,6 @@ public class Player implements Runnable {
                         }
                     }
 
-                    if (this.zone != null && this.effectSkin != null && this.effectSkin.xHPKI > 1
-                            && !MapService.gI().isMapBlackBallWar(this.zone.map.mapId)
-                            && !MapService.gI().isMapVoDaiSieuCap(this.zone.map.mapId)) {
-                        this.effectSkin.xHPKI = 1;
-                        this.nPoint.calPoint();
-                        Service.gI().point(this);
-                    }
-
-                    if (this.zone != null && this.effectSkin != null && this.effectSkin.xDame > 1
-                            && !MapService.gI().isMapBlackBallWar(this.zone.map.mapId)
-                            && !MapService.gI().isMapVoDaiSieuCap(this.zone.map.mapId)) {
-                        this.effectSkin.xDame = 1;
-                        this.nPoint.calPoint();
-                        Service.gI().point(this);
-                    }
-
                     if (this.isPl() && this.zone != null) {
                         fixBlackBallWar();
                     }

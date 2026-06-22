@@ -195,6 +195,9 @@ public class BossID {
     public static final int TAU_PAIPAI = -385;
     public static final int POCOLO_NAMEK = -386;
     public static final int POCOLO_NAMEK_CLONE = -387;
+    public static final int HTTV_GOKU = -388;
+    public static final int HTTV_CADIC = -389;
+    public static final int HTTV_BLACK_GOKU = -390;
     public static final int RONG_NHI = -386998;
     //========================Cadic M========================
     public static final int CADIC_M = -924;

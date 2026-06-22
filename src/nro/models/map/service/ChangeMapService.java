@@ -373,6 +373,8 @@ public class ChangeMapService {
             boolean nextMapIsTL = MapService.gI().isMapTuongLai(zoneJoin.map);
             boolean nextMapIsMabu = MapService.gI().isMapMaBu(zoneJoin.map.mapId);
             boolean sameZone = pl.zone.map.mapId == zoneJoin.map.mapId;
+            boolean currMapCanUsePowerBlessing = isPowerBlessingMap(pl.zone.map.mapId);
+            boolean nextMapCanUsePowerBlessing = isPowerBlessingMap(zoneJoin.map.mapId);
             if (typeSpace == AUTO_SPACE_SHIP) {
                 spaceShipArrive(pl, (byte) 0, pl.haveTennisSpaceShip ? TENNIS_SPACE_SHIP : DEFAULT_SPACE_SHIP);
                 pl.idMark.setIdSpaceShip(pl.haveTennisSpaceShip ? TENNIS_SPACE_SHIP : DEFAULT_SPACE_SHIP);
@@ -420,6 +422,7 @@ public class ChangeMapService {
                 pl.timeChangeZone = System.currentTimeMillis();
             }
             pl.idMark.setIdSpaceShip(NON_SPACE_SHIP);
+            refreshPowerBlessingOnMapChange(pl, currMapCanUsePowerBlessing, nextMapCanUsePowerBlessing);
             if (pl.isPl() && nextMapIsMabu) {
                 if (zoneJoin.map.mapId == 117) {
                     Service.gI().sendThongBao(pl, "Đây là không gian cao trọng lực, hãy cẩn thận");
@@ -856,16 +859,6 @@ public class ChangeMapService {
             if (player.effectSkill.useTroi) {
                 EffectSkillService.gI().removeUseTroi(player);
             }
-            if (player.effectSkin.xHPKI > 1 && !MapService.gI().isMapBlackBallWar(player.zone.map.mapId)
-                    && !MapService.gI().isMapVoDaiSieuCap(player.zone.map.mapId)) {
-                player.effectSkin.xHPKI = 1;
-                Service.gI().point(player);
-            }
-            if (player.effectSkin.xDame > 1 && !MapService.gI().isMapBlackBallWar(player.zone.map.mapId)
-                    && !MapService.gI().isMapVoDaiSieuCap(player.zone.map.mapId)) {
-                player.effectSkin.xDame = 1;
-                Service.gI().point(player);
-            }
             player.zone.removePlayer(player);
             if (!MapService.gI().isMapOffline(player.zone.map.mapId)) {
                 Message msg = null;
@@ -883,6 +876,20 @@ public class ChangeMapService {
                 }
             }
         }
+    }
+
+    private boolean isPowerBlessingMap(int mapId) {
+        return MapService.gI().isMapBlackBallWar(mapId) || MapService.gI().isMapVoDaiSieuCap(mapId);
+    }
+
+    private void refreshPowerBlessingOnMapChange(Player player, boolean oldMapCanUseBlessing, boolean newMapCanUseBlessing) {
+        if (player == null || player.effectSkin == null
+                || (player.effectSkin.xHPKI <= 1 && player.effectSkin.xDame <= 1)
+                || oldMapCanUseBlessing == newMapCanUseBlessing) {
+            return;
+        }
+        Service.gI().point(player);
+        PlayerService.gI().sendInfoHpMp(player);
     }
 
     public void goToTuongLai(Player player) {

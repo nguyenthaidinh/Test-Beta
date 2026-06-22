@@ -2,9 +2,6 @@ package nro.models.server;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import nro.models.database.HistoryTransactionDAO;
 import nro.models.boss.Boss_Manager.BossManager;
 import nro.models.boss.Boss_Manager.OtherBossManager;
@@ -266,21 +263,13 @@ public class ServerManager {
     }
 
     public void resetNhanQuaHangNgay() {
-        String url = "jdbc:mysql://localhost:3306/ngocrong";
-        String username = "root";
-        String password = "";
         String resetJson = "[1,1,\"1970-01-01T00:00:00\"]";
 
-        try (Connection conn = DriverManager.getConnection(url, username, password)) {
-            String sql = "UPDATE player SET checkNhanQua = ? WHERE checkNhanQua != ?";
-            PreparedStatement statement = conn.prepareStatement(sql);
-
-            statement.setString(1, resetJson);
-            statement.setString(2, resetJson);
-
-            int rowsUpdated = statement.executeUpdate();
+        try {
+            int rowsUpdated = LocalManager.executeUpdate("UPDATE player SET checkNhanQua = ? WHERE checkNhanQua != ?",
+                    resetJson, resetJson);
             Logger.success("Đã reset nhận quà hằng ngày cho " + rowsUpdated + " người chơi với dữ liệu: " + resetJson);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("Lỗi reset nhận quà hằng ngày: " + e.getMessage());
         }
     }

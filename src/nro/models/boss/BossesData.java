@@ -42,6 +42,7 @@ public class BossesData {
     private static final int REST_15_M = 900;
     private static final int REST_30_M = 1800;
     private static final int REST_1_H = 3600;
+    private static final int REST_2_H = 7200;
     private static final int REST_24_H = 86400000;
 
     // **************************************************************************
@@ -1170,6 +1171,56 @@ public class BossesData {
                     "|-1|Kakalốt! Ta chờ đợi giây phút này đã từ lâu!" }, // text chat 2
             new String[] {}, // text chat 3
             AppearType.CALL_BY_ANOTHER);
+
+    public static final BossData HTTV_GOKU = new BossData(
+            "Goku", // name
+            ConstPlayer.XAYDA, // gender
+            new short[] { 101, 65, 66, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            1000, // dame
+            new int[] { 2_000_000_000 }, // hp
+            new int[] { 160, 161, 162, 163 }, // map join
+            new int[][] {
+                    { Skill.GALICK, 7, 1000 },
+                    { Skill.KAMEJOKO, 7, 1000 },
+                    { Skill.TAI_TAO_NANG_LUONG, 7, 1000000 },
+                    { Skill.THAI_DUONG_HA_SAN, 1, 60000 } }, // skill
+            new String[] { "|-1|Tinh lai di Cadic!" }, // text chat 1
+            new String[] { "|-1|Cadic! Dung tay lai!" }, // text chat 2
+            new String[] {}, // text chat 3
+            REST_2_H);
+
+    public static final BossData HTTV_CADIC = new BossData(
+            "Cadic", // name
+            ConstPlayer.XAYDA, // gender
+            new short[] { 103, 16, 17, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            1000, // dame
+            new int[] { 2_000_000_000 }, // hp
+            new int[] { 160, 161, 162, 163 }, // map join
+            new int[][] {
+                    { Skill.GALICK, 7, 1000 },
+                    { Skill.ANTOMIC, 7, 1000 },
+                    { Skill.TAI_TAO_NANG_LUONG, 7, 1000000 } }, // skill
+            new String[] { "|-1|Kakalot!" }, // text chat 1
+            new String[] { "|-1|Chung ta se mot mat mot con!" }, // text chat 2
+            new String[] {}, // text chat 3
+            REST_2_H);
+
+    public static final BossData HTTV_BLACK_GOKU = new BossData(
+            "Black Goku", // name
+            ConstPlayer.TRAI_DAT, // gender
+            new short[] { 550, 551, 552, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            50000, // dame
+            new int[] { 2_000_000_000 }, // hp
+            new int[] { 160, 161, 162, 163 }, // map join
+            new int[][] {
+                    { Skill.KAMEJOKO, 7, 100 },
+                    { Skill.TAI_TAO_NANG_LUONG, 7, 1000000 },
+                    { Skill.KHIEN_NANG_LUONG, 7, 300000 },
+                    { Skill.GALICK, 7, 100 } }, // skill
+            new String[] { "|-1|Ta se bien hanh tinh nay thanh tan tich." }, // text chat 1
+            new String[] { "|-1|Cac nguoi chi co vay thoi sao?" }, // text chat 2
+            new String[] { "|-1|Lan sau ta se quay lai manh hon." }, // text chat 3
+            REST_2_H);
 
     public static final BossData DRABURA = new BossData(
             "Drabura",

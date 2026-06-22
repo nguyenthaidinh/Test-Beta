@@ -157,6 +157,9 @@ public class BossManager implements Runnable {
         this.createBoss(BossID.CUMBER);
         this.createBoss(BossID.COOLER, 1);
         this.createBoss(BossID.BLACK_GOKU, 2);
+        this.createBoss(BossID.HTTV_GOKU);
+        this.createBoss(BossID.HTTV_CADIC);
+        this.createBoss(BossID.HTTV_BLACK_GOKU);
         this.createBoss(BossID.GOLDEN_FRIEZA, 3);
         this.createBoss(BossID.SOI_HEC_QUYN1, 2);
         this.createBoss(BossID.AN_TROM, 5);
@@ -362,6 +365,12 @@ public class BossManager implements Runnable {
                     new Pocolo();
                 case BossID.BLACK_GOKU ->
                     new BlackGoku();
+                case BossID.HTTV_GOKU ->
+                    new nro.models.boss.gokuvegeta.Goku();
+                case BossID.HTTV_CADIC ->
+                    new nro.models.boss.gokuvegeta.Cadic();
+                case BossID.HTTV_BLACK_GOKU ->
+                    new nro.models.boss.gokuvegeta.BlackGoku();
                 case BossID.CUMBER ->
                     new Cumber();
                 case BossID.AN_TROM ->
