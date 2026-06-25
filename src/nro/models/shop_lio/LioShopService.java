@@ -203,7 +203,7 @@ public class LioShopService {
             msg = new Message(firstOpen ? -44 : -100);
             if (firstOpen) {
                 msg.writer().writeByte(2);
-                msg.writer().writeByte(1); // 1 tab
+                msg.writer().writeByte(5); // Consign UI expects 5 tabs
                 msg.writer().writeUTF("Đồ Thần Linh");
                 msg.writer().writeByte(totalPage); // max page
             } else {
@@ -240,6 +240,13 @@ public class LioShopService {
                 msg.writer().writeByte(0);
                 if (firstOpen) {
                     msg.writer().writeByte(0);
+                }
+            }
+            if (firstOpen) {
+                for (int i = 1; i < 5; i++) {
+                    msg.writer().writeUTF("");
+                    msg.writer().writeByte(1); // max page
+                    msg.writer().writeByte(0); // items count
                 }
             }
 
