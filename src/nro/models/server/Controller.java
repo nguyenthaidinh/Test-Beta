@@ -51,6 +51,7 @@ import nro.models.services_func.TransactionService;
 import nro.models.skill.Skill;
 import nro.models.utils.Logger;
 import nro.models.data.LocalResultSet;
+import nro.models.shop_lio.LioShopService;
 import nro.models.shop_ky_gui.ConsignShopService;
 
 /**
@@ -118,17 +119,23 @@ public class Controller implements IMessageHandler {
                             idItem = _msg.reader().readShort();
                             _msg.reader().readByte();
                             _msg.reader().readInt();
-                            // Thử mua từ ConsignShop trước, nếu không tìm thấy thì thử LioShop
-                            if (ConsignShopService.gI().getItemBuy(idItem) != null) {
+                            if (LioShopService.SHOP_TAG.equals(player.idMark.getTagNameShop())
+                                    && LioShopService.gI().hasAvailableItem(idItem)) {
+                                LioShopService.gI().buyItem(player, idItem);
+                            } else if (ConsignShopService.gI().getItemBuy(idItem) != null) {
                                 ConsignShopService.gI().buyItem(player, idItem);
                             } else {
-                                nro.models.shop_lio.LioShopService.gI().buyItem(player, idItem);
+                                LioShopService.gI().buyItem(player, idItem);
                             }
                             break;
                         case 4:
                             moneyType = _msg.reader().readByte();
                             money = _msg.reader().readByte();
-                            ConsignShopService.gI().openShopKyGui(player, moneyType, money);
+                            if (LioShopService.SHOP_TAG.equals(player.idMark.getTagNameShop())) {
+                                LioShopService.gI().openShopPage(player, money);
+                            } else {
+                                ConsignShopService.gI().openShopKyGui(player, moneyType, money);
+                            }
                             break;
                         case 5:
                             idItem = _msg.reader().readShort();

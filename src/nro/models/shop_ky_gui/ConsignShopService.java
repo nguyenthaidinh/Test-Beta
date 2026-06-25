@@ -181,6 +181,7 @@ public class ConsignShopService {
     }
 
     public void openShopKyGui(Player pl, byte index, int page) {
+        pl.idMark.setTagNameShop(null);
         if (page > getItemKyGui(pl, index).size()) {
             return;
         }
@@ -439,6 +440,7 @@ public class ConsignShopService {
     }
 
     public void openShopKyGui(Player pl) {
+        pl.idMark.setTagNameShop(null);
         Message msg = null;
         try {
             msg = new Message(-44);

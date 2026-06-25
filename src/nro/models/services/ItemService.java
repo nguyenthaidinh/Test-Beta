@@ -1312,9 +1312,9 @@ public class ItemService {
         short[] quan = {556, 558, 560};
         short[] gang = {562, 564, 566};
         short[] giay = {563, 565, 567};
-        if (Util.isTrue(10, 100)) {
+        if (Util.isTrue(225, 1000)) { // Nhẫn: 22.5%
             return 561;
-        } else if (Util.isTrue(25, 100)) {
+        } else if (Util.isTrue(200, 1550)) { // Găng: 10% tổng sau khi trượt nhẫn
             return gang[race];
         } else if (Util.isTrue(45, 100)) {
             return quan[race];

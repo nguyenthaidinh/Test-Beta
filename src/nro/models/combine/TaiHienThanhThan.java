@@ -363,7 +363,61 @@ public class TaiHienThanhThan {
         }
 
         private int randomKichHoatOption() {
-            return kichHoatOptions.get(Util.nextInt(kichHoatOptions.size()));
+            List<Integer> options = uniqueKichHoatOptions();
+            if (options.size() == 1) {
+                return options.get(0);
+            }
+            if (options.contains(129) && Util.isTrue(10, 100)) {
+                return 129;
+            }
+
+            int songokuIndex = options.indexOf(129);
+            if (songokuIndex >= 0) {
+                options.remove(songokuIndex);
+            }
+            return randomWeightedKichHoatOption(options);
+        }
+
+        private List<Integer> uniqueKichHoatOptions() {
+            List<Integer> options = new ArrayList<>();
+            for (int optionId : kichHoatOptions) {
+                if (!options.contains(optionId)) {
+                    options.add(optionId);
+                }
+            }
+            return options;
+        }
+
+        private int randomWeightedKichHoatOption(List<Integer> options) {
+            int totalWeight = 0;
+            for (int optionId : options) {
+                totalWeight += getKichHoatWeight(optionId);
+            }
+
+            int roll = Util.nextInt(1, totalWeight);
+            for (int optionId : options) {
+                roll -= getKichHoatWeight(optionId);
+                if (roll <= 0) {
+                    return optionId;
+                }
+            }
+            return options.get(Util.nextInt(options.size()));
+        }
+
+        private int getKichHoatWeight(int optionId) {
+            switch (optionId) {
+                case 245: // Set Than Vu Tru Kaio
+                case 237: // Set Nail chien binh Namek
+                case 241: // Set Cadic M
+                    return 50;
+                case 127: // Set Thien Xin Hang
+                case 128: // Set Kirin
+                    return 25;
+                case 129: // Set Songoku
+                    return 10;
+                default:
+                    return 25;
+            }
         }
     }
 }

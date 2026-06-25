@@ -23,6 +23,7 @@ import nro.models.services.Service;
 public class LioShopService {
 
     private static final int MAX_STACK_QUANTITY = 100_000_000;
+    public static final String SHOP_TAG = "LIO_DEP_TRAI_SHOP";
     private static LioShopService instance;
 
     public static LioShopService gI() {
@@ -161,9 +162,26 @@ public class LioShopService {
     }
 
     /**
-     * Mở giao diện shop (sử dụng protocol ConsignShop -100)
+     * Mở giao diện shop (mở lần đầu bằng -44, chuyển trang bằng -100)
      */
     public void openShop(Player player) {
+        openShop(player, 0, true);
+    }
+
+    public void openShopPage(Player player, int page) {
+        openShop(player, Math.max(0, page), false);
+    }
+
+    public boolean hasAvailableItem(int shopItemId) {
+        for (LioShopItem it : LioShopManager.gI().listItem) {
+            if (it != null && it.id == shopItemId && !it.isSold) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void openShop(Player player, int page, boolean firstOpen) {
         if (LioShopManager.gI() == null) {
             Service.gI().sendThongBao(player, "Shop đang bảo trì, vui lòng quay lại sau!");
             return;
@@ -171,21 +189,30 @@ public class LioShopService {
         List<LioShopItem> available = LioShopManager.gI().listItem.stream()
                 .filter(it -> it != null && !it.isSold)
                 .collect(Collectors.toList());
+        int totalPage = Math.max(1, (available.size() + 19) / 20);
+        if (page >= totalPage) {
+            page = totalPage - 1;
+        }
+        int from = Math.min(page * 20, available.size());
+        int to = Math.min(from + 20, available.size());
+        List<LioShopItem> itemsSend = available.subList(from, to);
 
         Message msg = null;
         try {
-            msg = new Message(-100);
-            msg.writer().writeByte(0); // tab index
-            msg.writer().writeByte(1); // 1 tab
-            // Tab "Đồ Thần Linh"
-            msg.writer().writeUTF("Đồ Thần Linh");
-            msg.writer().writeByte(1); // max page
-            msg.writer().writeByte(Math.min(available.size(), 20)); // items count
-
-            int count = 0;
-            for (LioShopItem shopItem : available) {
-                if (count >= 20) break;
-
+            player.idMark.setTagNameShop(SHOP_TAG);
+            msg = new Message(firstOpen ? -44 : -100);
+            if (firstOpen) {
+                msg.writer().writeByte(2);
+                msg.writer().writeByte(1); // 1 tab
+                msg.writer().writeUTF("Đồ Thần Linh");
+                msg.writer().writeByte(totalPage); // max page
+            } else {
+                msg.writer().writeByte(0); // tab index
+                msg.writer().writeByte(totalPage); // max page
+                msg.writer().writeByte(page);
+            }
+            msg.writer().writeByte(itemsSend.size()); // items count
+            for (LioShopItem shopItem : itemsSend) {
                 Item it = ItemService.gI().createNewItem(shopItem.itemId);
                 it.itemOptions.clear();
                 if (shopItem.options.isEmpty()) {
@@ -199,7 +226,7 @@ public class LioShopService {
                 msg.writer().writeInt(shopItem.priceThoiVang); // gold (thỏi vàng)
                 msg.writer().writeInt(-1); // gem
                 msg.writer().writeByte(0); // buy type
-                if (player.getSession().version >= 222) {
+                if (firstOpen || player.getSession().version >= 222) {
                     msg.writer().writeInt(shopItem.quantity);
                 } else {
                     msg.writer().writeByte(shopItem.quantity);
@@ -211,7 +238,9 @@ public class LioShopService {
                     msg.writer().writeShort(it.itemOptions.get(a).param);
                 }
                 msg.writer().writeByte(0);
-                count++;
+                if (firstOpen) {
+                    msg.writer().writeByte(0);
+                }
             }
 
             player.sendMessage(msg);
