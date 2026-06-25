@@ -27,7 +27,7 @@ public class LioShopService {
     private static final int MAX_STACK_QUANTITY = 100_000_000;
     public static final String SHOP_TAG = "LIO_DEP_TRAI_SHOP";
     public static final String BE_TAC_SHOP_TAG = "LIO_BE_TAC_SHOP";
-    private static final int PRICE_BE_TAC = 120;
+    private static final int PRICE_BE_TAC = 150;
     private static final int BE_TAC_ITEM_ID_BASE = 30000;
     private static final String[] BE_TAC_TAB_NAMES = {"Trái Đất", "Namek", "Xayda", "", ""};
     private static final short[][] BE_TAC_ITEMS = {
