@@ -34,10 +34,11 @@ public class LioDepTrai extends Npc {
                     + "|1|Chuyên thu mua và bán lại Đồ Thần Linh.\n"
                     + "|0|Bán cho ta: Nhận " + LioShopManager.PRICE_BUY_IN + " thỏi vàng/món\n"
                     + "|0|Mua từ ta: " + LioShopManager.PRICE_SELL_OUT + " thỏi vàng/món\n"
+                    + "|0|Bế tắc: Đồ Thần Linh 120 thỏi vàng/món\n"
                     + "|2|Đang có " + soLuongShop + "/" + LioShopManager.MAX_ITEMS + " món trong shop";
 
             createOtherMenu(player, ConstNpc.BASE_MENU, npcSay,
-                    "Bán đồ\nThần Linh", "Mua đồ\nThần Linh", "Đóng");
+                    "Bán đồ\nThần Linh", "Mua đồ\nThần Linh", "Bế\ntắc", "Đóng");
         }
     }
 
@@ -63,6 +64,9 @@ public class LioDepTrai extends Npc {
                             } else {
                                 LioShopService.gI().openShop(player);
                             }
+                        }
+                        case 2 -> {
+                            LioShopService.gI().openBeTacShop(player);
                         }
                     }
                 }

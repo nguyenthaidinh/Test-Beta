@@ -2,7 +2,9 @@ package nro.models.shop_lio;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import nro.models.consts.ConstItem;
 import nro.models.item.Item;
@@ -24,7 +26,19 @@ public class LioShopService {
 
     private static final int MAX_STACK_QUANTITY = 100_000_000;
     public static final String SHOP_TAG = "LIO_DEP_TRAI_SHOP";
+    public static final String BE_TAC_SHOP_TAG = "LIO_BE_TAC_SHOP";
+    private static final int PRICE_BE_TAC = 120;
+    private static final int BE_TAC_ITEM_ID_BASE = 30000;
+    private static final String[] BE_TAC_TAB_NAMES = {"Trái Đất", "Namek", "Xayda", "", ""};
+    private static final short[][] BE_TAC_ITEMS = {
+        {555, 556, 562, 563, 561},
+        {557, 558, 564, 565, 561},
+        {559, 560, 566, 567, 561},
+        {},
+        {}
+    };
     private static LioShopService instance;
+    private final Map<Integer, Item> beTacShopItems = new HashMap<>();
 
     public static LioShopService gI() {
         if (instance == null) {
@@ -181,6 +195,49 @@ public class LioShopService {
         return false;
     }
 
+    public boolean hasBeTacItem(int shopItemId) {
+        return getBeTacItemId(shopItemId) != -1;
+    }
+
+    public void buyBeTacItem(Player player, int shopItemId) {
+        short itemId = getBeTacItemId(shopItemId);
+        if (itemId == -1) {
+            Service.gI().sendThongBao(player, "Vat pham khong ton tai!");
+            openBeTacShop(player);
+            return;
+        }
+
+        Item thoiVang = findThoiVang(player, PRICE_BE_TAC);
+        if (thoiVang == null) {
+            Service.gI().sendThongBao(player, "Ban can " + PRICE_BE_TAC + " thoi vang de mua!");
+            openBeTacShop(player);
+            return;
+        }
+
+        if (InventoryService.gI().getCountEmptyBag(player) <= 0 && thoiVang.quantity > PRICE_BE_TAC) {
+            Service.gI().sendThongBao(player, "Hanh trang khong con cho trong!");
+            openBeTacShop(player);
+            return;
+        }
+
+        InventoryService.gI().subQuantityItemsBag(player, thoiVang, PRICE_BE_TAC);
+        Item item = createBeTacItemForBuy(shopItemId);
+        if (item == null || !InventoryService.gI().addItemBag(player, item)) {
+            Item refund = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, PRICE_BE_TAC);
+            InventoryService.gI().addItemBag(player, refund);
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendMoney(player);
+            Service.gI().sendThongBao(player, "Khong the mua vat pham, da hoan lai thoi vang.");
+            openBeTacShop(player);
+            return;
+        }
+
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendMoney(player);
+        Service.gI().sendThongBao(player, "Mua thanh cong " + item.template.name + "!");
+        openBeTacShop(player);
+    }
+
     private void openShop(Player player, int page, boolean firstOpen) {
         if (LioShopManager.gI() == null) {
             Service.gI().sendThongBao(player, "Shop đang bảo trì, vui lòng quay lại sau!");
@@ -204,49 +261,24 @@ public class LioShopService {
             if (firstOpen) {
                 msg.writer().writeByte(2);
                 msg.writer().writeByte(5); // Consign UI expects 5 tabs
-                msg.writer().writeUTF("Đồ Thần Linh");
-                msg.writer().writeByte(totalPage); // max page
+                for (int tab = 0; tab < 5; tab++) {
+                    msg.writer().writeUTF(tab < totalPage ? "Trang " + (tab + 1) : "");
+                    msg.writer().writeByte(1); // mỗi tab là một trang
+                    int tabFrom = Math.min(tab * 20, available.size());
+                    int tabTo = Math.min(tabFrom + 20, available.size());
+                    int tabCount = tab < totalPage ? tabTo - tabFrom : 0;
+                    msg.writer().writeByte(tabCount);
+                    for (int i = tabFrom; i < tabTo && tab < totalPage; i++) {
+                        writeShopItem(msg, player, available.get(i), true);
+                    }
+                }
             } else {
-                msg.writer().writeByte(0); // tab index
-                msg.writer().writeByte(totalPage); // max page
-                msg.writer().writeByte(page);
-            }
-            msg.writer().writeByte(itemsSend.size()); // items count
-            for (LioShopItem shopItem : itemsSend) {
-                Item it = ItemService.gI().createNewItem(shopItem.itemId);
-                it.itemOptions.clear();
-                if (shopItem.options.isEmpty()) {
-                    it.itemOptions.add(new ItemOption(73, 0));
-                } else {
-                    it.itemOptions.addAll(shopItem.options);
-                }
-
-                msg.writer().writeShort(it.template.id);
-                msg.writer().writeShort(shopItem.id);
-                msg.writer().writeInt(shopItem.priceThoiVang); // gold (thỏi vàng)
-                msg.writer().writeInt(-1); // gem
-                msg.writer().writeByte(0); // buy type
-                if (firstOpen || player.getSession().version >= 222) {
-                    msg.writer().writeInt(shopItem.quantity);
-                } else {
-                    msg.writer().writeByte(shopItem.quantity);
-                }
-                msg.writer().writeByte(0); // isMe
-                msg.writer().writeByte(it.itemOptions.size());
-                for (int a = 0; a < it.itemOptions.size(); a++) {
-                    msg.writer().writeByte(it.itemOptions.get(a).optionTemplate.id);
-                    msg.writer().writeShort(it.itemOptions.get(a).param);
-                }
-                msg.writer().writeByte(0);
-                if (firstOpen) {
-                    msg.writer().writeByte(0);
-                }
-            }
-            if (firstOpen) {
-                for (int i = 1; i < 5; i++) {
-                    msg.writer().writeUTF("");
-                    msg.writer().writeByte(1); // max page
-                    msg.writer().writeByte(0); // items count
+                msg.writer().writeByte(Math.min(page, 4)); // tab index
+                msg.writer().writeByte(1); // max page trong tab
+                msg.writer().writeByte(0); // page trong tab
+                msg.writer().writeByte(itemsSend.size()); // items count
+                for (LioShopItem shopItem : itemsSend) {
+                    writeShopItem(msg, player, shopItem, false);
                 }
             }
 
@@ -258,6 +290,158 @@ public class LioShopService {
                 msg.cleanup();
                 msg = null;
             }
+        }
+    }
+
+    public void openBeTacShop(Player player) {
+        openBeTacShop(player, 0, true);
+    }
+
+    public void openBeTacShopPage(Player player, int tab) {
+        openBeTacShop(player, Math.max(0, Math.min(tab, BE_TAC_ITEMS.length - 1)), false);
+    }
+
+    private void openBeTacShop(Player player, int tabIndex, boolean firstOpen) {
+        Message msg = null;
+        try {
+            player.idMark.setTagNameShop(BE_TAC_SHOP_TAG);
+            msg = new Message(firstOpen ? -44 : -100);
+            if (firstOpen) {
+                msg.writer().writeByte(2);
+                msg.writer().writeByte(5);
+                for (int tab = 0; tab < 5; tab++) {
+                    writeBeTacTab(msg, player, tab, true);
+                }
+            } else {
+                msg.writer().writeByte(tabIndex);
+                msg.writer().writeByte(1);
+                msg.writer().writeByte(0);
+                msg.writer().writeByte(BE_TAC_ITEMS[tabIndex].length);
+                for (int slot = 0; slot < BE_TAC_ITEMS[tabIndex].length; slot++) {
+                    writeBeTacShopItem(msg, player, tabIndex, slot, false);
+                }
+            }
+            player.sendMessage(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (msg != null) {
+                msg.cleanup();
+            }
+        }
+    }
+
+    private void writeBeTacTab(Message msg, Player player, int tab, boolean firstOpen) throws IOException {
+        msg.writer().writeUTF(BE_TAC_TAB_NAMES[tab]);
+        msg.writer().writeByte(1);
+        msg.writer().writeByte(BE_TAC_ITEMS[tab].length);
+        for (int slot = 0; slot < BE_TAC_ITEMS[tab].length; slot++) {
+            writeBeTacShopItem(msg, player, tab, slot, firstOpen);
+        }
+    }
+
+    private void writeBeTacShopItem(Message msg, Player player, int tab, int slot, boolean firstOpen) throws IOException {
+        Item it = getOrCreateBeTacShopItem(tab, slot);
+        if (it == null) {
+            return;
+        }
+        msg.writer().writeShort(it.template.id);
+        msg.writer().writeShort(getBeTacShopItemId(tab, slot));
+        msg.writer().writeInt(PRICE_BE_TAC);
+        msg.writer().writeInt(-1);
+        msg.writer().writeByte(0);
+        if (firstOpen || player.getSession().version >= 222) {
+            msg.writer().writeInt(1);
+        } else {
+            msg.writer().writeByte(1);
+        }
+        msg.writer().writeByte(0);
+        msg.writer().writeByte(it.itemOptions.size());
+        for (int i = 0; i < it.itemOptions.size(); i++) {
+            msg.writer().writeByte(it.itemOptions.get(i).optionTemplate.id);
+            msg.writer().writeShort(it.itemOptions.get(i).param);
+        }
+        msg.writer().writeByte(0);
+        if (firstOpen) {
+            msg.writer().writeByte(0);
+        }
+    }
+
+    private Item getOrCreateBeTacShopItem(int tab, int slot) {
+        int shopItemId = getBeTacShopItemId(tab, slot);
+        synchronized (beTacShopItems) {
+            Item item = beTacShopItems.get(shopItemId);
+            if (item == null) {
+                item = ItemService.gI().createDoThanLinh(BE_TAC_ITEMS[tab][slot]);
+                if (item != null) {
+                    beTacShopItems.put(shopItemId, item);
+                }
+            }
+            return item;
+        }
+    }
+
+    private Item createBeTacItemForBuy(int shopItemId) {
+        int raw = shopItemId - BE_TAC_ITEM_ID_BASE;
+        int tab = raw / 10;
+        int slot = raw % 10;
+        if (raw < 0 || tab < 0 || tab >= BE_TAC_ITEMS.length || slot < 0 || slot >= BE_TAC_ITEMS[tab].length) {
+            return null;
+        }
+        Item source = getOrCreateBeTacShopItem(tab, slot);
+        if (source == null || source.template == null) {
+            return null;
+        }
+        Item item = ItemService.gI().createNewItem(source.template.id);
+        item.itemOptions.clear();
+        item.itemOptions.addAll(copyOptions(source.itemOptions));
+        item.content = item.getContent();
+        item.info = item.getInfo();
+        return item;
+    }
+
+    private int getBeTacShopItemId(int tab, int slot) {
+        return BE_TAC_ITEM_ID_BASE + tab * 10 + slot;
+    }
+
+    private short getBeTacItemId(int shopItemId) {
+        int raw = shopItemId - BE_TAC_ITEM_ID_BASE;
+        int tab = raw / 10;
+        int slot = raw % 10;
+        if (raw < 0 || tab < 0 || tab >= BE_TAC_ITEMS.length || slot < 0 || slot >= BE_TAC_ITEMS[tab].length) {
+            return -1;
+        }
+        return BE_TAC_ITEMS[tab][slot];
+    }
+
+    private void writeShopItem(Message msg, Player player, LioShopItem shopItem, boolean firstOpen) throws IOException {
+        Item it = ItemService.gI().createNewItem(shopItem.itemId);
+        it.itemOptions.clear();
+        if (shopItem.options.isEmpty()) {
+            it.itemOptions.add(new ItemOption(73, 0));
+        } else {
+            it.itemOptions.addAll(shopItem.options);
+        }
+
+        msg.writer().writeShort(it.template.id);
+        msg.writer().writeShort(shopItem.id);
+        msg.writer().writeInt(shopItem.priceThoiVang); // gold (thỏi vàng)
+        msg.writer().writeInt(-1); // gem
+        msg.writer().writeByte(0); // buy type
+        if (firstOpen || player.getSession().version >= 222) {
+            msg.writer().writeInt(shopItem.quantity);
+        } else {
+            msg.writer().writeByte(shopItem.quantity);
+        }
+        msg.writer().writeByte(0); // isMe
+        msg.writer().writeByte(it.itemOptions.size());
+        for (int a = 0; a < it.itemOptions.size(); a++) {
+            msg.writer().writeByte(it.itemOptions.get(a).optionTemplate.id);
+            msg.writer().writeShort(it.itemOptions.get(a).param);
+        }
+        msg.writer().writeByte(0);
+        if (firstOpen) {
+            msg.writer().writeByte(0);
         }
     }
 

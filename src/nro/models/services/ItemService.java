@@ -1274,6 +1274,18 @@ public class ItemService {
         return item;
     }
 
+    public Item createDoThanLinh(short idTempTL) {
+        if (idTempTL < 555 || idTempTL > 567) {
+            return null;
+        }
+        Item item = createItemSetKichHoat(idTempTL, 1);
+        item.itemOptions.clear();
+        addDoThanLinhOptions(item.itemOptions, idTempTL, 207);
+        item.content = item.getContent();
+        item.info = item.getInfo();
+        return item;
+    }
+
     public Item createDoThanLinhKichHoat(int gender, int skhId) {
         short idTempTL = randomDoThanLinhTemplateId(gender);
         Item item = createItemSetKichHoat(idTempTL, 1);

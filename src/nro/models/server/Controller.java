@@ -119,7 +119,10 @@ public class Controller implements IMessageHandler {
                             idItem = _msg.reader().readShort();
                             _msg.reader().readByte();
                             _msg.reader().readInt();
-                            if (LioShopService.SHOP_TAG.equals(player.idMark.getTagNameShop())
+                            if (LioShopService.BE_TAC_SHOP_TAG.equals(player.idMark.getTagNameShop())
+                                    && LioShopService.gI().hasBeTacItem(idItem)) {
+                                LioShopService.gI().buyBeTacItem(player, idItem);
+                            } else if (LioShopService.SHOP_TAG.equals(player.idMark.getTagNameShop())
                                     && LioShopService.gI().hasAvailableItem(idItem)) {
                                 LioShopService.gI().buyItem(player, idItem);
                             } else if (ConsignShopService.gI().getItemBuy(idItem) != null) {
@@ -131,8 +134,10 @@ public class Controller implements IMessageHandler {
                         case 4:
                             moneyType = _msg.reader().readByte();
                             money = _msg.reader().readByte();
-                            if (LioShopService.SHOP_TAG.equals(player.idMark.getTagNameShop())) {
-                                LioShopService.gI().openShopPage(player, money);
+                            if (LioShopService.BE_TAC_SHOP_TAG.equals(player.idMark.getTagNameShop())) {
+                                LioShopService.gI().openBeTacShopPage(player, moneyType > 0 ? moneyType : money);
+                            } else if (LioShopService.SHOP_TAG.equals(player.idMark.getTagNameShop())) {
+                                LioShopService.gI().openShopPage(player, moneyType > 0 ? moneyType : money);
                             } else {
                                 ConsignShopService.gI().openShopKyGui(player, moneyType, money);
                             }
