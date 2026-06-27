@@ -102,8 +102,8 @@ public class SuperRankDAO {
                     superRankbuilder.setHead(((Long) info.get("head")).intValue());
                     superRankbuilder.setBody(((Long) info.get("body")).intValue());
                     superRankbuilder.setLeg(((Long) info.get("leg")).intValue());
-                    text.append("HP: ").append(Util.formatNumber(((Long) info.get("hp")).intValue())).append("\n");
-                    text.append("Sức đánh: ").append(Util.formatNumber(((Long) info.get("dame")).intValue())).append("\n");
+                    text.append("HP: ").append(Util.formatNumber(((Long) info.get("hp")).longValue())).append("\n");
+                    text.append("Sức đánh: ").append(Util.formatNumber(((Long) info.get("dame")).longValue())).append("\n");
                     text.append("Giáp: ").append(Util.formatNumber(((Long) info.get("def")).intValue())).append("\n");
                 }
             } catch (Exception e) {

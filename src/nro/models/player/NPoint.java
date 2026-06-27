@@ -36,6 +36,7 @@ public class NPoint {
 
     public static final byte MAX_LIMIT = 12;
     public static final long MAX_PLAYER_HP = 20_000_000_000L;
+    public static final long MAX_PLAYER_DAME = 20_000_000_000L;
 
     @Setter
     private Player player;
@@ -70,7 +71,8 @@ public class NPoint {
 
     public long hp, hpMax, hpg;
     public int mp, mpMax, mpg;
-    public int dame, dameg;
+    public long dame;
+    public int dameg;
     public int def, defg;
     public int crit, critg, critdragon;
     public byte speed = 8;
@@ -83,7 +85,8 @@ public class NPoint {
      * Chỉ số cộng thêm
      */
     public long hpAdd;
-    public int mpAdd, dameAdd, defAdd, critAdd, hpHoiAdd, mpHoiAdd;
+    public int mpAdd, defAdd, critAdd, hpHoiAdd, mpHoiAdd;
+    public long dameAdd;
 
     /**
      * //+#% sức đánh chí mạng
@@ -464,6 +467,7 @@ public class NPoint {
                     teleport = true;
                 }
                 ItemService.gI().normalizeTrumTop1Options(item);
+                ItemService.gI().normalizeFusionGokuOptions(item);
                 ItemService.gI().normalizeGokuNgayXuaOptions(item);
                 if (item.template.id != 1815 && isBodyItemOptionActive(item)) {
                     for (ItemOption io : item.itemOptions) {
@@ -480,7 +484,8 @@ public class NPoint {
     }
 
     private boolean isBodyItemOptionActive(Item item) {
-        if (item != null && item.template != null && item.template.id == 1870) {
+        if (item != null && item.template != null
+                && (item.template.id == 1780 || item.template.id == 1870)) {
             return isFusionActive();
         }
         return true;
@@ -1206,6 +1211,10 @@ public class NPoint {
         return toClientStat(this.hpg);
     }
 
+    public int getClientDame() {
+        return toClientStat(this.dame);
+    }
+
     public int getMP() {
         return Math.min(this.mp, this.mpMax);
     }
@@ -1405,16 +1414,12 @@ public class NPoint {
             dame /= 2;
         }
 
-        if (dame > 2_147_483_647) {
-            dame = 2_147_483_647;
-        }
-
-        this.dame = (int) dame;
+        this.dame = Math.max(0, Math.min(dame, MAX_PLAYER_DAME));
     }
 
     public void setDame(long dame) {
         if (dame > 0) {
-            this.dame = (int) (dame <= this.dame ? dame : this.dame);
+            this.dame = Math.min(dame, this.dame);
         } else {
             this.dame = 0;
         }
@@ -1555,7 +1560,7 @@ public class NPoint {
         }
     }
 
-    public int getDameAttack(boolean isAttackMob) {
+    public long getDameAttack(boolean isAttackMob) {
         setIsCrit();
         long dameAttack = this.dame;
         intrinsic = this.player.playerIntrinsic.intrinsic;
@@ -1641,13 +1646,14 @@ public class NPoint {
             case Skill.DICH_CHUYEN_TUC_THOI:
                 isCrit = true;
                 isCritTele = true;
-                dameAttack = Util.nextInt((int) (int) Math.min(2_147_483_647L, (dameAttack - (dameAttack / 100 * 5))),
-                        (int) (int) Math.min(2_147_483_647L, (dameAttack + (dameAttack / 100 * 5))));
+                long minDameTele = Math.max(0, dameAttack - dameAttack * 5 / 100);
+                long maxDameTele = Math.max(minDameTele,
+                        Math.min(MAX_PLAYER_DAME, dameAttack + dameAttack * 5 / 100));
+                dameAttack = Util.nextLong(minDameTele, maxDameTele);
                 break;
             case Skill.MAKANKOSAPPO:
                 percentDameSkill = skillSelect.damage;
-                int dameSkill = (int) Math.min(2_147_483_647L, (long) this.mpMax * percentDameSkill / 100);
-                return dameSkill;
+                return Math.min(MAX_PLAYER_DAME, (long) this.mpMax * percentDameSkill / 100);
             case Skill.QUA_CAU_KENH_KHI:
                 long hpmob = 0;
                 long hppl = 0;
@@ -1672,18 +1678,12 @@ public class NPoint {
                 }
 
                 dameqckk = dameqckk + (Util.nextInt(-5, 5) * dameqckk / 100);
-                if (dameqckk > 2_147_483_647) {
-                    dameqckk = 2_147_483_647;
-                }
-                return (int) dameqckk;
+                return Math.min(dameqckk, MAX_PLAYER_DAME);
             case Skill.DE_TRUNG:
                 if (player.setClothes.pikkoroDaimao == 5) {
                     dameAttack *= 4;
                 }
-                if (dameAttack > 2_147_483_647) {
-                    dameAttack = 2_147_483_647;
-                }
-                return (int) dameAttack;
+                return Math.min(dameAttack, MAX_PLAYER_DAME);
         }
 
         if (intrinsic.id == 18 && this.player.effectSkill.isMonkey) {
@@ -1725,9 +1725,7 @@ public class NPoint {
                 <= 0) {
             tempDameAttack = 1;
         }
-        dameAttack += (long) (Util.getOne(
-                -1, 1) * Util.nextInt((int) tempDameAttack
-                ) + 1);
+        dameAttack += Util.getOne(-1, 1) * Util.nextLong(tempDameAttack) + 1;
 
         if (player.effectSkin != null && player.effectSkin.isXChuong && (player.playerSkill.skillSelect.template.id == Skill.KAMEJOKO || player.playerSkill.skillSelect.template.id == Skill.ANTOMIC || player.playerSkill.skillSelect.template.id == Skill.MASENKO)) {
             dameAttack *= xChuong;
@@ -1736,11 +1734,7 @@ public class NPoint {
             player.effectSkin.lastTimeXChuong = System.currentTimeMillis();
         }
 
-        if (dameAttack
-                > 2_147_483_647) {
-            dameAttack = 2_147_483_647;
-        }
-        return (int) dameAttack;
+        return Math.max(0, Math.min(dameAttack, MAX_PLAYER_DAME));
     }
 
     public int getCurrPercentHP() {
@@ -1892,13 +1886,13 @@ public class NPoint {
         return this.tlHutMp;
     }
 
-    public int subDameInjureWithDeff(long dame) {
+    public long subDameInjureWithDeff(long dame) {
         long def = this.def;
         dame -= def;
         if (dame < 0) {
             dame = 1;
         }
-        return (int) dame;
+        return dame;
     }
 
     /*------------------------------------------------------------------------*/

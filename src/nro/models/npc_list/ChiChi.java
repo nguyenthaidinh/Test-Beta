@@ -26,10 +26,13 @@ public class ChiChi extends Npc {
 
     private static final int MENU_BUY_TRAIN_ARMOR_5 = 186900;
     private static final int MENU_BUY_CLAN_CAPSULE = 186901;
+    private static final int MENU_BUY_100_CLAN_CAPSULE = 186902;
     private static final short TRAIN_ARMOR_5_ITEM_ID = 1869;
     private static final long TRAIN_ARMOR_5_GOLD_COST = 36_000_000_000L;
     private static final int CLAN_CAPSULE_AMOUNT = 1;
     private static final int CLAN_CAPSULE_COST_TV = 10;
+    private static final int CLAN_CAPSULE_BULK_AMOUNT = 100;
+    private static final int CLAN_CAPSULE_BULK_COST_TV = 1_200;
 
     public ChiChi(int mapId, int status, int cx, int cy, int tempId, int avartar) {
         super(mapId, status, cx, cy, tempId, avartar);
@@ -45,6 +48,7 @@ public class ChiChi extends Npc {
                     "Cửa hàng",
                     "Giáp\nluyện tập\ncấp 5",
                     "1 Capsule\nBang\n10 TV",
+                    "100 Capsule\nBang\n1K2 TV",
                     "Đóng"));
 
             String[] menus = menu.toArray(new String[0]);
@@ -74,6 +78,12 @@ public class ChiChi extends Npc {
                         case 5:
                             createOtherMenu(player, MENU_BUY_CLAN_CAPSULE,
                                     "Con có muốn mua 1 Capsule Bang cho bang hội\nvới giá 10 thỏi vàng không?",
+                                    "Mua", "Từ chối");
+                            break;
+                        case 6:
+                            createOtherMenu(player, MENU_BUY_100_CLAN_CAPSULE,
+                                    "Con có muốn mua 100 Capsule Bang cho bang hội\n"
+                                    + "với giá 1.200 thỏi vàng không?",
                                     "Mua", "Từ chối");
                             break;
                         case 0:
@@ -131,7 +141,11 @@ public class ChiChi extends Npc {
                     }
                 } else if (player.idMark.getIndexMenu() == MENU_BUY_CLAN_CAPSULE) {
                     if (select == 0) {
-                        buyClanCapsule(player);
+                        buyClanCapsule(player, CLAN_CAPSULE_AMOUNT, CLAN_CAPSULE_COST_TV);
+                    }
+                } else if (player.idMark.getIndexMenu() == MENU_BUY_100_CLAN_CAPSULE) {
+                    if (select == 0) {
+                        buyClanCapsule(player, CLAN_CAPSULE_BULK_AMOUNT, CLAN_CAPSULE_BULK_COST_TV);
                     }
                 }
             }
@@ -165,28 +179,29 @@ public class ChiChi extends Npc {
         Service.gI().sendThongBao(player, "Mua thành công " + trainArmor.template.name);
     }
 
-    private void buyClanCapsule(Player player) {
+    private void buyClanCapsule(Player player, int amount, int cost) {
         if (player.clan == null) {
             Service.gI().sendThongBao(player, "Bạn cần có bang hội để mua Capsule Bang.");
             return;
         }
         Item thoiVang = InventoryService.gI().findItemBag(player, ConstItem.THOI_VANG);
         int currentQuantity = thoiVang == null ? 0 : thoiVang.quantity;
-        if (currentQuantity < CLAN_CAPSULE_COST_TV) {
+        if (currentQuantity < cost) {
             Service.gI().sendThongBao(player, "Bạn không đủ thỏi vàng, còn thiếu "
-                    + (CLAN_CAPSULE_COST_TV - currentQuantity) + " thỏi vàng.");
+                    + (cost - currentQuantity) + " thỏi vàng.");
             return;
         }
 
-        InventoryService.gI().subQuantityItemsBag(player, thoiVang, CLAN_CAPSULE_COST_TV);
-        player.clan.capsuleClan += CLAN_CAPSULE_AMOUNT;
+        InventoryService.gI().subQuantityItemsBag(player, thoiVang, cost);
+        player.clan.capsuleClan += amount;
         ClanMember member = player.clan.getClanMember((int) player.id);
         if (member != null) {
-            member.memberPoint += CLAN_CAPSULE_AMOUNT;
-            member.clanPoint += CLAN_CAPSULE_AMOUNT;
+            member.memberPoint += amount;
+            member.clanPoint += amount;
         }
         InventoryService.gI().sendItemBags(player);
         player.clan.sendMyClanForAllMember();
-        Service.gI().sendThongBao(player, "Mua thành công 1 Capsule Bang cho bang hội với giá 10 thỏi vàng.");
+        Service.gI().sendThongBao(player, "Mua thành công " + amount
+                + " Capsule Bang cho bang hội với giá " + Util.numberToMoney(cost) + " thỏi vàng.");
     }
 }

@@ -10,6 +10,7 @@ import nro.models.intrinsic.Intrinsic;
 import nro.models.mob.Mob;
 import nro.models.mob.MobMe;
 import nro.models.mob_bigboss.GauTuongCuop;
+import nro.models.player.NPoint;
 import nro.models.player.Pet;
 import nro.models.player.Player;
 import nro.models.player.NewSkill;
@@ -416,7 +417,7 @@ public class SkillService {
             case Skill.DEMON:
             case Skill.GALICK:
             case Skill.LIEN_HOAN:
-                if (player.zone != null && player.zone.map.mapId != 113 && plTarget != null && Util.getDistance(player, plTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
+                if (isMeleeAttackOutOfRange(player, plTarget)) {
                     miss = true;
                 }
                 if (mobTarget != null && Util.getDistance(player, mobTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
@@ -862,6 +863,22 @@ public class SkillService {
         }
     }
 
+    private boolean isMeleeAttackOutOfRange(Player player, Player target) {
+        if (player == null || target == null || player.zone == null) {
+            return false;
+        }
+        if (player.zone.map.mapId == 113) {
+            return false;
+        }
+        if (MapService.gI().isMapVoDaiSieuCap(player.zone.map.mapId)) {
+            // Map 145 has platform corners where the client can stop diagonally from
+            // the target. Check each axis so a visually close punch is not marked miss.
+            return Math.abs(player.location.x - target.location.x) > Skill.RANGE_ATTACK_CHIEU_DAM
+                    || Math.abs(player.location.y - target.location.y) > Skill.RANGE_ATTACK_CHIEU_DAM;
+        }
+        return Util.getDistance(player, target) > Skill.RANGE_ATTACK_CHIEU_DAM;
+    }
+
     private void phanSatThuong(Player plAtt, Player plTarget, long dame) {
         if (plAtt != null) {
             int percentPST = plTarget.nPoint.tlPST;
@@ -883,7 +900,9 @@ public class SkillService {
                             damePST = plAtt.nPoint.hpMax / 100 - giamdame;
                         }
                     }
-                    int damePSTHit = plAtt.injured(plAtt, damePST, true, false);
+                    long hpBefore = plAtt.nPoint.hp;
+                    plAtt.injured(plAtt, damePST, true, false);
+                    int damePSTHit = NPoint.toClientStat(Math.max(0, hpBefore - plAtt.nPoint.hp));
                     msg.writer().writeInt(plAtt.nPoint.getClientHp());
                     msg.writer().writeInt(damePSTHit);
                     msg.writer().writeBoolean(false);
@@ -908,14 +927,14 @@ public class SkillService {
     }
 
     private long limitDame(long dame) {
-        return Math.min(dame, 2_147_483_647L);
+        return Math.min(dame, NPoint.MAX_PLAYER_DAME);
     }
 
     private void hutHPMP(Player player, long dame, Player pl, Mob mob) {
         int tiLeHutHp = player.nPoint.getTileHutHp(mob != null);
         int tiLeHutMp = player.nPoint.getTiLeHutMp();
-        int hpHoi = (int) ((long) dame * tiLeHutHp / 100);
-        int mpHoi = (int) ((long) dame * tiLeHutMp / 100);
+        long hpHoi = dame * tiLeHutHp / 100;
+        long mpHoi = dame * tiLeHutMp / 100;
         if (hpHoi > 0 || mpHoi > 0) {
             int x = -1;
             int y = -1;
@@ -943,18 +962,23 @@ public class SkillService {
             }
         }
         dameAttack = limitDame(dameAttack);
-        int dameHit = plInjure.injured(plAtt, miss ? 0 : dameAttack, false, false);
+        long hpBefore = plInjure.nPoint.hp;
+        plInjure.injured(plAtt, miss ? 0 : dameAttack, false, false);
+        long dameHit = Math.max(0, hpBefore - plInjure.nPoint.hp);
+        int clientDameHit = NPoint.toClientStat(dameHit);
         if (plAtt.playerSkill == null) {
             return;
         }
         Skill skillSelect = plAtt.playerSkill.skillSelect;
-        int damePST = plInjure.effectSkill != null && plInjure.effectSkill.isShielding && plInjure.idMark != null ? plInjure.idMark.getDamePST() : dameHit;
+        long damePST = plInjure.effectSkill != null && plInjure.effectSkill.isShielding && plInjure.idMark != null
+                ? plInjure.idMark.getDamePST() : dameHit;
         phanSatThuong(plAtt, plInjure, miss ? 0 : damePST);
         hutHPMP(plAtt, dameHit, plInjure, null);
         if (plInjure instanceof Yardart) {
             if (plInjure.nPoint.hp < dameHit) {
-                dameHit = (int) Math.max(0, plInjure.nPoint.hp - 1);
-                if (dameHit == 0) {
+                dameHit = Math.max(0, plInjure.nPoint.hp - 1);
+                clientDameHit = NPoint.toClientStat(dameHit);
+                if (clientDameHit == 0) {
                     return;
                 }
             } else if (plInjure.nPoint.hp <= plInjure.nPoint.hpMax / 10) {
@@ -970,7 +994,7 @@ public class SkillService {
             msg.writer().writeInt((int) plInjure.id); //id ăn pem
             msg.writer().writeByte(1); //read continue
             msg.writer().writeByte(0); //type skill
-            msg.writer().writeInt(dameHit); //dame ăn
+            msg.writer().writeInt(clientDameHit); //dame ăn
             msg.writer().writeBoolean(plInjure.isDie()); //is die
             msg.writer().writeBoolean(plAtt.nPoint.isCrit); //crit
             Service.gI().sendMessAllPlayerInMap(plAtt, msg);
@@ -1027,7 +1051,7 @@ public class SkillService {
             dameHit = 0;
         }
 
-        dameHit = Math.min(dameHit, 2_147_483_647);
+        dameHit = Math.min(dameHit, NPoint.MAX_PLAYER_DAME);
 
         hutHPMP(plAtt, dameHit, null, mob);
         sendPlayerAttackMob(plAtt, mob);

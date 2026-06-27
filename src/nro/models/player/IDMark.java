@@ -107,7 +107,7 @@ public class IDMark {
     
     private boolean isGemCSMM;
     
-    private int damePST;
+    private long damePST;
 
     private int moneyKeoBuaBao;
     

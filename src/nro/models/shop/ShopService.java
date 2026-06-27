@@ -1065,7 +1065,7 @@ public class ShopService {
         pl.nPoint.calPoint();
         pl.nPoint.setHp(pl.nPoint.hpMax);
         pl.nPoint.setMp((int) pl.nPoint.mpMax);
-        pl.nPoint.setDame((int) pl.nPoint.dame);
+        pl.nPoint.setDame(pl.nPoint.dame);
         Service.gI().point(pl);
         Service.gI().Send_Info_NV(pl);
     }

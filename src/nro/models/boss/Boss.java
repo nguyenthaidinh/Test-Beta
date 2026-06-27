@@ -712,7 +712,7 @@ public class Boss extends Player implements IBoss {
                 die(plAtt);
             }
 
-            return (int) damage;
+            return nro.models.player.NPoint.toClientStat(damage);
         } else {
             return 0;
         }

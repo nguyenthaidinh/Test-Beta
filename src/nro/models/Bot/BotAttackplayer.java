@@ -152,7 +152,10 @@ public class BotAttackplayer extends Bot {
         }
 
         boolean isMiss = false;
-        int realDame = targetPlayer.injured(this, isMiss ? 0 : damage, false, false);
+        long hpBefore = targetPlayer.nPoint.hp;
+        targetPlayer.injured(this, isMiss ? 0 : damage, false, false);
+        long realDame = Math.max(0, hpBefore - targetPlayer.nPoint.hp);
+        int clientRealDame = NPoint.toClientStat(realDame);
 
         Skill skill = playerSkill.skillSelect;
 
@@ -164,7 +167,7 @@ public class BotAttackplayer extends Bot {
             msg.writer().writeInt((int) targetPlayer.id);
             msg.writer().writeByte(1);
             msg.writer().writeByte(0);
-            msg.writer().writeInt(realDame);
+            msg.writer().writeInt(clientRealDame);
             msg.writer().writeBoolean(targetPlayer.isDie());
             msg.writer().writeBoolean(nPoint.isCrit);
             Service.gI().sendMessAllPlayerInMap(this, msg);
@@ -231,7 +234,9 @@ public class BotAttackplayer extends Bot {
         try {
             msg = new Message(56);
             msg.writer().writeInt((int) attacker.id);
-            int damePSTHit = attacker.injured(attacker, damePST, true, false);
+            long hpBefore = attacker.nPoint.hp;
+            attacker.injured(attacker, damePST, true, false);
+            int damePSTHit = NPoint.toClientStat(Math.max(0, hpBefore - attacker.nPoint.hp));
             msg.writer().writeInt(attacker.nPoint.getClientHp());
             msg.writer().writeInt(damePSTHit);
             msg.writer().writeBoolean(false);
@@ -250,8 +255,8 @@ public class BotAttackplayer extends Bot {
         int tiLeHutHp = player.nPoint.getTileHutHp(mob != null);
         int tiLeHutMp = player.nPoint.getTiLeHutMp();
 
-        int hpHoi = (int) (dame * tiLeHutHp / 100);
-        int mpHoi = (int) (dame * tiLeHutMp / 100);
+        long hpHoi = dame * tiLeHutHp / 100;
+        long mpHoi = dame * tiLeHutMp / 100;
 
         if (hpHoi > 0 || mpHoi > 0) {
             int x = -1, y = -1;

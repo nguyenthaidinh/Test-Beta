@@ -27,6 +27,9 @@ public class ItemService {
     private static final String COSTUME_TRUM_TOP_1_NAME = "Trùm Top 1";
     private static final String COSTUME_TRUM_TOP_1_DESCRIPTION = "Cải trang Trùm Top 1";
     private static final int[] TRUM_TOP_1_CONTROLLED_OPTIONS = {38, 50, 77, 103, 204, 106, 94, 108, 95, 96};
+    private static final short COSTUME_FUSION_GOKU_ID = 1780;
+    private static final String COSTUME_FUSION_GOKU_DESCRIPTION = "Cải trang chỉ có tác dụng khi hợp thể";
+    private static final int[] FUSION_GOKU_CONTROLLED_OPTIONS = {77, 103, 204, 94, 116};
     private static final short COSTUME_GOKU_NGAY_XUA_ID = 1868;
     private static final String COSTUME_GOKU_NGAY_XUA_NAME = "Goku Ng\u00e0y X\u01b0a";
     private static final String COSTUME_GOKU_NGAY_XUA_DESCRIPTION = "C\u1ea3i trang Goku Ng\u00e0y X\u01b0a";
@@ -67,6 +70,7 @@ public class ItemService {
         for (Item.ItemOption io : itemShop.options) {
             item.itemOptions.add(new Item.ItemOption(io));
         }
+        normalizeFusionGokuOptions(item);
         normalizeGokuNgayXuaOptions(item);
         item.content = item.getContent();
         item.info = item.getInfo();
@@ -84,6 +88,7 @@ public class ItemService {
         for (Item.ItemOption io : item.itemOptions) {
             it.itemOptions.add(new Item.ItemOption(io));
         }
+        normalizeFusionGokuOptions(it);
         return it;
     }
 
@@ -95,10 +100,12 @@ public class ItemService {
         Item item = new Item();
         item.template = getTemplate(tempId);
         normalizeTrainArmorTemplate(item.template);
+        normalizeFusionGokuTemplate(item.template);
         normalizeGokuNgayXuaTemplate(item.template);
         item.quantity = quantity;
         item.createTime = System.currentTimeMillis();
 
+        normalizeFusionGokuOptions(item);
         normalizeGokuNgayXuaOptions(item);
         item.content = item.getContent();
         item.info = item.getInfo();
@@ -122,6 +129,27 @@ public class ItemService {
         }
         template.name = COSTUME_TRUM_TOP_1_NAME;
         template.description = COSTUME_TRUM_TOP_1_DESCRIPTION;
+    }
+
+    public void normalizeFusionGokuOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != COSTUME_FUSION_GOKU_ID) {
+            return;
+        }
+        normalizeFusionGokuTemplate(item.template);
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        item.itemOptions.removeIf(this::isFusionGokuControlledOption);
+        item.itemOptions.addAll(getFusionGokuOptions());
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    public void normalizeFusionGokuTemplate(Template.ItemTemplate template) {
+        if (template == null || template.id != COSTUME_FUSION_GOKU_ID) {
+            return;
+        }
+        template.description = COSTUME_FUSION_GOKU_DESCRIPTION;
     }
 
     public void normalizeGokuNgayXuaOptions(Item item) {
@@ -193,6 +221,16 @@ public class ItemService {
         return options;
     }
 
+    public List<ItemOption> getFusionGokuOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(77, 70));
+        options.add(new ItemOption(103, 70));
+        options.add(new ItemOption(204, 60));
+        options.add(new ItemOption(94, 20));
+        options.add(new ItemOption(116, 0));
+        return options;
+    }
+
     public List<ItemOption> getGokuNgayXuaOptions() {
         List<ItemOption> options = new ArrayList<>();
         options.add(new ItemOption(101, 100));
@@ -208,6 +246,18 @@ public class ItemService {
             return false;
         }
         for (int optionId : TRUM_TOP_1_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isFusionGokuControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : FUSION_GOKU_CONTROLLED_OPTIONS) {
             if (io.optionTemplate.id == optionId) {
                 return true;
             }

@@ -784,7 +784,7 @@ public class Service {
                 msg.writer().writeByte(20);
                 msg.writer().writeByte(20);
                 msg.writer().writeByte(1);
-                msg.writer().writeInt(player.nPoint.dame);
+                msg.writer().writeInt(player.nPoint.getClientDame());
                 msg.writer().writeInt(player.nPoint.def);
                 msg.writer().writeByte(player.nPoint.crit);
                 msg.writer().writeLong(player.nPoint.tiemNang);
@@ -1600,7 +1600,7 @@ public class Service {
                 msg.writer().writeInt(pl.pet.nPoint.getClientHpMax()); //hpfull
                 msg.writer().writeInt(pl.pet.nPoint.mp); //mp
                 msg.writer().writeInt(pl.pet.nPoint.mpMax); //mpfull
-                msg.writer().writeInt(pl.pet.nPoint.dame); //damefull
+                msg.writer().writeInt(pl.pet.nPoint.getClientDame()); //damefull
                 msg.writer().writeUTF(pl.pet.name); //name
                 msg.writer().writeUTF(getCurrStrLevel(pl.pet)); //curr level
                 msg.writer().writeLong(pl.pet.nPoint.power); //power

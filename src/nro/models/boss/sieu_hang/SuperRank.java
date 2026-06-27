@@ -8,6 +8,7 @@ import nro.models.boss.Boss_Manager.OtherBossManager;
 import nro.models.consts.BossStatus;
 import nro.models.consts.BossType;
 import nro.models.consts.ConstSuperRank;
+import nro.models.player.NPoint;
 import nro.models.player.Player;
 import nro.models.services.EffectSkillService;
 import nro.models.services.PlayerService;
@@ -303,20 +304,20 @@ public abstract class SuperRank extends Boss {
 
             if (!piercing && effectSkill.isShielding && !isMobAttack) {
                 if (this.idMark != null) {
-                    this.idMark.setDamePST((int) Math.min(damage, 2_147_483_647L));
+                    this.idMark.setDamePST(damage);
                 }
                 if (damage > nPoint.hpMax) {
                     EffectSkillService.gI().breakShield(this);
                 }
                 damage = 1;
             }
-            damage = Math.min(damage, 2_147_483_647L);
+            damage = Math.min(damage, NPoint.MAX_PLAYER_DAME);
             this.nPoint.subHP(damage);
             if (plAtt != null && isDie()) {
                 setDie(plAtt);
             }
 
-            return (int) damage;
+            return NPoint.toClientStat(damage);
         } else {
             return 0;
         }

@@ -735,7 +735,8 @@ public class Player implements Runnable {
         if (this.isPl() && this.fusion != null && this.fusion.typeFusion != ConstPlayer.NON_FUSION
                 && this.inventory != null && this.inventory.itemsBody.size() > 5) {
             Item outfit = this.inventory.itemsBody.get(5);
-            if (outfit.isNotNullItem() && (outfit.template.id == 1815 || outfit.template.id == 1870)) {
+            if (outfit.isNotNullItem()
+                    && (outfit.template.id == 1780 || outfit.template.id == 1815 || outfit.template.id == 1870)) {
                 return outfit;
             }
         }
@@ -1198,7 +1199,7 @@ public class Player implements Runnable {
 
             if (!piercing && effectSkill.isShielding && !isMobAttack) {
                 if (this.idMark != null) {
-                    this.idMark.setDamePST((int) Math.min(damage, 2_147_483_647L));
+                    this.idMark.setDamePST(damage);
                 }
                 if (damage > nPoint.hpMax) {
                     EffectSkillService.gI().breakShield(this);
@@ -1208,7 +1209,7 @@ public class Player implements Runnable {
                     damage = 10;
                 }
             }
-            damage = Math.min(damage, 2_147_483_647);
+            damage = Math.min(damage, NPoint.MAX_PLAYER_DAME);
             if (isMobAttack && this.charms.tdBatTu > System.currentTimeMillis() && damage >= this.nPoint.hp) {
                 damage = this.nPoint.hp - 1;
             }
@@ -1241,7 +1242,7 @@ public class Player implements Runnable {
                 }
             }
 
-            return (int) damage;
+            return NPoint.toClientStat(damage);
         } else {
             return 0;
         }

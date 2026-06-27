@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import nro.models.consts.ConstTaskBadges;
 import nro.models.map.ItemMap;
+import nro.models.player.NPoint;
 import nro.models.player.Player;
 import nro.models.services.EffectSkillService;
 import nro.models.services.ItemService;
@@ -75,7 +76,7 @@ public class XenBoHung extends Boss {
             return;
         }
         ChangeMapService.gI().changeMapYardrat(this, this.zone, pl.location.x, pl.location.y);
-        this.nPoint.dameg += (pl.nPoint.dame * 5 / 100);
+        this.nPoint.dameg = NPoint.toClientStat(this.nPoint.dameg + pl.nPoint.dame * 5 / 100);
         this.nPoint.hpg += (pl.nPoint.hp * 2 / 100);
         this.nPoint.critg++;
         this.nPoint.calPoint();

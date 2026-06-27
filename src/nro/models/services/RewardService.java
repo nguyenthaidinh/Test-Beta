@@ -1,5 +1,6 @@
 package nro.models.services;
 
+import nro.models.consts.ConstItem;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.player.Player;
@@ -32,6 +33,8 @@ public class RewardService {
     private static final short FIVE_STAR_DRAGON_BALL_ID = 18;
     private static final short[] LUCKY_ROUND_UPGRADE_STONE_IDS = {220, 223, 224, 221, 222};
     private static final int[] LUCKY_ROUND_DEFAULT_EVENT_ITEMS = {999, 1000, 1001};
+    private static final int LUCKY_ROUND_LOCKED_GOLD_BAR_RATE = 100;
+    private static final int LUCKY_ROUND_LOCKED_GOLD_BAR_QUANTITY = 1;
 
     private static final int[][][] ACTIVATION_SET = {
         {{129, 141, 1, 1000}, {127, 139, 1, 1000}, {128, 140, 1, 1000}}, // songoku - thien xin hang - kirin
@@ -103,6 +106,8 @@ public class RewardService {
                         it.itemOptions.add(new Item.ItemOption(93, Util.nextInt(1, 10))); // HSD
                     }
                     it.quantity = 1;
+                } else if (Util.isTrue(1, LUCKY_ROUND_LOCKED_GOLD_BAR_RATE)) {
+                    it = createLockedGoldBarLuckyRoundItem();
                 // Compensate for earlier reward checks so the overall fragment rate stays near 1%.
                 } else if (Util.isTrue(124, 10000)) {
                     it = createLuckyRoundFragmentItem();
@@ -244,6 +249,15 @@ public class RewardService {
     private Item createLuckyRoundUpgradeStoneItem() {
         short itemId = LUCKY_ROUND_UPGRADE_STONE_IDS[Util.nextInt(LUCKY_ROUND_UPGRADE_STONE_IDS.length)];
         return ItemService.gI().createNewItem(itemId, Util.nextInt(1, 5));
+    }
+
+    private Item createLockedGoldBarLuckyRoundItem() {
+        Item item = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, LUCKY_ROUND_LOCKED_GOLD_BAR_QUANTITY);
+        item.itemOptions.clear();
+        item.itemOptions.add(new ItemOption(30, 0));
+        item.info = item.getInfo();
+        item.content = item.getContent();
+        return item;
     }
 
 // Phương thức itemRand sẽ trả về vật phẩm mặc định nếu không thành công

@@ -11,6 +11,7 @@ import static nro.models.consts.BossType.PHOBANDT;
 import nro.models.clan.Clan;
 import nro.models.map.ItemMap;
 import nro.models.map.Zone;
+import nro.models.player.NPoint;
 import nro.models.player.Player;
 import nro.models.skill.Skill;
 import nro.models.services.EffectSkillService;
@@ -131,7 +132,7 @@ public class NinjaAoTim extends Boss {
                     && clan != null && clan.doanhTrai != null) {
                 if (Util.isTrue(4, 5)) {
                     try {
-                        int cloneDame = this.nPoint.dame / 10;
+                        int cloneDame = NPoint.toClientStat(this.nPoint.dame / 10);
                         int cloneHp = (int) Math.min(this.nPoint.hpMax / 10, Integer.MAX_VALUE);
                         clan.doanhTrai.bosses.add(new NinjaClone(this.zone, this, cloneDame, cloneHp, BossID.NINJA_AO_TIM1));
                         clan.doanhTrai.bosses.add(new NinjaClone(this.zone, this, cloneDame, cloneHp, BossID.NINJA_AO_TIM2));
