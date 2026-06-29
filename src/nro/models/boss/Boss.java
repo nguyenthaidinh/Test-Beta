@@ -653,6 +653,10 @@ public class Boss extends Player implements IBoss {
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
     }
 
+    protected boolean isThanLinhDrop(int defaultRate) {
+        return BossDropRateManager.gI().shouldDrop(this, defaultRate);
+    }
+
     @Override
     public boolean chatE() {
         if (Util.canDoWithTime(lastTimeChatE, timeChatE)) {

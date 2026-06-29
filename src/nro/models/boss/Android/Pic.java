@@ -29,7 +29,7 @@ public class Pic extends Boss {
         int y = this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24);
         Service.gI().dropItemMap(this.zone, new ItemMap(this.zone, 190, Util.nextInt(20000, 30001), x, y, plKill.id));
         // 10% rơi đồ thần linh
-        if (Util.isTrue(10, 100)) {
+        if (isThanLinhDrop(10)) {
             ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
             if (it != null) {
                 Service.gI().dropItemMap(this.zone, it);

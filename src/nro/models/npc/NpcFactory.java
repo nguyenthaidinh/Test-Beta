@@ -516,7 +516,7 @@ public class NpcFactory {
                             case 3 ->
                                 Input.gI().createFormFindPlayer(player);
                             case 4 ->
-                                BossManager.gI().showListBoss(player);
+                                BossManager.gI().showThanLinhDropRateList(player);
                             case 5 ->
                                 Input.gI().createFormSetGameTime(player);
                             case 6 -> {

@@ -136,7 +136,7 @@ public class Pocolo extends Boss {
         int x = this.location.x;
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
         Service.gI().dropItemMap(this.zone, new ItemMap(this.zone, 190, Util.nextInt(20000, 30001), x, y, plKill.id));
-        if (Util.isTrue(30, 100)) {
+        if (isThanLinhDrop(30)) {
             ItemMap thanLinhDrop = ItemService.gI().randDoTLBoss(this.zone, 1, x + Util.nextInt(-50, 50), y, plKill.id);
             if (thanLinhDrop != null) {
                 Service.gI().dropItemMap(this.zone, thanLinhDrop);

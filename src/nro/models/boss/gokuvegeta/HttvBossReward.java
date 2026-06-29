@@ -3,6 +3,7 @@ package nro.models.boss.gokuvegeta;
 import java.util.ArrayList;
 import java.util.List;
 import nro.models.boss.Boss;
+import nro.models.boss.BossDropRateManager;
 import nro.models.consts.ConstTaskBadges;
 import nro.models.item.Item;
 import nro.models.map.ItemMap;
@@ -32,7 +33,7 @@ final class HttvBossReward {
         int x = boss.location.x;
         int y = boss.zone.map.yPhysicInTop(x, boss.location.y - 24);
 
-        if (Util.isTrue(70, 100)) {
+        if (BossDropRateManager.gI().shouldDrop(boss, 70)) {
             ItemMap thanLinhDrop = ItemService.gI().randDoTLBoss(boss.zone, 1, x + Util.nextInt(-50, 50), y, plKill.id);
             if (thanLinhDrop != null) {
                 Service.gI().dropItemMap(boss.zone, thanLinhDrop);

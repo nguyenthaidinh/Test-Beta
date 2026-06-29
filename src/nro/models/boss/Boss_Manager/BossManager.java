@@ -99,8 +99,12 @@ import nro.models.player.Player;
 import nro.models.network.Message;
 import nro.models.map.service.MapService;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import nro.models.boss.Baby.Baby;
+import nro.models.boss.BossDropRateManager;
 import nro.models.boss.Boss_mini.MatTroi;
 import nro.models.boss.cumber.Cumber;
 import nro.models.map.Zone;
@@ -112,8 +116,11 @@ import nro.models.utils.Logger;
 
 public class BossManager implements Runnable {
 
+    public static final int MENU_THAN_LINH_DROP_RATE = 4;
+
     private static BossManager instance;
     public static byte ratioReward = 10;
+    private static final Map<Long, List<Boss>> ADMIN_DROP_RATE_SELECTIONS = new ConcurrentHashMap<>();
 
     public static BossManager gI() {
         if (instance == null) {
@@ -436,6 +443,93 @@ public class BossManager implements Runnable {
             msg.cleanup();
         } catch (Exception e) {
         }
+    }
+
+    public void showThanLinhDropRateList(Player player) {
+        if (!player.isAdmin()) {
+            return;
+        }
+
+        Map<String, Boss> bossTypes = new LinkedHashMap<>();
+        BossManager[] managers = {
+            this,
+            BrolyManager.gI(),
+            OtherBossManager.gI(),
+            RedRibbonHQManager.gI(),
+            TreasureUnderSeaManager.gI(),
+            SnakeWayManager.gI(),
+            GasDestroyManager.gI(),
+            FinalBossManager.gI(),
+            SkillSummonedManager.gI(),
+            YardartManager.gI(),
+            TrungThuEventManager.gI(),
+            HalloweenEventManager.gI(),
+            ChristmasEventManager.gI(),
+            HungVuongEventManager.gI(),
+            LunarNewYearEventManager.gI()
+        };
+
+        BossDropRateManager rateManager = BossDropRateManager.gI();
+        for (BossManager manager : managers) {
+            List<Boss> managerBosses = manager.getBosses();
+            for (int i = 0; i < managerBosses.size(); i++) {
+                Boss boss;
+                try {
+                    boss = managerBosses.get(i);
+                } catch (IndexOutOfBoundsException e) {
+                    break;
+                }
+                if (rateManager.supports(boss)) {
+                    bossTypes.putIfAbsent(boss.getClass().getName(), boss);
+                }
+            }
+        }
+
+        List<Boss> selections = new ArrayList<>(bossTypes.values());
+        ADMIN_DROP_RATE_SELECTIONS.put(player.id, selections);
+        player.idMark.setMenuType(MENU_THAN_LINH_DROP_RATE);
+
+        Message msg = null;
+        try {
+            msg = new Message(-96);
+            msg.writer().writeByte(0);
+            msg.writer().writeUTF("Tỉ lệ đồ Thần Linh");
+            msg.writer().writeByte(selections.size());
+            for (int i = 0; i < selections.size(); i++) {
+                Boss boss = selections.get(i);
+                int rate = rateManager.getEffectiveRate(boss);
+                boolean customized = rateManager.getConfiguredRate(boss) != null;
+
+                msg.writer().writeInt(i);
+                msg.writer().writeInt(i);
+                msg.writer().writeShort(boss.data[0].getOutfit()[0]);
+                if (player.getSession().version >= 214) {
+                    msg.writer().writeShort(-1);
+                }
+                msg.writer().writeShort(boss.data[0].getOutfit()[1]);
+                msg.writer().writeShort(boss.data[0].getOutfit()[2]);
+                msg.writer().writeUTF(boss.data[0].getName());
+                msg.writer().writeUTF("Thần Linh: " + rate + "%" + (customized ? " (đã chỉnh)" : " (mặc định)"));
+                msg.writer().writeUTF(boss.zone == null
+                        ? "Chưa xuất hiện"
+                        : boss.zone.map.mapName + " (" + boss.zone.map.mapId + ") khu " + boss.zone.zoneId);
+            }
+            player.sendMessage(msg);
+        } catch (Exception e) {
+            Logger.error("Lỗi mở danh sách tỉ lệ Thần Linh: " + e.getMessage() + "\n");
+        } finally {
+            if (msg != null) {
+                msg.cleanup();
+            }
+        }
+    }
+
+    public Boss getThanLinhDropRateSelection(Player player, int selection) {
+        List<Boss> selections = ADMIN_DROP_RATE_SELECTIONS.remove(player.id);
+        if (selections == null || selection < 0 || selection >= selections.size()) {
+            return null;
+        }
+        return selections.get(selection);
     }
 
     public Boss getBossById(int bossId) {

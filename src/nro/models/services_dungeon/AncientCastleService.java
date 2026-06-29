@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import nro.models.boss.Boss;
+import nro.models.boss.BossDropRateManager;
 import nro.models.boss.Boss_Manager.BossManager;
 import nro.models.boss.BossID;
 import nro.models.boss.doanh_trai.NinjaAoTim;
@@ -306,7 +307,7 @@ public class AncientCastleService implements Runnable {
         }
         int x = boss.location.x;
         int y = boss.zone.map.yPhysicInTop(x, boss.location.y - 24);
-        if (Util.isTrue(30, 100)) {
+        if (boss instanceof Boss castleBoss && BossDropRateManager.gI().shouldDrop(castleBoss, 30)) {
             ItemMap thanLinhDrop = ItemService.gI().randDoTLBoss(boss.zone, 1, x + Util.nextInt(-50, 50), y, plKill.id);
             if (thanLinhDrop != null) {
                 Service.gI().dropItemMap(boss.zone, thanLinhDrop);

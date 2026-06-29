@@ -22,12 +22,15 @@ import nro.models.map.service.NpcService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import nro.models.Bot.Bot;
 import nro.models.Bot.BotAttackplayer;
 import nro.models.Bot.BotManager;
 import nro.models.Bot.NewBot;
 import nro.models.Bot.BotGiaoDich;
 import nro.models.consts.ConstTaskBadges;
+import nro.models.boss.Boss;
+import nro.models.boss.BossDropRateManager;
 import nro.models.player.Inventory;
 import nro.models.server.Manager;
 import nro.models.services.ClanService;
@@ -46,6 +49,7 @@ import nro.models.utils.Util;
 public class Input {
 
     private static final Map<Integer, Object> PLAYER_ID_OBJECT = new HashMap<>();
+    private static final Map<Long, Boss> BOSS_DROP_RATE_TARGETS = new ConcurrentHashMap<>();
 
     public static final int CHANGE_PASSWORD = 500;
     public static final int GIFT_CODE = 501;
@@ -82,6 +86,7 @@ public class Input {
     public static final int BOTATTACKPLAYER = 33;
     public static final int FIND_PLAYER_GIFT_RUBY = 34;
     public static final int SET_GAME_TIME = 35;
+    public static final int SET_BOSS_THAN_LINH_RATE = 36;
 
     private static Input intance;
 
@@ -103,6 +108,41 @@ public class Input {
                 text[i] = msg.reader().readUTF();
             }
             switch (player.idMark.getTypeInput()) {
+                case SET_BOSS_THAN_LINH_RATE -> {
+                    if (!player.isAdmin()) {
+                        Service.gI().sendThongBao(player, "Không đủ quyền.");
+                        return;
+                    }
+
+                    Boss boss = BOSS_DROP_RATE_TARGETS.remove(player.id);
+                    if (boss == null) {
+                        Service.gI().sendThongBao(player, "Không tìm thấy boss cần chỉnh.");
+                        return;
+                    }
+
+                    try {
+                        int rate = Integer.parseInt(text[0].trim());
+                        if (rate < -1 || rate > 100) {
+                            Service.gI().sendThongBao(player, "Tỉ lệ phải từ 0 đến 100, hoặc -1 để dùng mặc định.");
+                            return;
+                        }
+
+                        Integer configuredRate = rate == -1 ? null : rate;
+                        BossDropRateManager rateManager = BossDropRateManager.gI();
+                        if (!rateManager.setConfiguredRate(boss, configuredRate)) {
+                            Service.gI().sendThongBao(player, "Không thể lưu tỉ lệ Thần Linh.");
+                            return;
+                        }
+
+                        int effectiveRate = rateManager.getEffectiveRate(boss);
+                        Service.gI().sendThongBao(player,
+                                "Đã đặt tỉ lệ Thần Linh của " + boss.data[0].getName()
+                                + " thành " + effectiveRate + "%"
+                                + (configuredRate == null ? " (mặc định)." : "."));
+                    } catch (Exception e) {
+                        Service.gI().sendThongBao(player, "Tỉ lệ không hợp lệ.");
+                    }
+                }
                 case SET_GAME_TIME -> {
                     if (!player.isAdmin()) {
                         Service.gI().sendThongBao(player, "Không đủ quyền.");
@@ -669,6 +709,23 @@ public class Input {
         createForm(pl, SET_GAME_TIME, "Cài đặt thời gian game",
                 new SubInput("Giờ (0-23)", NUMERIC),
                 new SubInput("Phút (0-59)", NUMERIC));
+    }
+
+    public void createFormSetBossThanLinhRate(Player pl, Boss boss) {
+        if (pl == null || boss == null || !pl.isAdmin()) {
+            return;
+        }
+
+        BossDropRateManager rateManager = BossDropRateManager.gI();
+        Integer configuredRate = rateManager.getConfiguredRate(boss);
+        int effectiveRate = rateManager.getEffectiveRate(boss);
+        BOSS_DROP_RATE_TARGETS.put(pl.id, boss);
+
+        createForm(pl, SET_BOSS_THAN_LINH_RATE,
+                "Boss: " + boss.data[0].getName()
+                + "\nTỉ lệ hiện tại: " + effectiveRate + "%"
+                + (configuredRate == null ? " (mặc định)" : " (đã chỉnh)"),
+                new SubInput("Nhập 0-100; -1 để về mặc định", ANY));
     }
 
     public void createFormFindPlayer1(Player pl) {

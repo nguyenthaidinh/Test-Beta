@@ -57,7 +57,7 @@ public class GoldenFrieza extends Boss {
         Service.gI().dropItemMap(this.zone, CaiTrangFideVang);
 
         // 30% roi do Than Linh
-        if (Util.isTrue(30, 100)) {
+        if (isThanLinhDrop(30)) {
             ItemMap thanLinhDrop = ItemService.gI().randDoTLBoss(this.zone, 1, x + Util.nextInt(-50, 50), y, plKill.id);
             if (thanLinhDrop != null) {
                 Service.gI().dropItemMap(this.zone, thanLinhDrop);
