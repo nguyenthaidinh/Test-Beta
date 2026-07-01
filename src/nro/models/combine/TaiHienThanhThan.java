@@ -13,7 +13,7 @@ import nro.models.utils.Util;
 public class TaiHienThanhThan {
 
     private static final int GOLD_TAI_HIEN = 2_000_000_000;
-    private static final int RATIO_TAI_HIEN = 50;
+    private static final int RATIO_TAI_HIEN = 80;
     private static final int REQUIRED_DO_HUY_DIET = 5;
     private static final int REQUIRED_DO_KICH_HOAT = 5;
     private static final int REQUIRED_TOTAL_ITEMS = REQUIRED_DO_HUY_DIET + REQUIRED_DO_KICH_HOAT;
