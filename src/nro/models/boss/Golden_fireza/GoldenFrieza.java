@@ -42,9 +42,9 @@ public class GoldenFrieza extends Boss {
 
     @Override
     public void reward(Player plKill) {
-        int diem = 5;
+        int diem = 15;
         plKill.event.addEventPoint(diem);
-        Service.gI().sendThongBao(plKill, "+5 Point");
+        Service.gI().sendThongBao(plKill, "+15 Point");
         int x = this.location.x;
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
 

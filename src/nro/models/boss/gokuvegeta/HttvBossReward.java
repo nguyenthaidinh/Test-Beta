@@ -56,8 +56,8 @@ final class HttvBossReward {
             BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.TRUM_SAN_BOSS, 1);
         }
         if (plKill.event != null) {
-            plKill.event.addEventPoint(5);
-            Service.gI().sendThongBao(plKill, "+5 Point");
+            plKill.event.addEventPoint(20);
+            Service.gI().sendThongBao(plKill, "+20 Point");
         }
         TaskService.gI().checkDoneTaskKillBoss(plKill, boss);
     }

@@ -132,10 +132,11 @@ public class SieuBoHung extends Boss {
                 ItemMap nrDrop = new ItemMap(this.zone, nrId, 1, x, y, plKill.id);
                 Service.gI().dropItemMap(zone, nrDrop);
             }
-            int diem = 5;
-            plKill.event.addEventPoint(diem);
-            Service.gI().sendThongBao(plKill, "+5 Point");
         }
+
+        int diem = 15;
+        plKill.event.addEventPoint(diem);
+        Service.gI().sendThongBao(plKill, "+15 Point");
 
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
     }

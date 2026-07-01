@@ -130,9 +130,9 @@ public class Pocolo extends Boss {
         if (plKill == null) {
             return;
         }
-        int diem = 5;
+        int diem = 25;
         plKill.event.addEventPoint(diem);
-        Service.gI().sendThongBao(plKill, "+5 Point");
+        Service.gI().sendThongBao(plKill, "+25 Point");
         int x = this.location.x;
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
         Service.gI().dropItemMap(this.zone, new ItemMap(this.zone, 190, Util.nextInt(20000, 30001), x, y, plKill.id));
