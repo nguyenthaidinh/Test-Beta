@@ -32,6 +32,8 @@ import nro.models.task.BadgesTaskService;
 
 public class Mob {
 
+    private static final int GOHAN_EXTRA_GOLD_DROP_PERCENT = 150;
+
     public int id;
     public Zone zone;
     public int tempId;
@@ -1072,8 +1074,66 @@ public class Mob {
             }
         }
 
+        applyGoldBonus(player, list);
         return list;
 
+    }
+
+    private void applyGoldBonus(Player killer, List<ItemMap> rewards) {
+        Player rewardOwner = killer;
+        if (killer != null && killer.isPet) {
+            Pet pet = (Pet) killer;
+            if (pet.master != null) {
+                rewardOwner = pet.master;
+            }
+        }
+        if (rewardOwner == null || rewardOwner.nPoint == null) {
+            return;
+        }
+
+        if (rewardOwner.setClothes != null && rewardOwner.setClothes.checkSetGohan()) {
+            addExtraGohanGoldDrops(rewards);
+        }
+
+        int bonusPercent = Math.max(0, rewardOwner.nPoint.tlGold);
+        if (bonusPercent == 0) {
+            return;
+        }
+
+        for (ItemMap reward : rewards) {
+            if (reward != null && reward.itemTemplate != null
+                    && reward.itemTemplate.type == 9 && reward.quantity > 0) {
+                long boostedQuantity = reward.quantity
+                        + (long) reward.quantity * bonusPercent / 100L;
+                reward.quantity = (int) Math.min(Integer.MAX_VALUE, boostedQuantity);
+            }
+        }
+    }
+
+    private void addExtraGohanGoldDrops(List<ItemMap> rewards) {
+        List<ItemMap> originalGoldDrops = new ArrayList<>();
+        for (ItemMap reward : rewards) {
+            if (reward != null && reward.itemTemplate != null
+                    && reward.itemTemplate.type == 9 && reward.quantity > 0) {
+                originalGoldDrops.add(reward);
+            }
+        }
+
+        int guaranteedDrops = GOHAN_EXTRA_GOLD_DROP_PERCENT / 100;
+        int extraDropChance = GOHAN_EXTRA_GOLD_DROP_PERCENT % 100;
+        for (ItemMap goldDrop : originalGoldDrops) {
+            int extraDrops = guaranteedDrops;
+            if (extraDropChance > 0 && Util.isTrue(extraDropChance, 100)) {
+                extraDrops++;
+            }
+
+            for (int i = 0; i < extraDrops; i++) {
+                int offset = (i % 2 == 0 ? -1 : 1) * (15 + i * 5);
+                int dropX = Math.max(0, goldDrop.x + offset);
+                rewards.add(new ItemMap(goldDrop.zone, goldDrop.itemTemplate,
+                        goldDrop.quantity, dropX, goldDrop.y, goldDrop.playerId));
+            }
+        }
     }
 
     private ItemMap dropItemTask(Player player) {

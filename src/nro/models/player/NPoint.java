@@ -476,6 +476,9 @@ public class NPoint {
                 }
             }
         }
+        if (this.player.setClothes != null && this.player.setClothes.checkSetGohan()) {
+            this.tlGold += 30;
+        }
         setDameTrainArmor();
         setOutfitFusion();
         setLioDepTraiBonus();

@@ -1115,7 +1115,7 @@ public class ShopService {
     public void showConfirmSellItem(Player pl, int where, int index) {
         Item item = null;
         if (where == 0) {
-            if (index < 0) {
+            if (index < 0 || index >= pl.inventory.itemsBody.size()) {
                 Service.gI().sendThongBao(pl, "Không thể thực hiện");
                 return;
             }
@@ -1123,6 +1123,10 @@ public class ShopService {
         } else {
             if (pl.getSession().version < 220) {
                 index -= (pl.inventory.itemsBody.size() - 7);
+            }
+            if (index < 0 || index >= pl.inventory.itemsBag.size()) {
+                Service.gI().sendThongBao(pl, "Không thể thực hiện");
+                return;
             }
             item = pl.inventory.itemsBag.get(index);
         }
@@ -1177,13 +1181,25 @@ public class ShopService {
         }
         Item item = null;
         if (where == 0) {
+            if (index >= pl.inventory.itemsBody.size()) {
+                Service.gI().sendThongBao(pl, "Không thể thực hiện");
+                return;
+            }
             item = pl.inventory.itemsBody.get(index);
         } else {
+            if (index >= pl.inventory.itemsBag.size()) {
+                Service.gI().sendThongBao(pl, "Không thể thực hiện");
+                return;
+            }
             item = pl.inventory.itemsBag.get(index);
         }
-        if (item != null) {
+        if (item != null && item.isNotNullItem()) {
             if (item.template.id == 570) {
                 Service.gI().sendThongBao(pl, "Bạn không thể bán vật phẩm này");
+                return;
+            }
+            if (item.template.id == 457) {
+                Input.gI().createFormBanSLL(pl);
                 return;
             }
             if (InventoryService.gI().getParam(pl, 93, item.template.id) > 0) {
@@ -1192,11 +1208,7 @@ public class ShopService {
             }
             int quantity = item.quantity;
             int cost = item.template.gold;
-            if (item.template.id == 457) {
-                quantity = 1;
-            } else {
-                cost /= 4;
-            }
+            cost /= 4;
             if (cost == 0) {
                 cost = 1;
             }
@@ -1212,9 +1224,7 @@ public class ShopService {
                     + " thu được " + Util.numberToMoney(cost) + " vàng");
 
             //Add vật phẩm đã bán
-            if (item.template.id != 457) {
-                BuyBackService.gI().addItem(pl, item);
-            }
+            BuyBackService.gI().addItem(pl, item);
             if (where == 0) {
                 InventoryService.gI().subQuantityItemsBody(pl, item, quantity);
                 InventoryService.gI().sendItemBody(pl);

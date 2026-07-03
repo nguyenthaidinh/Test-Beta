@@ -37,6 +37,7 @@ public class SetClothes {
 
     public byte worldcup;
     public byte setDHD;
+    public byte gohan;
 
     public boolean godClothes;
     public int ctHaiTac = -1;
@@ -170,6 +171,10 @@ public class SetClothes {
                         isActSet = true;
                         cadicM++;
                         break;
+                    case 233:
+                        isActSet = true;
+                        gohan++;
+                        break;
                 }
 
                 if (isActSet) {
@@ -196,6 +201,7 @@ public class SetClothes {
         this.nail = 0;
         this.cadicM = 0;
         this.setDHD = 0;
+        this.gohan = 0;
         this.worldcup = 0;
         this.godClothes = false;
         this.ctHaiTac = -1;
@@ -241,6 +247,33 @@ public class SetClothes {
                     return false;
                 }
             } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkSetGohan() {
+        if (this.player == null || this.player.inventory == null
+                || this.player.inventory.itemsBody == null
+                || this.player.inventory.itemsBody.size() < 5) {
+            return false;
+        }
+        for (int i = 0; i < 5; i++) {
+            Item item = this.player.inventory.itemsBody.get(i);
+            if (item == null || !item.isNotNullItem() || item.itemOptions == null) {
+                return false;
+            }
+
+            boolean isGohanPiece = false;
+            for (Item.ItemOption option : item.itemOptions) {
+                if (option != null && option.optionTemplate != null
+                        && option.optionTemplate.id == 233) {
+                    isGohanPiece = true;
+                    break;
+                }
+            }
+            if (!isGohanPiece) {
                 return false;
             }
         }

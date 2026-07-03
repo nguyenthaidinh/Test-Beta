@@ -549,29 +549,41 @@ public class Input {
                     }
                 }
                 case BANSLL -> {
-                    int sltv = Math.abs(Integer.parseInt(text[0]));
-                    long cost = (long) sltv * 37000000;
-                    Item ThoiVang = InventoryService.gI().findItemBag(player, 457);
-                    if (ThoiVang != null) {
-                        if (ThoiVang.quantity < sltv) {
-                            Service.gI().sendThongBao(player, "Bạn chỉ có " + ThoiVang.quantity + " Thỏi vàng");
-                        } else {
-                            if (player.inventory.gold + cost > Inventory.LIMIT_GOLD) {
-                                int slban = (int) ((Inventory.LIMIT_GOLD - player.inventory.gold) / 37000000);
-                                if (slban < 1) {
-                                    Service.gI().sendThongBao(player, "Vàng sau khi bán vượt quá giới hạn");
-                                } else if (slban < 2) {
-                                    Service.gI().sendThongBao(player, "Bạn chỉ có thể bán 1 Thỏi vàng");
-                                } else {
-                                    Service.gI().sendThongBao(player, "Số lượng trong khoảng 1 tới " + slban);
-                                }
+                    long requestedQuantity;
+                    try {
+                        requestedQuantity = Long.parseLong(text[0]);
+                    } catch (NumberFormatException e) {
+                        Service.gI().sendThongBao(player, "Số lượng thỏi vàng không hợp lệ.");
+                        return;
+                    }
+                    if (requestedQuantity <= 0 || requestedQuantity > Integer.MAX_VALUE) {
+                        Service.gI().sendThongBao(player, "Số lượng thỏi vàng phải lớn hơn 0.");
+                        return;
+                    }
+
+                    int sltv = (int) requestedQuantity;
+                    long cost = requestedQuantity * 37_000_000L;
+                    Item thoiVang = InventoryService.gI().findItemBag(player, 457);
+                    if (thoiVang == null) {
+                        Service.gI().sendThongBao(player, "Bạn không có thỏi vàng.");
+                    } else if (thoiVang.quantity < sltv) {
+                        Service.gI().sendThongBao(player, "Bạn chỉ có " + thoiVang.quantity + " Thỏi vàng");
+                    } else {
+                        if (player.inventory.gold + cost > Inventory.LIMIT_GOLD) {
+                            int slban = (int) ((Inventory.LIMIT_GOLD - player.inventory.gold) / 37_000_000L);
+                            if (slban < 1) {
+                                Service.gI().sendThongBao(player, "Vàng sau khi bán vượt quá giới hạn");
+                            } else if (slban < 2) {
+                                Service.gI().sendThongBao(player, "Bạn chỉ có thể bán 1 Thỏi vàng");
                             } else {
-                                InventoryService.gI().subQuantityItemsBag(player, ThoiVang, sltv);
-                                InventoryService.gI().sendItemBags(player);
-                                player.inventory.gold += cost;
-                                Service.gI().sendMoney(player);
-                                Service.gI().sendThongBao(player, "Đã bán " + sltv + " Thỏi vàng thu được " + Util.numberToMoney(cost) + " vàng");
+                                Service.gI().sendThongBao(player, "Số lượng trong khoảng 1 tới " + slban);
                             }
+                        } else {
+                            InventoryService.gI().subQuantityItemsBag(player, thoiVang, sltv);
+                            InventoryService.gI().sendItemBags(player);
+                            player.inventory.gold += cost;
+                            Service.gI().sendMoney(player);
+                            Service.gI().sendThongBao(player, "Đã bán " + sltv + " Thỏi vàng thu được " + Util.numberToMoney(cost) + " vàng");
                         }
                     }
                 }
