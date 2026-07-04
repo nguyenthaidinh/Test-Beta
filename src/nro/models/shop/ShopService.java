@@ -50,6 +50,10 @@ public class ShopService {
     private static final int TAB_CHI_CHI_EVENT_ID = 58;
     private static final short TRUM_TOP_1_ITEM_ID = 1870;
     private static final int TRUM_TOP_1_GEM_COST = 1_200_000;
+    private static final short[] SSJ4_COSTUME_ITEM_IDS = {1553, 1693};
+    private static final int SSJ4_COSTUME_GEM_COST = 500_000;
+    private static final short[] FEATURED_EVENT_ITEM_IDS = {1780, 1781, 1722, 1784, 1783};
+    private static final int[] FEATURED_EVENT_ITEM_GEM_COSTS = {3_000_000, 3_000_000, 1_000_000, 800_000, 600_000};
     private static final long BADGE_GOLD_COST = 16_000_000_000L;
     private static final short OOZARUN_1_CARD_ID = 1792;
     private static final short OOZARUN_2_CARD_ID = 1793;
@@ -77,6 +81,8 @@ public class ShopService {
             Shop shop = this.getShop(tagName);
             if (SHOP_CHI_CHI.equals(tagName)) {
                 ensureTrumTop1InChiChiShop(shop);
+                ensureSsj4CostumesInChiChiShop(shop);
+                ensureFeaturedEventItemsInChiChiShop(shop);
             }
             for (TabShop tabShop : shop.tabShops) {
                 for (ItemShop item : tabShop.itemShops) {
@@ -171,6 +177,125 @@ public class ShopService {
         itemShop.iconSpec = 0;
         itemShop.options.clear();
         itemShop.options.addAll(ItemService.gI().getTrumTop1Options());
+        return true;
+    }
+
+    private void ensureSsj4CostumesInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null && !shop.tabShops.isEmpty()) {
+            eventTab = shop.tabShops.get(0);
+        }
+        if (eventTab == null) {
+            return;
+        }
+
+        int insertIndex = 1;
+        for (short costumeId : SSJ4_COSTUME_ITEM_IDS) {
+            ItemShop costumeShopItem = null;
+            for (ItemShop itemShop : eventTab.itemShops) {
+                if (itemShop.temp != null && itemShop.temp.id == costumeId) {
+                    costumeShopItem = itemShop;
+                    break;
+                }
+            }
+            boolean isNewShopItem = costumeShopItem == null;
+            if (costumeShopItem == null) {
+                costumeShopItem = new ItemShop();
+                costumeShopItem.id = -costumeId;
+            }
+            if (!configureSsj4CostumeShopItem(costumeShopItem, eventTab, costumeId)) {
+                continue;
+            }
+            if (isNewShopItem) {
+                eventTab.itemShops.add(Math.min(insertIndex, eventTab.itemShops.size()), costumeShopItem);
+            }
+            insertIndex++;
+        }
+    }
+
+    private boolean configureSsj4CostumeShopItem(ItemShop itemShop, TabShop eventTab, short costumeId) {
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(costumeId);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = SSJ4_COSTUME_GEM_COST;
+        itemShop.iconSpec = 0;
+        itemShop.options.clear();
+        itemShop.options.addAll(ItemService.gI().getSsj4CostumeOptions());
+        return true;
+    }
+
+    private void ensureFeaturedEventItemsInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null && !shop.tabShops.isEmpty()) {
+            eventTab = shop.tabShops.get(0);
+        }
+        if (eventTab == null) {
+            return;
+        }
+
+        int insertIndex = 3;
+        for (int i = 0; i < FEATURED_EVENT_ITEM_IDS.length; i++) {
+            short itemId = FEATURED_EVENT_ITEM_IDS[i];
+            int gemCost = FEATURED_EVENT_ITEM_GEM_COSTS[i];
+            ItemShop eventShopItem = null;
+            for (ItemShop itemShop : eventTab.itemShops) {
+                if (itemShop.temp != null && itemShop.temp.id == itemId) {
+                    eventShopItem = itemShop;
+                    break;
+                }
+            }
+            boolean isNewShopItem = eventShopItem == null;
+            if (eventShopItem == null) {
+                eventShopItem = new ItemShop();
+                eventShopItem.id = -itemId;
+            }
+            if (!configureFeaturedEventShopItem(eventShopItem, eventTab, itemId, gemCost)) {
+                continue;
+            }
+            if (isNewShopItem) {
+                eventTab.itemShops.add(Math.min(insertIndex, eventTab.itemShops.size()), eventShopItem);
+            }
+            insertIndex++;
+        }
+    }
+
+    private boolean configureFeaturedEventShopItem(ItemShop itemShop, TabShop eventTab, short itemId, int gemCost) {
+        Item item = ItemService.gI().createNewItem(itemId);
+        if (item == null || item.template == null) {
+            return false;
+        }
+        itemShop.tabShop = eventTab;
+        itemShop.temp = item.template;
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = gemCost;
+        itemShop.iconSpec = 0;
+        itemShop.options.clear();
+        for (ItemOption option : item.itemOptions) {
+            itemShop.options.add(new ItemOption(option));
+        }
         return true;
     }
 

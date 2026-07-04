@@ -1321,6 +1321,11 @@ public class MrBlue {
                     Integer.parseInt(String.valueOf(opt.get(1)))));
         }
         ItemService.gI().normalizeLuckyRoundPetOptions(item);
+        ItemService.gI().normalizeSsj4CostumeOptions(item);
+        ItemService.gI().normalizeGohanCostumeOptions(item);
+        ItemService.gI().normalizeAngelDemonWingsOptions(item);
+        ItemService.gI().normalizeBrolyRedCostumeOptions(item);
+        ItemService.gI().normalizeBrolyCostumeOptions(item);
     }
 
     public static List<OptionCard> loadOptionCard(JSONArray json) {

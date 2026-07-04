@@ -34,6 +34,22 @@ public class ItemService {
     private static final String COSTUME_GOKU_NGAY_XUA_NAME = "Goku Ng\u00e0y X\u01b0a";
     private static final String COSTUME_GOKU_NGAY_XUA_DESCRIPTION = "C\u1ea3i trang Goku Ng\u00e0y X\u01b0a";
     private static final int[] GOKU_NGAY_XUA_CONTROLLED_OPTIONS = {101, 50, 95, 96, 106};
+    private static final short COSTUME_GOKU_SSJ4_ID = 1553;
+    private static final short COSTUME_CADIC_SSJ4_ID = 1693;
+    private static final String COSTUME_SSJ4_DESCRIPTION = "T\u0103ng 50% s\u1ee9c \u0111\u00e1nh, HP, KI; kh\u00e1ng l\u1ea1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. H\u1ee3p th\u1ec3 Goku SSJ4 v\u00e0 Ca\u0111\u00edc SSJ4 th\u00e0nh Gogeta SSJ4";
+    private static final int[] COSTUME_SSJ4_CONTROLLED_OPTIONS = {50, 77, 103, 106, 204};
+    private static final short COSTUME_GOHAN_ID = 1781;
+    private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 70% s\u1ee9c \u0111\u00e1nh, HP, KI; kh\u00e1ng l\u1ea1nh; t\u0103ng 20% n\u00e9 \u0111\u00f2n";
+    private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {50, 77, 103, 106, 108};
+    private static final short ANGEL_DEMON_WINGS_ID = 1722;
+    private static final String ANGEL_DEMON_WINGS_DESCRIPTION = "T\u0103ng 20% s\u1ee9c \u0111\u00e1nh, HP, KI v\u00e0 20% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss";
+    private static final int[] ANGEL_DEMON_WINGS_CONTROLLED_OPTIONS = {50, 77, 103, 204};
+    private static final short COSTUME_BROLY_RED_ID = 1784;
+    private static final String COSTUME_BROLY_RED_DESCRIPTION = "T\u0103ng 60% s\u1ee9c \u0111\u00e1nh, HP v\u00e0 KI";
+    private static final int[] COSTUME_BROLY_RED_CONTROLLED_OPTIONS = {50, 77, 103};
+    private static final short COSTUME_BROLY_ID = 1783;
+    private static final String COSTUME_BROLY_DESCRIPTION = "T\u0103ng 55% s\u1ee9c \u0111\u00e1nh, HP v\u00e0 KI";
+    private static final int[] COSTUME_BROLY_CONTROLLED_OPTIONS = {50, 77, 103};
     private static final short TRAIN_ARMOR_5_ID = 1869;
     private static final byte TRAIN_ARMOR_TYPE = 32;
     private static final int TRAIN_ARMOR_5_POWER_REQUIRE = 1_500_000;
@@ -72,6 +88,11 @@ public class ItemService {
         }
         normalizeFusionGokuOptions(item);
         normalizeGokuNgayXuaOptions(item);
+        normalizeSsj4CostumeOptions(item);
+        normalizeGohanCostumeOptions(item);
+        normalizeAngelDemonWingsOptions(item);
+        normalizeBrolyRedCostumeOptions(item);
+        normalizeBrolyCostumeOptions(item);
         item.content = item.getContent();
         item.info = item.getInfo();
         return item;
@@ -89,6 +110,11 @@ public class ItemService {
             it.itemOptions.add(new Item.ItemOption(io));
         }
         normalizeFusionGokuOptions(it);
+        normalizeSsj4CostumeOptions(it);
+        normalizeGohanCostumeOptions(it);
+        normalizeAngelDemonWingsOptions(it);
+        normalizeBrolyRedCostumeOptions(it);
+        normalizeBrolyCostumeOptions(it);
         return it;
     }
 
@@ -107,6 +133,11 @@ public class ItemService {
 
         normalizeFusionGokuOptions(item);
         normalizeGokuNgayXuaOptions(item);
+        normalizeSsj4CostumeOptions(item);
+        normalizeGohanCostumeOptions(item);
+        normalizeAngelDemonWingsOptions(item);
+        normalizeBrolyRedCostumeOptions(item);
+        normalizeBrolyCostumeOptions(item);
         item.content = item.getContent();
         item.info = item.getInfo();
         return item;
@@ -177,6 +208,82 @@ public class ItemService {
         template.description = COSTUME_GOKU_NGAY_XUA_DESCRIPTION;
     }
 
+    public void normalizeSsj4CostumeOptions(Item item) {
+        if (item == null || item.template == null || !isSsj4Costume(item.template.id)) {
+            return;
+        }
+        normalizeSsj4CostumeTemplate(item.template);
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        item.itemOptions.removeIf(this::isSsj4CostumeControlledOption);
+        item.itemOptions.addAll(getSsj4CostumeOptions());
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private void normalizeSsj4CostumeTemplate(Template.ItemTemplate template) {
+        if (template != null && isSsj4Costume(template.id)) {
+            template.description = COSTUME_SSJ4_DESCRIPTION;
+        }
+    }
+
+    public void normalizeGohanCostumeOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != COSTUME_GOHAN_ID) {
+            return;
+        }
+        item.template.description = COSTUME_GOHAN_DESCRIPTION;
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        item.itemOptions.removeIf(this::isGohanCostumeControlledOption);
+        item.itemOptions.addAll(getGohanCostumeOptions());
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    public void normalizeAngelDemonWingsOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != ANGEL_DEMON_WINGS_ID) {
+            return;
+        }
+        item.template.description = ANGEL_DEMON_WINGS_DESCRIPTION;
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        item.itemOptions.removeIf(this::isAngelDemonWingsControlledOption);
+        item.itemOptions.addAll(getAngelDemonWingsOptions());
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    public void normalizeBrolyRedCostumeOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != COSTUME_BROLY_RED_ID) {
+            return;
+        }
+        item.template.description = COSTUME_BROLY_RED_DESCRIPTION;
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        item.itemOptions.removeIf(this::isBrolyRedCostumeControlledOption);
+        item.itemOptions.addAll(getBrolyRedCostumeOptions());
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    public void normalizeBrolyCostumeOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != COSTUME_BROLY_ID) {
+            return;
+        }
+        item.template.description = COSTUME_BROLY_DESCRIPTION;
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        item.itemOptions.removeIf(this::isBrolyCostumeControlledOption);
+        item.itemOptions.addAll(getBrolyCostumeOptions());
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
     public void normalizeLuckyRoundPetOptions(Item item) {
         if (item == null || item.template == null || item.itemOptions == null
                 || (item.template.id != MOTO_BUN_MA_ID && item.template.id != PET_BABY_SHARK_ID)) {
@@ -241,6 +348,51 @@ public class ItemService {
         return options;
     }
 
+    public List<ItemOption> getSsj4CostumeOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(50, 50));
+        options.add(new ItemOption(77, 50));
+        options.add(new ItemOption(103, 50));
+        options.add(new ItemOption(106, 0));
+        options.add(new ItemOption(204, 30));
+        return options;
+    }
+
+    public List<ItemOption> getGohanCostumeOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(77, 70));
+        options.add(new ItemOption(50, 70));
+        options.add(new ItemOption(103, 70));
+        options.add(new ItemOption(106, 0));
+        options.add(new ItemOption(108, 20));
+        return options;
+    }
+
+    public List<ItemOption> getAngelDemonWingsOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(77, 20));
+        options.add(new ItemOption(103, 20));
+        options.add(new ItemOption(50, 20));
+        options.add(new ItemOption(204, 20));
+        return options;
+    }
+
+    public List<ItemOption> getBrolyRedCostumeOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(77, 60));
+        options.add(new ItemOption(103, 60));
+        options.add(new ItemOption(50, 60));
+        return options;
+    }
+
+    public List<ItemOption> getBrolyCostumeOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(77, 55));
+        options.add(new ItemOption(103, 55));
+        options.add(new ItemOption(50, 55));
+        return options;
+    }
+
     private boolean isTrumTop1ControlledOption(ItemOption io) {
         if (io == null || io.optionTemplate == null) {
             return false;
@@ -270,6 +422,70 @@ public class ItemService {
             return false;
         }
         for (int optionId : GOKU_NGAY_XUA_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSsj4Costume(int templateId) {
+        return templateId == COSTUME_GOKU_SSJ4_ID || templateId == COSTUME_CADIC_SSJ4_ID;
+    }
+
+    private boolean isSsj4CostumeControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : COSTUME_SSJ4_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isGohanCostumeControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : COSTUME_GOHAN_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isAngelDemonWingsControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : ANGEL_DEMON_WINGS_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isBrolyRedCostumeControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : COSTUME_BROLY_RED_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isBrolyCostumeControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : COSTUME_BROLY_CONTROLLED_OPTIONS) {
             if (io.optionTemplate.id == optionId) {
                 return true;
             }

@@ -469,6 +469,11 @@ public class NPoint {
                 ItemService.gI().normalizeTrumTop1Options(item);
                 ItemService.gI().normalizeFusionGokuOptions(item);
                 ItemService.gI().normalizeGokuNgayXuaOptions(item);
+                ItemService.gI().normalizeSsj4CostumeOptions(item);
+                ItemService.gI().normalizeGohanCostumeOptions(item);
+                ItemService.gI().normalizeAngelDemonWingsOptions(item);
+                ItemService.gI().normalizeBrolyRedCostumeOptions(item);
+                ItemService.gI().normalizeBrolyCostumeOptions(item);
                 if (item.template.id != 1815 && isBodyItemOptionActive(item)) {
                     for (ItemOption io : item.itemOptions) {
                         addOption(io);
