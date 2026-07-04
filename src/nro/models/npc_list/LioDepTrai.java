@@ -35,6 +35,7 @@ public class LioDepTrai extends Npc {
                     + "|0|Bán cho ta: Nhận " + LioShopManager.PRICE_BUY_IN + " thỏi vàng/món\n"
                     + "|0|Mua từ ta: " + LioShopManager.PRICE_SELL_OUT + " thỏi vàng/món\n"
                     + "|0|Khi đã Bế Tắc: Đồ Thần Linh 150 thỏi vàng/món\n"
+                    + "|7|Shop reset sau mỗi lần bảo trì\n"
                     + "|2|Đang có " + soLuongShop + "/" + LioShopManager.MAX_ITEMS + " món trong shop";
 
             createOtherMenu(player, ConstNpc.BASE_MENU, npcSay,

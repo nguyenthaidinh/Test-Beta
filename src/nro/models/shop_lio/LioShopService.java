@@ -25,6 +25,8 @@ import nro.models.services.Service;
 public class LioShopService {
 
     private static final int MAX_STACK_QUANTITY = 100_000_000;
+    private static final int SHOP_PAGE_SIZE = 20;
+    private static final int SHOP_TAB_COUNT = LioShopManager.MAX_ITEMS / SHOP_PAGE_SIZE;
     public static final String SHOP_TAG = "LIO_DEP_TRAI_SHOP";
     public static final String BE_TAC_SHOP_TAG = "LIO_BE_TAC_SHOP";
     private static final int PRICE_BE_TAC = 150;
@@ -246,12 +248,12 @@ public class LioShopService {
         List<LioShopItem> available = LioShopManager.gI().listItem.stream()
                 .filter(it -> it != null && !it.isSold)
                 .collect(Collectors.toList());
-        int totalPage = Math.max(1, (available.size() + 19) / 20);
+        int totalPage = Math.max(1, (available.size() + SHOP_PAGE_SIZE - 1) / SHOP_PAGE_SIZE);
         if (page >= totalPage) {
             page = totalPage - 1;
         }
-        int from = Math.min(page * 20, available.size());
-        int to = Math.min(from + 20, available.size());
+        int from = Math.min(page * SHOP_PAGE_SIZE, available.size());
+        int to = Math.min(from + SHOP_PAGE_SIZE, available.size());
         List<LioShopItem> itemsSend = available.subList(from, to);
 
         Message msg = null;
@@ -260,12 +262,12 @@ public class LioShopService {
             msg = new Message(firstOpen ? -44 : -100);
             if (firstOpen) {
                 msg.writer().writeByte(2);
-                msg.writer().writeByte(5); // Consign UI expects 5 tabs
-                for (int tab = 0; tab < 5; tab++) {
+                msg.writer().writeByte(SHOP_TAB_COUNT);
+                for (int tab = 0; tab < SHOP_TAB_COUNT; tab++) {
                     msg.writer().writeUTF(tab < totalPage ? "Trang " + (tab + 1) : "");
                     msg.writer().writeByte(1); // mỗi tab là một trang
-                    int tabFrom = Math.min(tab * 20, available.size());
-                    int tabTo = Math.min(tabFrom + 20, available.size());
+                    int tabFrom = Math.min(tab * SHOP_PAGE_SIZE, available.size());
+                    int tabTo = Math.min(tabFrom + SHOP_PAGE_SIZE, available.size());
                     int tabCount = tab < totalPage ? tabTo - tabFrom : 0;
                     msg.writer().writeByte(tabCount);
                     for (int i = tabFrom; i < tabTo && tab < totalPage; i++) {
@@ -273,7 +275,7 @@ public class LioShopService {
                     }
                 }
             } else {
-                msg.writer().writeByte(Math.min(page, 4)); // tab index
+                msg.writer().writeByte(Math.min(page, SHOP_TAB_COUNT - 1)); // tab index
                 msg.writer().writeByte(1); // max page trong tab
                 msg.writer().writeByte(0); // page trong tab
                 msg.writer().writeByte(itemsSend.size()); // items count

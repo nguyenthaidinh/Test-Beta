@@ -25,11 +25,11 @@ public class LioShopManager {
         return instance;
     }
 
-    // Giới hạn tối đa 50 món trong shop
-    public static final int MAX_ITEMS = 50;
+    // Giới hạn tối đa 200 món trong shop
+    public static final int MAX_ITEMS = 200;
 
-    // Giá mua vào (player bán cho NPC) = 15 thỏi vàng
-    public static final int PRICE_BUY_IN = 15;
+    // Giá mua vào (player bán cho NPC) = 25 thỏi vàng
+    public static final int PRICE_BUY_IN = 25;
 
     // Giá bán ra (player mua từ NPC) = 100 thỏi vàng
     public static final int PRICE_SELL_OUT = 100;
@@ -62,6 +62,17 @@ public class LioShopManager {
             }
         }
         return count;
+    }
+
+    public synchronized void resetForMaintenance() {
+        try (Connection con = LocalManager.getConnection()) {
+            try (Statement statement = con.createStatement()) {
+                statement.executeUpdate("DELETE FROM `shop_lio`");
+            }
+            listItem.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void save() {

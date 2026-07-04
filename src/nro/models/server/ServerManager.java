@@ -286,6 +286,11 @@ public class ServerManager {
         } catch (Exception e) {
             Logger.error("Lỗi save shop ký gửi!\n");
         }
+        try {
+            nro.models.shop_lio.LioShopManager.gI().resetForMaintenance();
+        } catch (Exception e) {
+            Logger.error("Lỗi reset shop Lio khi bảo trì!\n");
+        }
         Client.gI().close();
         Logger.success("SUCCESSFULLY MAINTENANCE!\n");
         System.exit(0);
