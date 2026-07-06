@@ -169,6 +169,10 @@ public class ConstNpc {
     //index menu lio dep trai
     public static final int MENU_SHOP_LIO_BAN = 700;
     public static final int MENU_SHOP_LIO_CONFIRM_BAN = 701;
+    public static final int MENU_SHOP_LIO_CHON_SET_THAN_LINH = 702;
+    public static final int MENU_SHOP_LIO_CONFIRM_SET_TRAI_DAT = 703;
+    public static final int MENU_SHOP_LIO_CONFIRM_SET_NAMEK = 704;
+    public static final int MENU_SHOP_LIO_CONFIRM_SET_XAYDA = 705;
 
     //index quy lão kamê
     public static final int MENU_OPEN_DBKB = 500;

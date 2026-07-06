@@ -206,7 +206,7 @@ public class NPoint {
     public short tlHpGiamODo;
 
     public boolean isGogeta;
-    public boolean isLioDepTrai;  // CT Lio đẹp trai (ID 1815)
+    public boolean isLioDepTrai;  // CT Lio đẹp trai (1815) hoặc CT Gohan (1781)
 
     public int tlSpeed;
 
@@ -474,7 +474,8 @@ public class NPoint {
                 ItemService.gI().normalizeAngelDemonWingsOptions(item);
                 ItemService.gI().normalizeBrolyRedCostumeOptions(item);
                 ItemService.gI().normalizeBrolyCostumeOptions(item);
-                if (item.template.id != 1815 && isBodyItemOptionActive(item)) {
+                if (item.template.id != 1815 && item.template.id != 1781
+                        && isBodyItemOptionActive(item)) {
                     for (ItemOption io : item.itemOptions) {
                         addOption(io);
                     }
@@ -703,10 +704,10 @@ public class NPoint {
         if (skin.isNotNullItem() && pskin.isNotNullItem()) {
             this.isGogeta = skin.template.id == 2133 && pskin.template.id == 2134 || skin.template.id == 2134 && pskin.template.id == 2133;
         }
-        // CT Lio đẹp trai - chỉ có tác dụng khi hợp thể
+        // CT Lio đẹp trai và CT Gohan - chỉ có tác dụng khi hợp thể
         this.isLioDepTrai = isFusionActive()
                 && skin.isNotNullItem()
-                && skin.template.id == 1815;
+                && (skin.template.id == 1815 || skin.template.id == 1781);
     }
 
     private void setLioDepTraiBonus() {
@@ -725,6 +726,9 @@ public class NPoint {
         }
         Item skin = pl.inventory.itemsBody.get(5);
         if (skin == null || !skin.isNotNullItem() || skin.itemOptions == null) {
+            return 0;
+        }
+        if (skin.template.id == 1815 || skin.template.id == 1781) {
             return 0;
         }
         int buff = 0;
@@ -974,7 +978,7 @@ public class NPoint {
             hpMax += (hpMax * 10 / 100L);
         }
 
-        // CT Lio đẹp trai +50% HP
+        // CT Lio đẹp trai / Gohan +50% HP
         if (this.isLioDepTrai) {
             hpMax += (hpMax * 50 / 100L);
         }
@@ -1125,7 +1129,7 @@ public class NPoint {
             mpMax += (mpMax * 10 / 100L);
         }
 
-        // CT Lio đẹp trai +50% KI
+        // CT Lio đẹp trai / Gohan +50% KI
         if (this.isLioDepTrai) {
             mpMax += (mpMax * 50 / 100L);
         }
@@ -1338,7 +1342,7 @@ public class NPoint {
             dame += (dame * 10 / 100L);
         }
 
-        // CT Lio đẹp trai +30% SĐ + 20% SĐCM
+        // CT Lio đẹp trai / Gohan +30% SĐ + 20% SĐCM
         if (this.isLioDepTrai) {
             dame += (dame * 30 / 100L);
             this.tlDameCrit.add(20);

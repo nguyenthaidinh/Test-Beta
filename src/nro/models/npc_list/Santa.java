@@ -168,11 +168,6 @@ public class Santa extends Npc {
     private void setCTLioDepTraiOptions(Item ct) {
         ct.itemOptions.clear();
         ct.itemOptions.add(new Item.ItemOption(30, 0));   // Khong the giao dich
-        ct.itemOptions.add(new Item.ItemOption(50, 30));  // SD +30%
-        ct.itemOptions.add(new Item.ItemOption(77, 50));  // HP +50%
-        ct.itemOptions.add(new Item.ItemOption(103, 50)); // KI +50%
-        ct.itemOptions.add(new Item.ItemOption(5, 20));   // SDCM +20%
-        ct.itemOptions.add(new Item.ItemOption(96, 10));  // Hut KI +10%
-        ct.itemOptions.add(new Item.ItemOption(117, 25)); // Dep +25% SD
+        ct.itemOptions.addAll(ItemService.gI().getLioDepTraiCostumeOptions());
     }
 }

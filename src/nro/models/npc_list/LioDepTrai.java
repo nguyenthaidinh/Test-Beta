@@ -39,7 +39,8 @@ public class LioDepTrai extends Npc {
                     + "|2|Đang có " + soLuongShop + "/" + LioShopManager.MAX_ITEMS + " món trong shop";
 
             createOtherMenu(player, ConstNpc.BASE_MENU, npcSay,
-                    "Bán đồ\nThần Linh", "Mua đồ\nThần Linh", "Khi đã\nBế Tắc", "Đóng");
+                    "Bán đồ\nThần Linh", "Mua đồ\nThần Linh", "Khi đã\nBế Tắc",
+                    "Mua nhanh\nSet TL\n800 TV", "Đóng");
         }
     }
 
@@ -69,6 +70,37 @@ public class LioDepTrai extends Npc {
                         case 2 -> {
                             LioShopService.gI().openBeTacShop(player);
                         }
+                        case 3 -> {
+                            createOtherMenu(player, ConstNpc.MENU_SHOP_LIO_CHON_SET_THAN_LINH,
+                                    "Chọn hành tinh của Set Thần Linh muốn mua\n"
+                                    + "Giá trọn bộ 5 món: 800 thỏi vàng",
+                                    "Trái Đất", "Namek", "Xayda", "Đóng");
+                        }
+                    }
+                }
+                case ConstNpc.MENU_SHOP_LIO_CHON_SET_THAN_LINH -> {
+                    switch (select) {
+                        case 0 -> openConfirmBuySet(player,
+                                ConstNpc.MENU_SHOP_LIO_CONFIRM_SET_TRAI_DAT, "Trái Đất");
+                        case 1 -> openConfirmBuySet(player,
+                                ConstNpc.MENU_SHOP_LIO_CONFIRM_SET_NAMEK, "Namek");
+                        case 2 -> openConfirmBuySet(player,
+                                ConstNpc.MENU_SHOP_LIO_CONFIRM_SET_XAYDA, "Xayda");
+                    }
+                }
+                case ConstNpc.MENU_SHOP_LIO_CONFIRM_SET_TRAI_DAT -> {
+                    if (select == 0) {
+                        LioShopService.gI().buyBeTacSet(player, 0);
+                    }
+                }
+                case ConstNpc.MENU_SHOP_LIO_CONFIRM_SET_NAMEK -> {
+                    if (select == 0) {
+                        LioShopService.gI().buyBeTacSet(player, 1);
+                    }
+                }
+                case ConstNpc.MENU_SHOP_LIO_CONFIRM_SET_XAYDA -> {
+                    if (select == 0) {
+                        LioShopService.gI().buyBeTacSet(player, 2);
                     }
                 }
                 case ConstNpc.MENU_SHOP_LIO_CONFIRM_BAN -> {
@@ -95,5 +127,12 @@ public class LioDepTrai extends Npc {
                 }
             }
         }
+    }
+
+    private void openConfirmBuySet(Player player, int menuId, String planetName) {
+        createOtherMenu(player, menuId,
+                "Mua trọn bộ 5 món Thần Linh " + planetName
+                + " với giá 800 thỏi vàng?",
+                "Mua", "Từ chối");
     }
 }

@@ -81,7 +81,7 @@ import nro.models.task.BadgesTaskService;
 public class Player implements Runnable {
 
     public long lastTimeEatPea;
-    public long lastTimeLioDepTraiHeal;  // CT Lio đẹp trai hồi HP
+    public long lastTimeLioDepTraiHeal;  // CT Lio đẹp trai / Gohan hồi HP
     public Map<Integer, Long> activeEffects = new HashMap<>();
     @Setter
     @Getter
@@ -460,7 +460,7 @@ public class Player implements Runnable {
                     if (nPoint != null) {
                         nPoint.update();
                     }
-                    // CT Lio đẹp trai: hồi 5% HP mỗi 30s khi hợp thể
+                    // CT Lio đẹp trai / Gohan: hồi 5% HP mỗi 30s khi hợp thể
                     if (this.isPl() && !this.isDie() && this.nPoint != null && this.nPoint.isLioDepTrai
                             && Util.canDoWithTime(this.lastTimeLioDepTraiHeal, 30000)) {
                         long hoiHp = this.nPoint.hpMax * 5 / 100;
@@ -736,7 +736,8 @@ public class Player implements Runnable {
                 && this.inventory != null && this.inventory.itemsBody.size() > 5) {
             Item outfit = this.inventory.itemsBody.get(5);
             if (outfit.isNotNullItem()
-                    && (outfit.template.id == 1780 || outfit.template.id == 1815 || outfit.template.id == 1870)) {
+                    && (outfit.template.id == 1780 || outfit.template.id == 1781
+                    || outfit.template.id == 1815 || outfit.template.id == 1870)) {
                 return outfit;
             }
         }

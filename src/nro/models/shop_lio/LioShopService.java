@@ -30,6 +30,8 @@ public class LioShopService {
     public static final String SHOP_TAG = "LIO_DEP_TRAI_SHOP";
     public static final String BE_TAC_SHOP_TAG = "LIO_BE_TAC_SHOP";
     private static final int PRICE_BE_TAC = 150;
+    private static final int PRICE_BE_TAC_SET = 800;
+    private static final int BE_TAC_SET_ITEM_COUNT = 5;
     private static final int BE_TAC_ITEM_ID_BASE = 30000;
     private static final String[] BE_TAC_TAB_NAMES = {"Trái Đất", "Namek", "Xayda", "", ""};
     private static final short[][] BE_TAC_ITEMS = {
@@ -238,6 +240,65 @@ public class LioShopService {
         Service.gI().sendMoney(player);
         Service.gI().sendThongBao(player, "Mua thanh cong " + item.template.name + "!");
         openBeTacShop(player);
+    }
+
+    public void buyBeTacSet(Player player, int planetIndex) {
+        if (planetIndex < 0 || planetIndex > 2
+                || BE_TAC_ITEMS[planetIndex].length != BE_TAC_SET_ITEM_COUNT) {
+            Service.gI().sendThongBao(player, "Hành tinh không hợp lệ!");
+            return;
+        }
+
+        synchronized (player.inventory) {
+            buyBeTacSetLocked(player, planetIndex);
+        }
+    }
+
+    private void buyBeTacSetLocked(Player player, int planetIndex) {
+        if (getTotalThoiVang(player) < PRICE_BE_TAC_SET) {
+            Service.gI().sendThongBao(player,
+                    "Bạn cần " + PRICE_BE_TAC_SET + " thỏi vàng để mua!");
+            return;
+        }
+
+        int slotsFreedByPayment = countGoldBarSlotsFreed(player, PRICE_BE_TAC_SET);
+        int availableSlots = InventoryService.gI().getCountEmptyBag(player) + slotsFreedByPayment;
+        if (availableSlots < BE_TAC_SET_ITEM_COUNT) {
+            Service.gI().sendThongBao(player, "Cần ít nhất "
+                    + (BE_TAC_SET_ITEM_COUNT - slotsFreedByPayment)
+                    + " ô hành trang trống để nhận đủ Set Thần Linh!");
+            return;
+        }
+
+        List<Item> setItems = new ArrayList<>();
+        for (int slot = 0; slot < BE_TAC_SET_ITEM_COUNT; slot++) {
+            Item item = createBeTacItemForBuy(getBeTacShopItemId(planetIndex, slot));
+            if (item == null || item.template == null) {
+                Service.gI().sendThongBao(player, "Không thể tạo đủ Set Thần Linh, giao dịch đã hủy.");
+                return;
+            }
+            setItems.add(item);
+        }
+
+        subtractThoiVang(player, PRICE_BE_TAC_SET);
+        List<Integer> emptySlots = getEmptyBagSlots(player, BE_TAC_SET_ITEM_COUNT);
+        if (emptySlots.size() < BE_TAC_SET_ITEM_COUNT) {
+            Item refund = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, PRICE_BE_TAC_SET);
+            InventoryService.gI().addItemBag(player, refund);
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendThongBao(player, "Hành trang không đủ chỗ, đã hoàn lại thỏi vàng.");
+            return;
+        }
+
+        for (int i = 0; i < BE_TAC_SET_ITEM_COUNT; i++) {
+            player.inventory.itemsBag.set(emptySlots.get(i), setItems.get(i));
+        }
+
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendMoney(player);
+        Service.gI().sendThongBao(player, "Mua nhanh thành công Set Thần Linh "
+                + BE_TAC_TAB_NAMES[planetIndex] + " gồm đủ 5 món với giá "
+                + PRICE_BE_TAC_SET + " thỏi vàng!");
     }
 
     private void openShop(Player player, int page, boolean firstOpen) {
@@ -467,6 +528,65 @@ public class LioShopService {
             }
         }
         return false;
+    }
+
+    private int getTotalThoiVang(Player player) {
+        long total = 0;
+        for (Item item : player.inventory.itemsBag) {
+            if (item != null && item.isNotNullItem()
+                    && item.template.id == ConstItem.THOI_VANG && item.quantity > 0) {
+                total += item.quantity;
+                if (total >= Integer.MAX_VALUE) {
+                    return Integer.MAX_VALUE;
+                }
+            }
+        }
+        return (int) total;
+    }
+
+    private int countGoldBarSlotsFreed(Player player, int quantity) {
+        int remaining = quantity;
+        int freedSlots = 0;
+        for (Item item : player.inventory.itemsBag) {
+            if (remaining <= 0) {
+                break;
+            }
+            if (item != null && item.isNotNullItem()
+                    && item.template.id == ConstItem.THOI_VANG && item.quantity > 0) {
+                if (item.quantity <= remaining) {
+                    remaining -= item.quantity;
+                    freedSlots++;
+                } else {
+                    remaining = 0;
+                }
+            }
+        }
+        return freedSlots;
+    }
+
+    private void subtractThoiVang(Player player, int quantity) {
+        int remaining = quantity;
+        for (int i = 0; i < player.inventory.itemsBag.size() && remaining > 0; i++) {
+            Item item = player.inventory.itemsBag.get(i);
+            if (item == null || !item.isNotNullItem()
+                    || item.template.id != ConstItem.THOI_VANG || item.quantity <= 0) {
+                continue;
+            }
+            int subtract = Math.min(item.quantity, remaining);
+            remaining -= subtract;
+            InventoryService.gI().subQuantityItemsBag(player, item, subtract);
+        }
+    }
+
+    private List<Integer> getEmptyBagSlots(Player player, int maxSlots) {
+        List<Integer> slots = new ArrayList<>();
+        for (int i = 0; i < player.inventory.itemsBag.size() && slots.size() < maxSlots; i++) {
+            Item item = player.inventory.itemsBag.get(i);
+            if (item == null || !item.isNotNullItem()) {
+                slots.add(i);
+            }
+        }
+        return slots;
     }
 
     private List<ItemOption> copyOptions(List<ItemOption> options) {
