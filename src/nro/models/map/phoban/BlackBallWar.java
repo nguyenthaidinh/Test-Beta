@@ -39,7 +39,7 @@ public class BlackBallWar implements Runnable {
     public static final byte MIN_CLOSE = 0;
     public static final byte SECOND_CLOSE = 0;
     public static final int AVAILABLE = 5;
-    private static final int TIME_WIN = 300000;
+    private static final int TIME_WIN = 600_000;
 
     private final Zone zone;
 

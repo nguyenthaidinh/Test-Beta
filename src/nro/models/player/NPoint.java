@@ -474,6 +474,13 @@ public class NPoint {
                 ItemService.gI().normalizeAngelDemonWingsOptions(item);
                 ItemService.gI().normalizeBrolyRedCostumeOptions(item);
                 ItemService.gI().normalizeBrolyCostumeOptions(item);
+                if (item.template.id == 1781 && isFusionActive()) {
+                    for (ItemOption io : item.itemOptions) {
+                        if (io.optionTemplate.id == 204) {
+                            addOption(io);
+                        }
+                    }
+                }
                 if (item.template.id != 1815 && item.template.id != 1781
                         && isBodyItemOptionActive(item)) {
                     for (ItemOption io : item.itemOptions) {
@@ -485,6 +492,7 @@ public class NPoint {
         if (this.player.setClothes != null && this.player.setClothes.checkSetGohan()) {
             this.tlGold += 30;
         }
+        applyFullUpgradeSetBonus();
         setDameTrainArmor();
         setOutfitFusion();
         setLioDepTraiBonus();
@@ -749,7 +757,7 @@ public class NPoint {
     }
 
     private int getFullUpgradeSetBonusPercent() {
-        if (this.player == null || !this.player.isPl() || this.player.inventory == null
+        if (this.player == null || this.player.inventory == null
                 || this.player.inventory.itemsBody == null || this.player.inventory.itemsBody.size() < 5) {
             return 0;
         }
@@ -762,8 +770,7 @@ public class NPoint {
             int level = 0;
             for (ItemOption io : item.itemOptions) {
                 if (io.optionTemplate != null && io.optionTemplate.id == 72) {
-                    level = io.param;
-                    break;
+                    level = Math.max(level, io.param);
                 }
             }
             if (level <= 0) {
@@ -783,6 +790,16 @@ public class NPoint {
             return 3;
         }
         return 0;
+    }
+
+    private void applyFullUpgradeSetBonus() {
+        int bonusPercent = getFullUpgradeSetBonusPercent();
+        if (bonusPercent <= 0) {
+            return;
+        }
+        this.tlHp.add(bonusPercent);
+        this.tlMp.add(bonusPercent);
+        this.tlDame.add(bonusPercent);
     }
 
     private void setDameTrainArmor() {
@@ -901,11 +918,6 @@ public class NPoint {
                     hpMax += (hpMax * tl / 100L);
                 }
             }
-        }
-
-        int fullUpgradeSetBonus = getFullUpgradeSetBonusPercent();
-        if (fullUpgradeSetBonus > 0) {
-            hpMax += (hpMax * fullUpgradeSetBonus / 100L);
         }
 
         // Xử lý set nappa
@@ -1073,10 +1085,6 @@ public class NPoint {
                     mpMax += (mpMax * tl / 100L);
                 }
             }
-        }
-        int fullUpgradeSetBonus = getFullUpgradeSetBonusPercent();
-        if (fullUpgradeSetBonus > 0) {
-            mpMax += (mpMax * fullUpgradeSetBonus / 100L);
         }
         // Xu ly set Picolo
         if (this.player.setClothes.picolo == 5) {
@@ -1248,10 +1256,6 @@ public class NPoint {
                     dame += (dame * tl / 100L);
                 }
             }
-        }
-        int fullUpgradeSetBonus = getFullUpgradeSetBonusPercent();
-        if (fullUpgradeSetBonus > 0) {
-            dame += (dame * fullUpgradeSetBonus / 100L);
         }
         // Xử lý pet pic
         if (this.player.isPet && ((Pet) this.player).typePet == 3 && (((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA || ((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA2 || ((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA3)) {

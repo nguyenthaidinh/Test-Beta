@@ -39,8 +39,8 @@ public class ItemService {
     private static final String COSTUME_SSJ4_DESCRIPTION = "T\u0103ng 50% s\u1ee9c \u0111\u00e1nh, HP, KI; kh\u00e1ng l\u1ea1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. H\u1ee3p th\u1ec3 Goku SSJ4 v\u00e0 Ca\u0111\u00edc SSJ4 th\u00e0nh Gogeta SSJ4";
     private static final int[] COSTUME_SSJ4_CONTROLLED_OPTIONS = {50, 77, 103, 106, 204};
     private static final short COSTUME_GOHAN_ID = 1781;
-    private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
-    private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 50, 77, 96, 103, 106, 108, 117};
+    private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
+    private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 50, 77, 96, 103, 106, 108, 117, 204};
     private static final short ANGEL_DEMON_WINGS_ID = 1722;
     private static final String ANGEL_DEMON_WINGS_DESCRIPTION = "T\u0103ng 20% s\u1ee9c \u0111\u00e1nh, HP, KI v\u00e0 20% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss";
     private static final int[] ANGEL_DEMON_WINGS_CONTROLLED_OPTIONS = {50, 77, 103, 204};
@@ -359,7 +359,9 @@ public class ItemService {
     }
 
     public List<ItemOption> getGohanCostumeOptions() {
-        return getLioDepTraiCostumeOptions();
+        List<ItemOption> options = getLioDepTraiCostumeOptions();
+        options.add(new ItemOption(204, 30));
+        return options;
     }
 
     public List<ItemOption> getLioDepTraiCostumeOptions() {
