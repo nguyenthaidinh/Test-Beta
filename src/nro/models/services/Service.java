@@ -493,14 +493,14 @@ public class Service {
         TopBossHunter.getInstance().load();
         List<Player> list = TopBossHunter.getInstance().getList();
         if (list.isEmpty()) {
-            NpcService.gI().createTutorial(player, -1, "Chua co du lieu BXH san boss.");
+            NpcService.gI().createTutorial(player, -1, "Chưa có dữ liệu BXH Săn Boss.");
             return;
         }
 
         Message msg = new Message(-96);
         try {
             msg.writer().writeByte(0);
-            msg.writer().writeUTF("Top San Boss");
+            msg.writer().writeUTF("BXH Săn Boss");
             msg.writer().writeByte(list.size());
             for (int i = 0; i < list.size(); i++) {
                 Player pl = list.get(i);
@@ -513,8 +513,8 @@ public class Service {
                 msg.writer().writeShort(pl.getBody());
                 msg.writer().writeShort(pl.getLeg());
                 msg.writer().writeUTF(pl.name);
-                msg.writer().writeUTF("Diem san boss: " + Util.formatNumber(pl.event.getEventPoint()));
-                msg.writer().writeUTF("Diem cua ban: " + Util.formatNumber(player.event.getEventPoint()));
+                msg.writer().writeUTF("");
+                msg.writer().writeUTF(pl.id == player.id ? "Điểm của bạn: " + Util.formatNumber(player.event.getEventPoint()) : "");
             }
             player.sendMessage(msg);
             msg.cleanup();

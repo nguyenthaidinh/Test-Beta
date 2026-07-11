@@ -94,8 +94,8 @@ public class QuyLaoKame extends Npc {
             ArrayList<String> menu = new ArrayList<>();
             if (!player.canReward) {
                 menu.add("Nói\nchuyện");
-                menu.add("Đổi điểm\nsự kiện\n[" + player.event.getEventPoint() + "]");
-                menu.add("BXH\nsan boss");
+                menu.add("Đổi quà\nSự kiện");
+                menu.add("BXH\nSăn Boss");
                 menu.add("Nhận quà\nKOL");
                 menu.add("Nhận quà\nKOL VIP");
                 if (ruacon != null && ruacon.quantity >= 1) {
