@@ -29,6 +29,7 @@ import java.util.concurrent.*;
 
 public class GoldenFrieza extends Boss {
 
+    private static final int DAMAGE_REDUCTION_PERCENT = 30;
     private static final ScheduledExecutorService bombScheduler = Executors.newScheduledThreadPool(1);
 
     private int status;
@@ -169,6 +170,7 @@ public class GoldenFrieza extends Boss {
         }
 
         damage = Math.min(damage, 50_000_000);
+        damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
         this.nPoint.subHP(damage);
 
         if (isDie()) {

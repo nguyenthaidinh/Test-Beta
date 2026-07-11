@@ -21,6 +21,8 @@ final class HttvBossReward {
 
     private static final short[] HUY_DIET_IDS = { 650, 651, 652, 653, 654, 655, 656, 657, 658, 659, 660, 661, 662 };
     private static final int[] DRAGON_BALL_IDS = { 15, 16, 17, 18, 19, 20 };
+    private static final int DEFAULT_EVENT_POINT = 20;
+    private static final int BLACK_GOKU_EVENT_POINT = 40;
 
     private HttvBossReward() {
     }
@@ -56,8 +58,9 @@ final class HttvBossReward {
             BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.TRUM_SAN_BOSS, 1);
         }
         if (plKill.event != null) {
-            plKill.event.addEventPoint(20);
-            Service.gI().sendThongBao(plKill, "+20 Point");
+            int eventPoint = boss instanceof BlackGoku ? BLACK_GOKU_EVENT_POINT : DEFAULT_EVENT_POINT;
+            plKill.event.addEventPoint(eventPoint);
+            Service.gI().sendThongBao(plKill, "+" + eventPoint + " Point");
         }
         TaskService.gI().checkDoneTaskKillBoss(plKill, boss);
     }

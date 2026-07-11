@@ -19,6 +19,8 @@ import nro.models.utils.Util;
 
 public class KhiDot extends Boss {
 
+    private static final int THANH_CO_EVENT_POINT = 5;
+
     public KhiDot() throws Exception {
         this(BossID.KHIDOT, BossesData.KHIDOT);
     }
@@ -32,6 +34,10 @@ public class KhiDot extends Boss {
         ItemMap it = new ItemMap(this.zone, 1045, 5, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
                 this.location.y - 24), -1);
         Service.gI().dropItemMap(this.zone, it);
+        if (isThanhCoBoss() && plKill != null && plKill.event != null) {
+            plKill.event.addEventPoint(THANH_CO_EVENT_POINT);
+            Service.gI().sendThongBao(plKill, "+" + THANH_CO_EVENT_POINT + " Point");
+        }
         AncientCastleService.gI().dropCastleBossReward(this, plKill);
     }
 

@@ -95,6 +95,7 @@ public class QuyLaoKame extends Npc {
             if (!player.canReward) {
                 menu.add("Nói\nchuyện");
                 menu.add("Đổi điểm\nsự kiện\n[" + player.event.getEventPoint() + "]");
+                menu.add("BXH\nsan boss");
                 menu.add("Nhận quà\nKOL");
                 menu.add("Nhận quà\nKOL VIP");
                 if (ruacon != null && ruacon.quantity >= 1) {
@@ -161,12 +162,15 @@ public class QuyLaoKame extends Npc {
                 ShopService.gI().opendShop(player, "SHOP_DOI_DIEM", false);
                 break;
             case 2:
-                handleKOLQuest(player, false);
+                Service.gI().showTopBossHunter(player);
                 break;
             case 3:
-                handleKOLQuest(player, true);
+                handleKOLQuest(player, false);
                 break;
             case 4:
+                handleKOLQuest(player, true);
+                break;
+            case 5:
                 handleTradeRuacon(player);
                 break;
         }

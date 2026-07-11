@@ -19,6 +19,10 @@ import nro.models.task.BadgesTaskService;
 
 public class Cooler extends Boss {
 
+    private static final int EVENT_POINT = 30;
+    private static final int THAN_LINH_DROP_RATE = 60;
+    private static final int DAMAGE_REDUCTION_PERCENT = 50;
+
     private long st;
 
     public Cooler() throws Exception {
@@ -28,19 +32,19 @@ public class Cooler extends Boss {
     @Override
     public void reward(Player plKill) {
         BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.TRUM_SAN_BOSS, 1);
-        int diem = 5;
+        int diem = EVENT_POINT;
         plKill.event.addEventPoint(diem);
-        Service.gI().sendThongBao(plKill, "+5 Point");
+        Service.gI().sendThongBao(plKill, "+" + EVENT_POINT + " Point");
         int x = this.location.x;
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
         int drop = 190; // 100% rơi item ID 190
         int quantity = Util.nextInt(20000, 30000);
         // Tạo itemMap cho item ID 190
-        if (isThanLinhDrop(30)) { // Đồ Thần Linh 30%
-        ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
-        if (it != null) {
-        Service.gI().dropItemMap(zone, it);
-        }
+        if (isThanLinhDrop(THAN_LINH_DROP_RATE)) {
+            ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
+            if (it != null) {
+                Service.gI().dropItemMap(zone, it);
+            }
         }
         ItemMap itemMap = new ItemMap(this.zone, drop, quantity, x, y, plKill.id);
         Item item = ItemService.gI().createNewItem((short) drop);
@@ -93,6 +97,7 @@ public class Cooler extends Boss {
                 this.chat("Xí hụt");
                 return 0;
             }
+            damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
             damage = this.nPoint.subDameInjureWithDeff(damage);
             this.nPoint.subHP(damage);
             if (isDie()) {

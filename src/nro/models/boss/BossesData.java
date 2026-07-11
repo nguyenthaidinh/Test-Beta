@@ -44,6 +44,12 @@ public class BossesData {
     private static final int REST_1_H = 3600;
     private static final int REST_2_H = 7200;
     private static final int REST_24_H = 86400000;
+    private static final int NAPPA_BOSS_HP = 1_500_000_000;
+    private static final int TDST_BOSS_HP = 2_000_000_000;
+    private static final int FUTURE_BOSS_HP = 2_000_000_000;
+    private static final int COOLER_BOSS_HP = 2_000_000_000;
+    private static final int CUMBER_BOSS_HP = 2_000_000_000;
+    private static final int GOLDEN_FRIEZA_BOSS_HP = 2_000_000_000;
 
     // **************************************************************************
     // Boss nappa
@@ -52,7 +58,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 159, 160, 161, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             9000, // dame
-            new int[] { 500000 }, // hp
+            new int[] { NAPPA_BOSS_HP }, // hp
             new int[] { 68, 69, 70, 71, 72 }, // map join
             new int[][] {
                     { Skill.MASENKO, 3, 1000 },
@@ -74,7 +80,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 165, 166, 167, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             10000, // dame
-            new int[] { 1000000 }, // hp
+            new int[] { NAPPA_BOSS_HP }, // hp
             new int[] { 63, 64, 65, 66, 67 }, // map join
             new int[][] {
                     { Skill.GALICK, 7, 1000 },
@@ -95,7 +101,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 162, 163, 164, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12400, // dame
-            new int[] { 1500000 }, // hp
+            new int[] { NAPPA_BOSS_HP }, // hp
             new int[] { 74, 75, 76, 77 }, // map join
             new int[][] {
                     { Skill.GALICK, 7, 1000 },
@@ -117,7 +123,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 168, 169, 170, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             10000, // dame
-            new int[] { 25_000_000 }, // hp
+            new int[] { TDST_BOSS_HP }, // hp
             new int[] { 79, 81, 82, 83 }, // map join
             // new int[]{86}, //map join
             new int[][] {
@@ -142,7 +148,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 174, 175, 176, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             11000, // dame
-            new int[] { 30_000_000 }, // hp
+            new int[] { TDST_BOSS_HP }, // hp
             new int[] { 79, 81, 82, 83 }, // map join
             new int[][] {
                     { Skill.LIEN_HOAN, 7, 1000 },
@@ -167,7 +173,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 171, 172, 173, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12000, // dame
-            new int[] { 30_500_000 }, // hp
+            new int[] { TDST_BOSS_HP }, // hp
             new int[] { 79, 81, 82, 83 }, // map join
             new int[][] {
                     { Skill.GALICK, 7, 1000 },
@@ -191,7 +197,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 177, 178, 179, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12500, // dame
-            new int[] { 40_000_000 }, // hp
+            new int[] { TDST_BOSS_HP }, // hp
             new int[] { 79, 81, 82, 83 }, // map join
             new int[][] {
                     { Skill.LIEN_HOAN, 7, 1000 },
@@ -215,7 +221,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 180, 181, 182, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             13000, // dame
-            new int[] { 50_000_000 }, // hp
+            new int[] { TDST_BOSS_HP }, // hp
             new int[] { 79, 81, 82, 83 }, // map join
             new int[][] {
                     { Skill.MASENKO, 7, 1000 },
@@ -453,7 +459,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 255, 256, 257, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12000, // dame
-            new int[] { 52_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 96, 94, 93 }, // map join
             new int[][] {
                     { Skill.THOI_MIEN, 3, 10000 },
@@ -485,7 +491,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 249, 250, 251, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12200, // dame
-            new int[] { 51_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 96, 94, 93 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 1000 },
@@ -505,7 +511,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 252, 253, 254, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12055, // dame
-            new int[] { 53_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 104 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 10000 },
@@ -535,7 +541,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 246, 247, 248, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12000, // dame
-            new int[] { 54_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 104 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 10000 },
@@ -554,7 +560,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 261, 262, 263, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12200, // dame
-            new int[] { 55_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 104 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 10000 },
@@ -570,7 +576,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 237, 238, 239, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             17022, // dame
-            new int[] { 10000000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 97, 98, 99 }, // map join
             new int[][] {
                     //// {Skill.SOCOLA, 7, 1000},
@@ -604,7 +610,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 240, 241, 242, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             18000, // dame
-            new int[] { 15000000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 97, 98, 99 }, // map join
             new int[][] {
                     //// {Skill.SOCOLA, 7, 1000},
@@ -625,7 +631,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 243, 244, 245, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             12000, // dame
-            new int[] { 20000000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 97, 98, 99 }, // map join
             new int[][] {
                     //// {Skill.SOCOLA, 7, 1000},
@@ -647,7 +653,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 228, 229, 230, -1, -1, -1 },
             20000,
-            new int[] { 100_000_000 },
+            new int[] { FUTURE_BOSS_HP },
             new int[] { 100 },
             new int[][] {
                     { Skill.KAMEJOKO, 7, 1000 },
@@ -685,7 +691,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 231, 232, 233, -1, -1, -1 },
             25000,
-            new int[] { 150_000_000 },
+            new int[] { FUTURE_BOSS_HP },
             new int[] { 100 },
             new int[][] {
                     { Skill.KAMEJOKO, 7, 1000 },
@@ -711,7 +717,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 234, 235, 236, -1, -1, -1 },
             30000,
-            new int[] { 200_000_000 },
+            new int[] { FUTURE_BOSS_HP },
             new int[] { 100 },
             new int[][] {
                     { Skill.KAMEJOKO, 7, 1000 },
@@ -746,7 +752,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 234, 235, 236, -1, -1, -1 },
             35000,
-            new int[] { 200_000_000 },
+            new int[] { FUTURE_BOSS_HP },
             new int[] { 103 },
             new int[][] {
                     { Skill.KAMEJOKO, 7, 10000 },
@@ -766,7 +772,7 @@ public class BossesData {
             ConstPlayer.XAYDA,
             new short[] { 234, 235, 236, -1, -1, -1 },
             40000,
-            new int[] { 250_000_000 },
+            new int[] { FUTURE_BOSS_HP },
             new int[] { 103 },
             new int[][] {
                     { Skill.KAMEJOKO, 7, 5000 },
@@ -784,7 +790,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 264, 265, 266, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             15000, // dame
-            new int[] { 15_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 103 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 5000 },
@@ -800,7 +806,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 264, 265, 266, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             15000, // dame
-            new int[] { 15_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 103 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 5000 },
@@ -816,7 +822,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 264, 265, 266, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             15000, // dame
-            new int[] { 15_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 103 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 5000 },
@@ -832,7 +838,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 264, 265, 266, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             15000, // dame
-            new int[] { 15_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 103 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 5000 },
@@ -848,7 +854,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 264, 265, 266, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             15000, // dame
-            new int[] { 15_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 103 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 5000 },
@@ -864,7 +870,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 264, 265, 266, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             15000, // dame
-            new int[] { 15_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 103 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 5000 },
@@ -880,7 +886,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 264, 265, 266, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             15000, // dame
-            new int[] { 15_000_000 }, // hp
+            new int[] { FUTURE_BOSS_HP }, // hp
             new int[] { 103 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 5000 },
@@ -897,7 +903,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 550, 551, 552, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             50000, // dame
-            new int[] { 500000000 }, // hp
+            new int[] { 2_000_000_000 }, // hp
             new int[] { 102, 92, 93, 94, 96, 97, 98, 99, 100 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 100 },
@@ -955,7 +961,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 1254, 1255, 1256, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             50000, // dame
-            new int[] { 500000000 }, // hp
+            new int[] { CUMBER_BOSS_HP }, // hp
             new int[] { 155 }, // map join
             new int[][] {
                     { Skill.KAMEJOKO, 7, 100 },
@@ -985,7 +991,7 @@ public class BossesData {
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 1257, 1255, 1256, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             100000, // dame
-            new int[] { 2_000_000_000 }, // hp
+            new int[] { CUMBER_BOSS_HP }, // hp
             new int[] { 155 }, // map join
             new int[][] {
                     { Skill.THAI_DUONG_HA_SAN, 7, 300000 },
@@ -2298,7 +2304,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 317, 318, 319, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             32000, // dame
-            new int[] { 200000000 }, // hp
+            new int[] { COOLER_BOSS_HP }, // hp
             new int[] { 110 }, // map join
             new int[][] {
                     { Skill.GALICK, 1, 2000 },
@@ -2326,7 +2332,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 320, 321, 322, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             50000, // dame
-            new int[] { 800000000 }, // hp
+            new int[] { COOLER_BOSS_HP }, // hp
             new int[] { 110 }, // map join
             new int[][] {
                     { Skill.GALICK, 1, 2000 },
@@ -2588,7 +2594,7 @@ public class BossesData {
             ConstPlayer.XAYDA, // gender
             new short[] { 502, 503, 504, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             100000, // dame
-            new int[] { 1000000000 }, // hp
+            new int[] { GOLDEN_FRIEZA_BOSS_HP }, // hp
             new int[] { 0 }, // map join
             new int[][] {
                     { Skill.TAI_TAO_NANG_LUONG, 1, 120000 }, { Skill.GALICK, 7, 1000 },

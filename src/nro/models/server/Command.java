@@ -59,6 +59,8 @@ public class Command {
         adminCommands.put("getitem", player -> Input.gI().createFormGetItem(player));
         adminCommands.put("hs", player -> Service.gI().releaseCooldownSkill(player));
         adminCommands.put("d", player -> Service.gI().setPos(player, player.location.x, player.location.y + 10));
+        adminCommands.put("resetdiemboss", this::resetBossHunterPoint);
+        adminCommands.put("cleardiemboss", this::resetBossHunterPoint);
         adminCommands.put("reloadgc", player -> {
             int count = GiftCodeManager.gI().reloadGiftCodes();
             if (count >= 0) {
@@ -74,6 +76,23 @@ public class Command {
                 + "\nThreads: " + Thread.activeCount()
                 + " luồng" + "\n" + SystemMetrics.ToString(),
                 "Ngọc rồng", "Đệ tử", "Bảo trì", "Tìm kiếm\nngười chơi", "Boss", "Đóng"));
+    }
+
+    private void resetBossHunterPoint(Player player) {
+        try {
+            int onlineCount = 0;
+            for (Player pl : new ArrayList<>(Client.gI().getPlayers())) {
+                if (pl != null && pl.event != null && pl.event.getEventPoint() != 0) {
+                    pl.event.setEventPoint(0);
+                    onlineCount++;
+                }
+            }
+            int rows = LocalManager.executeUpdate("UPDATE player SET event_point = 0 WHERE event_point <> 0");
+            Service.gI().sendThongBao(player, "Da reset diem san boss ve 0. DB: " + rows + ", online: " + onlineCount);
+        } catch (Exception e) {
+            Service.gI().sendThongBao(player, "Loi reset diem san boss!");
+            e.printStackTrace();
+        }
     }
 
     private void showAdminMenu(Player player) {

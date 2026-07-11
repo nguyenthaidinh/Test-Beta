@@ -16,21 +16,25 @@ import nro.models.utils.Util;
 
 public class Baby extends Boss {
 
+    private static final int EVENT_POINT = 50;
+    private static final int THAN_LINH_DROP_RATE = 50;
+    private static final int DAMAGE_REDUCTION_PERCENT = 60;
+
     public Baby() throws Exception {
         super(BossID.BABY, BossesData.BABY, BossesData.BABY_2, BossesData.BABY_3);
     }
 
     @Override
     public void reward(Player plKill) {
-        int diem = 15;
+        int diem = EVENT_POINT;
         plKill.event.addEventPoint(diem);
-        Service.gI().sendThongBao(plKill, "+15 Point");
+        Service.gI().sendThongBao(plKill, "+" + EVENT_POINT + " Point");
         int x = this.location.x; // đâyyyy
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
         int drop = 190; // 100% rơi item ID 190
         int quantity = Util.nextInt(20000, 30000);
         // Tạo itemMap cho item ID 190
-        if (isThanLinhDrop(20)) {
+        if (isThanLinhDrop(THAN_LINH_DROP_RATE)) {
             ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
             if (it != null) {
                 Service.gI().dropItemMap(zone, it);
@@ -117,7 +121,7 @@ public class Baby extends Boss {
                 return 0;
             }
 
-            damage = (long) (damage * 0.7);
+            damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
 
             damage = this.nPoint.subDameInjureWithDeff(damage / 2);
 

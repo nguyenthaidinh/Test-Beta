@@ -19,6 +19,10 @@ import nro.models.task.BadgesTaskService;
 
 public class BlackGoku extends Boss {
 
+    private static final int EVENT_POINT = 40;
+    private static final int THAN_LINH_DROP_RATE = 50;
+    private static final int DAMAGE_REDUCTION_PERCENT = 40;
+
     private long st;
     private int timeLeaveMap;
 
@@ -34,7 +38,7 @@ public class BlackGoku extends Boss {
         int drop = 190; // 100% rơi item ID 190
         int quantity = Util.nextInt(20000, 30000);
         // Tạo itemMap cho item ID 190
-        if (isThanLinhDrop(35)) { // 35% rơi đồ thần linh
+        if (isThanLinhDrop(THAN_LINH_DROP_RATE)) { // 50% rơi đồ thần linh
             ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
             if (it != null) {
                 Service.gI().dropItemMap(zone, it);
@@ -84,9 +88,9 @@ public class BlackGoku extends Boss {
             }
         }
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
-        int diem = 15;
+        int diem = EVENT_POINT;
         plKill.event.addEventPoint(diem);
-        Service.gI().sendThongBao(plKill, "+15 Point");
+        Service.gI().sendThongBao(plKill, "+" + EVENT_POINT + " Point");
     }
 
     @Override
@@ -96,6 +100,7 @@ public class BlackGoku extends Boss {
                 this.chat("Xí hụt");
                 return 0;
             }
+            damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
             if (this.currentLevel != 0) {
                 damage /= 2;
             }

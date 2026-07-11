@@ -134,9 +134,9 @@ public class SieuBoHung extends Boss {
             }
         }
 
-        int diem = 15;
+        int diem = 20;
         plKill.event.addEventPoint(diem);
-        Service.gI().sendThongBao(plKill, "+15 Point");
+        Service.gI().sendThongBao(plKill, "+20 Point");
 
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
     }

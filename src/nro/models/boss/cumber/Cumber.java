@@ -20,6 +20,10 @@ import nro.models.task.BadgesTaskService;
 
 public class Cumber extends Boss {
 
+    private static final int EVENT_POINT = 30;
+    private static final int THAN_LINH_DROP_RATE = 50;
+    private static final int DAMAGE_REDUCTION_PERCENT = 30;
+
     private long st;
     private int timeLeaveMap;
 
@@ -34,11 +38,11 @@ public class Cumber extends Boss {
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
         int drop = 190;
         int quantity = Util.nextInt(20000, 30000);
-        if (isThanLinhDrop(30)) {
-        ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
-        if (it != null) {
-        Service.gI().dropItemMap(zone, it);
-        }
+        if (isThanLinhDrop(THAN_LINH_DROP_RATE)) {
+            ItemMap it = ItemService.gI().randDoTLBoss(this.zone, 1, x, y, plKill.id);
+            if (it != null) {
+                Service.gI().dropItemMap(zone, it);
+            }
         }
         ItemMap itemMap = new ItemMap(this.zone, drop, quantity, x, y, plKill.id);
         Item item = ItemService.gI().createNewItem((short) drop);
@@ -76,9 +80,9 @@ public class Cumber extends Boss {
             Service.gI().dropItemMap(zone, optionalItemMap);
         }
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
-        int diem = 15;
+        int diem = EVENT_POINT;
         plKill.event.addEventPoint(diem);
-        Service.gI().sendThongBao(plKill, "+15 Point");
+        Service.gI().sendThongBao(plKill, "+" + EVENT_POINT + " Point");
     }
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
@@ -87,6 +91,7 @@ public class Cumber extends Boss {
                 this.chat("Xí hụt");
                 return 0;
             }
+            damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
             if (this.currentLevel != 0) {
                 damage /= 2;
             }

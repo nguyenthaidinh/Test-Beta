@@ -22,6 +22,8 @@ import nro.models.utils.Util;
 
 public class NhanBan extends Boss {
 
+    private static final int THANH_CO_EVENT_POINT = 5;
+
     private Player playerAtt;
     private long timeJoinMap;
 
@@ -107,6 +109,10 @@ public class NhanBan extends Boss {
                 reward(plKill);
             }
             if (isAncientCastleClone) {
+                if (plKill.event != null) {
+                    plKill.event.addEventPoint(THANH_CO_EVENT_POINT);
+                    Service.gI().sendThongBao(plKill, "+" + THANH_CO_EVENT_POINT + " Point");
+                }
                 AncientCastleService.gI().dropCastleBossReward(this, plKill);
                 ServerNotify.gI().notify(plKill.name + " đã đánh bại bản sao Thành cổ");
             } else {

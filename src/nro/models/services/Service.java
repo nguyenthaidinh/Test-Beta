@@ -29,6 +29,7 @@ import nro.models.Bot.BotAttackplayer;
 import nro.models.database.PlayerDAO;
 import nro.models.managers.MyClanTopBanDoKhoBau;
 import nro.models.managers.TopBanDoKhoBau;
+import nro.models.managers.TopBossHunter;
 import nro.models.managers.TopConDuongRanDoc;
 import nro.models.managers.TopKhiGasHuyDiet;
 import nro.models.map.Zone;
@@ -480,6 +481,40 @@ public class Service {
                 msg.writer().writeUTF(pl.nameClan);
                 msg.writer().writeUTF("Lv: " + pl.levelCDRDDone + " (" + Util.convertSecondsToTime(pl.lastTimeUpdateTopCDRD) + ")");
                 msg.writer().writeUTF("Bang chủ " + pl.name + "\n[" + Util.convertMilliseconds(pl.timeCDRDDone) + "]");
+            }
+            player.sendMessage(msg);
+            msg.cleanup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showTopBossHunter(Player player) {
+        TopBossHunter.getInstance().load();
+        List<Player> list = TopBossHunter.getInstance().getList();
+        if (list.isEmpty()) {
+            NpcService.gI().createTutorial(player, -1, "Chua co du lieu BXH san boss.");
+            return;
+        }
+
+        Message msg = new Message(-96);
+        try {
+            msg.writer().writeByte(0);
+            msg.writer().writeUTF("Top San Boss");
+            msg.writer().writeByte(list.size());
+            for (int i = 0; i < list.size(); i++) {
+                Player pl = list.get(i);
+                msg.writer().writeInt(i + 1);
+                msg.writer().writeInt((int) pl.id);
+                msg.writer().writeShort(pl.getHead());
+                if (player.getSession().version > 214) {
+                    msg.writer().writeShort(-1);
+                }
+                msg.writer().writeShort(pl.getBody());
+                msg.writer().writeShort(pl.getLeg());
+                msg.writer().writeUTF(pl.name);
+                msg.writer().writeUTF("Diem san boss: " + Util.formatNumber(pl.event.getEventPoint()));
+                msg.writer().writeUTF("Diem cua ban: " + Util.formatNumber(player.event.getEventPoint()));
             }
             player.sendMessage(msg);
             msg.cleanup();

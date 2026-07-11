@@ -169,11 +169,11 @@ public final class BossDropRateManager {
                 "nro.models.boss.MajinBuu_12h.Goku",
                 "nro.models.boss.MajinBuu_12h.Yacon");
 
-        add(rates, 20, "nro.models.boss.Baby.Baby");
-        add(rates, 35, "nro.models.boss.Black_Goku.BlackGoku");
+        add(rates, 50, "nro.models.boss.Baby.Baby");
+        add(rates, 50, "nro.models.boss.Black_Goku.BlackGoku");
+        add(rates, 60, "nro.models.boss.Cold.Cooler");
+        add(rates, 50, "nro.models.boss.cumber.Cumber");
         add(rates, 30,
-                "nro.models.boss.Cold.Cooler",
-                "nro.models.boss.cumber.Cumber",
                 "nro.models.boss.Golden_fireza.GoldenFrieza",
                 "nro.models.boss.ma_vuong_picolo_namek.Pocolo",
                 "nro.models.boss.MajinBuu_12h.Mabu");
