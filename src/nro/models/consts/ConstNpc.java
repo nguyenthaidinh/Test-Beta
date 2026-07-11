@@ -231,6 +231,8 @@ public class ConstNpc {
     public static final int DAT_CUOC_HAT_MIT = 532;
 
     public static final int BUY_BACK = 533;
+    public static final int MENU_ADMIN_BOSS = 534;
+    public static final int MENU_ADMIN_BOSS_ACTION = 535;
     public static final int MENU_OPTION_USE_ITEM726 = 726;
     public static final int MENU_SIEU_THAN_THUY = 2006;
     public static final int MENU_XUONG_TANG_DUOI = 2007;

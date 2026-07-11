@@ -683,6 +683,13 @@ public class Controller implements IMessageHandler {
                             case 0, 1, 2 -> {
                                 SuperRankService.gI().competing(player, _id);
                             }
+                            case BossManager.MENU_BOSS_LIST -> {
+                                if (!player.isAdmin()) {
+                                    Service.gI().sendThongBao(player, "Không thể thực hiện");
+                                    return;
+                                }
+                                BossManager.gI().showBossActionMenu(player, _id);
+                            }
                             case BossManager.MENU_THAN_LINH_DROP_RATE -> {
                                 if (!player.isAdmin()) {
                                     Service.gI().sendThongBao(player, "Không đủ quyền.");

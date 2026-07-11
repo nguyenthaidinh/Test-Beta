@@ -516,7 +516,8 @@ public class NpcFactory {
                             case 3 ->
                                 Input.gI().createFormFindPlayer(player);
                             case 4 ->
-                                BossManager.gI().showThanLinhDropRateList(player);
+                                NpcService.gI().createMenuConMeo(player, ConstNpc.MENU_ADMIN_BOSS, -1,
+                                        "Quản lý boss", "Danh sách\nBoss", "Tỉ lệ\nThần Linh", "Đóng");
                             case 5 ->
                                 Input.gI().createFormSetGameTime(player);
                             case 6 -> {
@@ -525,6 +526,16 @@ public class NpcFactory {
                             }
                         }
                     }
+                    case ConstNpc.MENU_ADMIN_BOSS -> {
+                        switch (select) {
+                            case 0 ->
+                                BossManager.gI().showListBoss(player);
+                            case 1 ->
+                                BossManager.gI().showThanLinhDropRateList(player);
+                        }
+                    }
+                    case ConstNpc.MENU_ADMIN_BOSS_ACTION ->
+                        BossManager.gI().handleBossAction(player, select);
                     case ConstNpc.CONFIRM_DISSOLUTION_CLAN -> {
                         switch (select) {
                             case 0 -> {

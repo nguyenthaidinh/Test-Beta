@@ -815,6 +815,34 @@ public class Boss extends Player implements IBoss {
         this.changeStatus(BossStatus.LEAVE_MAP);
     }
 
+    public Boss getRespawnTarget() {
+        Boss target = this;
+        while (target.parentBoss != null) {
+            target = target.parentBoss;
+        }
+        return target;
+    }
+
+    public void forceRespawnNow() {
+        if (this.parentBoss != null) {
+            this.getRespawnTarget().forceRespawnNow();
+            return;
+        }
+        if (this.zone != null) {
+            ChangeMapService.gI().exitMap(this);
+        }
+        this.zone = null;
+        this.lastZone = null;
+        this.playerTarger = null;
+        this.prepareBom = false;
+        this.currentLevel = -1;
+        this.lastTimeRest = 0;
+        this.changeStatus(BossStatus.RESPAWN);
+        this.respawn();
+        this.changeStatus(BossStatus.JOIN_MAP);
+        this.joinMap();
+    }
+
     @Override
     public void setBom(Player plAtt) {
         try {

@@ -1,7 +1,7 @@
 package nro.models.server;
 
 import nro.models.services.PlayerService;
-import nro.models.boss.Boss_Manager.BrolyManager;
+import nro.models.boss.Boss_Manager.BossManager;
 import nro.models.consts.ConstNpc;
 import nro.models.managers.GiftCodeManager;
 import nro.models.item.Item;
@@ -55,7 +55,7 @@ public class Command {
 
     private void initAdminCommands() {
         adminCommands.put("item", player -> Input.gI().createFormGiveItem(player));
-        adminCommands.put("brl", player -> BrolyManager.gI().showListBoss(player));
+        adminCommands.put("brl", player -> BossManager.gI().showListBoss(player));
         adminCommands.put("getitem", player -> Input.gI().createFormGetItem(player));
         adminCommands.put("hs", player -> Service.gI().releaseCooldownSkill(player));
         adminCommands.put("d", player -> Service.gI().setPos(player, player.location.x, player.location.y + 10));

@@ -107,19 +107,25 @@ import nro.models.boss.Baby.Baby;
 import nro.models.boss.BossDropRateManager;
 import nro.models.boss.Boss_mini.MatTroi;
 import nro.models.boss.cumber.Cumber;
+import nro.models.consts.ConstNpc;
 import nro.models.map.Zone;
+import nro.models.map.service.ChangeMapService;
+import nro.models.map.service.NpcService;
 import nro.models.mob_bigboss.GauTuongCuop;
 import nro.models.server.Maintenance;
 import nro.models.server.ServerManager;
+import nro.models.services.Service;
 import nro.models.utils.Functions;
 import nro.models.utils.Logger;
 
 public class BossManager implements Runnable {
 
+    public static final int MENU_BOSS_LIST = 3;
     public static final int MENU_THAN_LINH_DROP_RATE = 4;
 
     private static BossManager instance;
     public static byte ratioReward = 10;
+    private static final Map<Long, List<Boss>> ADMIN_BOSS_SELECTIONS = new ConcurrentHashMap<>();
     private static final Map<Long, List<Boss>> ADMIN_DROP_RATE_SELECTIONS = new ConcurrentHashMap<>();
 
     public static BossManager gI() {
@@ -410,19 +416,22 @@ public class BossManager implements Runnable {
         if (!player.isAdmin()) {
             return;
         }
-        player.idMark.setMenuType(3);
+        player.idMark.setMenuType(MENU_BOSS_LIST);
+        List<Boss> selections = getAdminBossSelections();
+        ADMIN_BOSS_SELECTIONS.put(player.id, selections);
+        if (selections.isEmpty()) {
+            NpcService.gI().createTutorial(player, -1, "Chưa có boss trong danh sách.");
+            return;
+        }
         Message msg;
         try {
             msg = new Message(-96);
             msg.writer().writeByte(0);
-            msg.writer().writeUTF("Boss");
-            msg.writer().writeByte((int) bosses.stream().filter(boss -> !MapService.gI().isMapBossFinal(boss.data[0].getMapJoin()[0]) && !MapService.gI().isMapHuyDiet(boss.data[0].getMapJoin()[0]) && !MapService.gI().isMapCadic(boss.data[0].getMapJoin()[0]) && !MapService.gI().isMapYardart(boss.data[0].getMapJoin()[0]) && !MapService.gI().isMapMaBu(boss.data[0].getMapJoin()[0]) && !MapService.gI().isMapBlackBallWar(boss.data[0].getMapJoin()[0])).count());
-            for (int i = 0; i < bosses.size(); i++) {
-                Boss boss = this.bosses.get(i);
-                if (MapService.gI().isMapBossFinal(boss.data[0].getMapJoin()[0]) || MapService.gI().isMapCadic(boss.data[0].getMapJoin()[0]) || MapService.gI().isMapYardart(boss.data[0].getMapJoin()[0]) || MapService.gI().isMapHuyDiet(boss.data[0].getMapJoin()[0]) || MapService.gI().isMapMaBu(boss.data[0].getMapJoin()[0]) || MapService.gI().isMapBlackBallWar(boss.data[0].getMapJoin()[0])) {
-                    continue;
-                }
-                msg.writer().writeInt(i);
+            msg.writer().writeUTF("Quản lý Boss");
+            msg.writer().writeByte(selections.size());
+            for (int i = 0; i < selections.size(); i++) {
+                Boss boss = selections.get(i);
+                msg.writer().writeInt(i + 1);
                 msg.writer().writeInt(i);
                 msg.writer().writeShort(boss.data[0].getOutfit()[0]);
                 if (player.getSession().version >= 214) {
@@ -431,18 +440,108 @@ public class BossManager implements Runnable {
                 msg.writer().writeShort(boss.data[0].getOutfit()[1]);
                 msg.writer().writeShort(boss.data[0].getOutfit()[2]);
                 msg.writer().writeUTF(boss.data[0].getName());
-                if (boss.zone != null) {
-                    msg.writer().writeUTF(boss.bossStatus.toString());
-                    msg.writer().writeUTF(boss.zone.map.mapName + "(" + boss.zone.map.mapId + ") khu " + boss.zone.zoneId + "");
-                } else {
-                    msg.writer().writeUTF(boss.bossStatus.toString());
-                    msg.writer().writeUTF("=))");
-                }
+                msg.writer().writeUTF(getBossStatusText(boss));
+                msg.writer().writeUTF(getBossLocationText(boss));
             }
             player.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
         }
+    }
+
+    private List<Boss> getAdminBossSelections() {
+        List<Boss> selections = new ArrayList<>();
+        for (Boss boss : new ArrayList<>(this.bosses)) {
+            if (canShowInAdminBossList(boss)) {
+                selections.add(boss);
+            }
+        }
+        return selections;
+    }
+
+    private boolean canShowInAdminBossList(Boss boss) {
+        if (boss == null || boss.data == null || boss.data.length == 0 || boss.data[0].getMapJoin().length == 0) {
+            return false;
+        }
+        int mapJoin = boss.data[0].getMapJoin()[0];
+        return !MapService.gI().isMapBossFinal(mapJoin)
+                && !MapService.gI().isMapHuyDiet(mapJoin)
+                && !MapService.gI().isMapCadic(mapJoin)
+                && !MapService.gI().isMapYardart(mapJoin)
+                && !MapService.gI().isMapMaBu(mapJoin)
+                && !MapService.gI().isMapBlackBallWar(mapJoin);
+    }
+
+    private String getBossStatusText(Boss boss) {
+        if (boss.zone != null && !boss.isDie()) {
+            return "Đang xuất hiện - " + boss.bossStatus;
+        }
+        return "Chưa xuất hiện - " + boss.bossStatus;
+    }
+
+    private String getBossLocationText(Boss boss) {
+        if (boss.zone == null) {
+            return "Chưa có map/khu";
+        }
+        return boss.zone.map.mapName + " (" + boss.zone.map.mapId + ") khu " + boss.zone.zoneId;
+    }
+
+    public void showBossActionMenu(Player player, int selection) {
+        if (!player.isAdmin()) {
+            Service.gI().sendThongBao(player, "Không đủ quyền.");
+            return;
+        }
+        Boss boss = getAdminBossSelection(player, selection);
+        if (boss == null) {
+            Service.gI().sendThongBao(player, "Boss không còn trong danh sách.");
+            showListBoss(player);
+            return;
+        }
+        player.idMark.setTempId(selection);
+        NpcService.gI().createMenuConMeo(player, ConstNpc.MENU_ADMIN_BOSS_ACTION, -1,
+                boss.data[0].getName()
+                + "\n" + getBossStatusText(boss)
+                + "\n" + getBossLocationText(boss),
+                "Đi tới", "Hồi sinh", "Làm mới", "Đóng");
+    }
+
+    public void handleBossAction(Player player, int select) {
+        if (!player.isAdmin()) {
+            Service.gI().sendThongBao(player, "Không đủ quyền.");
+            return;
+        }
+        Boss boss = getAdminBossSelection(player, (int) player.idMark.getTempId());
+        if (boss == null) {
+            Service.gI().sendThongBao(player, "Boss không còn trong danh sách.");
+            showListBoss(player);
+            return;
+        }
+        switch (select) {
+            case 0 -> {
+                if (boss.zone == null) {
+                    Service.gI().sendThongBao(player, "Boss chưa xuất hiện, hãy hồi sinh trước.");
+                    return;
+                }
+                ChangeMapService.gI().changeMapYardrat(player, boss.zone, boss.location.x, boss.location.y);
+            }
+            case 1 -> {
+                Boss respawnTarget = boss.getRespawnTarget();
+                respawnTarget.forceRespawnNow();
+                Service.gI().sendThongBao(player, "Đã hồi sinh " + respawnTarget.data[0].getName() + ".");
+                showListBoss(player);
+            }
+            case 2 -> showListBoss(player);
+            default -> ADMIN_BOSS_SELECTIONS.remove(player.id);
+        }
+    }
+
+    private Boss getAdminBossSelection(Player player, int selection) {
+        List<Boss> selections = ADMIN_BOSS_SELECTIONS.get(player.id);
+        if (selections == null || selection < 0 || selection >= selections.size()) {
+            return null;
+        }
+        Boss boss = selections.get(selection);
+        return this.bosses.contains(boss) ? boss : null;
     }
 
     public void showThanLinhDropRateList(Player player) {
