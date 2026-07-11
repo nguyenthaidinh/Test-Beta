@@ -513,7 +513,7 @@ public class Service {
                 msg.writer().writeShort(pl.getBody());
                 msg.writer().writeShort(pl.getLeg());
                 msg.writer().writeUTF(pl.name);
-                msg.writer().writeUTF("");
+                msg.writer().writeUTF("Điểm săn Boss: " + Util.formatNumber(pl.event.getEventPoint()));
                 msg.writer().writeUTF(pl.id == player.id ? "Điểm của bạn: " + Util.formatNumber(player.event.getEventPoint()) : "");
             }
             player.sendMessage(msg);
