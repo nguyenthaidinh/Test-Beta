@@ -17,7 +17,7 @@ import nro.models.services.Service;
 
 /**
  * Service xử lý logic mua bán đồ Thần Linh tại NPC Lio Đẹp Trai
- * - Bán: Player bán đồ TL → nhận 25 thỏi vàng, đồ vào shop
+ * - Bán: Player bán đồ TL → nhận 100 thỏi vàng, đồ vào shop
  * - Mua: Player mua đồ TL từ shop → trả 100 thỏi vàng
  *
  * @author Lio
@@ -63,7 +63,7 @@ public class LioShopService {
 
     /**
      * Player bán đồ Thần Linh cho NPC
-     * Nhận 25 thỏi vàng, đồ được đưa vào shop
+     * Nhận 100 thỏi vàng, đồ được đưa vào shop
      */
     public void sellItem(Player player, Item item) {
         if (!isDoThanLinh(item)) {
@@ -91,7 +91,7 @@ public class LioShopService {
         // Xóa đồ TL khỏi hành trang
         InventoryService.gI().subQuantityItemsBag(player, item, 1);
 
-        // Trả 25 thỏi vàng cho player
+        // Trả 100 thỏi vàng cho player
         Item thoiVang = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, LioShopManager.PRICE_BUY_IN);
         if (!InventoryService.gI().addItemBag(player, thoiVang)) {
             Item rollbackItem = ItemService.gI().createNewItem(itemId);

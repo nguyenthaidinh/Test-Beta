@@ -15,7 +15,7 @@ import nro.models.shop_lio.LioShopService;
  * Hoạt ảnh: Mabu mập (head=297, body=298, leg=299)
  *
  * Chức năng:
- * - Bán đồ TL cho NPC: nhận 25 thỏi vàng
+ * - Bán đồ TL cho NPC: nhận 100 thỏi vàng
  * - Mua đồ TL từ shop: trả 100 thỏi vàng
  *
  * @author Lio
