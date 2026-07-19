@@ -363,10 +363,7 @@ public class TaiHienThanhThan {
         }
 
         private int randomKichHoatOption() {
-            List<Integer> options = uniqueKichHoatOptions();
-            if (options.size() == 1) {
-                return options.get(0);
-            }
+            List<Integer> options = getRuntimeOptionsByGender();
             if (options.contains(129) && Util.isTrue(10, 100)) {
                 return 129;
             }
@@ -376,6 +373,33 @@ public class TaiHienThanhThan {
                 options.remove(songokuIndex);
             }
             return randomWeightedKichHoatOption(options);
+        }
+
+        private List<Integer> getRuntimeOptionsByGender() {
+            List<Integer> options = new ArrayList<>();
+            switch (gender) {
+                case 0:
+                    options.add(127);
+                    options.add(128);
+                    options.add(129);
+                    options.add(245);
+                    break;
+                case 1:
+                    options.add(130);
+                    options.add(131);
+                    options.add(132);
+                    options.add(237);
+                    break;
+                case 2:
+                    options.add(133);
+                    options.add(134);
+                    options.add(135);
+                    options.add(241);
+                    break;
+                default:
+                    return uniqueKichHoatOptions();
+            }
+            return options;
         }
 
         private List<Integer> uniqueKichHoatOptions() {
