@@ -6,10 +6,8 @@ import nro.models.boss.BossesData;
 import nro.models.boss.BossID;
 import static nro.models.consts.BossType.HALLOWEEN_EVENT;
 import nro.models.consts.ConstPlayer;
-import nro.models.map.ItemMap;
 import nro.models.player.Player;
 import nro.models.services.EffectSkillService;
-import nro.models.services.Service;
 import nro.models.services.SkillService;
 import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
@@ -22,9 +20,7 @@ public class BiMa extends Boss {
 
     @Override
     public void reward(Player plKill) {
-        ItemMap it = new ItemMap(this.zone, 585, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
-                this.location.y - 24), plKill.id);
-        Service.gI().dropItemMap(this.zone, it);
+        HalloweenRewards.dropBossReward(this, plKill);
     }
 
     public void halloween(Player player) {

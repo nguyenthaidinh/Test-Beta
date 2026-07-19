@@ -10,6 +10,8 @@ import nro.models.clan.Clan;
 import nro.models.map.Zone;
 import nro.models.mob.Mob;
 import nro.models.player.Player;
+import nro.models.services.InventoryService;
+import nro.models.services.ItemService;
 import nro.models.services.ItemTimeService;
 import nro.models.map.service.MapService;
 import nro.models.services.Service;
@@ -28,7 +30,11 @@ public class SnakeWay implements Runnable {
 
     public static final long POWER_CAN_GO_TO_CDRD = 2000000000;
     public static final int AVAILABLE = 50;
-    public static final int TIME_CON_DUONG_RAN_DOC = 1800000;
+    public static final int TIME_CON_DUONG_RAN_DOC = 90 * 60 * 1000;
+    public static final int HP_CON_DUONG_RAN_DOC = 2_000_000_000;
+    private static final short REWARD_GOLD_BAR_ID = 457;
+    private static final int REWARD_GOLD_BAR_QUANTITY = 500;
+    private static final int REWARD_GEM_QUANTITY = 10_000;
 
     public int id;
     public byte level;
@@ -43,6 +49,7 @@ public class SnakeWay implements Runnable {
     public List<Boss> bosses = new ArrayList<>();
     public boolean endCDRD;
     public boolean allMobsDead;
+    private boolean winRewardGiven;
 
     public void addZone(Zone zone) {
         this.zones.add(zone);
@@ -84,6 +91,10 @@ public class SnakeWay implements Runnable {
             }
             if (allCharactersDead) {
                 allMobsDead = true;
+            }
+
+            if (endCDRD && !winRewardGiven) {
+                rewardWinForPlayers();
             }
 
             if (!kickoutcdrd && (endCDRD || Util.canDoWithTime(lastTimeOpen, TIME_CON_DUONG_RAN_DOC - 60000))) {
@@ -149,25 +160,21 @@ public class SnakeWay implements Runnable {
                 if (i == 5) {
                     mob.lvMob = 1;
                     mob.point.dame = (int) level * 100 * mob.tempId * 12;
-                    mob.point.maxHp = (int) level * 1000 * mob.tempId * 12;
-                    mob.hoiSinh();
-                    mob.hoiSinhMobPhoBan();
                 } else {
                     mob.lvMob = 0;
                     mob.point.dame = (int) level * 10 * mob.tempId;
-                    mob.point.maxHp = (int) level * 100 * mob.tempId;
-                    mob.hoiSinh();
-                    mob.hoiSinhMobPhoBan();
                 }
+                mob.point.maxHp = HP_CON_DUONG_RAN_DOC;
+                mob.hoiSinh();
+                mob.hoiSinhMobPhoBan();
             }
 
             if (zone.map.mapId == 144) {
                 try {
-                    long bossDamage = (200000 * level);
-                    long bossMaxHealth = (2000000 * level);
+                    long bossDamage = (200000L * level);
+                    int bossMaxHealth = HP_CON_DUONG_RAN_DOC;
                     for (int i = 6; i > 0; i--) {
                         bossDamage = Math.min(bossDamage, 200000000L);
-                        bossMaxHealth = Math.min(bossMaxHealth, 2000000000L);
                         bosses.add(new SAIBAMEN(
                                 zone,
                                 clan,
@@ -177,7 +184,6 @@ public class SnakeWay implements Runnable {
                         ));
                     }
                     bossDamage = Math.min(bossDamage * 5, 200000000L);
-                    bossMaxHealth = Math.min(bossMaxHealth * 5, 2000000000L);
                     bosses.add(new NADIC(
                             zone,
                             clan,
@@ -185,7 +191,6 @@ public class SnakeWay implements Runnable {
                             (int) bossMaxHealth
                     ));
                     bossDamage = Math.min(bossDamage * 10, 200000000L);
-                    bossMaxHealth = Math.min(bossMaxHealth * 10, 2000000000L);
                     bosses.add(new CADICH(
                             zone,
                             clan,
@@ -200,6 +205,10 @@ public class SnakeWay implements Runnable {
     }
 
     public void finish() {
+        boolean rewardWin = endCDRD && !winRewardGiven;
+        if (rewardWin) {
+            rewardWinForPlayers();
+        }
         for (Zone zone : zones) {
             for (int i = zone.getPlayers().size() - 1; i >= 0; i--) {
                 if (i < zone.getPlayers().size()) {
@@ -209,6 +218,36 @@ public class SnakeWay implements Runnable {
                 }
             }
 
+        }
+    }
+
+    private void rewardWinForPlayers() {
+        for (Zone zone : zones) {
+            for (Player player : zone.getPlayers()) {
+                rewardWin(player);
+            }
+        }
+        winRewardGiven = true;
+    }
+
+    private void rewardWin(Player player) {
+        if (player == null || player.inventory == null) {
+            return;
+        }
+
+        player.inventory.gem = (int) Math.min((long) player.inventory.gem + REWARD_GEM_QUANTITY, Integer.MAX_VALUE);
+
+        boolean addedGoldBar = InventoryService.gI().addItemBag(
+                player,
+                ItemService.gI().createNewItem(REWARD_GOLD_BAR_ID, REWARD_GOLD_BAR_QUANTITY)
+        );
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendMoney(player);
+
+        if (addedGoldBar) {
+            Service.gI().sendThongBao(player, "Bạn nhận được 500 thỏi vàng và 10.000 ngọc xanh khi hoàn thành Con đường rắn độc");
+        } else {
+            Service.gI().sendThongBao(player, "Bạn nhận được 10.000 ngọc xanh, hành trang không đủ chỗ để nhận 500 thỏi vàng");
         }
     }
 
@@ -261,6 +300,7 @@ public class SnakeWay implements Runnable {
         this.bosses.clear();
         this.allMobsDead = false;
         this.endCDRD = false;
+        this.winRewardGiven = false;
         this.isOpened = false;
         this.clan.ConDuongRanDoc = null;
         this.clan = null;

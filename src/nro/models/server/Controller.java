@@ -128,7 +128,7 @@ public class Controller implements IMessageHandler {
                             } else if (ConsignShopService.gI().getItemBuy(idItem) != null) {
                                 ConsignShopService.gI().buyItem(player, idItem);
                             } else {
-                                LioShopService.gI().buyItem(player, idItem);
+                                Service.gI().sendThongBao(player, "Không thể thực hiện");
                             }
                             break;
                         case 4:

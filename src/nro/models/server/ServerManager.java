@@ -11,6 +11,7 @@ import nro.models.boss.Boss_Manager.RedRibbonHQManager;
 import nro.models.boss.Boss_Manager.GasDestroyManager;
 import nro.models.boss.Boss_Manager.YardartManager;
 import nro.models.boss.Boss_Manager.TrungThuEventManager;
+import nro.models.boss.Boss_Manager.HalloweenEventManager;
 import nro.models.boss.Boss_Manager.HungVuongEventManager;
 import nro.models.boss.Boss_Manager.SkillSummonedManager;
 import nro.models.interfaces.ISession;
@@ -135,6 +136,7 @@ public class ServerManager {
             new Thread(SnakeWayManager.gI(), "Update snake way boss").start();
             new Thread(GasDestroyManager.gI(), "Update gas destroy boss").start();
             new Thread(TrungThuEventManager.gI(), "Update trung thu boss").start();
+            new Thread(HalloweenEventManager.gI(), "Update halloween boss").start();
             new Thread(HungVuongEventManager.gI(), "Update hung vuong boss").start();
 
             new Thread(BotManager.gI(), "Thread Bot Game").start();

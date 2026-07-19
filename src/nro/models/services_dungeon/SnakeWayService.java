@@ -20,6 +20,8 @@ import nro.models.utils.Util;
 
 public class SnakeWayService {
 
+    private static final int CDRD_JOIN_COOLDOWN_DAYS = 3;
+
     private static SnakeWayService instance;
 
     public static SnakeWayService gI() {
@@ -50,8 +52,8 @@ public class SnakeWayService {
                 if (player.clanMember.getNumDateFromJoinTimeToToday() < 2) {
                     return;
                 }
-                if (!player.joinCDRD && !Util.isTimeDifferenceGreaterThanNDays(player.lastTimeJoinCDRD, 7)) {
-                    Service.gI().sendThongBao(player, "Vui lòng đợi " + TimeUtil.getDateLeft(player.lastTimeJoinCDRD, 7 * 24 * 60 * 60) + " nữa");
+                if (!player.joinCDRD && !Util.isTimeDifferenceGreaterThanNDays(player.lastTimeJoinCDRD, CDRD_JOIN_COOLDOWN_DAYS)) {
+                    Service.gI().sendThongBao(player, "Vui lòng đợi " + TimeUtil.getDateLeft(player.lastTimeJoinCDRD, CDRD_JOIN_COOLDOWN_DAYS * 24 * 60 * 60) + " nữa");
                     return;
                 } else if (!player.joinCDRD) {
                     player.talkToThuongDe = false;

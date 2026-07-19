@@ -43,7 +43,7 @@ public class EventManager {
            // new InternationalWomensDay().init();
         }
         if (HALLOWEEN) {
-          //  new Halloween().init();
+            new Halloween().init();
         }
         if (CHRISTMAS) {
           //  new Christmas().init();

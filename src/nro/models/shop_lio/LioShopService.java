@@ -65,63 +65,74 @@ public class LioShopService {
      * Player bán đồ Thần Linh cho NPC
      * Nhận 100 thỏi vàng, đồ được đưa vào shop
      */
-    public void sellItem(Player player, Item item) {
-        if (!isDoThanLinh(item)) {
-            Service.gI().sendThongBao(player, "Chỉ có thể bán đồ Thần Linh!");
-            return;
-        }
+    public synchronized void sellItem(Player player, Item item) {
+        synchronized (player.inventory) {
+            if (!isDoThanLinh(item)) {
+                Service.gI().sendThongBao(player, "Chỉ có thể bán đồ Thần Linh!");
+                return;
+            }
 
-        if (LioShopManager.gI().getAvailableCount() >= LioShopManager.MAX_ITEMS) {
-            Service.gI().sendThongBao(player, "Shop đã đầy (" + LioShopManager.MAX_ITEMS + " món), vui lòng quay lại sau!");
-            return;
-        }
+            int bagIndex = InventoryService.gI().getIndexBag(player, item);
+            if (bagIndex < 0 || item.quantity <= 0) {
+                Service.gI().sendThongBao(player, "Vật phẩm không còn trong hành trang!");
+                return;
+            }
 
-        boolean canReceiveThoiVang = hasStackableThoiVang(player)
-                || item.quantity <= 1
-                || InventoryService.gI().getCountEmptyBag(player) > 0;
-        if (!canReceiveThoiVang) {
-            Service.gI().sendThongBao(player, "Hành trang không còn chỗ trống để nhận thỏi vàng!");
-            return;
-        }
+            if (LioShopManager.gI().getAvailableCount() >= LioShopManager.MAX_ITEMS) {
+                Service.gI().sendThongBao(player, "Shop đã đầy (" + LioShopManager.MAX_ITEMS + " món), vui lòng quay lại sau!");
+                return;
+            }
 
-        // Copy item data trước khi xóa
-        short itemId = item.template.id;
-        List<ItemOption> ops = copyOptions(item.itemOptions);
+            boolean canReceiveThoiVang = hasStackableThoiVang(player, LioShopManager.PRICE_BUY_IN)
+                    || item.quantity <= 1
+                    || InventoryService.gI().getCountEmptyBag(player) > 0;
+            if (!canReceiveThoiVang) {
+                Service.gI().sendThongBao(player, "Hành trang không còn chỗ trống để nhận thỏi vàng!");
+                return;
+            }
 
-        // Xóa đồ TL khỏi hành trang
-        InventoryService.gI().subQuantityItemsBag(player, item, 1);
+            // Copy item data trước khi xóa
+            short itemId = item.template.id;
+            List<ItemOption> ops = copyOptions(item.itemOptions);
 
-        // Trả 100 thỏi vàng cho player
-        Item thoiVang = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, LioShopManager.PRICE_BUY_IN);
-        if (!InventoryService.gI().addItemBag(player, thoiVang)) {
-            Item rollbackItem = ItemService.gI().createNewItem(itemId);
-            rollbackItem.itemOptions.clear();
-            rollbackItem.itemOptions.addAll(copyOptions(ops));
-            InventoryService.gI().addItemBag(player, rollbackItem);
+            // Xóa đồ TL khỏi hành trang
+            if (!removeOneItemFromBag(player, item, bagIndex)) {
+                Service.gI().sendThongBao(player, "Vật phẩm không còn trong hành trang!");
+                return;
+            }
+
+            // Trả 100 thỏi vàng cho player
+            Item thoiVang = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, LioShopManager.PRICE_BUY_IN);
+            if (!InventoryService.gI().addItemBag(player, thoiVang)) {
+                Item rollbackItem = ItemService.gI().createNewItem(itemId);
+                rollbackItem.itemOptions.clear();
+                rollbackItem.itemOptions.addAll(copyOptions(ops));
+                InventoryService.gI().addItemBag(player, rollbackItem);
+                InventoryService.gI().sendItemBags(player);
+                Service.gI().sendThongBao(player, "Không thể trả thỏi vàng, đã hoàn lại đồ Thần Linh.");
+                return;
+            }
+
+            // Thêm vào shop sau khi trả thưởng thành công
+            int newId = LioShopManager.gI().getMaxId() + 1;
+            LioShopItem shopItem = new LioShopItem(
+                    newId, itemId, (int) player.id, player.name,
+                    LioShopManager.PRICE_SELL_OUT, 1, ops, false);
+            LioShopManager.gI().listItem.add(shopItem);
+
             InventoryService.gI().sendItemBags(player);
-            Service.gI().sendThongBao(player, "Không thể trả thỏi vàng, đã hoàn lại đồ Thần Linh.");
-            return;
+            Service.gI().sendMoney(player);
+            LioShopManager.gI().save();
+
+            Service.gI().sendThongBao(player, "Bán thành công! Nhận được " + LioShopManager.PRICE_BUY_IN + " thỏi vàng.");
         }
-
-        // Thêm vào shop sau khi trả thưởng thành công
-        int newId = LioShopManager.gI().getMaxId() + 1;
-        LioShopItem shopItem = new LioShopItem(
-                newId, itemId, (int) player.id, player.name,
-                LioShopManager.PRICE_SELL_OUT, 1, ops, false);
-        LioShopManager.gI().listItem.add(shopItem);
-
-        InventoryService.gI().sendItemBags(player);
-        Service.gI().sendMoney(player);
-        LioShopManager.gI().save();
-
-        Service.gI().sendThongBao(player, "Bán thành công! Nhận được " + LioShopManager.PRICE_BUY_IN + " thỏi vàng.");
     }
 
     /**
      * Player mua đồ Thần Linh từ shop
      * Trả 100 thỏi vàng
      */
-    public void buyItem(Player player, int shopItemId) {
+    public synchronized void buyItem(Player player, int shopItemId) {
         LioShopItem shopItem = null;
         for (LioShopItem it : LioShopManager.gI().listItem) {
             if (it != null && it.id == shopItemId && !it.isSold) {
@@ -203,7 +214,7 @@ public class LioShopService {
         return getBeTacItemId(shopItemId) != -1;
     }
 
-    public void buyBeTacItem(Player player, int shopItemId) {
+    public synchronized void buyBeTacItem(Player player, int shopItemId) {
         short itemId = getBeTacItemId(shopItemId);
         if (itemId == -1) {
             Service.gI().sendThongBao(player, "Vat pham khong ton tai!");
@@ -242,7 +253,7 @@ public class LioShopService {
         openBeTacShop(player);
     }
 
-    public void buyBeTacSet(Player player, int planetIndex) {
+    public synchronized void buyBeTacSet(Player player, int planetIndex) {
         if (planetIndex < 0 || planetIndex > 2
                 || BE_TAC_ITEMS[planetIndex].length != BE_TAC_SET_ITEM_COUNT) {
             Service.gI().sendThongBao(player, "Hành tinh không hợp lệ!");
@@ -520,10 +531,10 @@ public class LioShopService {
         return null;
     }
 
-    private boolean hasStackableThoiVang(Player player) {
+    private boolean hasStackableThoiVang(Player player, int quantity) {
         for (Item item : player.inventory.itemsBag) {
             if (item.isNotNullItem() && item.template.id == ConstItem.THOI_VANG
-                    && item.quantity < MAX_STACK_QUANTITY) {
+                    && item.quantity <= MAX_STACK_QUANTITY - quantity) {
                 return true;
             }
         }
@@ -587,6 +598,20 @@ public class LioShopService {
             }
         }
         return slots;
+    }
+
+    private boolean removeOneItemFromBag(Player player, Item item, int bagIndex) {
+        if (bagIndex < 0 || bagIndex >= player.inventory.itemsBag.size()
+                || player.inventory.itemsBag.get(bagIndex) != item || item.quantity <= 0) {
+            return false;
+        }
+        if (item.quantity <= 1) {
+            player.inventory.itemsBag.set(bagIndex, ItemService.gI().createItemNull());
+            item.dispose();
+        } else {
+            item.quantity--;
+        }
+        return true;
     }
 
     private List<ItemOption> copyOptions(List<ItemOption> options) {

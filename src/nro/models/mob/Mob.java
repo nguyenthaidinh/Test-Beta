@@ -5,8 +5,10 @@ import nro.models.services.Service;
 import nro.models.services.TaskService;
 import nro.models.map.service.ItemMapService;
 import nro.models.consts.ConstMap;
+import nro.models.consts.ConstItem;
 import nro.models.consts.ConstMob;
 import nro.models.consts.ConstTask;
+import nro.models.event.EventManager;
 import nro.models.item.Item;
 import nro.models.map.ItemMap;
 import java.util.List;
@@ -611,6 +613,7 @@ public class Mob {
             return list;
         }
         int mapid = player.zone.map.mapId;
+        addHalloweenMobReward(player, list, x, yEnd, mapid);
         //========================Capsul Kì Bí========================
         if (player.itemTime.isUseMayDo
                 && (Util.isTrue(20, 100))
@@ -1077,6 +1080,30 @@ public class Mob {
         applyGoldBonus(player, list);
         return list;
 
+    }
+
+    private void addHalloweenMobReward(Player player, List<ItemMap> list, int x, int yEnd, int mapid) {
+        boolean isHalloweenDropMap = MapService.gI().AllMap(mapid) || MapService.gI().isMapEventHalloween(mapid);
+        if (!EventManager.HALLOWEEN || MapService.gI().isMapPhoBan(mapid) || !isHalloweenDropMap) {
+            return;
+        }
+
+        int pumpkinDropRate = 5;
+        int pumpkinQuantityMin = 1;
+        int pumpkinQuantityMax = 2;
+
+        if (player.effectSkill != null && player.effectSkill.isHalloween) {
+            pumpkinDropRate = 8;
+            pumpkinQuantityMin = 2;
+            pumpkinQuantityMax = 4;
+        }
+
+        if (Util.isTrue(pumpkinDropRate, 100)) {
+            list.add(new ItemMap(zone, ConstItem.BI_NGO, Util.nextInt(pumpkinQuantityMin, pumpkinQuantityMax), x, yEnd, player.id));
+        }
+        if (Util.isTrue(1, 1000)) {
+            list.add(new ItemMap(zone, ConstItem.THIEP_HALLOWEEN, 1, x + 12, yEnd, player.id));
+        }
     }
 
     private void applyGoldBonus(Player killer, List<ItemMap> rewards) {
