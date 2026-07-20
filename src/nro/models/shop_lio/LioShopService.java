@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import nro.models.utils.Util;
 import nro.models.consts.ConstItem;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
@@ -17,7 +19,7 @@ import nro.models.services.Service;
 
 /**
  * Service xử lý logic mua bán đồ Thần Linh tại NPC Lio Đẹp Trai
- * - Bán: Player bán đồ TL → nhận 100 thỏi vàng, đồ vào shop
+ * - Bán: Player bán đồ TL → nhận 50 thỏi vàng, đồ vào shop
  * - Mua: Player mua đồ TL từ shop → trả 100 thỏi vàng
  *
  * @author Lio
@@ -25,6 +27,7 @@ import nro.models.services.Service;
 public class LioShopService {
 
     private static final int MAX_STACK_QUANTITY = 100_000_000;
+    public static final int DAILY_SELL_LIMIT = 80;
     private static final int SHOP_PAGE_SIZE = 20;
     private static final int SHOP_TAB_COUNT = LioShopManager.MAX_ITEMS / SHOP_PAGE_SIZE;
     public static final String SHOP_TAG = "LIO_DEP_TRAI_SHOP";
@@ -43,6 +46,7 @@ public class LioShopService {
     };
     private static LioShopService instance;
     private final Map<Integer, Item> beTacShopItems = new HashMap<>();
+    private final Map<Long, DailySellCounter> dailySellCounters = new ConcurrentHashMap<>();
 
     public static LioShopService gI() {
         if (instance == null) {
@@ -63,7 +67,7 @@ public class LioShopService {
 
     /**
      * Player bán đồ Thần Linh cho NPC
-     * Nhận 100 thỏi vàng, đồ được đưa vào shop
+     * Nhận 50 thỏi vàng, đồ được đưa vào shop
      */
     public synchronized void sellItem(Player player, Item item) {
         synchronized (player.inventory) {
@@ -80,6 +84,12 @@ public class LioShopService {
 
             if (LioShopManager.gI().getAvailableCount() >= LioShopManager.MAX_ITEMS) {
                 Service.gI().sendThongBao(player, "Shop đã đầy (" + LioShopManager.MAX_ITEMS + " món), vui lòng quay lại sau!");
+                return;
+            }
+
+            int dailySellCount = getDailySellCount(player.id);
+            if (dailySellCount >= DAILY_SELL_LIMIT) {
+                Service.gI().sendThongBao(player, "Hôm nay bạn đã bán đủ " + DAILY_SELL_LIMIT + " món, vui lòng quay lại ngày mai!");
                 return;
             }
 
@@ -123,6 +133,7 @@ public class LioShopService {
             InventoryService.gI().sendItemBags(player);
             Service.gI().sendMoney(player);
             LioShopManager.gI().save();
+            increaseDailySellCount(player.id);
 
             Service.gI().sendThongBao(player, "Bán thành công! Nhận được " + LioShopManager.PRICE_BUY_IN + " thỏi vàng.");
         }
@@ -541,6 +552,27 @@ public class LioShopService {
         return false;
     }
 
+    private int getDailySellCount(long playerId) {
+        DailySellCounter counter = dailySellCounters.get(playerId);
+        if (counter == null) {
+            return 0;
+        }
+        if (Util.isAfterMidnight(counter.lastTime)) {
+            counter.count = 0;
+            counter.lastTime = System.currentTimeMillis();
+        }
+        return counter.count;
+    }
+
+    private void increaseDailySellCount(long playerId) {
+        DailySellCounter counter = dailySellCounters.computeIfAbsent(playerId, id -> new DailySellCounter());
+        if (Util.isAfterMidnight(counter.lastTime)) {
+            counter.count = 0;
+        }
+        counter.count++;
+        counter.lastTime = System.currentTimeMillis();
+    }
+
     private int getTotalThoiVang(Player player) {
         long total = 0;
         for (Item item : player.inventory.itemsBag) {
@@ -625,5 +657,11 @@ public class LioShopService {
             }
         }
         return copies;
+    }
+
+    private static class DailySellCounter {
+
+        private int count;
+        private long lastTime;
     }
 }
