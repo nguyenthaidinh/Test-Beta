@@ -30,10 +30,11 @@ public class LioDepTrai extends Npc {
     public void openBaseMenu(Player player) {
         if (canOpenNpc(player)) {
             int soLuongShop = LioShopManager.gI() != null ? LioShopManager.gI().getAvailableCount() : 0;
+            int luotBanConLai = LioShopService.gI().getRemainingDailySellCount(player.id);
             String npcSay = "|2|Chào " + player.name + "! Ta là Lio Đẹp Trai!\n"
                     + "|1|Chuyên thu mua và bán lại Đồ Thần Linh.\n"
                     + "|0|Bán cho ta: Nhận " + LioShopManager.PRICE_BUY_IN + " thỏi vàng/món\n"
-                    + "|0|Mỗi ngày bán tối đa " + LioShopService.DAILY_SELL_LIMIT + " món\n"
+                    + "|0|Hôm nay còn " + luotBanConLai + "/" + LioShopService.DAILY_SELL_LIMIT + " món có thể bán\n"
                     + "|0|Mua từ ta: " + LioShopManager.PRICE_SELL_OUT + " thỏi vàng/món\n"
                     + "|0|Khi đã Bế Tắc: Đồ Thần Linh 150 thỏi vàng/món\n"
                     + "|7|Shop reset sau mỗi lần bảo trì\n"

@@ -225,6 +225,10 @@ public class LioShopService {
         return getBeTacItemId(shopItemId) != -1;
     }
 
+    public int getRemainingDailySellCount(long playerId) {
+        return Math.max(0, DAILY_SELL_LIMIT - getDailySellCount(playerId));
+    }
+
     public synchronized void buyBeTacItem(Player player, int shopItemId) {
         short itemId = getBeTacItemId(shopItemId);
         if (itemId == -1) {
