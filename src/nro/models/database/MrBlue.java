@@ -1367,8 +1367,11 @@ public class MrBlue {
         item.itemOptions.clear();
         for (Object option : options) {
             JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(option));
-            item.itemOptions.add(new Item.ItemOption(Integer.parseInt(String.valueOf(opt.get(0))),
-                    Integer.parseInt(String.valueOf(opt.get(1)))));
+            int optionId = Integer.parseInt(String.valueOf(opt.get(0)));
+            if (ItemService.gI().getItemOptionTemplate(optionId) == null) {
+                continue;
+            }
+            item.itemOptions.add(new Item.ItemOption(optionId, Integer.parseInt(String.valueOf(opt.get(1)))));
         }
         ItemService.gI().normalizeLuckyRoundPetOptions(item);
         ItemService.gI().normalizeSsj4CostumeOptions(item);

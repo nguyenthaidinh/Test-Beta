@@ -891,6 +891,7 @@ public class Service {
                 if (!item.isNotNullItem()) {
                     msg.writer().writeShort(-1);
                 } else {
+                    ItemService.gI().normalizeJackyChunCostumeOptions(item);
                     msg.writer().writeShort(item.template.id);
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
@@ -911,6 +912,7 @@ public class Service {
                 if (!item.isNotNullItem()) {
                     msg.writer().writeShort(-1);
                 } else {
+                    ItemService.gI().normalizeJackyChunCostumeOptions(item);
                     msg.writer().writeShort(item.template.id);
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
@@ -931,6 +933,7 @@ public class Service {
                 if (!item.isNotNullItem()) {
                     msg.writer().writeShort(-1);
                 } else {
+                    ItemService.gI().normalizeJackyChunCostumeOptions(item);
                     msg.writer().writeShort(item.template.id);
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());

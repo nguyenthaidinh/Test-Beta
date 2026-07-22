@@ -100,6 +100,9 @@ public class Item {
         }
 
         public String getOptionString() {
+            if (this.optionTemplate == null) {
+                return "";
+            }
             return Util.replace(this.optionTemplate.name, "#", String.valueOf(this.param));
         }
 
@@ -110,13 +113,17 @@ public class Item {
         @Override
         public String toString() {
             final String n = "\"";
+            int optionId = optionTemplate == null ? -1 : optionTemplate.id;
             return "{"
-                    + n + "id" + n + ":" + n + optionTemplate.id + n + ","
+                    + n + "id" + n + ":" + n + optionId + n + ","
                     + n + "param" + n + ":" + n + param + n
                     + "}";
         }
 
         public String getOptionString(int param) {
+            if (this.optionTemplate == null) {
+                return "";
+            }
             String key = this.optionTemplate.name + "#" + param + "#";
             String value = OPTION_STRING.get(key);
             if (value == null) {

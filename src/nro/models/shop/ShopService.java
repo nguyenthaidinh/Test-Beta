@@ -287,6 +287,7 @@ public class ShopService {
         if (itemShop.temp == null) {
             return false;
         }
+        ItemService.gI().normalizeJackyChunCostumeTemplate(itemShop.temp);
         itemShop.isNew = true;
         itemShop.typeSell = COST_GEM;
         itemShop.cost = JACKY_CHUN_COSTUME_GEM_COST;

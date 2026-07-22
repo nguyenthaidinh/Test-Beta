@@ -608,6 +608,7 @@ public class InventoryService {
                     continue;
                 }
                 ItemService.gI().normalizeGokuNgayXuaOptions(item);
+                ItemService.gI().normalizeJackyChunCostumeOptions(item);
                 msg.writer().writeShort(item.template.id);
                 msg.writer().writeInt(item.quantity);
                 msg.writer().writeUTF(item.getInfo());
@@ -651,6 +652,7 @@ public class InventoryService {
                     msg.writer().writeShort(-1);
                 } else {
                     ItemService.gI().normalizeGokuNgayXuaOptions(item);
+                    ItemService.gI().normalizeJackyChunCostumeOptions(item);
                     msg.writer().writeShort(item.template.id);
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
@@ -694,6 +696,7 @@ public class InventoryService {
                 msg.writer().writeShort(it.isNotNullItem() ? it.template.id : -1);
                 if (it.isNotNullItem()) {
                     ItemService.gI().normalizeGokuNgayXuaOptions(it);
+                    ItemService.gI().normalizeJackyChunCostumeOptions(it);
                     msg.writer().writeInt(it.quantity);
                     msg.writer().writeUTF(it.getInfo());
                     msg.writer().writeUTF(it.getContent());

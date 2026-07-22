@@ -79,8 +79,6 @@ public final class Manager {
     public static boolean LOCAL = false;
     public static boolean TEST = false;
     public static boolean DAO_AUTO_UPDATER = false;
-    private static final int JACKY_CHUN_CHUONG_OPTION_ID = 251;
-    private static final String JACKY_CHUN_CHUONG_OPTION_NAME = "Mỗi 1 phút, đòn chưởng đầu tiên x4 sát thương";
     public static MapTemplate[] MAP_TEMPLATES;
     public static final List<nro.models.map.Map> MAPS = new ArrayList<>();
     private final ScheduledExecutorService mapUpdater = Executors.newSingleThreadScheduledExecutor();
@@ -709,6 +707,7 @@ public final class Manager {
 
                         ItemService.gI().normalizeTrainArmorTemplate(itemTemp);
                         ItemService.gI().normalizeGokuNgayXuaTemplate(itemTemp);
+                        ItemService.gI().normalizeJackyChunCostumeTemplate(itemTemp);
                         ITEM_TEMPLATES.add(itemTemp);
                     } while (rs.next());
                     offset += batchSize;
@@ -737,7 +736,6 @@ public final class Manager {
             while (rs.next()) {
                 ensureItemOptionTemplate(rs.getInt("id"), rs.getString("name"));
             }
-            ensureItemOptionTemplate(JACKY_CHUN_CHUONG_OPTION_ID, JACKY_CHUN_CHUONG_OPTION_NAME);
             Logger.success(Logger.PURPLE + "Successfully loaded map item option template (" + ITEM_OPTION_TEMPLATES.size() + ")\n");
 
             //load shop

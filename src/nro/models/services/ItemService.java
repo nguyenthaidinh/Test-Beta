@@ -43,8 +43,9 @@ public class ItemService {
     private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
     private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 50, 77, 96, 103, 106, 108, 117, 204};
     private static final short COSTUME_JACKY_CHUN_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
-    private static final int COSTUME_JACKY_CHUN_CHUONG_INFO_OPTION = 251;
-    private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117, COSTUME_JACKY_CHUN_CHUONG_INFO_OPTION};
+    private static final int COSTUME_JACKY_CHUN_LEGACY_CHUONG_INFO_OPTION = 251;
+    private static final String COSTUME_JACKY_CHUN_DESCRIPTION = "C\u1ea3i trang th\u00e0nh Jacky Chun\nM\u1ed7i 1 ph\u00fat, \u0111\u00f2n ch\u01b0\u1edfng \u0111\u1ea7u ti\u00ean x4 s\u00e1t th\u01b0\u01a1ng";
+    private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117, COSTUME_JACKY_CHUN_LEGACY_CHUONG_INFO_OPTION};
     private static final short ANGEL_DEMON_WINGS_ID = 1722;
     private static final String ANGEL_DEMON_WINGS_DESCRIPTION = "T\u0103ng 20% s\u1ee9c \u0111\u00e1nh, HP, KI v\u00e0 20% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss";
     private static final int[] ANGEL_DEMON_WINGS_CONTROLLED_OPTIONS = {50, 77, 103, 204};
@@ -253,13 +254,21 @@ public class ItemService {
         if (item == null || item.template == null || item.template.id != COSTUME_JACKY_CHUN_ID) {
             return;
         }
+        normalizeJackyChunCostumeTemplate(item.template);
         if (item.itemOptions == null) {
             item.itemOptions = new ArrayList<>();
         }
-        item.itemOptions.removeIf(this::isJackyChunCostumeControlledOption);
+        item.itemOptions.removeIf(io -> io == null || io.optionTemplate == null || isJackyChunCostumeControlledOption(io));
         item.itemOptions.addAll(getJackyChunCostumeOptions());
         item.info = item.getInfo();
         item.content = item.getContent();
+    }
+
+    public void normalizeJackyChunCostumeTemplate(Template.ItemTemplate template) {
+        if (template == null || template.id != COSTUME_JACKY_CHUN_ID) {
+            return;
+        }
+        template.description = COSTUME_JACKY_CHUN_DESCRIPTION;
     }
 
     public void normalizeAngelDemonWingsOptions(Item item) {
@@ -402,7 +411,6 @@ public class ItemService {
         options.add(new ItemOption(103, 50));
         options.add(new ItemOption(5, 30));
         options.add(new ItemOption(117, 20));
-        options.add(new ItemOption(COSTUME_JACKY_CHUN_CHUONG_INFO_OPTION, 0));
         return options;
     }
 
@@ -839,6 +847,9 @@ public class ItemService {
     }
 
     public ItemOptionTemplate getItemOptionTemplate(int id) {
+        if (id < 0 || id >= Manager.ITEM_OPTION_TEMPLATES.size()) {
+            return null;
+        }
         return Manager.ITEM_OPTION_TEMPLATES.get(id);
     }
 
