@@ -1,6 +1,7 @@
 package nro.models.services;
 
 import nro.models.combine.CombineService;
+import nro.models.consts.ConstItem;
 import nro.models.player_system.Template;
 import nro.models.player_system.Template.ItemOptionTemplate;
 import nro.models.item.Item;
@@ -41,6 +42,8 @@ public class ItemService {
     private static final short COSTUME_GOHAN_ID = 1781;
     private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
     private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 50, 77, 96, 103, 106, 108, 117, 204};
+    private static final short COSTUME_JACKY_CHUN_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
+    private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117};
     private static final short ANGEL_DEMON_WINGS_ID = 1722;
     private static final String ANGEL_DEMON_WINGS_DESCRIPTION = "T\u0103ng 20% s\u1ee9c \u0111\u00e1nh, HP, KI v\u00e0 20% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss";
     private static final int[] ANGEL_DEMON_WINGS_CONTROLLED_OPTIONS = {50, 77, 103, 204};
@@ -90,6 +93,7 @@ public class ItemService {
         normalizeGokuNgayXuaOptions(item);
         normalizeSsj4CostumeOptions(item);
         normalizeGohanCostumeOptions(item);
+        normalizeJackyChunCostumeOptions(item);
         normalizeAngelDemonWingsOptions(item);
         normalizeBrolyRedCostumeOptions(item);
         normalizeBrolyCostumeOptions(item);
@@ -112,6 +116,7 @@ public class ItemService {
         normalizeFusionGokuOptions(it);
         normalizeSsj4CostumeOptions(it);
         normalizeGohanCostumeOptions(it);
+        normalizeJackyChunCostumeOptions(it);
         normalizeAngelDemonWingsOptions(it);
         normalizeBrolyRedCostumeOptions(it);
         normalizeBrolyCostumeOptions(it);
@@ -135,6 +140,7 @@ public class ItemService {
         normalizeGokuNgayXuaOptions(item);
         normalizeSsj4CostumeOptions(item);
         normalizeGohanCostumeOptions(item);
+        normalizeJackyChunCostumeOptions(item);
         normalizeAngelDemonWingsOptions(item);
         normalizeBrolyRedCostumeOptions(item);
         normalizeBrolyCostumeOptions(item);
@@ -238,6 +244,19 @@ public class ItemService {
         }
         item.itemOptions.removeIf(this::isGohanCostumeControlledOption);
         item.itemOptions.addAll(getGohanCostumeOptions());
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    public void normalizeJackyChunCostumeOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != COSTUME_JACKY_CHUN_ID) {
+            return;
+        }
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        item.itemOptions.removeIf(this::isJackyChunCostumeControlledOption);
+        item.itemOptions.addAll(getJackyChunCostumeOptions());
         item.info = item.getInfo();
         item.content = item.getContent();
     }
@@ -375,6 +394,16 @@ public class ItemService {
         return options;
     }
 
+    public List<ItemOption> getJackyChunCostumeOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(50, 30));
+        options.add(new ItemOption(77, 50));
+        options.add(new ItemOption(103, 50));
+        options.add(new ItemOption(5, 30));
+        options.add(new ItemOption(117, 20));
+        return options;
+    }
+
     public List<ItemOption> getAngelDemonWingsOptions() {
         List<ItemOption> options = new ArrayList<>();
         options.add(new ItemOption(77, 20));
@@ -457,6 +486,18 @@ public class ItemService {
             return false;
         }
         for (int optionId : COSTUME_GOHAN_CONTROLLED_OPTIONS) {
+            if (io.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isJackyChunCostumeControlledOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return false;
+        }
+        for (int optionId : COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS) {
             if (io.optionTemplate.id == optionId) {
                 return true;
             }

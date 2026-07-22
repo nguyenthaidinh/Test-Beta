@@ -54,7 +54,7 @@ public class ShopService {
     private static final short[] SSJ4_COSTUME_ITEM_IDS = {1553, 1693};
     private static final int SSJ4_COSTUME_GEM_COST = 500_000;
     private static final short JACKY_CHUN_COSTUME_ITEM_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
-    private static final int JACKY_CHUN_COSTUME_GEM_COST = 2_000_000;
+    private static final int JACKY_CHUN_COSTUME_GEM_COST = 3_000_000;
     private static final int JACKY_CHUN_COSTUME_EXPIRE_DAYS = 2;
     private static final int OPTION_EXPIRE_DAYS = 93;
     private static final short[] FEATURED_EVENT_ITEM_IDS = {1780, 1781, 1722, 1784, 1783};
@@ -292,6 +292,7 @@ public class ShopService {
         itemShop.cost = JACKY_CHUN_COSTUME_GEM_COST;
         itemShop.iconSpec = 0;
         itemShop.options.clear();
+        itemShop.options.addAll(ItemService.gI().getJackyChunCostumeOptions());
         itemShop.options.add(new ItemOption(OPTION_EXPIRE_DAYS, JACKY_CHUN_COSTUME_EXPIRE_DAYS));
         return true;
     }
