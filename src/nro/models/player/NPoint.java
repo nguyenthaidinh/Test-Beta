@@ -938,6 +938,9 @@ public class NPoint {
         if (player.itemTime != null && player.itemTime.isUseRX) {
             hpMax += (hpMax * 10L / 100L);
         }
+        if (player.itemTime != null && player.itemTime.isUsePumpkinDragonHpKi) {
+            hpMax += (hpMax * 35L / 100L);
+        }
 
         // Xử lý set nhật ấn
         if (this.isNhatAn) {
@@ -1150,6 +1153,9 @@ public class NPoint {
         // Xử lý rồng xương
         if (player.itemTime != null && player.itemTime.isUseRX) {
             mpMax += (mpMax * 10L / 100L);
+        }
+        if (player.itemTime != null && player.itemTime.isUsePumpkinDragonHpKi) {
+            mpMax += (mpMax * 35L / 100L);
         }
 
         // Xử lý hợp thể
@@ -1381,6 +1387,9 @@ public class NPoint {
         // Xử lý rồng xương
         if (player.itemTime != null && player.itemTime.isUseRX) {
             dame += (dame * 10L / 100L);
+        }
+        if (player.itemTime != null && player.itemTime.isUsePumpkinDragonDame) {
+            dame += (dame * 20L / 100L);
         }
 
         // Xử lý phù

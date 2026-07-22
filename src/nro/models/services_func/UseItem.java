@@ -1,6 +1,8 @@
 package nro.models.services_func;
 
 import nro.models.boss.Boss;
+import nro.models.boss.event.Halloween.HalloweenExchangeService;
+import nro.models.boss.event.Halloween.HalloweenRewards;
 import nro.models.boss.Boss_mini.SoiHecQuyn;
 import nro.models.services.shenron.SummonDragon;
 import nro.models.combine.CombineService;
@@ -676,6 +678,13 @@ public class UseItem {
                                 break;
                             case 1608:
                                 UseItem.gI().QuaThieuNhi(pl, item);
+                                break;
+                            case ConstItem.HOM_HALLOWEEN:
+                                UseItem.gI().openHalloweenBox(pl, item);
+                                break;
+                            case ConstItem.BI_NGO:
+                            case ConstItem.THIEP_HALLOWEEN:
+                                HalloweenExchangeService.openExchangeMenu(pl);
                                 break;
                             case 1822: // rada ngọc rồng
                                 UseItem.gI().RadaNgocRong(pl, item.template.id);
@@ -1527,6 +1536,34 @@ public class UseItem {
         }
     }
 
+    private void openHalloweenBox(Player pl, Item item) {
+        if (InventoryService.gI().getCountEmptyBag(pl) <= 0) {
+            Service.gI().sendThongBao(pl, "Hanh trang da day");
+            return;
+        }
+
+        Item reward = HalloweenRewards.createHalloweenBoxReward();
+        if (reward == null || !reward.isNotNullItem()) {
+            Service.gI().sendThongBao(pl, "Khong the tao phan thuong Halloween");
+            return;
+        }
+        int rewardQuantity = reward.quantity;
+
+        if (!InventoryService.gI().addItemBag(pl, reward)) {
+            Service.gI().sendThongBao(pl, "Hanh trang da day");
+            return;
+        }
+
+        InventoryService.gI().subQuantityItemsBag(pl, item, 1);
+        pl.point_halloween_box++;
+        Service.gI().updatePlayerPointHalloweenBox(pl);
+        Manager.isTopHalloweenBoxChanged = true;
+        InventoryService.gI().sendItemBags(pl);
+        Service.gI().sendThongBao(pl, "Ban nhan duoc " + reward.template.name
+                + (rewardQuantity > 1 ? " x" + rewardQuantity : ""));
+        CombineService.gI().sendEffectOpenItem(pl, item.template.iconID, reward.template.iconID);
+    }
+
     private void useItemTime(Player pl, Item item) {
         switch (item.template.id) {
             case 379: // máy dò capsule
@@ -1728,7 +1765,9 @@ public class UseItem {
                     break;
             }
         } else if (tempId >= Shenron_Service.NGOC_RONG_1_SAO && tempId <= Shenron_Service.NGOC_RONG_7_SAO) {
-            Shenron_Service.gI().openMenuSummonShenron(pl, 0);
+            Shenron_Service.gI().openMenuSummonShenron(pl, Shenron_Service.TYPE_ICE);
+        } else if (tempId >= ConstItem.BI_NGO_1_SAO && tempId <= ConstItem.BI_NGO_7_SAO) {
+            Shenron_Service.gI().openMenuSummonShenron(pl, Shenron_Service.TYPE_PUMPKIN);
         }
     }
 

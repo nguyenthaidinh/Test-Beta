@@ -127,6 +127,14 @@ public class ItemTimeService {
         if (player.itemTime.isUseRX) {
             sendItemTime(player, 8579, player.itemTime.timeRX / 1000);
         }
+        if (player.itemTime.isUsePumpkinDragonDame) {
+            sendItemTime(player, 6581, (int) ((TIME_PUMPKIN_DRAGON_BUFF
+                    - (System.currentTimeMillis() - player.itemTime.lastTimeUsePumpkinDragonDame)) / 1000));
+        }
+        if (player.itemTime.isUsePumpkinDragonHpKi) {
+            sendItemTime(player, 6583, (int) ((TIME_PUMPKIN_DRAGON_BUFF
+                    - (System.currentTimeMillis() - player.itemTime.lastTimeUsePumpkinDragonHpKi)) / 1000));
+        }
     }
 
     public void turnOnTDLT(Player player, Item item) {

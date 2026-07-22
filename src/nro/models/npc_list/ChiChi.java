@@ -1,5 +1,6 @@
 package nro.models.npc_list;
 
+import nro.models.boss.event.Halloween.HalloweenExchangeService;
 import nro.models.clan.ClanMember;
 import nro.models.consts.ConstItem;
 import nro.models.consts.ConstNpc;
@@ -54,6 +55,8 @@ public class ChiChi extends Npc {
                     "Mua 1\nthỏi vàng\n50tr vàng",
                     "Đóng"));
 
+            menu.add(menu.size() - 1, "Top\nHom\nHalloween");
+            menu.add(menu.size() - 1, "Doi qua\nHalloween");
             String[] menus = menu.toArray(new String[0]);
 
             createOtherMenu(player, ConstNpc.BASE_MENU,
@@ -93,6 +96,16 @@ public class ChiChi extends Npc {
                             createOtherMenu(player, MENU_BUY_GOLD_BAR,
                                     "Con có muốn mua 1 thỏi vàng với giá 50 triệu vàng không?",
                                     "Mua", "Từ chối");
+                            break;
+                        case 8:
+                            createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_BOX_TOP,
+                                    "Dua top mo Hom Halloween.\nMoi lan mo thanh cong 1 Hom Halloween se duoc tinh 1 diem.",
+                                    "Top 100\nHom\nHalloween",
+                                    "Xem diem",
+                                    "Dong");
+                            break;
+                        case 9:
+                            HalloweenExchangeService.openExchangeMenu(player, this);
                             break;
                         case 0:
                             createOtherMenu(player, ConstNpc.PHAO_BONG_VIP,
@@ -143,6 +156,15 @@ public class ChiChi extends Npc {
                             Service.gI().sendThongBao(player, "Bạn có " + player.point_sukien2 + " điểm Kem trái cây.");
                             break;
                     }
+                } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_BOX_TOP) {
+                    switch (select) {
+                        case 0:
+                            Service.gI().showListTop(player, Manager.TopHalloweenBox);
+                            break;
+                        case 1:
+                            Service.gI().sendThongBao(player, "Ban da mo " + player.point_halloween_box + " Hom Halloween.");
+                            break;
+                    }
                 } else if (player.idMark.getIndexMenu() == MENU_BUY_TRAIN_ARMOR_5) {
                     if (select == 0) {
                         buyTrainArmor5(player);
@@ -159,6 +181,8 @@ public class ChiChi extends Npc {
                     if (select == 0) {
                         buyGoldBar(player);
                     }
+                } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_EXCHANGE) {
+                    HalloweenExchangeService.handleExchange(player, select);
                 }
             }
         }

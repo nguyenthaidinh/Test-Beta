@@ -104,6 +104,8 @@ public class Player implements Runnable {
     public int point_sukien;
     public int point_sukien1;
     public int point_sukien2;
+    public int point_halloween_box;
+    public long lastTimeWearJackyChunCostume;
     public int thachdauwhis = 0;
     public int DuaHau;
     public int point_vuahung;
@@ -246,6 +248,7 @@ public class Player implements Runnable {
 
     // shenron event
     public long lastTimeShenronAppeared;
+    public long lastTimePumpkinShenronAppeared;
     public boolean isShenronAppear;
     public Shenron_Event shenronEvent;
 
@@ -1105,6 +1108,9 @@ public class Player implements Runnable {
                 return 0;
             }
             if (!Util.canDoWithTime(this.lastTimeRevived, 1500)) {
+                return 0;
+            }
+            if (!this.isBoss && this.effectSkill != null && this.effectSkill.isHalloween) {
                 return 0;
             }
 

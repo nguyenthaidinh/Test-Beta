@@ -1,6 +1,7 @@
 package nro.models.shop;
 
 import nro.models.consts.ConstAchievement;
+import nro.models.consts.ConstItem;
 import nro.models.item.Item;
 import nro.models.player.Inventory;
 import nro.models.player.Player;
@@ -52,6 +53,10 @@ public class ShopService {
     private static final int TRUM_TOP_1_GEM_COST = 1_200_000;
     private static final short[] SSJ4_COSTUME_ITEM_IDS = {1553, 1693};
     private static final int SSJ4_COSTUME_GEM_COST = 500_000;
+    private static final short JACKY_CHUN_COSTUME_ITEM_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
+    private static final int JACKY_CHUN_COSTUME_GEM_COST = 2_000_000;
+    private static final int JACKY_CHUN_COSTUME_EXPIRE_DAYS = 2;
+    private static final int OPTION_EXPIRE_DAYS = 93;
     private static final short[] FEATURED_EVENT_ITEM_IDS = {1780, 1781, 1722, 1784, 1783};
     private static final int[] FEATURED_EVENT_ITEM_GEM_COSTS = {3_000_000, 3_000_000, 1_000_000, 800_000, 600_000};
     private static final long BADGE_GOLD_COST = 16_000_000_000L;
@@ -82,6 +87,7 @@ public class ShopService {
             if (SHOP_CHI_CHI.equals(tagName)) {
                 ensureTrumTop1InChiChiShop(shop);
                 ensureSsj4CostumesInChiChiShop(shop);
+                ensureJackyChunCostumeInChiChiShop(shop);
                 ensureFeaturedEventItemsInChiChiShop(shop);
             }
             for (TabShop tabShop : shop.tabShops) {
@@ -237,6 +243,59 @@ public class ShopService {
         return true;
     }
 
+    private void ensureJackyChunCostumeInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null && !shop.tabShops.isEmpty()) {
+            eventTab = shop.tabShops.get(0);
+        }
+        if (eventTab == null) {
+            return;
+        }
+
+        ItemShop jackyChunShopItem = null;
+        for (ItemShop itemShop : eventTab.itemShops) {
+            if (itemShop.temp != null && itemShop.temp.id == JACKY_CHUN_COSTUME_ITEM_ID) {
+                jackyChunShopItem = itemShop;
+                break;
+            }
+        }
+        boolean isNewShopItem = jackyChunShopItem == null;
+        if (jackyChunShopItem == null) {
+            jackyChunShopItem = new ItemShop();
+            jackyChunShopItem.id = -JACKY_CHUN_COSTUME_ITEM_ID;
+        }
+        if (!configureJackyChunCostumeShopItem(jackyChunShopItem, eventTab)) {
+            return;
+        }
+        if (isNewShopItem) {
+            eventTab.itemShops.add(Math.min(3, eventTab.itemShops.size()), jackyChunShopItem);
+        }
+    }
+
+    private boolean configureJackyChunCostumeShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(JACKY_CHUN_COSTUME_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = JACKY_CHUN_COSTUME_GEM_COST;
+        itemShop.iconSpec = 0;
+        itemShop.options.clear();
+        itemShop.options.add(new ItemOption(OPTION_EXPIRE_DAYS, JACKY_CHUN_COSTUME_EXPIRE_DAYS));
+        return true;
+    }
+
     private void ensureFeaturedEventItemsInChiChiShop(Shop shop) {
         if (shop == null || shop.tabShops == null) {
             return;
@@ -255,7 +314,7 @@ public class ShopService {
             return;
         }
 
-        int insertIndex = 3;
+        int insertIndex = 4;
         for (int i = 0; i < FEATURED_EVENT_ITEM_IDS.length; i++) {
             short itemId = FEATURED_EVENT_ITEM_IDS[i];
             int gemCost = FEATURED_EVENT_ITEM_GEM_COSTS[i];
@@ -908,7 +967,9 @@ public class ShopService {
         }
 
         // Yêu cầu có cải trang Quy Lão Kame
-        if (itemTempId == 711 && !InventoryService.gI().findItemSkinQuyLaoKame(player)) {
+        if (itemTempId == ConstItem.CAI_TRANG_JACKY_CHUN
+                && is.tabShop.id != TAB_CHI_CHI_EVENT_ID
+                && !InventoryService.gI().findItemSkinQuyLaoKame(player)) {
             Service.gI().sendThongBao(player, "Bạn phải có cải trang thành Quy Lão Kame mới có thể đổi.");
             return;
         }

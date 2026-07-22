@@ -6,7 +6,9 @@ import nro.models.boss.Broly.SuperBroly;
 import nro.models.boss.sieu_hang.Rival;
 import nro.models.boss.yardrat.Yardart;
 import nro.models.consts.ConstAchievement;
+import nro.models.consts.ConstItem;
 import nro.models.intrinsic.Intrinsic;
+import nro.models.item.Item;
 import nro.models.mob.Mob;
 import nro.models.mob.MobMe;
 import nro.models.mob_bigboss.GauTuongCuop;
@@ -22,7 +24,9 @@ import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import nro.models.boss.Boss;
 import nro.models.boss.BossID;
 import nro.models.npc.NonInteractiveNPC;
@@ -35,6 +39,12 @@ import nro.models.skill.Skill;
  *
  */
 public class SkillService {
+
+    private static final int JACKY_CHUN_CHUONG_DELAY = 60_000;
+    private static final int JACKY_CHUN_CHUONG_MULTIPLIER = 4;
+    private static final long HIGH_DAMAGE_ANNOUNCE_THRESHOLD = 300_000_000L;
+    private static final long HIGH_DAMAGE_ANNOUNCE_COOLDOWN = 5_000L;
+    private final Map<Long, Long> lastHighDamageAnnouncements = new ConcurrentHashMap<>();
 
     private static SkillService instance;
 
@@ -475,7 +485,9 @@ public class SkillService {
                         }
                     }
                     for (Mob mob : mobs) {
+                        long hpBefore = mob.point.gethp();
                         mob.injured(player, player.nPoint.getDameAttack(true), true);
+                        announceHighDamage(player, Math.max(0, hpBefore - mob.point.gethp()));
                     }
                     PlayerService.gI().sendInfoHpMpMoney(player);
                     affterUseSkill(player, player.playerSkill.skillSelect.template.id);
@@ -772,7 +784,9 @@ public class SkillService {
         if (!player.isBoss && player.zone.mobs != null) {
             for (Mob mob : new ArrayList<>(player.zone.mobs)) {
                 if (mob != null && !mob.isDie() && Util.getDistance(player, mob) <= rangeBom) {
+                    long hpBefore = mob.point.gethp();
                     mob.injured(player, dame, true);
+                    announceHighDamage(player, Math.max(0, hpBefore - mob.point.gethp()));
                 }
             }
         }
@@ -787,7 +801,9 @@ public class SkillService {
                         damePlayer = applyDameBoss(player, pl, damePlayer);
                         damePlayer = player.effectSkill.isMonkey ? damePlayer / 3 : damePlayer / 2;
                     }
+                    long hpBefore = pl.nPoint.hp;
                     pl.injured(player, limitDame(damePlayer), MapService.gI().isMapYardart(player.zone.map.mapId), false);
+                    announceHighDamage(player, Math.max(0, hpBefore - pl.nPoint.hp));
                     PlayerService.gI().sendInfoHpMpMoney(pl);
                     Service.gI().Send_Info_NV(pl);
                 }
@@ -926,8 +942,99 @@ public class SkillService {
         return dame;
     }
 
+    private long applyJackyChunChuongDame(Player plAtt, long dame) {
+        if (!isJackyChunChuongReady(plAtt)) {
+            return dame;
+        }
+        if (dame > Long.MAX_VALUE / JACKY_CHUN_CHUONG_MULTIPLIER) {
+            return Long.MAX_VALUE;
+        }
+        return dame * JACKY_CHUN_CHUONG_MULTIPLIER;
+    }
+
+    private boolean isJackyChunChuongReady(Player plAtt) {
+        if (plAtt == null || plAtt.inventory == null || plAtt.inventory.itemsBody == null
+                || plAtt.playerSkill == null || plAtt.playerSkill.skillSelect == null
+                || plAtt.playerSkill.skillSelect.template == null || !isJackyChunChuongSkill(plAtt)) {
+            return false;
+        }
+        if (plAtt.inventory.itemsBody.size() <= 5) {
+            plAtt.lastTimeWearJackyChunCostume = 0;
+            return false;
+        }
+        Item costume = plAtt.inventory.itemsBody.get(5);
+        if (costume == null || !costume.isNotNullItem() || costume.template.id != ConstItem.CAI_TRANG_JACKY_CHUN) {
+            plAtt.lastTimeWearJackyChunCostume = 0;
+            return false;
+        }
+        if (plAtt.lastTimeWearJackyChunCostume <= 0) {
+            plAtt.lastTimeWearJackyChunCostume = System.currentTimeMillis();
+            return false;
+        }
+        return Util.canDoWithTime(plAtt.lastTimeWearJackyChunCostume, JACKY_CHUN_CHUONG_DELAY);
+    }
+
+    private boolean isJackyChunChuongSkill(Player plAtt) {
+        int skillId = plAtt.playerSkill.skillSelect.template.id;
+        return skillId == Skill.KAMEJOKO || skillId == Skill.MASENKO || skillId == Skill.ANTOMIC
+                || skillId == Skill.SUPER_KAME || skillId == Skill.LIEN_HOAN_CHUONG;
+    }
+
     private long limitDame(long dame) {
         return Math.min(dame, NPoint.MAX_PLAYER_DAME);
+    }
+
+    private void announceHighDamage(Player plAtt, long damage) {
+        if (damage <= HIGH_DAMAGE_ANNOUNCE_THRESHOLD) {
+            return;
+        }
+        Player announcer = getHighDamageAnnouncer(plAtt);
+        if (announcer == null) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        Long lastAnnounce = lastHighDamageAnnouncements.get(announcer.id);
+        if (lastAnnounce != null && now - lastAnnounce < HIGH_DAMAGE_ANNOUNCE_COOLDOWN) {
+            return;
+        }
+        lastHighDamageAnnouncements.put(announcer.id, now);
+        Service.gI().sendThongBaoAllPlayer("Người chơi " + getHighDamageAttackerName(plAtt, announcer)
+                + " vừa tung ra chiêu " + getSelectedSkillName(plAtt)
+                + " với sát thương " + Util.formatNumber(damage));
+    }
+
+    private Player getHighDamageAnnouncer(Player plAtt) {
+        if (plAtt == null || plAtt.isBoss || plAtt.isBot || plAtt.isNewPet || plAtt.isNewPet1) {
+            return null;
+        }
+        if (plAtt.isPl()) {
+            return plAtt;
+        }
+        if (plAtt.isPet && plAtt instanceof Pet) {
+            Player master = ((Pet) plAtt).master;
+            if (master != null && master.isPl()) {
+                return master;
+            }
+        }
+        return null;
+    }
+
+    private String getHighDamageAttackerName(Player plAtt, Player announcer) {
+        if (plAtt != null && plAtt.isPet && plAtt.name != null && !plAtt.name.equals(announcer.name)) {
+            return announcer.name + " (" + plAtt.name + ")";
+        }
+        return announcer.name;
+    }
+
+    private String getSelectedSkillName(Player plAtt) {
+        if (plAtt == null || plAtt.playerSkill == null || plAtt.playerSkill.skillSelect == null) {
+            return "khong ro";
+        }
+        Skill skill = plAtt.playerSkill.skillSelect;
+        if (skill.template != null && skill.template.name != null && !skill.template.name.isEmpty()) {
+            return skill.template.name;
+        }
+        return "Skill " + skill.skillId;
     }
 
     private void hutHPMP(Player player, long dame, Player pl, Mob mob) {
@@ -961,6 +1068,7 @@ public class SkillService {
                 dameAttack /= 3;
             }
         }
+        dameAttack = applyJackyChunChuongDame(plAtt, dameAttack);
         dameAttack = limitDame(dameAttack);
         long hpBefore = plInjure.nPoint.hp;
         plInjure.injured(plAtt, miss ? 0 : dameAttack, false, false);
@@ -969,6 +1077,7 @@ public class SkillService {
         if (plAtt.playerSkill == null) {
             return;
         }
+        announceHighDamage(plAtt, dameHit);
         Skill skillSelect = plAtt.playerSkill.skillSelect;
         long damePST = plInjure.effectSkill != null && plInjure.effectSkill.isShielding && plInjure.idMark != null
                 ? plInjure.idMark.getDamePST() : dameHit;
@@ -1055,7 +1164,9 @@ public class SkillService {
 
         hutHPMP(plAtt, dameHit, null, mob);
         sendPlayerAttackMob(plAtt, mob);
+        long hpBefore = mob.point.gethp();
         mob.injured(plAtt, dameHit, dieWhenHpFull);
+        announceHighDamage(plAtt, Math.max(0, hpBefore - mob.point.gethp()));
     }
 
     public void sendPlayerPrepareSkill(Player player, int affterMiliseconds) {

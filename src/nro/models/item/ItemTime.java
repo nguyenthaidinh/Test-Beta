@@ -25,6 +25,7 @@ public class ItemTime {
     public static final int TIME_NUOC_MIA1 = 600_000;
     public static final int TIME_NUOC_MIA2 = 600_000;
     public static final int TIME_NUOC_MIA3 = 600_000;
+    public static final int TIME_PUMPKIN_DRAGON_BUFF = 3_600_000; // 60 phut
 
     public static final int TIME_BANH_TT_1 = 3_600_000;   // 60 phút
     public static final int TIME_BANH_TT_2 = 5_400_000;   // 90 phút
@@ -91,6 +92,11 @@ public class ItemTime {
     public boolean isUseRX;
     public long lastTimeUseRX;
     public int timeRX;
+
+    public boolean isUsePumpkinDragonDame;
+    public long lastTimeUsePumpkinDragonDame;
+    public boolean isUsePumpkinDragonHpKi;
+    public long lastTimeUsePumpkinDragonHpKi;
 
     public boolean isUseCMS;
     public long lastTimeUseCMS;
@@ -285,6 +291,18 @@ public class ItemTime {
             }
         }
         // Bánh Trung Thu
+        if (isUsePumpkinDragonDame) {
+            if (Util.canDoWithTime(lastTimeUsePumpkinDragonDame, TIME_PUMPKIN_DRAGON_BUFF)) {
+                isUsePumpkinDragonDame = false;
+                Service.gI().point(player);
+            }
+        }
+        if (isUsePumpkinDragonHpKi) {
+            if (Util.canDoWithTime(lastTimeUsePumpkinDragonHpKi, TIME_PUMPKIN_DRAGON_BUFF)) {
+                isUsePumpkinDragonHpKi = false;
+                Service.gI().point(player);
+            }
+        }
         if (isUseBanhTT1) {
             if (Util.canDoWithTime(lastTimeBanhTT1, TIME_BANH_TT_1)) {
                 isUseBanhTT1 = false;

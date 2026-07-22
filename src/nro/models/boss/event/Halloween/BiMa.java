@@ -36,22 +36,19 @@ public class BiMa extends Boss {
                 this.chat("Xí hụt");
                 return 0;
             }
-            damage = this.nPoint.subDameInjureWithDeff(damage / 7);
+            damage = this.nPoint.subDameInjureWithDeff(damage);
             if (!piercing && effectSkill.isShielding) {
                 if (damage > nPoint.hpMax) {
                     EffectSkillService.gI().breakShield(this);
                 }
                 damage = damage / 1;
             }
-            if (damage > this.nPoint.hpMax / 50) {
-                damage = this.nPoint.hpMax / 50;
-            }
             this.nPoint.subHP(damage);
             if (isDie()) {
                 this.setDie(plAtt);
                 die(plAtt);
             }
-            return (int) damage;
+            return damage > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) damage;
         } else {
             return 0;
         }

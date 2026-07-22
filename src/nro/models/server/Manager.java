@@ -112,12 +112,14 @@ public final class Manager {
     public static List<TOP> Topsukien;
     public static List<TOP> Topsukien1;
     public static List<TOP> Topsukien2 = new ArrayList<>();
+    public static List<TOP> TopHalloweenBox = new ArrayList<>();
     public static List<TOP> Topwhis;
     public static List<TOP> Topmaydam;
     public static List<TOP> TopLuckyRound = new ArrayList<>();
     public static final String queryTopmaydam = "SELECT id, point_maydam, total_damage_maydam FROM player ORDER BY point_maydam DESC LIMIT 100";
     public static final String queryTopsukien1 = "SELECT id, point_sukien1 FROM player ORDER BY point_sukien1 DESC LIMIT 100";
     public static final String queryTopsukien2 = "SELECT id, point_sukien2 FROM player ORDER BY point_sukien2 DESC LIMIT 100";
+    public static final String queryTopHalloweenBox = "SELECT id, point_halloween_box FROM player WHERE point_halloween_box > 0 ORDER BY point_halloween_box DESC, id ASC LIMIT 100";
     public static final String queryTopwhis = "SELECT id, thachdauwhis FROM player ORDER BY thachdauwhis DESC LIMIT 100";
     public static final String queryTopsukien = "SELECT id, point_sukien FROM player ORDER BY point_sukien DESC LIMIT 100";
     public static final String queryTopLuckyRound = "SELECT l.player_id AS id, l.point AS lucky_round_point FROM lucky_round_top l INNER JOIN player p ON p.id = l.player_id WHERE l.point > 0 ORDER BY l.point DESC, l.player_id ASC LIMIT 100";
@@ -127,6 +129,7 @@ public final class Manager {
     public static boolean isTopSukienChanged = false;
     public static boolean isTopSukien1Changed = false;
     public static boolean isTopSukien2Changed = false;
+    public static boolean isTopHalloweenBoxChanged = false;
     public static boolean isTopWhisChanged = false;
     public static boolean isTopLuckyRoundChanged = false;
 
@@ -138,7 +141,7 @@ public final class Manager {
     }
 
     public static boolean hasNewTopScores() {
-        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopWhisChanged || isTopLuckyRoundChanged;
+        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopHalloweenBoxChanged || isTopWhisChanged || isTopLuckyRoundChanged;
     }
 
     public static void resetTopFlags() {
@@ -146,6 +149,7 @@ public final class Manager {
         isTopSukienChanged = false;
         isTopSukien1Changed = false;
         isTopSukien2Changed = false;
+        isTopHalloweenBoxChanged = false;
         isTopWhisChanged = false;
         isTopLuckyRoundChanged = false;
     }
@@ -1011,6 +1015,9 @@ public final class Manager {
             Topsukien = realTop(queryTopsukien, ConnectionDatabase);
             Logger.success(Logger.PURPLE + "Successfully Top Su Kien (" + Topsukien.size() + ")\n");
             Topsukien1 = realTop(queryTopsukien1, ConnectionDatabase);
+            Topsukien2 = realTop(queryTopsukien2, ConnectionDatabase);
+            TopHalloweenBox = realTop(queryTopHalloweenBox, ConnectionDatabase);
+            Logger.success(Logger.PURPLE + "Successfully Top Halloween Box (" + TopHalloweenBox.size() + ")\n");
             Topwhis = realTop(queryTopwhis, ConnectionDatabase);
             Logger.success(Logger.RED + "Successfully top Thach Dau Whis (" + Topwhis.size() + ")\n");
             Topmaydam = realTop(queryTopmaydam, ConnectionDatabase);
@@ -1060,6 +1067,11 @@ public final class Manager {
                     int point2 = rs.getInt("point_sukien2");
                     top.setInfo1(point2 + " điểm");
                     top.setInfo2(point2 + " điểm");
+
+                } else if (query.equals(Manager.queryTopHalloweenBox)) {
+                    int point = rs.getInt("point_halloween_box");
+                    top.setInfo1(point + " lan mo");
+                    top.setInfo2(point + " lan mo Hom Halloween");
 
                 } else if (query.equals(Manager.queryTopwhis)) {
                     int whis = rs.getInt("thachdauwhis");

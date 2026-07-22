@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import nro.models.radar.OptionCard;
 import nro.models.radar.Card;
 import nro.models.data.LocalManager;
+import nro.models.consts.ConstItem;
 import nro.models.consts.ConstPlayer;
 import nro.models.data.DataGame;
 import nro.models.clan.Clan;
@@ -56,6 +57,8 @@ import nro.models.npc.DuaHauEgg;
 import nro.models.player.KOLProgressData;
 
 public class MrBlue {
+
+    private static final int COSTUME_BODY_INDEX = 5;
 
     public static Player login(MySession session, AntiLogin al) {
         Player player = null;
@@ -119,6 +122,11 @@ public class MrBlue {
                                 player.point_sukien = rs.getInt("point_sukien");
                                 player.point_sukien1 = rs.getInt("point_sukien1");
                                 player.point_sukien2 = rs.getInt("point_sukien2");
+                                try {
+                                    player.point_halloween_box = rs.getInt("point_halloween_box");
+                                } catch (Exception ignored) {
+                                    player.point_halloween_box = 0;
+                                }
                                 player.thachdauwhis = rs.getInt("thachdauwhis");
                                 player.point_maydam = rs.getInt("point_maydam");
                                 player.total_damage_maydam = rs.getLong("total_damage_maydam");
@@ -366,6 +374,7 @@ public class MrBlue {
             if (player.inventory.itemsBody.size() == 10) {
                 player.inventory.itemsBody.add(ItemService.gI().createItemNull());
             }
+            initJackyChunCostumeWearTime(player);
             dataArray.clear();
 
             //data bag
@@ -533,7 +542,7 @@ public class MrBlue {
             int timeUseTDLT = 0;
             int timeOpenPower = 0;
             int timeMayDo = 0;
-            long timeCoBonLa= 0;
+            long timeCoBonLa = 0;
             int timeKhoBauX2 = 0;
             int timeBuaSanta = 0;
             int timeMeal = 0;
@@ -549,6 +558,8 @@ public class MrBlue {
             long timeNuocMia1 = 0;
             long timeNuocMia2 = 0;
             long timeNuocMia3 = 0;
+            long timePumpkinDragonDame = 0;
+            long timePumpkinDragonHpKi = 0;
             int timeBoHuyet = Integer.parseInt(String.valueOf(dataArray.get(0)));
             int timeBoHuyet2 = Integer.parseInt(String.valueOf(dataArray.get(1)));
             int timeBoKhi = Integer.parseInt(String.valueOf(dataArray.get(2)));
@@ -566,58 +577,63 @@ public class MrBlue {
                 timeMayDo = Integer.parseInt(String.valueOf(dataArray.get(11)));
             }
             if (dataArray.size() > 12) {
-                timeKhoBauX2 = Integer.parseInt(String.valueOf(dataArray.get(12)));
+                timeCoBonLa = Long.parseLong(String.valueOf(dataArray.get(12)));
             }
             if (dataArray.size() > 13) {
+                timeKhoBauX2 = Integer.parseInt(String.valueOf(dataArray.get(13)));
             }
             if (dataArray.size() > 14) {
-                timeMeal = Integer.parseInt(String.valueOf(dataArray.get(14)));
+                timeBuaSanta = Integer.parseInt(String.valueOf(dataArray.get(14)));
             }
             if (dataArray.size() > 15) {
-                iconMeal = Integer.parseInt(String.valueOf(dataArray.get(15)));
+                timeMeal = Integer.parseInt(String.valueOf(dataArray.get(15)));
             }
             if (dataArray.size() > 16) {
-                timeUseTDLT = Integer.parseInt(String.valueOf(dataArray.get(16)));
+                iconMeal = Integer.parseInt(String.valueOf(dataArray.get(16)));
             }
             if (dataArray.size() > 17) {
-                timeUseCMS = Integer.parseInt(String.valueOf(dataArray.get(17)));
+                timeUseTDLT = Integer.parseInt(String.valueOf(dataArray.get(17)));
             }
             if (dataArray.size() > 18) {
-                timeUseGTPT = Integer.parseInt(String.valueOf(dataArray.get(18)));
+                timeUseCMS = Integer.parseInt(String.valueOf(dataArray.get(18)));
             }
             if (dataArray.size() > 19) {
-                timeUseDK = Integer.parseInt(String.valueOf(dataArray.get(19)));
+                timeUseGTPT = Integer.parseInt(String.valueOf(dataArray.get(19)));
             }
             if (dataArray.size() > 20) {
-                timeUseRX = Integer.parseInt(String.valueOf(dataArray.get(20)));
+                timeUseDK = Integer.parseInt(String.valueOf(dataArray.get(20)));
             }
             if (dataArray.size() > 21) {
-                timeMeal2 = Integer.parseInt(String.valueOf(dataArray.get(21)));
+                timeUseRX = Integer.parseInt(String.valueOf(dataArray.get(21)));
             }
             if (dataArray.size() > 22) {
-                iconMeal2 = Integer.parseInt(String.valueOf(dataArray.get(22)));
+                timeMeal2 = Integer.parseInt(String.valueOf(dataArray.get(22)));
             }
             if (dataArray.size() > 23) {
+                iconMeal2 = Integer.parseInt(String.valueOf(dataArray.get(23)));
             }
             if (dataArray.size() > 24) {
-                timeUseNCD = Integer.parseInt(String.valueOf(dataArray.get(24)));
             }
             if (dataArray.size() > 25) {
-                timeBuaSanta = Integer.parseInt(String.valueOf(dataArray.get(25)));
+                timeUseNCD = Integer.parseInt(String.valueOf(dataArray.get(25)));
             }
             if (dataArray.size() > 26) {
-                timeKilis = (int) Long.parseLong(String.valueOf(dataArray.get(26)));
+                timeNuocMia1 = (int) Long.parseLong(String.valueOf(dataArray.get(26)));
             }
             if (dataArray.size() > 27) {
-                timeNuocMia1 = (int) Long.parseLong(String.valueOf(dataArray.get(27)));
+                timeNuocMia2 = (int) Long.parseLong(String.valueOf(dataArray.get(27)));
             }
             if (dataArray.size() > 28) {
-                timeNuocMia2 = (int) Long.parseLong(String.valueOf(dataArray.get(28)));
-            }
-            if (dataArray.size() > 29) {
                 timeNuocMia3 = (int) Long.parseLong(String.valueOf(dataArray.get(28)));
             }
+            if (dataArray.size() > 29) {
+                timeKilis = (int) Long.parseLong(String.valueOf(dataArray.get(29)));
+            }
             if (dataArray.size() > 30) {
+                timePumpkinDragonDame = Long.parseLong(String.valueOf(dataArray.get(30)));
+            }
+            if (dataArray.size() > 31) {
+                timePumpkinDragonHpKi = Long.parseLong(String.valueOf(dataArray.get(31)));
             }
 
             player.itemTime.lastTimeBoHuyet = System.currentTimeMillis() - (ItemTime.TIME_ITEM - timeBoHuyet);
@@ -645,6 +661,10 @@ public class MrBlue {
             player.itemTime.lastTimeUseRX = System.currentTimeMillis();
             player.itemTime.lastTimeEatMeal2 = System.currentTimeMillis() - (ItemTime.TIME_EAT_MEAL - timeMeal2);
             player.itemTime.lastTimeUseNCD = System.currentTimeMillis() - (ItemTime.TIME_NCD - timeUseNCD);
+            player.itemTime.lastTimeUsePumpkinDragonDame = System.currentTimeMillis()
+                    - (ItemTime.TIME_PUMPKIN_DRAGON_BUFF - timePumpkinDragonDame);
+            player.itemTime.lastTimeUsePumpkinDragonHpKi = System.currentTimeMillis()
+                    - (ItemTime.TIME_PUMPKIN_DRAGON_BUFF - timePumpkinDragonHpKi);
 
             player.itemTime.iconMeal = iconMeal;
             player.itemTime.isEatMeal = timeMeal != 0;
@@ -660,6 +680,7 @@ public class MrBlue {
             player.itemTime.isUseAnDanh2 = timeAnDanh2 != 0;
             player.itemTime.isOpenPower = timeOpenPower != 0;
             player.itemTime.isUseMayDo = timeMayDo != 0;
+            player.itemTime.isUseCoBonLa = timeCoBonLa != 0;
             player.itemTime.isUseKhoBauX2 = timeKhoBauX2 != 0;
             player.itemTime.isUseBuaSanta = timeBuaSanta != 0;
             player.itemTime.isUseTDLT = timeUseTDLT != 0;
@@ -674,6 +695,8 @@ public class MrBlue {
             player.itemTime.isUseNuocMia1 = timeNuocMia1 != 0;
             player.itemTime.isUseNuocMia2 = timeNuocMia2 != 0;
             player.itemTime.isUseNuocMia3 = timeNuocMia3 != 0;
+            player.itemTime.isUsePumpkinDragonDame = timePumpkinDragonDame != 0;
+            player.itemTime.isUsePumpkinDragonHpKi = timePumpkinDragonHpKi != 0;
             dataArray.clear();
 
             //data nhiệm vụ
@@ -858,6 +881,7 @@ public class MrBlue {
                 while (pet.inventory.itemsBody.size() < requiredSize) {
                     pet.inventory.itemsBody.add(ItemService.gI().createItemNull());
                 }
+                initJackyChunCostumeWearTime(pet);
                 // data skills
                 dataArray = (JSONArray) JSONValue.parse(String.valueOf(petData.get(3)));
                 for (int i = 0; i < dataArray.size(); i++) {
@@ -1326,6 +1350,17 @@ public class MrBlue {
         ItemService.gI().normalizeAngelDemonWingsOptions(item);
         ItemService.gI().normalizeBrolyRedCostumeOptions(item);
         ItemService.gI().normalizeBrolyCostumeOptions(item);
+    }
+
+    private static void initJackyChunCostumeWearTime(Player player) {
+        if (player == null || player.inventory == null || player.inventory.itemsBody == null
+                || player.inventory.itemsBody.size() <= COSTUME_BODY_INDEX) {
+            return;
+        }
+        Item costume = player.inventory.itemsBody.get(COSTUME_BODY_INDEX);
+        if (costume != null && costume.isNotNullItem() && costume.template.id == ConstItem.CAI_TRANG_JACKY_CHUN) {
+            player.lastTimeWearJackyChunCostume = System.currentTimeMillis();
+        }
     }
 
     public static List<OptionCard> loadOptionCard(JSONArray json) {

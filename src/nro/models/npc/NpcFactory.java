@@ -1,5 +1,6 @@
 package nro.models.npc;
 
+import nro.models.boss.event.Halloween.HalloweenExchangeService;
 import nro.models.npc_list.Whis;
 import nro.models.utils.TimeUtil;
 import nro.models.npc_list.LinhCanh;
@@ -536,6 +537,8 @@ public class NpcFactory {
                     }
                     case ConstNpc.MENU_ADMIN_BOSS_ACTION ->
                         BossManager.gI().handleBossAction(player, select);
+                    case ConstNpc.MENU_HALLOWEEN_EXCHANGE ->
+                        HalloweenExchangeService.handleExchange(player, select);
                     case ConstNpc.CONFIRM_DISSOLUTION_CLAN -> {
                         switch (select) {
                             case 0 -> {

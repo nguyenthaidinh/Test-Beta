@@ -1,9 +1,11 @@
 package nro.models.services.shenron;
 
+import nro.models.boss.event.Halloween.HalloweenRewards;
 import nro.models.network.Message;
 import nro.models.consts.ConstNpc;
 import nro.models.consts.ConstPlayer;
 import nro.models.item.Item;
+import nro.models.item.ItemTime;
 import nro.models.player.Player;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,6 +57,16 @@ public class Shenron_Event {
     public static final String[] SHENRON_WISHES
             = new String[]{"Điều ước 1", "Điều ước 2", "Điều ước 3", "Điều ước 4"};
 
+    public static final String PUMPKIN_SHENRON_SAY
+            = "Rong Bi Ngo se ban cho nguoi 1 dieu uoc, hay chon di:"
+            + "\n1) Doi skill 3, 4 de tu."
+            + "\n2) Tang 20% suc danh trong 60 phut."
+            + "\n3) Tang 35% HP, KI trong 60 phut."
+            + "\n4) Nhan 1 cai trang Halloween.";
+
+    public static final String[] PUMPKIN_SHENRON_WISHES
+            = new String[]{"Doi skill\n3-4 de tu", "Tang 20%\nsuc danh", "Tang 35%\nHP KI", "Cai trang\nHalloween"};
+
     public boolean shenronLeave;
 
     public void update() {
@@ -91,10 +103,31 @@ public class Shenron_Event {
     }
 
     public void sendBlackGokuhesShenron() {
-        NpcService.gI().createMenuRongThieng(player, ConstNpc.SHOW_SHENRON_EVENT_CONFIRM, SHENRONEVENT_SAY, SHENRON_WISHES);
+        NpcService.gI().createMenuRongThieng(player, ConstNpc.SHOW_SHENRON_EVENT_CONFIRM,
+                getShenronSay(), getShenronWishes());
+    }
+
+    private String getShenronSay() {
+        return player.idMark.getShenronType() == Shenron_Service.TYPE_PUMPKIN
+                ? PUMPKIN_SHENRON_SAY : SHENRONEVENT_SAY;
+    }
+
+    private String[] getShenronWishes() {
+        return player.idMark.getShenronType() == Shenron_Service.TYPE_PUMPKIN
+                ? PUMPKIN_SHENRON_WISHES : SHENRON_WISHES;
     }
 
     public void showConfirmShenron(byte select) {
+        if (player.idMark.getShenronType() == Shenron_Service.TYPE_PUMPKIN) {
+            if (select < 0 || select >= PUMPKIN_SHENRON_WISHES.length) {
+                sendBlackGokuhesShenron();
+                return;
+            }
+            this.select = select;
+            NpcService.gI().createMenuRongThieng(player, ConstNpc.SHENRON_EVENT_CONFIRM,
+                    "Nguoi co chac muon uoc?", PUMPKIN_SHENRON_WISHES[select], "Tu choi");
+            return;
+        }
         this.select = select;
         String wish = null;
         switch (player.idMark.getShenronType()) {
@@ -132,6 +165,29 @@ public class Shenron_Event {
 
     public void confirmWish() {
         switch (player.idMark.getShenronType()) {
+            case Shenron_Service.TYPE_PUMPKIN:
+                switch (this.select) {
+                    case 0:
+                        if (!changePetSkill34()) {
+                            return;
+                        }
+                        break;
+                    case 1:
+                        activatePumpkinDragonDameBuff();
+                        break;
+                    case 2:
+                        activatePumpkinDragonHpKiBuff();
+                        break;
+                    case 3:
+                        if (!givePumpkinDragonCostume()) {
+                            return;
+                        }
+                        break;
+                    default:
+                        sendBlackGokuhesShenron();
+                        return;
+                }
+                break;
             case 0:
                 switch (this.select) {
                      case 0: //thay chiêu 3-4 đệ tử
@@ -255,6 +311,72 @@ public class Shenron_Event {
         shenronLeave();
     }
 
+    private boolean changePetSkill34() {
+        if (player.pet != null) {
+            if (player.pet.playerSkill.skills.get(2).skillId != -1) {
+                player.pet.openSkill3();
+                if (player.pet.playerSkill.skills.get(3).skillId != -1) {
+                    player.pet.openSkill4();
+                }
+                return true;
+            }
+            Service.gI().sendThongBao(player, "It nhat de tu nguoi phai co chieu 3 chu!");
+            sendBlackGokuhesShenron();
+            return false;
+        }
+        Service.gI().sendThongBao(player, "Nguoi lam gi co de tu?");
+        sendBlackGokuhesShenron();
+        return false;
+    }
+
+    private void activatePumpkinDragonDameBuff() {
+        player.itemTime.isUsePumpkinDragonDame = true;
+        player.itemTime.lastTimeUsePumpkinDragonDame = System.currentTimeMillis();
+        ItemTimeService.gI().sendItemTime(player, 6581, ItemTime.TIME_PUMPKIN_DRAGON_BUFF / 1000);
+        refreshPointAfterPumpkinWish(false);
+        Service.gI().sendThongBao(player, "Suc danh tang 20% trong 60 phut.");
+    }
+
+    private void activatePumpkinDragonHpKiBuff() {
+        player.itemTime.isUsePumpkinDragonHpKi = true;
+        player.itemTime.lastTimeUsePumpkinDragonHpKi = System.currentTimeMillis();
+        ItemTimeService.gI().sendItemTime(player, 6583, ItemTime.TIME_PUMPKIN_DRAGON_BUFF / 1000);
+        refreshPointAfterPumpkinWish(true);
+        Service.gI().sendThongBao(player, "HP va KI tang 35% trong 60 phut.");
+    }
+
+    private void refreshPointAfterPumpkinWish(boolean healFull) {
+        player.nPoint.calPoint();
+        if (healFull) {
+            player.nPoint.setHp(player.nPoint.hpMax);
+            player.nPoint.setMp((int) player.nPoint.mpMax);
+        }
+        Service.gI().point(player);
+        Service.gI().Send_Info_NV(player);
+    }
+
+    private boolean givePumpkinDragonCostume() {
+        if (InventoryService.gI().getCountEmptyBag(player) <= 0) {
+            Service.gI().sendThongBao(player, "Hanh trang da day");
+            reSummonShenron();
+            return false;
+        }
+        Item costume = HalloweenRewards.createHalloweenCostumeReward(30);
+        if (costume == null || !costume.isNotNullItem()) {
+            Service.gI().sendThongBao(player, "Khong the tao cai trang Halloween");
+            reSummonShenron();
+            return false;
+        }
+        if (!InventoryService.gI().addItemBag(player, costume)) {
+            Service.gI().sendThongBao(player, "Hanh trang da day");
+            reSummonShenron();
+            return false;
+        }
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendThongBao(player, "Ban nhan duoc " + costume.template.name);
+        return true;
+    }
+
     public void shenronLeave() {
         if (!shenronLeave) {
             shenronLeave = true;
@@ -268,8 +390,19 @@ public class Shenron_Event {
                 select = -1;
             }
             zone.shenronType = -1;
-            player.lastTimeShenronAppeared = System.currentTimeMillis();
+            updateLastTimeShenronAppeared();
             Shenron_Manager.gI().remove(this);
+        }
+    }
+
+    private void updateLastTimeShenronAppeared() {
+        if (player == null) {
+            return;
+        }
+        if (shenronType == Shenron_Service.TYPE_PUMPKIN) {
+            player.lastTimePumpkinShenronAppeared = System.currentTimeMillis();
+        } else {
+            player.lastTimeShenronAppeared = System.currentTimeMillis();
         }
     }
 }

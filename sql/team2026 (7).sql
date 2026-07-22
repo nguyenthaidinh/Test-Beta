@@ -5659,13 +5659,13 @@ INSERT INTO `item_template` (`id`, `TYPE`, `gender`, `NAME`, `description`, `lev
 (699, 27, 3, 'HP +400K', ' ', 1, 2755, -1, 1, 0, 0, 0, -1, -1, -1),
 (700, 27, 3, 'Sức đánh +20K', ' ', 1, 2754, -1, 1, 0, 0, 0, -1, -1, -1),
 (701, 27, 3, 'KI +400K', ' ', 1, 2756, -1, 1, 0, 0, 0, -1, -1, -1),
-(702, 12, 3, 'Bí ngô 1 sao', 'Thu thập để ước Rồng Xương', 0, 6579, -1, 1, 0, 0, 0, -1, -1, -1),
-(703, 12, 3, 'Bí ngô 2 sao', 'Thu thập để ước Rồng Xương', 0, 6580, -1, 1, 0, 0, 0, -1, -1, -1),
-(704, 12, 3, 'Bí ngô 3 sao', 'Thu thập để ước Rồng Xương', 0, 6581, -1, 1, 0, 0, 0, -1, -1, -1),
-(705, 12, 3, 'Bí ngô 4 sao', 'Thu thập để ước Rồng Xương', 0, 6582, -1, 1, 0, 0, 0, -1, -1, -1),
-(706, 12, 3, 'Bí ngô 5 sao', 'Thu thập để ước Rồng Xương', 0, 6583, -1, 1, 0, 0, 0, -1, -1, -1),
-(707, 12, 3, 'Bí ngô 6 sao', 'Thu thập để ước Rồng Xương', 0, 6584, -1, 1, 0, 0, 0, -1, -1, -1),
-(708, 12, 3, 'Bí ngô 7 sao', 'Thu thập để ước Rồng Xương', 0, 6585, -1, 1, 0, 0, 0, -1, -1, -1),
+(702, 12, 3, 'Bí ngô 1 sao', 'Thu thập đủ 7 viên để ước Rồng Bí Ngô', 0, 6579, -1, 1, 0, 0, 0, -1, -1, -1),
+(703, 12, 3, 'Bí ngô 2 sao', 'Thu thập đủ 7 viên để ước Rồng Bí Ngô', 0, 6580, -1, 1, 0, 0, 0, -1, -1, -1),
+(704, 12, 3, 'Bí ngô 3 sao', 'Thu thập đủ 7 viên để ước Rồng Bí Ngô', 0, 6581, -1, 1, 0, 0, 0, -1, -1, -1),
+(705, 12, 3, 'Bí ngô 4 sao', 'Thu thập đủ 7 viên để ước Rồng Bí Ngô', 0, 6582, -1, 1, 0, 0, 0, -1, -1, -1),
+(706, 12, 3, 'Bí ngô 5 sao', 'Thu thập đủ 7 viên để ước Rồng Bí Ngô', 0, 6583, -1, 1, 0, 0, 0, -1, -1, -1),
+(707, 12, 3, 'Bí ngô 6 sao', 'Thu thập đủ 7 viên để ước Rồng Bí Ngô', 0, 6584, -1, 1, 0, 0, 0, -1, -1, -1),
+(708, 12, 3, 'Bí ngô 7 sao', 'Thu thập đủ 7 viên để ước Rồng Bí Ngô', 0, 6585, -1, 1, 0, 0, 0, -1, -1, -1),
 (709, 27, 3, 'Bông hoa', 'VPSK', 1, 5206, -1, 1, 0, 0, 0, -1, -1, -1),
 (710, 5, 3, 'Cải trang', 'Cải trang thành Quy lão Kamê', 1, 5175, -1, 0, 0, 0, 0, 554, 555, 556),
 (711, 5, 3, 'Cải trang', 'Cải trang thành Jacky Chun', 1, 3527, -1, 0, 0, 0, 0, 356, 357, 358),
@@ -9778,7 +9778,8 @@ CREATE TABLE `player` (
   `thanhTichKhiGas` varchar(255) NOT NULL DEFAULT '[0,0,0,0]',
   `thanhTichCDRD` varchar(255) NOT NULL DEFAULT '[0,0,0,0]',
   `nhiem_vu_kol` text NOT NULL,
-  `point_sukien2` int(11) NOT NULL DEFAULT 0
+  `point_sukien2` int(11) NOT NULL DEFAULT 0,
+  `point_halloween_box` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --

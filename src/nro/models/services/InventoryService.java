@@ -1,5 +1,6 @@
 package nro.models.services;
 
+import nro.models.consts.ConstItem;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.npc.MabuEgg;
@@ -28,6 +29,8 @@ import nro.models.task.BadgesTaskService;
  *
  */
 public class InventoryService {
+
+    private static final int COSTUME_BODY_INDEX = 5;
 
     private static InventoryService I;
 
@@ -400,8 +403,22 @@ public class InventoryService {
 
         sItem = player.inventory.itemsBody.get(index);
         player.inventory.itemsBody.set(index, item);
+        syncJackyChunCostumeWearTime(player, index, item, true);
         return sItem;
 
+    }
+
+    private void syncJackyChunCostumeWearTime(Player player, int bodyIndex, Item item, boolean resetWhenEquipped) {
+        if (player == null || bodyIndex != COSTUME_BODY_INDEX) {
+            return;
+        }
+        if (item != null && item.isNotNullItem() && item.template.id == ConstItem.CAI_TRANG_JACKY_CHUN) {
+            if (resetWhenEquipped || player.lastTimeWearJackyChunCostume <= 0) {
+                player.lastTimeWearJackyChunCostume = System.currentTimeMillis();
+            }
+        } else {
+            player.lastTimeWearJackyChunCostume = 0;
+        }
     }
 
     public void itemBagToBody(Player player, int index) {
@@ -433,6 +450,7 @@ public class InventoryService {
                 }
             }
             player.inventory.itemsBody.set(index, putItemBag(player, item));
+            syncJackyChunCostumeWearTime(player, index, player.inventory.itemsBody.get(index), false);
             sendItemBags(player);
             sendItemBody(player);
             Service.gI().player(player);
@@ -472,6 +490,7 @@ public class InventoryService {
         Item item = player.pet.inventory.itemsBody.get(index);
         if (item.isNotNullItem()) {
             player.pet.inventory.itemsBody.set(index, putItemBag(player, item));
+            syncJackyChunCostumeWearTime(player.pet, index, player.pet.inventory.itemsBody.get(index), false);
             sendItemBags(player);
             sendItemBody(player);
             Service.gI().point(player);
@@ -504,6 +523,7 @@ public class InventoryService {
                         }
                         if (powerRequire <= player.nPoint.power) {
                             player.inventory.itemsBody.set(bodyIndex, item);
+                            syncJackyChunCostumeWearTime(player, bodyIndex, item, true);
                             player.inventory.itemsBox.set(index, itemBody);
                             done = true;
 
@@ -555,15 +575,18 @@ public class InventoryService {
 
     public void itemBodyToBox(Player player, int index) {
         if (index < 0 || index >= player.inventory.itemsBody.size()) {
-            Item item = player.inventory.itemsBody.get(index);
-            if (item.isNotNullItem()) {
-                player.inventory.itemsBody.set(index, putItemBox(player, item));
-                sortItems(player.inventory.itemsBag);
-                sendItemBody(player);
-                sendItemBox(player);
-                Service.gI().point(player);
-                Service.gI().Send_Caitrang(player);
-            }
+            Service.gI().sendThongBao(player, "Khong the thuc hien");
+            return;
+        }
+        Item item = player.inventory.itemsBody.get(index);
+        if (item.isNotNullItem()) {
+            player.inventory.itemsBody.set(index, putItemBox(player, item));
+            syncJackyChunCostumeWearTime(player, index, player.inventory.itemsBody.get(index), false);
+            sortItems(player.inventory.itemsBox);
+            sendItemBody(player);
+            sendItemBox(player);
+            Service.gI().point(player);
+            Service.gI().Send_Caitrang(player);
         }
     }
 
@@ -572,6 +595,7 @@ public class InventoryService {
     }
 
     public void sendItemBags(Player player) {
+        compactForcedStackableItems(player.inventory.itemsBag);
         sortItems(player.inventory.itemsBag);
         Message msg;
         try {
@@ -855,9 +879,13 @@ public class InventoryService {
                 }
             }
         }
-        if (itemAdd.template.isUpToUp) {
+        boolean isStackable = itemAdd.template.isUpToUp || isForcedStackableItem(itemAdd.template.id);
+        if (isStackable) {
             for (Item it : items) {
-                if (!it.isNotNullItem() || it.template.id != itemAdd.template.id || (!checkListsEqual(it.itemOptions, itemAdd.itemOptions) && itemAdd.template.id != 2074 && !itemAdd.isDaNangCap() && !itemAdd.isManhTS()) || it.quantity >= 100_000_000) {
+                if (!it.isNotNullItem() || it.template.id != itemAdd.template.id
+                        || (!isForcedStackableItem(itemAdd.template.id) && !checkListsEqual(it.itemOptions, itemAdd.itemOptions)
+                        && itemAdd.template.id != 2074 && !itemAdd.isDaNangCap() && !itemAdd.isManhTS())
+                        || it.quantity >= 100_000_000) {
                     continue;
                 }
 
@@ -896,6 +924,47 @@ public class InventoryService {
             }
         }
         return false;
+    }
+
+    private void compactForcedStackableItems(List<Item> items) {
+        compactItemStacks(items, ConstItem.BI_NGO);
+        compactItemStacks(items, ConstItem.THIEP_HALLOWEEN);
+    }
+
+    private void compactItemStacks(List<Item> items, int itemId) {
+        long totalQuantity = 0;
+        Item lastStack = null;
+        for (Item item : items) {
+            if (item != null && item.isNotNullItem() && item.template.id == itemId) {
+                totalQuantity += item.quantity;
+                lastStack = item;
+            }
+        }
+        if (totalQuantity <= 0) {
+            return;
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            Item item = items.get(i);
+            if (item == null || !item.isNotNullItem() || item.template.id != itemId) {
+                continue;
+            }
+            if (totalQuantity > 0) {
+                int quantity = (int) Math.min(totalQuantity, 99_999L);
+                item.quantity = quantity;
+                totalQuantity -= quantity;
+                lastStack = item;
+            } else {
+                removeItem(items, item);
+            }
+        }
+        if (totalQuantity > 0 && lastStack != null) {
+            lastStack.quantity += (int) Math.min(totalQuantity, Integer.MAX_VALUE - lastStack.quantity);
+        }
+    }
+
+    private boolean isForcedStackableItem(int itemId) {
+        return itemId == ConstItem.BI_NGO || itemId == ConstItem.THIEP_HALLOWEEN;
     }
 
     public static boolean checkListsEqual(List<ItemOption> list1, List<ItemOption> list2) {
