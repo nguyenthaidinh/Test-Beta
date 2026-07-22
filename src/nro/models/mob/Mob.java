@@ -632,7 +632,7 @@ public class Mob {
         //========================Map Bang Hội========================
         if (MapService.gI().isMapUpPorata(mapid)) {
             int dropRate1 = 10;
-            int dropRate2 = 5;
+            int dropRate2 = 2;
             int dropRate3 = 1;
 
             if (player.itemTime.isUseCoBonLa) {
@@ -645,7 +645,7 @@ public class Mob {
                 ItemMap it = new ItemMap(zone, 933, 1, x, yEnd, player.id);
                 it.options.add(new Item.ItemOption(31, 1));
                 list.add(it);
-            } else if (Util.isTrue(dropRate2, 100) && player.itemEvent.canDropManhVo(150)) {
+            } else if (Util.isTrue(dropRate2, 100) && player.itemEvent.canDropManhVo(50_000)) {
                 ItemMap it = new ItemMap(zone, 934, 1, x, yEnd, player.id);
                 it.options.add(new Item.ItemOption(31, 1));
                 list.add(it);

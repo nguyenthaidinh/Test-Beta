@@ -1038,22 +1038,24 @@ public class MrBlue {
             //data item event
             try {
                 dataArray = (JSONArray) JSONValue.parse(rs.getString("data_item_event"));
-                player.itemEvent.remainingTVGSCount = Integer.parseInt(dataArray.get(0).toString());
-                player.itemEvent.lastTVGSTime = Long.parseLong(dataArray.get(1).toString());
-                player.itemEvent.remainingHHCount = Integer.parseInt(dataArray.get(2).toString());
-                player.itemEvent.lastHHTime = Long.parseLong(dataArray.get(3).toString());
-                player.itemEvent.remainingBNCount = Integer.parseInt(dataArray.get(4).toString());
-                player.itemEvent.lastBNTime = Long.parseLong(dataArray.get(5).toString());
-                player.itemEvent.remainingBanhQuyCount = Integer.parseInt(dataArray.get(6).toString());
-                player.itemEvent.lastItemBanhQuy = Long.parseLong(dataArray.get(7).toString());
-                player.itemEvent.remainingKeoNguoiTuyetCount = Integer.parseInt(dataArray.get(8).toString());
-                player.itemEvent.lastItemKeoNguoiTuyet = Long.parseLong(dataArray.get(9).toString());
-                player.itemEvent.remainingCaTuyetCount = Integer.parseInt(dataArray.get(10).toString());
-                player.itemEvent.lastItemCaTuyet = Long.parseLong(dataArray.get(11).toString());
-                player.itemEvent.remainingChuongDongCount = Integer.parseInt(dataArray.get(12).toString());
-                player.itemEvent.lastItemChuongDong = Long.parseLong(dataArray.get(13).toString());
-                player.itemEvent.remainingKeoDuongCount = Integer.parseInt(dataArray.get(14).toString());
-                player.itemEvent.lastItemKeoDuong = Long.parseLong(dataArray.get(15).toString());
+                player.itemEvent.remainingTVGSCount = getJsonInt(dataArray, 0, 0);
+                player.itemEvent.lastTVGSTime = getJsonLong(dataArray, 1, 0);
+                player.itemEvent.remainingHHCount = getJsonInt(dataArray, 2, 0);
+                player.itemEvent.lastHHTime = getJsonLong(dataArray, 3, 0);
+                player.itemEvent.remainingBNCount = getJsonInt(dataArray, 4, 0);
+                player.itemEvent.lastBNTime = getJsonLong(dataArray, 5, 0);
+                player.itemEvent.remainingBanhQuyCount = getJsonInt(dataArray, 6, 0);
+                player.itemEvent.lastItemBanhQuy = getJsonLong(dataArray, 7, 0);
+                player.itemEvent.remainingKeoNguoiTuyetCount = getJsonInt(dataArray, 8, 0);
+                player.itemEvent.lastItemKeoNguoiTuyet = getJsonLong(dataArray, 9, 0);
+                player.itemEvent.remainingCaTuyetCount = getJsonInt(dataArray, 10, 0);
+                player.itemEvent.lastItemCaTuyet = getJsonLong(dataArray, 11, 0);
+                player.itemEvent.remainingChuongDongCount = getJsonInt(dataArray, 12, 0);
+                player.itemEvent.lastItemChuongDong = getJsonLong(dataArray, 13, 0);
+                player.itemEvent.remainingKeoDuongCount = getJsonInt(dataArray, 14, 0);
+                player.itemEvent.lastItemKeoDuong = getJsonLong(dataArray, 15, 0);
+                player.itemEvent.remainingManhVo = getJsonInt(dataArray, 16, 0);
+                player.itemEvent.lastItemManhVo = getJsonLong(dataArray, 17, 0);
             } catch (Exception e) {
                 player.itemEvent.remainingTVGSCount = 0;
                 player.itemEvent.lastTVGSTime = 0;
@@ -1071,6 +1073,8 @@ public class MrBlue {
                 player.itemEvent.lastItemKeoDuong = 0;
                 player.itemEvent.remainingKeoNguoiTuyetCount = 0;
                 player.itemEvent.lastItemKeoNguoiTuyet = 0;
+                player.itemEvent.remainingManhVo = 0;
+                player.itemEvent.lastItemManhVo = 0;
 
             }
             //data luyện tập
@@ -1334,6 +1338,28 @@ public class MrBlue {
         return player;
     }
 
+    private static int getJsonInt(JSONArray dataArray, int index, int defaultValue) {
+        if (dataArray == null || dataArray.size() <= index || dataArray.get(index) == null) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(String.valueOf(dataArray.get(index)));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    private static long getJsonLong(JSONArray dataArray, int index, long defaultValue) {
+        if (dataArray == null || dataArray.size() <= index || dataArray.get(index) == null) {
+            return defaultValue;
+        }
+        try {
+            return Long.parseLong(String.valueOf(dataArray.get(index)));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     private static void loadItemOptions(Item item, JSONArray options) {
         if (item == null || options == null || options.isEmpty()) {
             return;
@@ -1347,6 +1373,7 @@ public class MrBlue {
         ItemService.gI().normalizeLuckyRoundPetOptions(item);
         ItemService.gI().normalizeSsj4CostumeOptions(item);
         ItemService.gI().normalizeGohanCostumeOptions(item);
+        ItemService.gI().normalizeJackyChunCostumeOptions(item);
         ItemService.gI().normalizeAngelDemonWingsOptions(item);
         ItemService.gI().normalizeBrolyRedCostumeOptions(item);
         ItemService.gI().normalizeBrolyCostumeOptions(item);

@@ -136,15 +136,18 @@ public class ItemEvent {
         return false;
     }
 
-   public boolean canDropManhVo(int maxCount) {
-    if (Util.isAfterMidnight(lastItemManhVo)) {
-        remainingManhVo = maxCount;
-        lastItemManhVo = System.currentTimeMillis();
-        return true;
-    } else if (remainingManhVo > 0) {
-        remainingManhVo--;
-        return true;
+    public boolean canDropManhVo(int maxCount) {
+        if (maxCount <= 0) {
+            return false;
+        }
+        if (Util.isAfterMidnight(lastItemManhVo)) {
+            remainingManhVo = maxCount - 1;
+            lastItemManhVo = System.currentTimeMillis();
+            return true;
+        } else if (remainingManhVo > 0) {
+            remainingManhVo--;
+            return true;
+        }
+        return false;
     }
-    return false;
-}
 }

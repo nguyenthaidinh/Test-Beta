@@ -79,6 +79,8 @@ public final class Manager {
     public static boolean LOCAL = false;
     public static boolean TEST = false;
     public static boolean DAO_AUTO_UPDATER = false;
+    private static final int JACKY_CHUN_CHUONG_OPTION_ID = 251;
+    private static final String JACKY_CHUN_CHUONG_OPTION_NAME = "Mỗi 1 phút, đòn chưởng đầu tiên x4 sát thương";
     public static MapTemplate[] MAP_TEMPLATES;
     public static final List<nro.models.map.Map> MAPS = new ArrayList<>();
     private final ScheduledExecutorService mapUpdater = Executors.newSingleThreadScheduledExecutor();
@@ -174,6 +176,27 @@ public final class Manager {
         radar.Leg = -1;
         radar.Bag = -1;
         radar.AuraId = -1;
+    }
+
+    private static void ensureItemOptionTemplate(int id, String name) {
+        if (id < 0) {
+            return;
+        }
+        while (ITEM_OPTION_TEMPLATES.size() <= id) {
+            ItemOptionTemplate optionTemp = new ItemOptionTemplate();
+            optionTemp.id = ITEM_OPTION_TEMPLATES.size();
+            optionTemp.name = "";
+            optionTemp.type = 0;
+            ITEM_OPTION_TEMPLATES.add(optionTemp);
+        }
+        ItemOptionTemplate optionTemp = ITEM_OPTION_TEMPLATES.get(id);
+        if (optionTemp == null || optionTemp.id != id) {
+            optionTemp = new ItemOptionTemplate();
+            ITEM_OPTION_TEMPLATES.set(id, optionTemp);
+        }
+        optionTemp.id = id;
+        optionTemp.name = name;
+        optionTemp.type = 0;
     }
 
     public class MapBgDataManager {
@@ -712,11 +735,9 @@ public final class Manager {
             ps = ConnectionDatabase.prepareStatement("select id, name from item_option_template");
             rs = ps.executeQuery();
             while (rs.next()) {
-                ItemOptionTemplate optionTemp = new ItemOptionTemplate();
-                optionTemp.id = rs.getInt("id");
-                optionTemp.name = rs.getString("name");
-                ITEM_OPTION_TEMPLATES.add(optionTemp);
+                ensureItemOptionTemplate(rs.getInt("id"), rs.getString("name"));
             }
+            ensureItemOptionTemplate(JACKY_CHUN_CHUONG_OPTION_ID, JACKY_CHUN_CHUONG_OPTION_NAME);
             Logger.success(Logger.PURPLE + "Successfully loaded map item option template (" + ITEM_OPTION_TEMPLATES.size() + ")\n");
 
             //load shop

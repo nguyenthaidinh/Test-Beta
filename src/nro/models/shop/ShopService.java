@@ -55,7 +55,7 @@ public class ShopService {
     private static final int SSJ4_COSTUME_GEM_COST = 500_000;
     private static final short JACKY_CHUN_COSTUME_ITEM_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
     private static final int JACKY_CHUN_COSTUME_GEM_COST = 3_000_000;
-    private static final int JACKY_CHUN_COSTUME_EXPIRE_DAYS = 2;
+    private static final int JACKY_CHUN_COSTUME_EXPIRE_DAYS = 7;
     private static final int OPTION_EXPIRE_DAYS = 93;
     private static final short[] FEATURED_EVENT_ITEM_IDS = {1780, 1781, 1722, 1784, 1783};
     private static final int[] FEATURED_EVENT_ITEM_GEM_COSTS = {3_000_000, 3_000_000, 1_000_000, 800_000, 600_000};

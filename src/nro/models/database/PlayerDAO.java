@@ -870,6 +870,18 @@ public class PlayerDAO {
                 dataArray.add(player.itemEvent.lastHHTime);
                 dataArray.add(player.itemEvent.remainingBNCount);
                 dataArray.add(player.itemEvent.lastBNTime);
+                dataArray.add(player.itemEvent.remainingBanhQuyCount);
+                dataArray.add(player.itemEvent.lastItemBanhQuy);
+                dataArray.add(player.itemEvent.remainingKeoNguoiTuyetCount);
+                dataArray.add(player.itemEvent.lastItemKeoNguoiTuyet);
+                dataArray.add(player.itemEvent.remainingCaTuyetCount);
+                dataArray.add(player.itemEvent.lastItemCaTuyet);
+                dataArray.add(player.itemEvent.remainingChuongDongCount);
+                dataArray.add(player.itemEvent.lastItemChuongDong);
+                dataArray.add(player.itemEvent.remainingKeoDuongCount);
+                dataArray.add(player.itemEvent.lastItemKeoDuong);
+                dataArray.add(player.itemEvent.remainingManhVo);
+                dataArray.add(player.itemEvent.lastItemManhVo);
                 String dataItemEvent = dataArray.toJSONString();
                 dataArray.clear();
 

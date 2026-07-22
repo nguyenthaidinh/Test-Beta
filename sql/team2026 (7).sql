@@ -2622,7 +2622,8 @@ INSERT INTO `item_option_template` (`id`, `NAME`) VALUES
 (247, '$[4] Giảm nhẹ hao HP,KI chiêu Kaioken'),
 (248, '$[5] Tăng mạnh sát thương và giảm mạnh hao HP,KI chiêu Kaioken'),
 (249, 'Hắc hóa: +#% HP cho người chơi xung quanh'),
-(250, '# Kilis');
+(250, '# Kilis'),
+(251, 'Mỗi 1 phút, đòn chưởng đầu tiên x4 sát thương');
 
 -- --------------------------------------------------------
 

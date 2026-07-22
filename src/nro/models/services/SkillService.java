@@ -946,6 +946,7 @@ public class SkillService {
         if (!isJackyChunChuongReady(plAtt)) {
             return dame;
         }
+        plAtt.lastTimeWearJackyChunCostume = System.currentTimeMillis();
         if (dame > Long.MAX_VALUE / JACKY_CHUN_CHUONG_MULTIPLIER) {
             return Long.MAX_VALUE;
         }
@@ -1068,7 +1069,9 @@ public class SkillService {
                 dameAttack /= 3;
             }
         }
-        dameAttack = applyJackyChunChuongDame(plAtt, dameAttack);
+        if (!miss) {
+            dameAttack = applyJackyChunChuongDame(plAtt, dameAttack);
+        }
         dameAttack = limitDame(dameAttack);
         long hpBefore = plInjure.nPoint.hp;
         plInjure.injured(plAtt, miss ? 0 : dameAttack, false, false);
