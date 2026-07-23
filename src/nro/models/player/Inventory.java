@@ -51,7 +51,7 @@ public class Inventory {
 
     public int getParam(Item it, int id) {
         for (ItemOption op : it.itemOptions) {
-            if (op != null && op.optionTemplate.id == id) {
+            if (op != null && op.optionTemplate != null && op.optionTemplate.id == id) {
                 return op.param;
             }
         }
@@ -61,7 +61,7 @@ public class Inventory {
     public boolean haveOption(List<Item> l, int index, int id) {
         Item it = l.get(index);
         if (it != null && it.isNotNullItem()) {
-            return it.itemOptions.stream().anyMatch(op -> op != null && op.optionTemplate.id == id);
+            return it.itemOptions.stream().anyMatch(op -> op != null && op.optionTemplate != null && op.optionTemplate.id == id);
         }
         return false;
     }

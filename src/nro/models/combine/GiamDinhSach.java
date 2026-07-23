@@ -25,6 +25,9 @@ public class GiamDinhSach {
         Item buaGiamDinh = null;
 
         for (Item item : player.combineNew.itemsCombine) {
+            if (item == null || item.template == null) {
+                continue;
+            }
             if (item.isSachTuyetKy() || item.isSachTuyetKy2()) {
                 sachTuyetKy = item;
             } else if (item.template.id == 1284) {
@@ -59,6 +62,9 @@ public class GiamDinhSach {
         Item buaGiamDinh = null;
 
         for (Item item : player.combineNew.itemsCombine) {
+            if (item == null || item.template == null) {
+                continue;
+            }
             if (item.isSachTuyetKy() || item.isSachTuyetKy2()) {
                 sachTuyetKy = item;
             } else if (item.template.id == 1284) {
@@ -75,6 +81,9 @@ public class GiamDinhSach {
 
         for (int i = 0; i < sachTuyetKy.itemOptions.size(); i++) {
             Item.ItemOption io = sachTuyetKy.itemOptions.get(i);
+            if (io == null || io.optionTemplate == null) {
+                continue;
+            }
             if (io.optionTemplate.id == 217) {
                 int randomOption = options[Util.nextInt(options.length)];
                 int randomValue = Util.nextInt(1, 10 / Util.nextInt(1, 3));

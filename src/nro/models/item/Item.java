@@ -53,7 +53,9 @@ public class Item {
     public String getInfo() {
         String strInfo = "";
         for (ItemOption itemOption : itemOptions) {
-            strInfo += itemOption.getOptionString();
+            if (itemOption != null) {
+                strInfo += itemOption.getOptionString();
+            }
         }
         return strInfo;
     }
@@ -68,7 +70,9 @@ public class Item {
         this.content = null;
         if (this.itemOptions != null) {
             for (ItemOption io : this.itemOptions) {
-                io.dispose();
+                if (io != null) {
+                    io.dispose();
+                }
             }
             this.itemOptions.clear();
         }
@@ -85,6 +89,9 @@ public class Item {
         }
 
         public ItemOption(ItemOption io) {
+            if (io == null) {
+                return;
+            }
             this.param = io.param;
             this.optionTemplate = io.optionTemplate;
         }
@@ -144,7 +151,8 @@ public class Item {
 
     public boolean isSKH() {
         for (ItemOption itemOption : itemOptions) {
-            if (itemOption.optionTemplate.id >= 127 && itemOption.optionTemplate.id <= 135) {
+            if (itemOption != null && itemOption.optionTemplate != null
+                    && itemOption.optionTemplate.id >= 127 && itemOption.optionTemplate.id <= 135) {
                 return true;
             }
         }
@@ -204,7 +212,7 @@ public class Item {
     public int getOptionParam(int id) {
         for (int i = 0; i < this.itemOptions.size(); i++) {
             ItemOption itemOption = this.itemOptions.get(i);
-            if (itemOption != null && itemOption.optionTemplate.id == id) {
+            if (itemOption != null && itemOption.optionTemplate != null && itemOption.optionTemplate.id == id) {
                 return itemOption.param;
             }
         }
@@ -214,7 +222,7 @@ public class Item {
     public void addOptionParam(int id, int param) {
         for (int i = 0; i < this.itemOptions.size(); i++) {
             ItemOption itemOption = this.itemOptions.get(i);
-            if (itemOption != null && itemOption.optionTemplate.id == id) {
+            if (itemOption != null && itemOption.optionTemplate != null && itemOption.optionTemplate.id == id) {
                 itemOption.param += param;
                 return;
             }
@@ -288,7 +296,7 @@ public class Item {
             case 1434 ->
                 new ItemOption(160, 5);
             default ->
-                itemOptions.get(0);
+                itemOptions == null || itemOptions.isEmpty() ? null : itemOptions.get(0);
         };
     }
 
@@ -305,6 +313,9 @@ public class Item {
         item.quantity = this.quantity;
         item.createTime = this.createTime;
         for (Item.ItemOption io : this.itemOptions) {
+            if (io == null) {
+                continue;
+            }
             item.itemOptions.add(new Item.ItemOption(io));
         }
         return item;
@@ -313,6 +324,9 @@ public class Item {
     public String getOptionInfo() {
         StringJoiner optionInfo = new StringJoiner("\n");
         for (ItemOption io : this.itemOptions) {
+            if (io == null || io.optionTemplate == null) {
+                continue;
+            }
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102 && io.optionTemplate.id != 107 && io.optionTemplate.id != 218) {
                 optionInfo.add(io.getOptionString());
             }
@@ -337,9 +351,15 @@ public class Item {
     public String getOptionInfo(Item item) {
         boolean haveOption = false;
         StringJoiner optionInfo = new StringJoiner("\n");
+        ItemOption iodpl = item != null ? item.getOptionDaPhaLe() : null;
+        if (iodpl == null || iodpl.optionTemplate == null) {
+            return getOptionInfo();
+        }
         Item itC = this.cloneItem();
-        ItemOption iodpl = item.getOptionDaPhaLe();
         for (ItemOption io : itC.itemOptions) {
+            if (io == null || io.optionTemplate == null) {
+                continue;
+            }
             if (!haveOption && io.optionTemplate.id == iodpl.optionTemplate.id) {
                 io.param += iodpl.param;
                 haveOption = true;
@@ -357,9 +377,15 @@ public class Item {
 
     public String getOptionInfoCuongHoa(Item item) {
         StringJoiner optionInfo = new StringJoiner("\n");
+        ItemOption iodpl = item != null ? item.getOptionDaPhaLe() : null;
+        if (iodpl == null || iodpl.optionTemplate == null) {
+            return getOptionInfo();
+        }
         Item itC = this.cloneItem();
-        ItemOption iodpl = item.getOptionDaPhaLe();
         for (ItemOption io : itC.itemOptions) {
+            if (io == null || io.optionTemplate == null) {
+                continue;
+            }
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102 && io.optionTemplate.id != 107 && io.optionTemplate.id != 218) {
                 optionInfo.add(io.getOptionString());
             }
@@ -372,7 +398,7 @@ public class Item {
     public void subOptionParam(int id, int param) {
         for (int i = 0; i < this.itemOptions.size(); i++) {
             ItemOption itemOption = this.itemOptions.get(i);
-            if (itemOption != null && itemOption.optionTemplate.id == id) {
+            if (itemOption != null && itemOption.optionTemplate != null && itemOption.optionTemplate.id == id) {
                 itemOption.param -= param;
                 return;
             }
@@ -504,13 +530,17 @@ public class Item {
     }
 
     public boolean isDoKyGui() {
-        return this.template != null && (this.itemOptions.stream().anyMatch(op -> op.optionTemplate.id == 86) || this.itemOptions.stream().anyMatch(op -> op.optionTemplate.id == 87) || this.template.type == 14 || this.template.type == 15 || this.template.type == 6 || this.template.id >= 14 && this.template.id <= 20);
+        return this.template != null && (this.itemOptions.stream().anyMatch(op -> op != null && op.optionTemplate != null && op.optionTemplate.id == 86)
+                || this.itemOptions.stream().anyMatch(op -> op != null && op.optionTemplate != null && op.optionTemplate.id == 87)
+                || this.template.type == 14 || this.template.type == 15 || this.template.type == 6 || this.template.id >= 14 && this.template.id <= 20);
     }
 
     public String getInfoItem() {
         String strInfo = "|1|" + template.name + "\n|0|";
         for (ItemOption itemOption : itemOptions) {
-            strInfo += itemOption.getOptionString() + "\n";
+            if (itemOption != null) {
+                strInfo += itemOption.getOptionString() + "\n";
+            }
         }
         strInfo += "|2|" + template.description;
         return strInfo;
@@ -519,7 +549,7 @@ public class Item {
     public boolean isHaveOption(int id) {
         for (int i = 0; i < this.itemOptions.size(); i++) {
             ItemOption itemOption = this.itemOptions.get(i);
-            if (itemOption != null && itemOption.optionTemplate.id == id) {
+            if (itemOption != null && itemOption.optionTemplate != null && itemOption.optionTemplate.id == id) {
                 return true;
             }
         }
@@ -539,7 +569,7 @@ public class Item {
             return null;
         }
         for (ItemOption option : this.itemOptions) {
-            if (option.optionTemplate != null && option.optionTemplate.id == id) {
+            if (option != null && option.optionTemplate != null && option.optionTemplate.id == id) {
                 return option;
             }
         }

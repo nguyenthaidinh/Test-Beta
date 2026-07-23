@@ -21,7 +21,7 @@ public class NangCapSachTuyetKy {
     private static final int SUCCESS_RATE_PERCENT = 10;
 
     public static void showInfoCombine(Player player) {
-        if (!hasRequiredItems(player)) {
+        if (player.combineNew.itemsCombine.size() != 2) {
             Service.gI().sendDialogMessage(player, "Cần Sách Tuyệt Kỹ 1 và 10 Kìm bấm giấy.");
             return;
         }
@@ -30,6 +30,9 @@ public class NangCapSachTuyetKy {
         Item kimBamGiay = null;
 
         for (Item item : player.combineNew.itemsCombine) {
+            if (item == null || item.template == null) {
+                continue;
+            }
             if (item.isSachTuyetKy()) {
                 sachTuyetKy = item;
             } else if (item.template.id == KIM_BAM_GIAY_ID) {
@@ -67,6 +70,9 @@ public class NangCapSachTuyetKy {
         Item kimBamGiay = null;
 
         for (Item item : player.combineNew.itemsCombine) {
+            if (item == null || item.template == null) {
+                continue;
+            }
             if (item.isSachTuyetKy()) {
                 sachTuyetKy = item;
             } else if (item.template.id == KIM_BAM_GIAY_ID) {
@@ -103,6 +109,9 @@ public class NangCapSachTuyetKy {
         boolean hasKimBamGiay = false;
 
         for (Item item : player.combineNew.itemsCombine) {
+            if (item == null || item.template == null) {
+                continue;
+            }
             if (item.isSachTuyetKy()) {
                 hasSachTuyetKy = true;
             } else if (item.template.id == KIM_BAM_GIAY_ID && item.quantity >= REQUIRED_KIM_BAM_GIAY_QUANTITY) {

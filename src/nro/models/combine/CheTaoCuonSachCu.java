@@ -80,7 +80,12 @@ public class CheTaoCuonSachCu {
     }
 
     private static boolean hasSufficientSpace(Player player) {
-        return InventoryService.gI().getCountEmptyBag(player) > 0 || InventoryService.gI().findItemBag(player, CUON_SACH_CU_ID) != null;
+        Item trangSachCu = InventoryService.gI().findItemBag(player, TRANG_SACH_CU_ID);
+        Item biaSach = InventoryService.gI().findItemBag(player, BIA_SACH_ID);
+        return InventoryService.gI().getCountEmptyBag(player) > 0
+                || InventoryService.gI().findItemBag(player, CUON_SACH_CU_ID) != null
+                || (trangSachCu != null && trangSachCu.quantity == REQUIRED_TRANG_SACH_CU)
+                || (biaSach != null && biaSach.quantity == REQUIRED_BIA_SACH);
     }
 
     private static void processSuccess(Player player, Item trangSachCu, Item biaSach) {

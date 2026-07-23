@@ -59,8 +59,18 @@ public class DoiSachTuyetKy {
                 + itemName + " " + current + "/" + required + "\n";
     }
 
+    private static boolean hasSpaceForResult(Player player, boolean useConDau) {
+        Item cuonSachCu = InventoryService.gI().findItemBag(player, 1283);
+        Item kimBamGiay = InventoryService.gI().findItemBag(player, 1285);
+        Item conDau = useConDau ? InventoryService.gI().findItemBag(player, 1794) : null;
+        return InventoryService.gI().getCountEmptyBag(player) > 0
+                || (cuonSachCu != null && cuonSachCu.quantity == REQUIRED_CUON_SACH_CU)
+                || (kimBamGiay != null && kimBamGiay.quantity == REQUIRED_KIM_BAM_GIAY)
+                || (useConDau && conDau != null && conDau.quantity == REQUIRED_CON_DAU);
+    }
+
     public static void doiSachTuyetKy(Player player, boolean useConDau) {
-        if (InventoryService.gI().getCountEmptyBag(player) == 0) {
+        if (!hasSpaceForResult(player, useConDau)) {
             Service.gI().sendThongBao(player, "Cần 1 ô trống trong hành trang.");
             return;
         }
@@ -131,7 +141,7 @@ public class DoiSachTuyetKy {
         short itemId = SACH_IDS[Util.nextInt(SACH_IDS.length)];
 
         Item sach = ItemService.gI().createNewItem(itemId);
-        sach.itemOptions.removeIf(opt -> opt.optionTemplate.id == 218);
+        sach.itemOptions.removeIf(opt -> opt == null || opt.optionTemplate == null || opt.optionTemplate.id == 218);
 
         if (useConDau) {
             if (Util.isTrue(EXTRA_OPTION_CHANCE, 100)) {
@@ -151,7 +161,7 @@ public class DoiSachTuyetKy {
         sach.itemOptions.add(new Item.ItemOption(87, 0));
         sach.itemOptions.add(new Item.ItemOption(219, 5));
         sach.itemOptions.add(new Item.ItemOption(212, 1000));
-        sach.itemOptions.removeIf(opt -> opt.optionTemplate.id == 218);
+        sach.itemOptions.removeIf(opt -> opt == null || opt.optionTemplate == null || opt.optionTemplate.id == 218);
 
         return sach;
     }

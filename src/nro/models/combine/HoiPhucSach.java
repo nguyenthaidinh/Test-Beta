@@ -29,6 +29,9 @@ public class HoiPhucSach {
         }
         Item sachTuyetKy = null;
         for (Item item : player.combineNew.itemsCombine) {
+            if (item == null || item.template == null) {
+                continue;
+            }
             if (item.isSachTuyetKy() || item.isSachTuyetKy2()) {
                 sachTuyetKy = item;
             }
@@ -58,6 +61,9 @@ public class HoiPhucSach {
         }
         Item sachTuyetKy = null;
         for (Item item : player.combineNew.itemsCombine) {
+            if (item == null || item.template == null) {
+                continue;
+            }
             if (item.isSachTuyetKy() || item.isSachTuyetKy2()) {
                 sachTuyetKy = item;
             }
@@ -71,6 +77,9 @@ public class HoiPhucSach {
         }
         player.inventory.subGem(getGem(doBen));
         for (Item.ItemOption io : sachTuyetKy.itemOptions) {
+            if (io == null || io.optionTemplate == null) {
+                continue;
+            }
             if (io.optionTemplate.id == 212) {
                 io.param = 1000;
                 break;
