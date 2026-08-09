@@ -230,12 +230,16 @@ public abstract class SuperRank extends Boss {
                         break;
                 }
 
+                int bonusXuyenGiapSonCon = plAtt.setClothes != null && plAtt.setClothes.sonCon == 5 ? 50 : 0;
+                int tlXuyenGiapChuong = plAtt.nPoint.tlxgc + bonusXuyenGiapSonCon;
+                int tlXuyenGiapCanChien = plAtt.nPoint.tlxgcc + bonusXuyenGiapSonCon;
+
                 switch (plAtt.playerSkill.skillSelect.template.id) {
                     case Skill.KAMEJOKO:
                     case Skill.MASENKO:
                     case Skill.ANTOMIC:
-                        if (tlGiap - plAtt.nPoint.tlxgc >= 0) {
-                            tlGiap -= plAtt.nPoint.tlxgc;
+                        if (tlGiap - tlXuyenGiapChuong >= 0) {
+                            tlGiap -= tlXuyenGiapChuong;
                         } else {
                             tlGiap = 0;
                         }
@@ -245,10 +249,17 @@ public abstract class SuperRank extends Boss {
                     case Skill.GALICK:
                     case Skill.LIEN_HOAN:
                     case Skill.KAIOKEN:
-                        if (tlGiap - plAtt.nPoint.tlxgcc >= 0) {
-                            tlGiap -= plAtt.nPoint.tlxgcc;
+                        if (tlGiap - tlXuyenGiapCanChien >= 0) {
+                            tlGiap -= tlXuyenGiapCanChien;
                         } else {
                             tlGiap = 0;
+                        }
+                        break;
+                    case Skill.QUA_CAU_KENH_KHI:
+                    case Skill.MAKANKOSAPPO:
+                    case Skill.DICH_CHUYEN_TUC_THOI:
+                        if (bonusXuyenGiapSonCon > 0) {
+                            tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon);
                         }
                         break;
                 }

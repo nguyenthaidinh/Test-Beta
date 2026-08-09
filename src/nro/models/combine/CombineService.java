@@ -58,6 +58,7 @@ public class CombineService {
     public static final int CHE_TAO_TRANG_BI_THIEN_SU = 515;
     public static final int TAI_HIEN_THANH_THAN = 516;
     public static final int NANG_CHI_SO_BONG_TAI = 517;
+    public static final int THACH_THUC_THAN_THANH = 520;
     public static final int NANG_CAP_BONG_TAI3 = 455;
     public static final int NANG_CHI_SO_BONG_TAI3 = 457;
     public static final int HIEN_TE_THAN_LINH = 998;
@@ -173,6 +174,9 @@ public class CombineService {
             case TAI_HIEN_THANH_THAN:
                 TaiHienThanhThan.showInfoCombine(player);
                 break;
+            case THACH_THUC_THAN_THANH:
+                ThachThucThanThanh.showInfoCombine(player);
+                break;
             case DUI_DUC:
                 CheTaoDuiDuc.showInfoCombine(player);
                 break;
@@ -263,6 +267,9 @@ public class CombineService {
                 break;
             case TAI_HIEN_THANH_THAN:
                 TaiHienThanhThan.taiHien(player);
+                break;
+            case THACH_THUC_THAN_THANH:
+                ThachThucThanThanh.thachThuc(player);
                 break;
             case DUI_DUC:
                 CheTaoDuiDuc.CheTaoDuiDuc(player);
@@ -687,6 +694,8 @@ public class CombineService {
                 return "Chế tạo\ntrang bị thiên sứ";
             case TAI_HIEN_THANH_THAN:
                 return "Tái hiện\ntrang bị Thần Linh";
+            case THACH_THUC_THAN_THANH:
+                return "Th\u00e1ch th\u1ee9c\nTh\u1ea7n Th\u00e1nh";
             case LAM_PHEP_NHAP_DA:
                 return "Ta sẽ phù phép\n"
                         + "cho 10 mảnh đá vụn\n"
@@ -728,6 +737,12 @@ public class CombineService {
                         + "Sau đó chọn 'Nâng Cấp'";
             case TAI_HIEN_THANH_THAN:
                 return "Vào hành trang\nChọn 5 trang bị Hủy Diệt cùng hành tinh\nvà 5 trang bị Kích Hoạt cùng hành tinh\nSau đó chọn 'Tái hiện'";
+            case THACH_THUC_THAN_THANH:
+                return "V\u00e0o h\u00e0nh trang\n"
+                        + "Ch\u1ecdn 1 \u0111\u1ed3 Th\u1ea7n Linh K\u00edch Ho\u1ea1t\n"
+                        + "Ch\u1ecdn 1 s\u00e9t H\u1ee7y Di\u1ec7t (5 m\u00f3n) c\u00f9ng h\u00e0nh tinh\n"
+                        + "Ch\u1ecdn 10 \u0110\u00e1 ng\u0169 s\u1eafc\n"
+                        + "Sau \u0111\u00f3 ch\u1ecdn 'Ch\u1ebf t\u1ea1o'";
             case NANG_CAP_BONG_TAI:
                 return "Vào hành trang\nChọn bông tai Porata\nChọn mảnh bông tai để nâng cấp, Số lượng 9999 cái"
                         + "\nSau đó chọn 'Nâng cấp'";

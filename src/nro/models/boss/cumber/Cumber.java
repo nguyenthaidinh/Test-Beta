@@ -91,7 +91,7 @@ public class Cumber extends Boss {
                 this.chat("Xí hụt");
                 return 0;
             }
-            damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
+            damage -= damage * getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT) / 100;
             if (this.currentLevel != 0) {
                 damage /= 2;
             }

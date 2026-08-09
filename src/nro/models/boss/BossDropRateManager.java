@@ -8,9 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import nro.models.utils.Logger;
 import nro.models.utils.Util;
@@ -22,6 +24,7 @@ public final class BossDropRateManager {
 
     private static final Path CONFIG_PATH = Path.of("data", "boss_than_linh_rates.properties");
     private static final Map<String, Integer> DEFAULT_RATES = createDefaultRates();
+    private static final Set<String> LARGE_BOSS_DROP_CLASSES = createLargeBossDropClasses();
     private static final BossDropRateManager INSTANCE = new BossDropRateManager();
 
     private final Map<String, Integer> configuredRates = new ConcurrentHashMap<>();
@@ -36,6 +39,10 @@ public final class BossDropRateManager {
 
     public boolean supports(Boss boss) {
         return boss != null && DEFAULT_RATES.containsKey(getKey(boss));
+    }
+
+    public boolean supportsLargeBossDrop(Boss boss) {
+        return boss != null && LARGE_BOSS_DROP_CLASSES.contains(getKey(boss));
     }
 
     public int getDefaultRate(Boss boss) {
@@ -195,6 +202,13 @@ public final class BossDropRateManager {
                 "nro.models.boss.nhan_ban.NhanBan");
 
         return Map.copyOf(rates);
+    }
+
+    private static Set<String> createLargeBossDropClasses() {
+        Set<String> classes = new HashSet<>(DEFAULT_RATES.keySet());
+        classes.add("nro.models.boss.than_huy_diet.WhisBoss");
+        classes.add("nro.models.boss.than_huy_diet.BeerusBoss");
+        return Set.copyOf(classes);
     }
 
     private static void add(Map<String, Integer> rates, int rate, String... classNames) {

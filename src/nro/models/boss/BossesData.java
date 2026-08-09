@@ -2589,6 +2589,34 @@ public class BossesData {
             new String[] {}, // text chat 3
             REST_1_M);
 
+    public static final BossData WHIS_BOSS = new BossData(
+            "Whis", // name
+            ConstPlayer.TRAI_DAT, // gender
+            new short[] { 838, 839, 840, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            10000, // dame, se can bang sau
+            new int[] { 2_000_000_000 }, // hp
+            new int[] { ConstMap.HANH_TINH_BILL }, // map tam, chua bat tu dong xuat hien
+            new int[][] {
+                    { Skill.DRAGON, 7, 500 } },
+            new String[] { "|-1|Hay thu bat kip ta." },
+            new String[] { "|-1|Cham qua." },
+            new String[] { "|-1|Kha lam." },
+            REST_1_H);
+
+    public static final BossData BEERUS_BOSS = new BossData(
+            "Beerus", // name
+            ConstPlayer.XAYDA, // gender
+            new short[] { 508, 509, 510, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            10000, // dame, se can bang sau
+            new int[] { 2_000_000_000 }, // hp
+            new int[] { ConstMap.HANH_TINH_BILL }, // map tam, chua bat tu dong xuat hien
+            new int[][] {
+                    { Skill.GALICK, 7, 500 } },
+            new String[] { "|-1|Nguoi dam thach thuc Than Huy Diet sao?" },
+            new String[] { "|-1|That vo vi." },
+            new String[] { "|-1|Chuyen nay chua ket thuc." },
+            REST_1_H);
+
     public static final BossData GOLDEN_FRIEZA = new BossData(
             "Fide Vàng", // name
             ConstPlayer.XAYDA, // gender

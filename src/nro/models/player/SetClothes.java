@@ -26,12 +26,21 @@ public class SetClothes {
     public byte ocTieu;
     public byte pikkoroDaimao;
     public byte picolo;
+    public byte sonEm;
+    public byte ngaoCon;
+    public byte ngaoEm;
     public byte lienHoan;
     public byte nail;
 
     public byte kakarot;
     public byte cadic;
     public byte nappa;
+    public byte svkCon;
+    public byte sonCon;
+    public byte khanhCon;
+    public byte biCon;
+    public byte cayCon;
+    public byte binhCon;
     public byte giamSatThuong;
     public byte cadicM;
 
@@ -83,8 +92,14 @@ public class SetClothes {
             Item item = this.player.inventory.itemsBody.get(i);
 
             // Loại bỏ điều kiện kiểm tra isNotNullItem
+            if (item == null || item.itemOptions == null) {
+                continue;
+            }
             boolean isActSet = false;
             for (Item.ItemOption io : item.itemOptions) {
+                if (io == null || io.optionTemplate == null) {
+                    continue;
+                }
                 switch (io.optionTemplate.id) {
                     case 129:
                     case 141:
@@ -131,18 +146,64 @@ public class SetClothes {
                         isActSet = true;
                         cadic++;
                         break;
-                    case 253:
-                        isActSet = true;
-                        kaioken++;
-                        break;
                     case 250:
                         isActSet = true;
                         lienHoan++;
                         break;
-                    case 252:
                     case 255:
                         isActSet = true;
                         giamSatThuong++;
+                        break;
+                    case 251:
+                        if (this.player.gender == 0) {
+                            switch (io.param) {
+                                case 1:
+                                    isActSet = true;
+                                    svkCon++;
+                                    break;
+                                case 2:
+                                    isActSet = true;
+                                    sonCon++;
+                                    break;
+                                case 3:
+                                    isActSet = true;
+                                    khanhCon++;
+                                    break;
+                            }
+                        } else if (this.player.gender == 1) {
+                            switch (io.param) {
+                                case 4:
+                                    isActSet = true;
+                                    sonEm++;
+                                    break;
+                                case 5:
+                                    isActSet = true;
+                                    ngaoCon++;
+                                    break;
+                                case 6:
+                                    isActSet = true;
+                                    ngaoEm++;
+                                    break;
+                            }
+                        }
+                        break;
+                    case 252:
+                        if (this.player.gender == 2) {
+                            isActSet = true;
+                            biCon++;
+                        }
+                        break;
+                    case 253:
+                        if (this.player.gender == 2) {
+                            isActSet = true;
+                            cayCon++;
+                        }
+                        break;
+                    case 254:
+                        if (this.player.gender == 2) {
+                            isActSet = true;
+                            binhCon++;
+                        }
                         break;
 
                     case 21:
@@ -192,10 +253,19 @@ public class SetClothes {
         this.ocTieu = 0;
         this.pikkoroDaimao = 0;
         this.picolo = 0;
+        this.sonEm = 0;
+        this.ngaoCon = 0;
+        this.ngaoEm = 0;
         this.lienHoan = 0;
         this.kakarot = 0;
         this.cadic = 0;
         this.nappa = 0;
+        this.svkCon = 0;
+        this.sonCon = 0;
+        this.khanhCon = 0;
+        this.biCon = 0;
+        this.cayCon = 0;
+        this.binhCon = 0;
         this.giamSatThuong = 0;
         this.thanVuTruKaio = 0;
         this.nail = 0;

@@ -121,7 +121,7 @@ public class Baby extends Boss {
                 return 0;
             }
 
-            damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
+            damage -= damage * getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT) / 100;
 
             damage = this.nPoint.subDameInjureWithDeff(damage / 2);
 

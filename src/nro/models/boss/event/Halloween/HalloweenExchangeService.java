@@ -12,12 +12,12 @@ import nro.models.services.Service;
 
 public final class HalloweenExchangeService {
 
-    private static final int BOX_CARD_COST = 10;
-    private static final int BOX_PUMPKIN_COST = 100;
+    private static final int BOX_CARD_COST = 20;
+    private static final int BOX_PUMPKIN_COST = 200;
     private static final int COSTUME_CARD_COST = 50;
     private static final int COSTUME_PUMPKIN_COST = 500;
-    private static final int PET_CARD_COST = 200;
-    private static final int PET_PUMPKIN_COST = 2_000;
+    private static final int PET_CARD_COST = 400;
+    private static final int PET_PUMPKIN_COST = 4_000;
     private static final int EXCHANGE_COSTUME_EXPIRE_DAYS = 30;
 
     private HalloweenExchangeService() {
@@ -58,48 +58,48 @@ public final class HalloweenExchangeService {
     private static String createMenuText(Player player) {
         int cardCount = countItemBag(player, ConstItem.THIEP_HALLOWEEN);
         int pumpkinCount = countItemBag(player, ConstItem.BI_NGO);
-        return "Doi qua Halloween"
-                + "\nDang co: " + cardCount + " Thiep, " + pumpkinCount + " Bi ngo"
-                + "\n\n10 Thiep + 100 Bi ngo = 1 Hom Halloween"
-                + "\n50 Thiep + 500 Bi ngo = Cai trang Halloween random"
-                + "\n200 Thiep + 2000 Bi ngo = Pet Bi Ma Vuong";
+        return "Đổi quà Halloween"
+                + "\nĐang có: " + cardCount + " Thiệp, " + pumpkinCount + " Bí ngô"
+                + "\n\n20 Thiệp + 200 Bí ngô = 1 Hòm Halloween"
+                + "\n50 Thiệp + 500 Bí ngô = Cải trang Halloween random"
+                + "\n400 Thiệp + 4000 Bí ngô = Pet Bí Ma Vương";
     }
 
     private static String[] createMenuOptions() {
         return new String[]{
-            "Doi\nHom",
-            "Doi\nCai trang",
-            "Doi\nPet",
-            "Dong"
+            "Đổi\nHòm",
+            "Đổi\nCải trang",
+            "Đổi\nPet",
+            "Đóng"
         };
     }
 
     private static void exchange(Player player, int cardCost, int pumpkinCost, Item reward) {
         if (InventoryService.gI().getCountEmptyBag(player) <= 0) {
-            Service.gI().sendThongBao(player, "Hanh trang da day.");
+            Service.gI().sendThongBao(player, "Hành trang đã đầy.");
             return;
         }
 
         int cardCount = countItemBag(player, ConstItem.THIEP_HALLOWEEN);
         int pumpkinCount = countItemBag(player, ConstItem.BI_NGO);
         if (cardCount < cardCost || pumpkinCount < pumpkinCost) {
-            Service.gI().sendThongBao(player, "Khong du nguyen lieu. Can " + cardCost
-                    + " Thiep Halloween va " + pumpkinCost + " Bi ngo.");
+            Service.gI().sendThongBao(player, "Không đủ nguyên liệu. Cần " + cardCost
+                    + " Thiệp Halloween và " + pumpkinCost + " Bí ngô.");
             return;
         }
         if (reward == null || !reward.isNotNullItem()) {
-            Service.gI().sendThongBao(player, "Khong the tao phan thuong Halloween.");
+            Service.gI().sendThongBao(player, "Không thể tạo phần thưởng Halloween.");
             return;
         }
         if (!InventoryService.gI().addItemBag(player, reward)) {
-            Service.gI().sendThongBao(player, "Hanh trang da day.");
+            Service.gI().sendThongBao(player, "Hành trang đã đầy.");
             return;
         }
 
         subItemBag(player, ConstItem.THIEP_HALLOWEEN, cardCost);
         subItemBag(player, ConstItem.BI_NGO, pumpkinCost);
         InventoryService.gI().sendItemBags(player);
-        Service.gI().sendThongBao(player, "Doi thanh cong " + reward.template.name + ".");
+        Service.gI().sendThongBao(player, "Đổi thành công " + reward.template.name + ".");
     }
 
     private static int countItemBag(Player player, int itemId) {

@@ -170,7 +170,7 @@ public class GoldenFrieza extends Boss {
         }
 
         damage = Math.min(damage, 50_000_000);
-        damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
+        damage -= damage * getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT) / 100;
         this.nPoint.subHP(damage);
 
         if (isDie()) {

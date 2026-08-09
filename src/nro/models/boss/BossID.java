@@ -198,6 +198,8 @@ public class BossID {
     public static final int HTTV_GOKU = -388;
     public static final int HTTV_CADIC = -389;
     public static final int HTTV_BLACK_GOKU = -390;
+    public static final int WHIS_BOSS = -391;
+    public static final int BEERUS_BOSS = -392;
     public static final int RONG_NHI = -386998;
     //========================Cadic M========================
     public static final int CADIC_M = -924;

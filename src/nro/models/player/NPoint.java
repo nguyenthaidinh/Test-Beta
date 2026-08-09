@@ -34,7 +34,7 @@ import nro.models.utils.TimeUtil;
  */
 public class NPoint {
 
-    public static final byte MAX_LIMIT = 12;
+    public static final byte MAX_LIMIT = 15;
     public static final long MAX_PLAYER_HP = 20_000_000_000L;
     public static final long MAX_PLAYER_DAME = 20_000_000_000L;
 
@@ -925,6 +925,15 @@ public class NPoint {
         if (this.player.setClothes.nappa == 5) {
             hpMax += (hpMax * 80L / 100L);
         }
+        if (this.player.setClothes.biCon == 5) {
+            hpMax += (hpMax * 120L / 100L);
+        }
+        if (this.player.setClothes.cayCon == 5) {
+            hpMax += (hpMax * 50L / 100L);
+        }
+        if (this.player.setClothes.binhCon == 5) {
+            hpMax += (hpMax * 60L / 100L);
+        }
 
         if (this.player.setClothes.cadicM >= 2) {
             hpMax += (hpMax * 20L / 100L);
@@ -1093,6 +1102,9 @@ public class NPoint {
         // Xu ly set Picolo
         if (this.player.setClothes.picolo == 5) {
             mpMax += (mpMax * 100L / 100L);
+        }
+        if (this.player.setClothes.sonEm == 5) {
+            mpMax += (mpMax * 150L / 100L);
         }
         if (this.isNguyetAn) {
             mpMax += (mpMax * 15L / 100L);
@@ -1455,6 +1467,9 @@ public class NPoint {
         this.def = this.defg * 4;
         this.def += this.defAdd;
 
+        if (this.player.setClothes.binhCon == 5) {
+            this.def += this.def * 30 / 100;
+        }
         if (this.player.itemTime != null && this.player.itemTime.isUseNuocMia3) {
             this.def += this.def * 10 / 100;
         }
@@ -1592,7 +1607,7 @@ public class NPoint {
         intrinsic = this.player.playerIntrinsic.intrinsic;
         percentDameIntrinsic = 0;
         int percentDameSkill = 0;
-        byte percentXDame = 0;
+        int percentXDame = 0;
         Skill skillSelect = player.playerSkill.skillSelect;
         if (skillSelect.template.id != Skill.DICH_CHUYEN_TUC_THOI && isCritTele) {
             isCrit = true;
@@ -1611,7 +1626,10 @@ public class NPoint {
                 }
                 percentDameSkill = skillSelect.damage;
                 if (this.player.setClothes.songoku == 5) {
-                    percentXDame = 100;
+                    percentXDame += 100;
+                }
+                if (this.player.setClothes.svkCon == 5) {
+                    percentXDame += 125;
                 }
                 break;
             case Skill.GALICK:
@@ -1660,13 +1678,19 @@ public class NPoint {
                 }
                 percentDameSkill = skillSelect.damage;
                 if (this.player.setClothes.ocTieu == 5) {
-                    percentXDame = 100;
+                    percentXDame += 100;
+                }
+                if (this.player.setClothes.ngaoCon == 5) {
+                    percentXDame += 130;
                 }
                 break;
             case Skill.KAIOKEN:
                 percentDameSkill = skillSelect.damage;
                 if (player.setClothes.thanVuTruKaio == 5) {
-                    percentXDame = 30;
+                    percentXDame += 30;
+                }
+                if (player.setClothes.sonCon == 5) {
+                    percentXDame += 40;
                 }
                 break;
             case Skill.DICH_CHUYEN_TUC_THOI:
@@ -1708,6 +1732,9 @@ public class NPoint {
             case Skill.DE_TRUNG:
                 if (player.setClothes.pikkoroDaimao == 5) {
                     dameAttack *= 4;
+                }
+                if (player.setClothes.ngaoEm == 5) {
+                    dameAttack += dameAttack * 150 / 100;
                 }
                 return Math.min(dameAttack, MAX_PLAYER_DAME);
         }
@@ -1954,6 +1981,12 @@ public class NPoint {
                 return 110010000000L;
             case 12:
                 return 120010000000L;
+            case 13:
+                return 130010000000L;
+            case 14:
+                return 140010000000L;
+            case 15:
+                return 150010000000L;
             default:
                 return 0;
         }
@@ -1987,6 +2020,12 @@ public class NPoint {
                 return 110010000000L;
             case 12:
                 return 120010000000L;
+            case 13:
+                return 130010000000L;
+            case 14:
+                return 140010000000L;
+            case 15:
+                return 150010000000L;
             default:
                 return 0;
         }
@@ -2020,6 +2059,12 @@ public class NPoint {
                 return 675000;
             case 12:
                 return 750000;
+            case 13:
+                return 825000;
+            case 14:
+                return 900000;
+            case 15:
+                return 1000000;
             default:
                 return 0;
         }
@@ -2053,6 +2098,12 @@ public class NPoint {
                 return 30000;
             case 12:
                 return 33000;
+            case 13:
+                return 36000;
+            case 14:
+                return 39000;
+            case 15:
+                return 42000;
             default:
                 return 0;
         }
@@ -2086,6 +2137,12 @@ public class NPoint {
                 return 2200;
             case 12:
                 return 2500;
+            case 13:
+                return 2800;
+            case 14:
+                return 3100;
+            case 15:
+                return 3500;
             default:
                 return 0;
         }
@@ -2119,13 +2176,30 @@ public class NPoint {
                 return 12;
             case 12:
                 return 13;
+            case 13:
+                return 14;
+            case 14:
+                return 15;
+            case 15:
+                return 16;
             default:
                 return 0;
         }
     }
 
     public void powerUp(long power) {
-        this.power += power;
+        if (power <= 0) {
+            return;
+        }
+        long maxPower = getPowerLimit();
+        if (maxPower > 0) {
+            if (this.power >= maxPower) {
+                return;
+            }
+            this.power += Math.min(power, maxPower - this.power);
+        } else {
+            this.power += power;
+        }
         TaskService.gI().checkDoneTaskPower(player, this.power);
     }
 

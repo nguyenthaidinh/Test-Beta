@@ -43,9 +43,9 @@ public class ItemService {
     private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
     private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 50, 77, 96, 103, 106, 108, 117, 204};
     private static final short COSTUME_JACKY_CHUN_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
-    private static final int COSTUME_JACKY_CHUN_LEGACY_CHUONG_INFO_OPTION = 251;
+    private static final int DO_THAN_THANH_SET_OPTION = 251;
     private static final String COSTUME_JACKY_CHUN_DESCRIPTION = "C\u1ea3i trang th\u00e0nh Jacky Chun\nM\u1ed7i 1 ph\u00fat, \u0111\u00f2n ch\u01b0\u1edfng \u0111\u1ea7u ti\u00ean x4 s\u00e1t th\u01b0\u01a1ng";
-    private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117, COSTUME_JACKY_CHUN_LEGACY_CHUONG_INFO_OPTION};
+    private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117, DO_THAN_THANH_SET_OPTION};
     private static final short ANGEL_DEMON_WINGS_ID = 1722;
     private static final String ANGEL_DEMON_WINGS_DESCRIPTION = "T\u0103ng 20% s\u1ee9c \u0111\u00e1nh, HP, KI v\u00e0 20% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss";
     private static final int[] ANGEL_DEMON_WINGS_CONTROLLED_OPTIONS = {50, 77, 103, 204};
@@ -747,10 +747,14 @@ public class ItemService {
     }
 
     public Item createItemSKH(int itemId, int skhId) {
+        return createItemSKH(itemId, skhId, 1);
+    }
+
+    public Item createItemSKH(int itemId, int skhId, int skhParam) {
         Item item = createItemSetKichHoat(itemId, 1);
         if (item != null) {
             item.itemOptions.addAll(ItemService.gI().getListOptionItemShop((short) itemId));
-            item.itemOptions.add(new Item.ItemOption(skhId, 1));
+            item.itemOptions.add(new Item.ItemOption(skhId, skhParam));
             for (int subId : getOptionIdsBySKH(skhId)) {
                 item.itemOptions.add(new Item.ItemOption(subId, 1));
             }
@@ -815,6 +819,11 @@ public class ItemService {
                 return new int[]{242, 243, 244};
             case 245:
                 return new int[]{246, 247, 248};
+            case 251:
+            case 252:
+            case 253:
+            case 254:
+                return new int[]{};
             default:
                 return new int[]{};
         }
@@ -1614,11 +1623,15 @@ public class ItemService {
     }
 
     public Item createDoThanLinhKichHoat(int gender, int skhId) {
+        return createDoThanLinhKichHoat(gender, skhId, 1);
+    }
+
+    public Item createDoThanLinhKichHoat(int gender, int skhId, int skhParam) {
         short idTempTL = randomDoThanLinhTemplateId(gender);
         Item item = createItemSetKichHoat(idTempTL, 1);
         item.itemOptions.clear();
         addDoThanLinhOptions(item.itemOptions, idTempTL, 207);
-        item.itemOptions.add(new ItemOption(skhId, 1));
+        item.itemOptions.add(new ItemOption(skhId, skhParam));
         for (int subId : getOptionIdsBySKH(skhId)) {
             item.itemOptions.add(new ItemOption(subId, 1));
         }
@@ -1804,7 +1817,10 @@ public class ItemService {
 
     private void Option_All(List<ItemOption> item, int skhId) {
         item.add(new ItemOption(skhId, 1));
-        item.add(new ItemOption(ID(skhId), 1));
+        int subOptionId = ID(skhId);
+        if (subOptionId > 0) {
+            item.add(new ItemOption(subOptionId, 1));
+        }
         item.add(new ItemOption(30, 1));
     }
 
@@ -1828,6 +1844,11 @@ public class ItemService {
                 return 137;
             case 135: // 3
                 return 138;
+            case 251:
+            case 252:
+            case 253:
+            case 254:
+                return 0;
         }
         return 0;
     }

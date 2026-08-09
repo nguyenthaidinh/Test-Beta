@@ -23,6 +23,7 @@ import nro.models.utils.Util;
 public class Whis extends Npc {
 
     private static final int COST_HD = 50_000_000;
+    private static final String WHIS_FOOD_SHOP_TAG = "WHIS_FOOD";
 
     public Whis(int mapId, int status, int cx, int cy, int tempId, int avatar) {
         super(mapId, status, cx, cy, tempId, avatar);
@@ -38,7 +39,8 @@ public class Whis extends Npc {
             case 154 ->
                 createOtherMenu(player, ConstNpc.BASE_MENU,
                         "Thử đánh với ta xem nào.\nNgươi còn 1 lượt nữa cơ mà.",
-                        "Nói chuyện", "Học\ntuyệt kỹ", "Top 100", "[LV:" + (player.traning.getTop() + 1) + "]");
+                        "Nói chuyện", "Cửa hàng", "Học\ntuyệt kỹ", "Top 100",
+                        "[LV:" + (player.traning.getTop() + 1) + "]");
             case 164 ->
                 createOtherMenu(player, ConstNpc.BASE_MENU,
                         "Ta có thể giúp gì cho ngươi?", "Quay về", "Từ chối");
@@ -71,6 +73,11 @@ public class Whis extends Npc {
                         CombineService.gI().startCombine(player);
                     }
                 }
+                case CombineService.THACH_THUC_THAN_THANH -> {
+                    if (select == 0) {
+                        CombineService.gI().startCombine(player);
+                    }
+                }
                 case 6 ->
                     handleHocTuyetKy(player, select);
             }
@@ -78,35 +85,37 @@ public class Whis extends Npc {
     }
 
     private void handleBaseMenu(Player player, int select) {
-        Item biKiepTuyetKy = InventoryService.gI().findItem(player.inventory.itemsBag, 1229);
+        if (this.mapId == 154) {
+            Item biKiepTuyetKy = InventoryService.gI().findItem(player.inventory.itemsBag, 1229);
+            switch (select) {
+                case 0 ->
+                    createOtherMenu(player, 5,
+                            "Ta sẽ giúp ngươi chế tạo trang bị thiên sứ",
+                            "Shop thiên sứ", "Chế tạo", "Tái hiện\nThánh Thần",
+                            "Th\u00e1ch th\u1ee9c\nTh\u1ea7n Th\u00e1nh", "Từ chối");
+                case 1 ->
+                    ShopService.gI().opendShop(player, WHIS_FOOD_SHOP_TAG, false);
+                case 2 ->
+                    showSkillLearningMenu(player, biKiepTuyetKy);
+                case 3 ->
+                    Service.gI().showListTop(player, Manager.Topwhis);
+                case 4 ->
+                    TrainingService.gI().callBoss(player, BossID.WHIS, false);
+            }
+            return;
+        }
 
         switch (select) {
             case 0 -> {
-                if (this.mapId == 154) {
-                    createOtherMenu(player, 5,
-                            "Ta sẽ giúp ngươi chế tạo trang bị thiên sứ",
-                            "Shop thiên sứ", "Chế tạo", "Tái hiện\nThánh Thần", "Từ chối");
-                } else if (this.mapId == 164) {
+                if (this.mapId == 164) {
                     ChangeMapService.gI().changeMapInYard(player, 154, -1, 758);
                 } else if (this.mapId == 48) {
                     HeroWarService.gI().joinFromWhis(player);
                 }
             }
-            case 2 -> {
-                if (this.mapId == 154) {
-                    Service.gI().showListTop(player, Manager.Topwhis);
-                }
-            }
             case 1 -> {
-                if (this.mapId == 154) {
-                    showSkillLearningMenu(player, biKiepTuyetKy);
-                } else if (this.mapId == 48) {
+                if (this.mapId == 48) {
                     HeroWarService.gI().showWinnerHistory(player);
-                }
-            }
-            case 3 -> {
-                if (this.mapId == 154) {
-                    TrainingService.gI().callBoss(player, BossID.WHIS, false);
                 }
             }
         }
@@ -117,7 +126,7 @@ public class Whis extends Npc {
             case 0 ->
                 ShopService.gI().opendShop(player, "THIEN_SU", false);
             case 1 -> {
-                if (!player.setClothes.checkSetDes()) {
+                if (player.setClothes == null || !player.setClothes.checkSetDes()) {
                     createOtherMenu(player, ConstNpc.IGNORE_MENU,
                             "Ngươi hãy trang bị đủ 5 món trang bị Hủy Diệt rồi ta nói chuyện tiếp.", "OK");
                 } else {
@@ -130,6 +139,14 @@ public class Whis extends Npc {
                             "Ngươi hãy trang bị đủ 5 món trang bị Thiên Sứ rồi ta mới có thể tái hiện Thánh Thần.", "OK");
                 } else {
                     CombineService.gI().openTabCombine(player, CombineService.TAI_HIEN_THANH_THAN);
+                }
+            }
+            case 3 -> {
+                if (player.setClothes == null || !player.setClothes.checkSetAngel()) {
+                    createOtherMenu(player, ConstNpc.IGNORE_MENU,
+                            "Ng\u01b0\u01a1i h\u00e3y trang b\u1ecb \u0111\u1ee7 5 m\u00f3n trang b\u1ecb Thi\u00ean S\u1ee9 r\u1ed3i ta m\u1edbi c\u00f3 th\u1ec3 m\u1edf th\u00e1ch th\u1ee9c Th\u1ea7n Th\u00e1nh.", "OK");
+                } else {
+                    CombineService.gI().openTabCombine(player, CombineService.THACH_THUC_THAN_THANH);
                 }
             }
         }

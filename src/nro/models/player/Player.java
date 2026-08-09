@@ -1137,19 +1137,28 @@ public class Player implements Runnable {
                         tlNeDon = 0;
                 }
 
+                int bonusXuyenGiapSonCon = plAtt.setClothes != null && plAtt.setClothes.sonCon == 5 ? 50 : 0;
+                int tlXuyenGiapChuong = plAtt.nPoint.tlxgc + bonusXuyenGiapSonCon;
+                int tlXuyenGiapCanChien = plAtt.nPoint.tlxgcc + bonusXuyenGiapSonCon;
+
                 switch (plAtt.playerSkill.skillSelect.template.id) {
                     case Skill.KAMEJOKO, Skill.MASENKO, Skill.ANTOMIC -> {
-                        if (tlGiap - plAtt.nPoint.tlxgc >= 0) {
-                            tlGiap -= plAtt.nPoint.tlxgc;
+                        if (tlGiap - tlXuyenGiapChuong >= 0) {
+                            tlGiap -= tlXuyenGiapChuong;
                         } else {
                             tlGiap = 0;
                         }
                     }
                     case Skill.DRAGON, Skill.DEMON, Skill.GALICK, Skill.LIEN_HOAN, Skill.KAIOKEN -> {
-                        if (tlGiap - plAtt.nPoint.tlxgcc >= 0) {
-                            tlGiap -= plAtt.nPoint.tlxgcc;
+                        if (tlGiap - tlXuyenGiapCanChien >= 0) {
+                            tlGiap -= tlXuyenGiapCanChien;
                         } else {
                             tlGiap = 0;
+                        }
+                    }
+                    case Skill.QUA_CAU_KENH_KHI, Skill.MAKANKOSAPPO, Skill.DICH_CHUYEN_TUC_THOI -> {
+                        if (bonusXuyenGiapSonCon > 0) {
+                            tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon);
                         }
                     }
                 }

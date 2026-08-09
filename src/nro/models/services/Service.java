@@ -987,8 +987,12 @@ public class Service {
         }
 
         if (player.isPet) {
-            player.nPoint.powerUp(param);
-            player.nPoint.tiemNangUp(param);
+            long petMaxPower = player.nPoint.getPowerLimit();
+            long petParam = Math.min(param, Math.max(0, petMaxPower - player.nPoint.power));
+            if (petParam > 0) {
+                player.nPoint.powerUp(petParam);
+                player.nPoint.tiemNangUp(petParam);
+            }
 
             Player master = ((Pet) player).master;
 
@@ -2106,18 +2110,27 @@ public class Service {
             if (pl.setClothes.songoku >= 5
                     || pl.setClothes.kaioken >= 5
                     || pl.setClothes.kirin >= 5
-                    || pl.setClothes.thienXinHang >= 5) {
+                    || pl.setClothes.thienXinHang >= 5
+                    || pl.setClothes.svkCon >= 5
+                    || pl.setClothes.sonCon >= 5
+                    || pl.setClothes.khanhCon >= 5) {
                 Service.gI().sendEffAllPlayer(pl, 1200, 1, -1, 1);
             } else if (pl.setClothes.ocTieu >= 5
                     || pl.setClothes.pikkoroDaimao >= 5
-                    || pl.setClothes.picolo >= 5) {
+                    || pl.setClothes.picolo >= 5
+                    || pl.setClothes.sonEm >= 5
+                    || pl.setClothes.ngaoCon >= 5
+                    || pl.setClothes.ngaoEm >= 5) {
                 Service.gI().sendEffAllPlayer(pl, 10277, 1, -1, 1);
             } else if (pl.setClothes.thanVuTruKaio >= 5) {
                 Service.gI().sendEffAllPlayer(pl, 10277, 1, -1, 1);
                 Service.gI().sendEffAllPlayer(pl, 5017, 1, -1, 1);
             } else if (pl.setClothes.kakarot >= 5
                     || pl.setClothes.nappa >= 5
-                    || pl.setClothes.cadic >= 5) {
+                    || pl.setClothes.cadic >= 5
+                    || pl.setClothes.biCon >= 5
+                    || pl.setClothes.cayCon >= 5
+                    || pl.setClothes.binhCon >= 5) {
                 Service.gI().sendEffAllPlayer(pl, 1202, 1, -1, 1);
             }
         }

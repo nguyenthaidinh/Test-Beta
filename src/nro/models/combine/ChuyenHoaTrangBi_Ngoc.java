@@ -147,6 +147,7 @@ public class ChuyenHoaTrangBi_Ngoc {
         return io.optionTemplate.id >= 136 && io.optionTemplate.id <= 144
                 || io.optionTemplate.id >= 224 && io.optionTemplate.id <= 227
                 || io.optionTemplate.id >= 127 && io.optionTemplate.id <= 132
+                || io.optionTemplate.id >= 251 && io.optionTemplate.id <= 254
                 || io.optionTemplate.id == 6 || io.optionTemplate.id == 7 || io.optionTemplate.id == 9;
     }
 
@@ -198,6 +199,7 @@ public class ChuyenHoaTrangBi_Ngoc {
         return (id == 236 || id == 228
                 || (id >= 127 && id <= 135) || (id >= 136 && id <= 144)
                 || (id >= 233 && id <= 248) || (id >= 136 && id <= 144)
+                || (id >= 251 && id <= 254)
                 || (id >= 210 && id <= 218) || (id >= 224 && id <= 227));
     }
 }

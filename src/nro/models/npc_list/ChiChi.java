@@ -14,7 +14,6 @@ import nro.models.services.InventoryService;
 import nro.models.server.Manager;
 import nro.models.services.ItemService;
 import nro.models.services.Service;
-import nro.models.services_func.Input;
 import nro.models.shop.ShopService;
 import nro.models.utils.Util;
 
@@ -25,6 +24,7 @@ import nro.models.utils.Util;
  */
 public class ChiChi extends Npc {
 
+    private static final String HALLOWEEN_EVENT_SHOP_TAG = "HALLOWEEN_EVENT_SHOP";
     private static final int MENU_BUY_TRAIN_ARMOR_5 = 186900;
     private static final int MENU_BUY_CLAN_CAPSULE = 186901;
     private static final int MENU_BUY_100_CLAN_CAPSULE = 186902;
@@ -45,9 +45,6 @@ public class ChiChi extends Npc {
     public void openBaseMenu(Player player) {
         if (canOpenNpc(player)) {
             List<String> menu = new ArrayList<>(Arrays.asList(
-                    "Top\nHộp quà\nthiếu nhi\n2025",
-                    "Top\nNước mía",
-                    "Top\nKem trái cây",
                     "Cửa hàng",
                     "Giáp\nluyện tập\ncấp 5",
                     "1 Capsule\nBang\n10 TV",
@@ -55,8 +52,9 @@ public class ChiChi extends Npc {
                     "Mua 1\nthỏi vàng\n50tr vàng",
                     "Đóng"));
 
-            menu.add(menu.size() - 1, "Top\nHom\nHalloween");
-            menu.add(menu.size() - 1, "Doi qua\nHalloween");
+            menu.add(menu.size() - 1, "Shop\nsự kiện");
+            menu.add(menu.size() - 1, "Top\nHòm\nHalloween");
+            menu.add(menu.size() - 1, "Đổi quà\nHalloween");
             String[] menus = menu.toArray(new String[0]);
 
             createOtherMenu(player, ConstNpc.BASE_MENU,
@@ -68,92 +66,46 @@ public class ChiChi extends Npc {
     @Override
     public void confirmMenu(Player player, int select) {
         if (canOpenNpc(player)) {
-            int soLuong = 0;
             if (this.mapId == 5) {
                 if (player.idMark.isBaseMenu()) {
                     switch (select) {
-                        case 3:
+                        case 0:
                             ShopService.gI().opendShop(player, "SHOP_CHI_CHI", false);
                             break;
-                        case 4:
+                        case 1:
                             createOtherMenu(player, MENU_BUY_TRAIN_ARMOR_5,
                                     "Con có muốn mua Giáp tập luyện cấp 5\nGiá "
                                     + Util.numberToMoney(TRAIN_ARMOR_5_GOLD_COST) + " vàng không?",
                                     "Mua", "Từ chối");
                             break;
-                        case 5:
+                        case 2:
                             createOtherMenu(player, MENU_BUY_CLAN_CAPSULE,
                                     "Con có muốn mua 1 Capsule Bang cho bang hội\nvới giá 10 thỏi vàng không?",
                                     "Mua", "Từ chối");
                             break;
-                        case 6:
+                        case 3:
                             createOtherMenu(player, MENU_BUY_100_CLAN_CAPSULE,
                                     "Con có muốn mua 100 Capsule Bang cho bang hội\n"
                                     + "với giá 1.200 thỏi vàng không?",
                                     "Mua", "Từ chối");
                             break;
-                        case 7:
+                        case 4:
                             createOtherMenu(player, MENU_BUY_GOLD_BAR,
                                     "Con có muốn mua 1 thỏi vàng với giá 50 triệu vàng không?",
                                     "Mua", "Từ chối");
                             break;
-                        case 8:
+                        case 5:
+                            ShopService.gI().opendShop(player, HALLOWEEN_EVENT_SHOP_TAG, false);
+                            break;
+                        case 6:
                             createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_BOX_TOP,
-                                    "Dua top mo Hom Halloween.\nMoi lan mo thanh cong 1 Hom Halloween se duoc tinh 1 diem.",
-                                    "Top 100\nHom\nHalloween",
-                                    "Xem diem",
-                                    "Dong");
+                                    "Đua top mở Hòm Halloween.\nMỗi lần mở thành công 1 Hòm Halloween sẽ được tính 1 điểm.",
+                                    "Top 100\nHòm\nHalloween",
+                                    "Xem điểm",
+                                    "Đóng");
                             break;
-                        case 9:
+                        case 7:
                             HalloweenExchangeService.openExchangeMenu(player, this);
-                            break;
-                        case 0:
-                            createOtherMenu(player, ConstNpc.PHAO_BONG_VIP,
-                                    "Sự kiện đua top Hộp quà thiếu nhi nhận quà khủng\n Kết thúc và trao giải sau (....)\nHạn chót nhận giải: (15 ngày nữa)\nĐến gặp ChiChi để nhận giải nhé\nChi tiết xem tại diễn đàn, Fanpage",
-                                    "Top 100\nHộp quà\nthiếu nhi\n2025",
-                                    "Xem điểm",
-                                    "Đóng");
-                            break;
-                        case 1:
-                            createOtherMenu(player, ConstNpc.PHAO_BONG,
-                                    "Sự kiện đua top Nước mía nhận quà khủng\n Kết thúc và trao giải sau (....)\nHạn chót nhận giải: (15 ngày nữa)\nĐến gặp ChiChi để nhận giải nhé\nChi tiết xem tại diễn đàn, Fanpage",
-                                    "Top 100\nNước mía",
-                                    "Xem điểm",
-                                    "Đóng");
-                            break;
-                        case 2:
-                            createOtherMenu(player, ConstNpc.GOKU_DAY,
-                                    "Sự kiện đua top Kem trái cây nhận quà khủng\n Kết thúc và trao giải sau (....)\nHạn chót nhận giải: (15 ngày nữa)\nĐến gặp ChiChi để nhận giải nhé\nChi tiết xem tại diễn đàn, Fanpage",
-                                    "Top 100\nKem trái cây",
-                                    "Xem điểm",
-                                    "Đóng");
-                            break;
-                    }
-                } else if (player.idMark.getIndexMenu() == ConstNpc.PHAO_BONG_VIP) {
-                    switch (select) {
-                        case 0:
-                            Service.gI().showListTop(player, Manager.Topsukien);
-                            break;
-                        case 1:
-                            Service.gI().sendThongBao(player, "Bạn có " + player.point_sukien + " điểm Hộp quà thiếu nhi.");
-                            break;
-                    }
-                } else if (player.idMark.getIndexMenu() == ConstNpc.PHAO_BONG) {
-                    switch (select) {
-                        case 0:
-                            Service.gI().showListTop(player, Manager.Topsukien1);
-                            break;
-                        case 1:
-                            Service.gI().sendThongBao(player, "Bạn có " + player.point_sukien1 + " điểm Nước mía.");
-                            break;
-                    }
-                } else if (player.idMark.getIndexMenu() == ConstNpc.GOKU_DAY) {
-                    switch (select) {
-                        case 0:
-                            Service.gI().showListTop(player, Manager.Topsukien2);
-                            break;
-                        case 1:
-                            Service.gI().sendThongBao(player, "Bạn có " + player.point_sukien2 + " điểm Kem trái cây.");
                             break;
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_BOX_TOP) {
@@ -162,7 +114,7 @@ public class ChiChi extends Npc {
                             Service.gI().showListTop(player, Manager.TopHalloweenBox);
                             break;
                         case 1:
-                            Service.gI().sendThongBao(player, "Ban da mo " + player.point_halloween_box + " Hom Halloween.");
+                            Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_box + " Hòm Halloween.");
                             break;
                     }
                 } else if (player.idMark.getIndexMenu() == MENU_BUY_TRAIN_ARMOR_5) {

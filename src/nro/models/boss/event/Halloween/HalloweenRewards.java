@@ -25,6 +25,8 @@ public final class HalloweenRewards {
     private static final int HALLOWEEN_STAT_MIN = 25;
     private static final int HALLOWEEN_STAT_MAX = 50;
     private static final int HALLOWEEN_COSTUME_EXTRA_PERCENT = 30;
+    private static final int HALLOWEEN_PET_CRITICAL_DAMAGE_MIN = 15;
+    private static final int HALLOWEEN_PET_CRITICAL_DAMAGE_MAX = 25;
 
     private static final int[] COSTUME_REWARDS = {
         ConstItem.CAI_TRANG_BONG_BANG_HALLOWEEN,
@@ -140,12 +142,17 @@ public final class HalloweenRewards {
         options.add(new ItemOption(OPTION_DAMAGE_PERCENT, randomHalloweenStat()));
         options.add(new ItemOption(OPTION_HP_PERCENT, randomHalloweenStat()));
         options.add(new ItemOption(OPTION_KI_PERCENT, randomHalloweenStat()));
+        options.add(new ItemOption(OPTION_CRITICAL_DAMAGE_PERCENT, randomHalloweenPetCriticalDamage()));
         options.add(new ItemOption(OPTION_DEF_PERCENT, 5));
         options.add(new ItemOption(OPTION_CAN_NOT_TRADE, 0));
     }
 
     private static int randomHalloweenStat() {
         return Util.nextInt(HALLOWEEN_STAT_MIN, HALLOWEEN_STAT_MAX);
+    }
+
+    private static int randomHalloweenPetCriticalDamage() {
+        return Util.nextInt(HALLOWEEN_PET_CRITICAL_DAMAGE_MIN, HALLOWEEN_PET_CRITICAL_DAMAGE_MAX);
     }
 
     private static boolean isHalloweenCostume(int itemId) {

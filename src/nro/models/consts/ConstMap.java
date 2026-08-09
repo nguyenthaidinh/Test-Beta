@@ -162,6 +162,7 @@ public class ConstMap {
     public static final int THANH_CO_1 = 183;
     public static final int THANH_CO_2 = 184;
     public static final int DAU_TRUONG_THANH_CO = 185;
+    public static final int DAO_HAI_TAC_1 = 186;
     //type change map
     public static final int CHANGE_CAPSULE = 500;
     public static final int CHANGE_BLACK_BALL = 501;

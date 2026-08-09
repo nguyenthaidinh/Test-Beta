@@ -42,6 +42,8 @@ import static nro.models.consts.BossType.SKILLSUMMONED;
 import static nro.models.consts.BossType.TET_EVENT;
 import static nro.models.consts.BossType.TRUNGTHU_EVENT;
 import static nro.models.consts.BossType.YARDART;
+import nro.models.consts.ConstItem;
+import nro.models.map.ItemMap;
 import nro.models.network.Message;
 import java.util.List;
 import nro.models.map.Zone;
@@ -63,6 +65,10 @@ import nro.models.interfaces.IBoss;
 import java.io.IOException;
 
 public class Boss extends Player implements IBoss {
+
+    private static final int DA_NGU_SAC_DROP_RATE = 5;
+    private static final int DA_NGU_SAC_THAN_HUY_DIET_DROP_RATE = 50;
+    private static final int DA_NGU_SAC_DROP_QUANTITY = 1;
 
     public int currentLevel = -1;
     public final BossData[] data;
@@ -635,17 +641,42 @@ public class Boss extends Player implements IBoss {
                 && (this.zone.map.mapId != 140 || !MapService.gI().isMapMaBu(this.zone.map.mapId)
                 || !MapService.gI().isMapDoanhTrai(this.zone.map.mapId)
                 || !MapService.gI().isMapBanDoKhoBau(this.zone.map.mapId))) {
-            if (!plKill.isBot) {
-                reward(plKill);
-            }
+            rewardKiller(plKill);
             ServerNotify.gI().notify(plKill.name + ": Đã tiêu diệt được " + this.name + " mọi người đều ngưỡng mộ.");
             this.changeStatus(BossStatus.DIE);
         } else {
-            if (plKill != null && !plKill.isBot) {
-                reward(plKill);
-            }
+            rewardKiller(plKill);
             this.changeStatus(BossStatus.DIE);
         }
+    }
+
+    private void rewardKiller(Player plKill) {
+        if (plKill == null || plKill.isBot) {
+            return;
+        }
+        reward(plKill);
+        dropDaNguSacFromLargeBoss(plKill);
+    }
+
+    private void dropDaNguSacFromLargeBoss(Player plKill) {
+        if (this.zone == null || this.zone.map == null || this.location == null
+                || !BossDropRateManager.gI().supportsLargeBossDrop(this)
+                || !Util.isTrue(getDaNguSacDropRate(), 100)) {
+            return;
+        }
+        int x = this.location.x + Util.nextInt(-30, 30);
+        int y = this.zone.map.yPhysicInTop(this.location.x, this.location.y - 24);
+        Service.gI().dropItemMap(this.zone,
+                new ItemMap(this.zone, ConstItem.DA_NGU_SAC, DA_NGU_SAC_DROP_QUANTITY, x, y, plKill.id));
+    }
+
+    private int getDaNguSacDropRate() {
+        String className = getClass().getName();
+        if ("nro.models.boss.than_huy_diet.WhisBoss".equals(className)
+                || "nro.models.boss.than_huy_diet.BeerusBoss".equals(className)) {
+            return DA_NGU_SAC_THAN_HUY_DIET_DROP_RATE;
+        }
+        return DA_NGU_SAC_DROP_RATE;
     }
 
     @Override
@@ -720,6 +751,16 @@ public class Boss extends Player implements IBoss {
         } else {
             return 0;
         }
+    }
+
+    protected int getEffectiveDamageReductionPercent(Player plAtt, int reductionPercent) {
+        if (reductionPercent <= 0) {
+            return 0;
+        }
+        if (plAtt != null && plAtt.setClothes != null && plAtt.setClothes.sonCon == 5) {
+            return Math.max(0, reductionPercent - 50);
+        }
+        return reductionPercent;
     }
 
     @Override

@@ -191,6 +191,7 @@ public class ChuyenHoaTrangBi_Vang {
         return (id == 236 || id == 228
                 || (id >= 127 && id <= 135) || (id >= 136 && id <= 144)
                 || (id >= 233 && id <= 248) || (id >= 136 && id <= 144)
+                || (id >= 251 && id <= 254)
                 || (id >= 210 && id <= 218) || (id >= 224 && id <= 227));
     }
 }

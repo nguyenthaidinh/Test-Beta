@@ -619,6 +619,9 @@ public class SkillService {
                 if (player.setClothes.thienXinHang == 5) {
                     timeStun *= 2;
                 }
+                if (player.setClothes.khanhCon == 5) {
+                    timeStun *= 2;
+                }
                 mobs = new ArrayList<>();
                 players = new ArrayList<>();
                 if (!MapService.gI().isMapOffline(player.zone.map.mapId)) {
@@ -774,6 +777,9 @@ public class SkillService {
         int rangeBom = SkillUtil.getRangeBom(tuSatSkill.point);
         if (player.setClothes.cadicM == 2) {
             rangeBom += 200;
+        }
+        if (player.setClothes.cayCon == 5) {
+            rangeBom *= 2;
         }
         long dame = player.nPoint.hp;
         if (player.setClothes.cadicM == 4) {
@@ -1328,6 +1334,9 @@ public class SkillService {
                 if (intrinsic.id == 12) {
                     subTimeParam = intrinsic.param1;
                 }
+                if (player.setClothes.ngaoEm == 5) {
+                    subTimeParam += 50;
+                }
             }
             case Skill.TU_SAT -> {
                 if (intrinsic.id == 19) {
@@ -1337,6 +1346,11 @@ public class SkillService {
             case Skill.HUYT_SAO -> {
                 if (intrinsic.id == 21) {
                     subTimeParam = intrinsic.param1;
+                }
+            }
+            case Skill.THOI_MIEN -> {
+                if (player.setClothes.khanhCon == 5) {
+                    subTimeParam += 50;
                 }
             }
             case Skill.MASENKO -> {
@@ -1351,6 +1365,9 @@ public class SkillService {
                     subTimeParam = subTimeParam + 50; // Nếu nail = 5, cộng thêm 50
                 }
             }
+        }
+        if (subTimeParam > 100) {
+            subTimeParam = 100;
         }
         player.playerSkill.skillSelect.lastTimeUseThisSkill = System.currentTimeMillis() - 1;
         int coolDown = player.playerSkill.skillSelect.coolDown;

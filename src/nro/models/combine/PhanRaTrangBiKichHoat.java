@@ -103,6 +103,9 @@ public class PhanRaTrangBiKichHoat {
                 return false;
             }
             for (ItemOption option : item.itemOptions) {
+                if (option == null || option.optionTemplate == null) {
+                    continue;
+                }
                 for (int[] optionsForRace : optionIds) {
                     for (int validOptionId : optionsForRace) {
                         if (option.optionTemplate.id == validOptionId) {

@@ -95,6 +95,8 @@ import nro.models.boss.event_trung_thu.NguyetThan;
 import nro.models.boss.event_trung_thu.NhatThan;
 import nro.models.boss.event_tet.LanCon;
 import nro.models.boss.event_noel.OngGiaNoel;
+import nro.models.boss.than_huy_diet.BeerusBoss;
+import nro.models.boss.than_huy_diet.WhisBoss;
 import nro.models.player.Player;
 import nro.models.network.Message;
 import nro.models.map.service.MapService;
@@ -392,6 +394,10 @@ public class BossManager implements Runnable {
                     new RongNhi();
                 case BossID.BABY ->
                     new Baby();
+                case BossID.WHIS_BOSS ->
+                    new WhisBoss();
+                case BossID.BEERUS_BOSS ->
+                    new BeerusBoss();
                 default ->
                     null;
             };

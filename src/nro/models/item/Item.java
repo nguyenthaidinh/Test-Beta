@@ -152,7 +152,10 @@ public class Item {
     public boolean isSKH() {
         for (ItemOption itemOption : itemOptions) {
             if (itemOption != null && itemOption.optionTemplate != null
-                    && itemOption.optionTemplate.id >= 127 && itemOption.optionTemplate.id <= 135) {
+                    && ((itemOption.optionTemplate.id >= 127 && itemOption.optionTemplate.id <= 135)
+                    || itemOption.optionTemplate.id == 233
+                    || (itemOption.optionTemplate.id >= 237 && itemOption.optionTemplate.id <= 248)
+                    || (itemOption.optionTemplate.id >= 251 && itemOption.optionTemplate.id <= 254))) {
                 return true;
             }
         }

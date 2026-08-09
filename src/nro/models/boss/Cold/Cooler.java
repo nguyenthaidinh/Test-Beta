@@ -97,7 +97,7 @@ public class Cooler extends Boss {
                 this.chat("Xí hụt");
                 return 0;
             }
-            damage -= damage * DAMAGE_REDUCTION_PERCENT / 100;
+            damage -= damage * getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT) / 100;
             damage = this.nPoint.subDameInjureWithDeff(damage);
             this.nPoint.subHP(damage);
             if (isDie()) {

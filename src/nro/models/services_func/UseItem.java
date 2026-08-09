@@ -1538,19 +1538,19 @@ public class UseItem {
 
     private void openHalloweenBox(Player pl, Item item) {
         if (InventoryService.gI().getCountEmptyBag(pl) <= 0) {
-            Service.gI().sendThongBao(pl, "Hanh trang da day");
+            Service.gI().sendThongBao(pl, "Hành trang đã đầy");
             return;
         }
 
         Item reward = HalloweenRewards.createHalloweenBoxReward();
         if (reward == null || !reward.isNotNullItem()) {
-            Service.gI().sendThongBao(pl, "Khong the tao phan thuong Halloween");
+            Service.gI().sendThongBao(pl, "Không thể tạo phần thưởng Halloween");
             return;
         }
         int rewardQuantity = reward.quantity;
 
         if (!InventoryService.gI().addItemBag(pl, reward)) {
-            Service.gI().sendThongBao(pl, "Hanh trang da day");
+            Service.gI().sendThongBao(pl, "Hành trang đã đầy");
             return;
         }
 
@@ -1559,7 +1559,7 @@ public class UseItem {
         Service.gI().updatePlayerPointHalloweenBox(pl);
         Manager.isTopHalloweenBoxChanged = true;
         InventoryService.gI().sendItemBags(pl);
-        Service.gI().sendThongBao(pl, "Ban nhan duoc " + reward.template.name
+        Service.gI().sendThongBao(pl, "Bạn nhận được " + reward.template.name
                 + (rewardQuantity > 1 ? " x" + rewardQuantity : ""));
         CombineService.gI().sendEffectOpenItem(pl, item.template.iconID, reward.template.iconID);
     }

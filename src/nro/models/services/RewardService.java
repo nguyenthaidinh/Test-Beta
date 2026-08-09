@@ -1759,9 +1759,11 @@ public class RewardService {
 
     public void initActivationOption(int gender, int type, List<ItemOption> list) {
         if (type <= 4) {
-            int[] idOption = ACTIVATION_SET[gender][Util.nextInt(0, 2)];
+            int[] idOption = ACTIVATION_SET[gender][Util.nextInt(0, ACTIVATION_SET[gender].length - 1)];
             list.add(new ItemOption(idOption[0], 1)); // tên set
-            list.add(new ItemOption(idOption[1], 1)); // hiệu ứng set
+            if (idOption[1] > 0) {
+                list.add(new ItemOption(idOption[1], 1)); // hiệu ứng set
+            }
             list.add(new ItemOption(30, 7)); // không thể giao dịch
         }
     }
