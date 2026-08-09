@@ -446,12 +446,18 @@ public final class Manager {
                     }
                     clan.addClanMember(cm);
                 }
-                dataArray = (JSONArray) JSONValue.parse(rs.getString("thanhTichBDKB"));
-                if (!dataArray.isEmpty()) {
-                    clan.levelDoneBanDoKhoBau = Integer.parseInt(String.valueOf(dataArray.get(0)));
-                    clan.thoiGianHoanThanhBDKB = Long.parseLong(String.valueOf(dataArray.get(1)));
+                Object thanhTichBDKB = JSONValue.parse(rs.getString("thanhTichBDKB"));
+                dataArray = thanhTichBDKB instanceof JSONArray ? (JSONArray) thanhTichBDKB : null;
+                if (dataArray != null && dataArray.size() >= 2) {
+                    try {
+                        clan.levelDoneBanDoKhoBau = Integer.parseInt(String.valueOf(dataArray.get(0)));
+                        clan.thoiGianHoanThanhBDKB = Long.parseLong(String.valueOf(dataArray.get(1)));
+                    } catch (NumberFormatException e) {
+                    }
                 }
-                dataArray.clear();
+                if (dataArray != null) {
+                    dataArray.clear();
+                }
                 CLANS.add(clan);
             }
 
