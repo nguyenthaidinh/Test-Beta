@@ -80,8 +80,7 @@ public class Item {
             if (itemOption == null || itemOption.optionTemplate == null) {
                 continue;
             }
-            if (itemOption.optionTemplate.id == ItemService.DO_THAN_THANH_SET_OPTION
-                    && !ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
+            if (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
                 continue;
             }
             clientOptions.add(itemOption);
@@ -192,23 +191,23 @@ public class Item {
             }
             switch (optionParam) {
                 case ItemService.DO_THAN_THANH_PARAM_SVK_CON:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set SVK con (5 m\u00f3n +125% Kamejoko)";
+                    return "Set SVK con\n(5 m\u00f3n +125% s\u00e1t th\u01b0\u01a1ng Kamejoko)";
                 case ItemService.DO_THAN_THANH_PARAM_SON_CON:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set S\u01a1n con (5 m\u00f3n +50% xuy\u00ean gi\u00e1p, +40% Kaioken)";
+                    return "Set S\u01a1n con\n(5 m\u00f3n +50% xuy\u00ean gi\u00e1p, +40% s\u00e1t th\u01b0\u01a1ng Kaioken)";
                 case ItemService.DO_THAN_THANH_PARAM_KHANH_CON:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Kh\u00e1nh con (5 m\u00f3n x2 Th\u00e1i D\u01b0\u01a1ng H\u1ea1 San, -50% th\u00f4i mi\u00ean)";
+                    return "Set Kh\u00e1nh con\n(5 m\u00f3n x2 Th\u00e1i D\u01b0\u01a1ng H\u1ea1 San, -50% th\u1eddi gian Th\u00f4i Mi\u00ean)";
                 case ItemService.DO_THAN_THANH_PARAM_SON_EM:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set S\u01a1n em (5 m\u00f3n +150% KI)";
+                    return "Set S\u01a1n em\n(5 m\u00f3n +150% KI)";
                 case ItemService.DO_THAN_THANH_PARAM_NGAO_CON:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Ngao con (5 m\u00f3n +130% Li\u00ean Ho\u00e0n)";
+                    return "Set Ngao con\n(5 m\u00f3n +130% s\u00e1t th\u01b0\u01a1ng Li\u00ean Ho\u00e0n)";
                 case ItemService.DO_THAN_THANH_PARAM_NGAO_EM:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Ngao em (5 m\u00f3n +150% \u0110\u1ebb Tr\u1ee9ng, x2 th\u1eddi gian h\u1ed3i)";
+                    return "Set Ngao em\n(5 m\u00f3n +150% s\u00e1t th\u01b0\u01a1ng \u0110\u1ebb Tr\u1ee9ng, x2 th\u1eddi gian h\u1ed3i)";
                 case ItemService.DO_THAN_THANH_PARAM_BI_CON:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Bi con (5 m\u00f3n +120% HP)";
+                    return "Set Bi con\n(5 m\u00f3n +120% HP)";
                 case ItemService.DO_THAN_THANH_PARAM_CAY_CON:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set C\u1ea7y con (5 m\u00f3n +50% HP, x2 ph\u1ea1m vi T\u1ef1 S\u00e1t)";
+                    return "Set C\u1ea7y con\n(5 m\u00f3n +50% HP, x2 ph\u1ea1m vi T\u1ef1 S\u00e1t)";
                 case ItemService.DO_THAN_THANH_PARAM_BINH_CON:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set B\u00ecnh con (5 m\u00f3n +60% HP, +30% gi\u00e1p)";
+                    return "Set B\u00ecnh con\n(5 m\u00f3n +60% HP, +30% gi\u00e1p)";
                 default:
                     return null;
             }
