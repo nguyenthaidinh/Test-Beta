@@ -2806,6 +2806,18 @@ public class Service {
         }
     }
 
+    public void updatePlayerPointHalloweenCapsule(Player pl) {
+        java.sql.PreparedStatement ps = null;
+        try (java.sql.Connection con = LocalManager.getConnection()) {
+            ps = con.prepareStatement("UPDATE player SET point_halloween_capsule = ? WHERE id = ?");
+            ps.setInt(1, pl.point_halloween_capsule);
+            ps.setLong(2, pl.id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            Logger.logException(PlayerDAO.class, e, "Loi update point_halloween_capsule");
+        }
+    }
+
     public void sendDanhQuaiNhanNgoc(Player player) {
         if (player.event.luotNhanNgocMienPhi == 1) {
             Service.gI().sendThongBao(player, "Hôm nay bạn sẽ nhận được từ 1 đến 2 viên ngọc khi tiêu diệt 1 con quái");

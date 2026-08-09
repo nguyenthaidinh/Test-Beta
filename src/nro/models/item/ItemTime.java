@@ -29,7 +29,8 @@ public class ItemTime {
 
     public static final int TIME_BANH_TT_1 = 3_600_000;   // 60 phút
     public static final int TIME_BANH_TT_2 = 5_400_000;   // 90 phút
-    public static final int TIME_BANH_TT_DB = 5_400_000;  // 90 phút
+    public static final int TIME_BANH_TT_DB = 3_600_000;  // 60 phút
+    public static final int TIME_HOP_BANH_TT = 5_400_000; // 90 phút
 
     public static final int TIME_BUA_SANTA = 1800000;
     public static final int TIME_EAT_MEAL = 600000;
@@ -128,8 +129,10 @@ public class ItemTime {
     public long lastTimeBanhTT1;
     public boolean isUseBanhTT2;       // +20% SĐ/HP/KI
     public long lastTimeBanhTT2;
-    public boolean isUseBanhTTDB;      // +30% SĐ/HP/KI
+    public boolean isUseBanhTTDB;      // +15% SĐ, +20% HP/KI
     public long lastTimeBanhTTDB;
+    public boolean isUseHopBanhTT;     // +25% SĐ, +30% HP/KI
+    public long lastTimeHopBanhTT;
 
     public ItemTime(Player player) {
         this.player = player;
@@ -321,6 +324,13 @@ public class ItemTime {
             if (Util.canDoWithTime(lastTimeBanhTTDB, TIME_BANH_TT_DB)) {
                 isUseBanhTTDB = false;
                 Service.gI().sendThongBao(player, "Hiệu ứng Bánh Trung Thu Đặc Biệt đã hết");
+                Service.gI().point(player);
+            }
+        }
+        if (isUseHopBanhTT) {
+            if (Util.canDoWithTime(lastTimeHopBanhTT, TIME_HOP_BANH_TT)) {
+                isUseHopBanhTT = false;
+                Service.gI().sendThongBao(player, "Hiệu ứng Hộp bánh Trung Thu đã hết");
                 Service.gI().point(player);
             }
         }

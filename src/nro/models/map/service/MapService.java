@@ -374,6 +374,9 @@ public class MapService {
      */
     public List<Zone> getMapCapsule(Player pl) {
         List<Zone> list = new ArrayList<>();
+        if (pl.mapBeforeCapsule != null && isMapDaoHaiTac(pl.mapBeforeCapsule.map.mapId)) {
+            pl.mapBeforeCapsule = null;
+        }
         if (pl.mapBeforeCapsule != null
                 && pl.mapBeforeCapsule.map.mapId != 21
                 && pl.mapBeforeCapsule.map.mapId != 22
@@ -417,6 +420,9 @@ public class MapService {
     }
 
     private void addListMapCapsule(Player pl, List<Zone> list, Zone zone) {
+        if (zone != null && isMapDaoHaiTac(zone.map.mapId)) {
+            return;
+        }
         for (Zone z : list) {
             if (z != null && zone != null && z.map.mapId == zone.map.mapId) {
                 return;
@@ -526,6 +532,12 @@ public class MapService {
 
     public boolean isMapHanhTinhThucVat(int mapId) {
         return mapId >= 160 && mapId <= 163;
+    }
+
+    public boolean isMapDaoHaiTac(int mapId) {
+        return mapId == ConstMap.DAO_HAI_TAC_1
+                || mapId == ConstMap.DAO_HAI_TAC_2
+                || mapId == ConstMap.DAO_HAI_TAC_3;
     }
 
     public boolean isMapThanhCo(int mapId) {

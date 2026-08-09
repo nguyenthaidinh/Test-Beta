@@ -95,6 +95,8 @@ import nro.models.boss.event_trung_thu.NguyetThan;
 import nro.models.boss.event_trung_thu.NhatThan;
 import nro.models.boss.event_tet.LanCon;
 import nro.models.boss.event_noel.OngGiaNoel;
+import nro.models.boss.pirate.PirateBlackBoss;
+import nro.models.boss.pirate.PirateCoolerBoss;
 import nro.models.boss.than_huy_diet.BeerusBoss;
 import nro.models.boss.than_huy_diet.WhisBoss;
 import nro.models.player.Player;
@@ -184,6 +186,8 @@ public class BossManager implements Runnable {
         this.createBoss(BossID.POCOLO_NAMEK, 1);
         this.createBoss(BossID.WHIS_BOSS);
         this.createBoss(BossID.BEERUS_BOSS);
+        this.createBoss(BossID.COOLER_PIRATE);
+        this.createBoss(BossID.PIRATE_BLACK, 2);
 
     }
 
@@ -400,6 +404,10 @@ public class BossManager implements Runnable {
                     new WhisBoss();
                 case BossID.BEERUS_BOSS ->
                     new BeerusBoss();
+                case BossID.COOLER_PIRATE ->
+                    new PirateCoolerBoss();
+                case BossID.PIRATE_BLACK ->
+                    new PirateBlackBoss();
                 default ->
                     null;
             };

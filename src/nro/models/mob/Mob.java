@@ -614,6 +614,7 @@ public class Mob {
         }
         int mapid = player.zone.map.mapId;
         addHalloweenMobReward(player, list, x, yEnd, mapid);
+        addPirateIslandChestMobReward(player, list, x, yEnd, mapid);
         //========================Capsul Kì Bí========================
         if (player.itemTime.isUseMayDo
                 && (Util.isTrue(20, 100))
@@ -1080,6 +1081,24 @@ public class Mob {
         applyGoldBonus(player, list);
         return list;
 
+    }
+
+    private void addPirateIslandChestMobReward(Player player, List<ItemMap> list, int x, int yEnd, int mapid) {
+        if (!isPirateIslandMap(mapid)) {
+            return;
+        }
+        if (Util.isTrue(1, 500)) {
+            list.add(new ItemMap(zone, ConstItem.RUONG_VANG, 1, x + 12, yEnd, player.id));
+        }
+        if (Util.isTrue(1, 100)) {
+            list.add(new ItemMap(zone, ConstItem.RUONG_BAC, 1, x, yEnd, player.id));
+        }
+    }
+
+    private boolean isPirateIslandMap(int mapid) {
+        return mapid == ConstMap.DAO_HAI_TAC_1
+                || mapid == ConstMap.DAO_HAI_TAC_2
+                || mapid == ConstMap.DAO_HAI_TAC_3;
     }
 
     private void addHalloweenMobReward(Player player, List<ItemMap> list, int x, int yEnd, int mapid) {

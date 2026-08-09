@@ -208,6 +208,8 @@ public final class BossDropRateManager {
         Set<String> classes = new HashSet<>(DEFAULT_RATES.keySet());
         classes.add("nro.models.boss.than_huy_diet.WhisBoss");
         classes.add("nro.models.boss.than_huy_diet.BeerusBoss");
+        classes.add("nro.models.boss.pirate.PirateCoolerBoss");
+        classes.add("nro.models.boss.pirate.PirateBlackBoss");
         return Set.copyOf(classes);
     }
 

@@ -103,7 +103,7 @@ public class NoiBanh extends Npc {
             case 3 -> {
                 pl.itemTime.isUseBanhTTDB = true;
                 pl.itemTime.lastTimeBanhTTDB = System.currentTimeMillis();
-                thongBao = "Ăn " + tenBanh + " thành công!\n+30% Sức Đánh / HP / KI trong 90 phút";
+                thongBao = "Ăn " + tenBanh + " thành công!\n+15% Sức Đánh, +20% HP / KI trong 60 phút";
             }
             default -> thongBao = "";
         }
@@ -123,7 +123,7 @@ public class NoiBanh extends Npc {
                 + "\n|2|Bánh 2 Trứng (80 Đuôi Khỉ):"
                 + "\n|1|  +20% SĐ / HP / KI - 90 phút"
                 + "\n|2|Bánh Đặc Biệt (120 Đuôi Khỉ):"
-                + "\n|1|  +30% SĐ / HP / KI - 90 phút"
+                + "\n|1|  +15% SĐ, +20% HP / KI - 60 phút"
                 + "\n\n|7|Đuôi Khỉ drop từ Boss Khỉ Đột"
                 + "\n|7|Các buff có thể dùng đồng thời!";
         Service.gI().sendThongBaoOK(pl, info);

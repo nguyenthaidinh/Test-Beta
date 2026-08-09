@@ -2593,28 +2593,64 @@ public class BossesData {
             "Whis", // name
             ConstPlayer.TRAI_DAT, // gender
             new short[] { 838, 839, 840, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
-            10000, // dame, se can bang sau
+            25_000_000, // dame
             new int[] { 2_000_000_000 }, // hp
             new int[] { ConstMap.DAO_HAI_TAC_1 }, // map Dao Hai Tac
             new int[][] {
                     { Skill.DRAGON, 7, 500 } },
-            new String[] { "|-1|Hay thu bat kip ta." },
-            new String[] { "|-1|Cham qua." },
-            new String[] { "|-1|Kha lam." },
+            new String[] { "|-1|Nếu bắt kịp ta, ta sẽ xem như ngươi có chút bản lĩnh." },
+            new String[] { "|-1|Chậm quá, ta còn chưa cần dùng đến quyền trượng." },
+            new String[] { "|-1|Khá lắm, nhưng cuộc vui mới chỉ bắt đầu." },
             REST_1_H);
 
     public static final BossData BEERUS_BOSS = new BossData(
             "Beerus", // name
             ConstPlayer.XAYDA, // gender
             new short[] { 508, 509, 510, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
-            10000, // dame, se can bang sau
+            35_000_000, // dame
             new int[] { 2_000_000_000 }, // hp
             new int[] { ConstMap.DAO_HAI_TAC_1 }, // map Dao Hai Tac
             new int[][] {
                     { Skill.GALICK, 7, 500 } },
-            new String[] { "|-1|Nguoi dam thach thuc Than Huy Diet sao?" },
-            new String[] { "|-1|That vo vi." },
-            new String[] { "|-1|Chuyen nay chua ket thuc." },
+            new String[] { "|-1|Ngươi dám bước vào vùng cấm của Thần Hủy Diệt sao?" },
+            new String[] { "|-1|Một đòn yếu ớt như vậy cũng gọi là tấn công à?" },
+            new String[] { "|-1|Ta sẽ nhớ mặt ngươi. Chuyện này chưa kết thúc đâu." },
+            REST_1_H);
+
+    public static final BossData COOLER_PIRATE = new BossData(
+            "Cooler", // name
+            ConstPlayer.XAYDA, // gender
+            new short[] { 320, 321, 322, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            30_000_000, // dame
+            new int[] { 2_000_000_000 }, // hp
+            new int[] { ConstMap.DAO_HAI_TAC_2 }, // map Vung dat lanh leo
+            new int[][] {
+                    { Skill.GALICK, 7, 500 },
+                    { Skill.ANTOMIC, 7, 1200 } },
+            new String[] { "|-1|Cái lạnh nơi này sẽ chôn vùi những kẻ xâm nhập." },
+            new String[] {
+                    "|-1|Run lên đi, đó là bản năng của kẻ yếu.",
+                    "|-1|Ta sẽ đóng băng cả hơi thở cuối cùng của ngươi.",
+                    "|-1|Đừng nhầm ta với đám thuộc hạ vô dụng." },
+            new String[] { "|-1|Không thể nào... ta là Cooler!" },
+            REST_1_H);
+
+    public static final BossData PIRATE_BLACK = new BossData(
+            "Black Goku", // name
+            ConstPlayer.TRAI_DAT, // gender
+            new short[] { 550, 551, 552, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
+            30_000_000, // dame
+            new int[] { 2_000_000_000 }, // hp
+            new int[] { ConstMap.DAO_HAI_TAC_3 }, // map Khu hang dong
+            new int[][] {
+                    { Skill.KAMEJOKO, 7, 500 },
+                    { Skill.GALICK, 7, 1200 } },
+            new String[] { "|-1|Ta đã chờ một kẻ đủ gan bước vào bóng tối này." },
+            new String[] {
+                    "|-1|Thân xác này sẽ nghiền nát mọi hy vọng của ngươi.",
+                    "|-1|Ánh sáng cuối hang cũng không cứu nổi các ngươi đâu.",
+                    "|-1|Hãy nhìn cho kỹ, đây là sức mạnh của thần linh bị tha hóa." },
+            new String[] { "|-1|Ta sẽ trở lại... cùng một bóng tối sâu hơn." },
             REST_1_H);
 
     public static final BossData GOLDEN_FRIEZA = new BossData(

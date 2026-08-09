@@ -55,6 +55,7 @@ public class ChiChi extends Npc {
             menu.add(menu.size() - 1, "Shop\nsự kiện");
             menu.add(menu.size() - 1, "Top\nHòm\nHalloween");
             menu.add(menu.size() - 1, "Đổi quà\nHalloween");
+            menu.add(menu.size() - 1, "Top\nCapsule\nHalloween");
             String[] menus = menu.toArray(new String[0]);
 
             createOtherMenu(player, ConstNpc.BASE_MENU,
@@ -107,6 +108,13 @@ public class ChiChi extends Npc {
                         case 7:
                             HalloweenExchangeService.openExchangeMenu(player, this);
                             break;
+                        case 8:
+                            createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_CAPSULE_TOP,
+                                    "Đua top mở Capsule Halloween.\nMỗi lần mở thành công 1 Capsule Halloween sẽ được tính 1 điểm.",
+                                    "Top 100\nCapsule\nHalloween",
+                                    "Xem điểm",
+                                    "Đóng");
+                            break;
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_BOX_TOP) {
                     switch (select) {
@@ -115,6 +123,15 @@ public class ChiChi extends Npc {
                             break;
                         case 1:
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_box + " Hòm Halloween.");
+                            break;
+                    }
+                } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_CAPSULE_TOP) {
+                    switch (select) {
+                        case 0:
+                            Service.gI().showListTop(player, Manager.TopHalloweenCapsule);
+                            break;
+                        case 1:
+                            Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_capsule + " Capsule Halloween.");
                             break;
                     }
                 } else if (player.idMark.getIndexMenu() == MENU_BUY_TRAIN_ARMOR_5) {

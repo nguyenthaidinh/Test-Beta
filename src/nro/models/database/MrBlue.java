@@ -127,6 +127,11 @@ public class MrBlue {
                                 } catch (Exception ignored) {
                                     player.point_halloween_box = 0;
                                 }
+                                try {
+                                    player.point_halloween_capsule = rs.getInt("point_halloween_capsule");
+                                } catch (Exception ignored) {
+                                    player.point_halloween_capsule = 0;
+                                }
                                 player.thachdauwhis = rs.getInt("thachdauwhis");
                                 player.point_maydam = rs.getInt("point_maydam");
                                 player.total_damage_maydam = rs.getLong("total_damage_maydam");

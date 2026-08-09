@@ -113,6 +113,7 @@ public final class Manager {
     public static List<TOP> Topsukien1;
     public static List<TOP> Topsukien2 = new ArrayList<>();
     public static List<TOP> TopHalloweenBox = new ArrayList<>();
+    public static List<TOP> TopHalloweenCapsule = new ArrayList<>();
     public static List<TOP> Topwhis;
     public static List<TOP> Topmaydam;
     public static List<TOP> TopLuckyRound = new ArrayList<>();
@@ -120,6 +121,7 @@ public final class Manager {
     public static final String queryTopsukien1 = "SELECT id, point_sukien1 FROM player ORDER BY point_sukien1 DESC LIMIT 100";
     public static final String queryTopsukien2 = "SELECT id, point_sukien2 FROM player ORDER BY point_sukien2 DESC LIMIT 100";
     public static final String queryTopHalloweenBox = "SELECT id, point_halloween_box FROM player WHERE point_halloween_box > 0 ORDER BY point_halloween_box DESC, id ASC LIMIT 100";
+    public static final String queryTopHalloweenCapsule = "SELECT id, point_halloween_capsule FROM player WHERE point_halloween_capsule > 0 ORDER BY point_halloween_capsule DESC, id ASC LIMIT 100";
     public static final String queryTopwhis = "SELECT id, thachdauwhis FROM player ORDER BY thachdauwhis DESC LIMIT 100";
     public static final String queryTopsukien = "SELECT id, point_sukien FROM player ORDER BY point_sukien DESC LIMIT 100";
     public static final String queryTopLuckyRound = "SELECT l.player_id AS id, l.point AS lucky_round_point FROM lucky_round_top l INNER JOIN player p ON p.id = l.player_id WHERE l.point > 0 ORDER BY l.point DESC, l.player_id ASC LIMIT 100";
@@ -130,6 +132,7 @@ public final class Manager {
     public static boolean isTopSukien1Changed = false;
     public static boolean isTopSukien2Changed = false;
     public static boolean isTopHalloweenBoxChanged = false;
+    public static boolean isTopHalloweenCapsuleChanged = false;
     public static boolean isTopWhisChanged = false;
     public static boolean isTopLuckyRoundChanged = false;
 
@@ -141,7 +144,7 @@ public final class Manager {
     }
 
     public static boolean hasNewTopScores() {
-        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopHalloweenBoxChanged || isTopWhisChanged || isTopLuckyRoundChanged;
+        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopHalloweenBoxChanged || isTopHalloweenCapsuleChanged || isTopWhisChanged || isTopLuckyRoundChanged;
     }
 
     public static void resetTopFlags() {
@@ -150,6 +153,7 @@ public final class Manager {
         isTopSukien1Changed = false;
         isTopSukien2Changed = false;
         isTopHalloweenBoxChanged = false;
+        isTopHalloweenCapsuleChanged = false;
         isTopWhisChanged = false;
         isTopLuckyRoundChanged = false;
     }
@@ -1047,6 +1051,8 @@ public final class Manager {
             Topsukien2 = realTop(queryTopsukien2, ConnectionDatabase);
             TopHalloweenBox = realTop(queryTopHalloweenBox, ConnectionDatabase);
             Logger.success(Logger.PURPLE + "Successfully Top Halloween Box (" + TopHalloweenBox.size() + ")\n");
+            TopHalloweenCapsule = realTop(queryTopHalloweenCapsule, ConnectionDatabase);
+            Logger.success(Logger.PURPLE + "Successfully Top Halloween Capsule (" + TopHalloweenCapsule.size() + ")\n");
             Topwhis = realTop(queryTopwhis, ConnectionDatabase);
             Logger.success(Logger.RED + "Successfully top Thach Dau Whis (" + Topwhis.size() + ")\n");
             Topmaydam = realTop(queryTopmaydam, ConnectionDatabase);
@@ -1101,6 +1107,11 @@ public final class Manager {
                     int point = rs.getInt("point_halloween_box");
                     top.setInfo1(point + " lan mo");
                     top.setInfo2(point + " lan mo Hom Halloween");
+
+                } else if (query.equals(Manager.queryTopHalloweenCapsule)) {
+                    int point = rs.getInt("point_halloween_capsule");
+                    top.setInfo1(point + " lần mở");
+                    top.setInfo2(point + " lần mở Capsule Halloween");
 
                 } else if (query.equals(Manager.queryTopwhis)) {
                     int whis = rs.getInt("thachdauwhis");

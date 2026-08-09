@@ -22,16 +22,60 @@ public final class HalloweenRewards {
     private static final int OPTION_DEF_PERCENT = 94;
     private static final int OPTION_CRITICAL_DAMAGE_PERCENT = 5;
     private static final int OPTION_DAMAGE_BOSS_PERCENT = 204;
+    private static final int OPTION_TELEPORT = 33;
+    private static final int OPTION_NO_COLD = 106;
+    private static final int OPTION_RESIST_TDHS = 116;
     private static final int HALLOWEEN_STAT_MIN = 25;
     private static final int HALLOWEEN_STAT_MAX = 50;
     private static final int HALLOWEEN_COSTUME_EXTRA_PERCENT = 30;
     private static final int HALLOWEEN_PET_CRITICAL_DAMAGE_MIN = 15;
     private static final int HALLOWEEN_PET_CRITICAL_DAMAGE_MAX = 25;
+    private static final int HALLOWEEN_GHOST_GOKU_HP_MIN = 20;
+    private static final int HALLOWEEN_GHOST_GOKU_HP_MAX = 50;
+    private static final int HALLOWEEN_GHOST_CADIC_DAMAGE_MIN = 20;
+    private static final int HALLOWEEN_GHOST_CADIC_DAMAGE_MAX = 40;
+    private static final int HALLOWEEN_GHOST_POCOLO_KI_MIN = 20;
+    private static final int HALLOWEEN_GHOST_POCOLO_KI_MAX = 50;
+    private static final int CAPSULE_GOLD_MIN = 20;
+    private static final int CAPSULE_GOLD_MAX = 200;
+    private static final int THAN_CHET_CUTE_HP_KI_MIN = 20;
+    private static final int THAN_CHET_CUTE_HP_KI_MAX = 40;
+    private static final int THAN_CHET_CUTE_DEF_MIN = 10;
+    private static final int THAN_CHET_CUTE_DEF_MAX = 25;
+    private static final int BI_NGO_NHI_NHANH_STAT_MIN = 20;
+    private static final int BI_NGO_NHI_NHANH_STAT_MAX = 30;
+    private static final int BI_NGO_NHI_NHANH_CRITICAL_MIN = 20;
+    private static final int BI_NGO_NHI_NHANH_CRITICAL_MAX = 25;
+    private static final int LUOI_HAI_THAN_CHET_STAT_MIN = 20;
+    private static final int LUOI_HAI_THAN_CHET_STAT_MAX = 50;
+    private static final int LUOI_HAI_THAN_CHET_DEF_MIN = 20;
+    private static final int LUOI_HAI_THAN_CHET_DEF_MAX = 25;
+    private static final int LUOI_HAI_THAN_CHET_CRITICAL_MIN = 20;
+    private static final int LUOI_HAI_THAN_CHET_CRITICAL_MAX = 30;
+    private static final int SUPER_GOD_COSTUME_DAMAGE_PERCENT = 70;
+    private static final int SUPER_GOD_COSTUME_HP_KI_PERCENT = 80;
+    private static final int SUPER_GOD_COSTUME_DAMAGE_BOSS_PERCENT = 30;
+    private static final int HALLOWEEN_CAPSULE_PERMANENT_RATE = 5;
+    private static final int[] HALLOWEEN_CAPSULE_EXPIRE_DAYS = {1, 3, 5, 7};
 
     private static final int[] COSTUME_REWARDS = {
         ConstItem.CAI_TRANG_BONG_BANG_HALLOWEEN,
         ConstItem.CAI_TRANG_VUA_QUY_SATAN_HALLOWEEN,
         ConstItem.CAI_TRANG_DRACULA_HALLOWEEN
+    };
+    private static final int[] PUMPKIN_DRAGON_BALL_REWARDS = {
+        ConstItem.BI_NGO_1_SAO,
+        ConstItem.BI_NGO_2_SAO,
+        ConstItem.BI_NGO_3_SAO,
+        ConstItem.BI_NGO_4_SAO,
+        ConstItem.BI_NGO_5_SAO,
+        ConstItem.BI_NGO_6_SAO,
+        ConstItem.BI_NGO_7_SAO
+    };
+    private static final int[] SUPER_GOD_COSTUME_REWARDS = {
+        ConstItem.CAI_TRANG_SIEU_THAN_TRAI_DAT,
+        ConstItem.CAI_TRANG_SIEU_THAN_NAMEC,
+        ConstItem.CAI_TRANG_SIEU_THAN_XAYDA
     };
 
     private HalloweenRewards() {
@@ -70,13 +114,144 @@ public final class HalloweenRewards {
         if (roll <= 180) {
             return ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, Util.nextInt(30, 70));
         }
-        if (roll <= 350) {
+        if (roll <= 300) {
+            return createRandomPumpkinDragonBallReward();
+        }
+        if (roll <= 470) {
             return ItemService.gI().createNewItem((short) GEM_ID, Util.nextInt(100, 300));
         }
-        if (roll <= 600) {
+        if (roll <= 720) {
             return ItemService.gI().createNewItem((short) ConstItem.THIEP_HALLOWEEN, Util.nextInt(1, 3));
         }
         return ItemService.gI().createNewItem((short) ConstItem.BI_NGO, Util.nextInt(20, 50));
+    }
+
+    public static Item createRandomPumpkinDragonBallReward() {
+        return ItemService.gI().createNewItem((short) randomPumpkinDragonBallId(), 1);
+    }
+
+    public static Item createHalloweenCapsuleReward() {
+        int roll = Util.nextInt(10);
+        switch (roll) {
+            case 0:
+                return createHalloweenGhostGokuReward();
+            case 1:
+                return createHalloweenGhostCadicReward();
+            case 2:
+                return createHalloweenGhostPocoloReward();
+            case 3:
+                return ItemService.gI().createNewItem((short) ConstItem.THOI_VANG,
+                        Util.nextInt(CAPSULE_GOLD_MIN, CAPSULE_GOLD_MAX));
+            case 4:
+                return createThanChetCuteReward();
+            case 5:
+                return createBiNgoNhiNhanhReward();
+            case 6:
+                return createLuoiHaiThanChetReward();
+            default:
+                return createSuperGodCostumeReward(SUPER_GOD_COSTUME_REWARDS[roll - 7]);
+        }
+    }
+
+    private static int randomPumpkinDragonBallId() {
+        return PUMPKIN_DRAGON_BALL_REWARDS[Util.nextInt(PUMPKIN_DRAGON_BALL_REWARDS.length)];
+    }
+
+    private static Item createHalloweenGhostGokuReward() {
+        Item item = ItemService.gI().createNewItem((short) ConstItem.HON_MA_GOKU);
+        item.itemOptions.add(new ItemOption(OPTION_HP_PERCENT,
+                Util.nextInt(HALLOWEEN_GHOST_GOKU_HP_MIN, HALLOWEEN_GHOST_GOKU_HP_MAX)));
+        addHalloweenCapsuleExpire(item);
+        return item;
+    }
+
+    private static Item createHalloweenGhostCadicReward() {
+        Item item = ItemService.gI().createNewItem((short) ConstItem.HON_MA_CA_DIC);
+        item.itemOptions.add(new ItemOption(OPTION_DAMAGE_PERCENT,
+                Util.nextInt(HALLOWEEN_GHOST_CADIC_DAMAGE_MIN, HALLOWEEN_GHOST_CADIC_DAMAGE_MAX)));
+        addHalloweenCapsuleExpire(item);
+        return item;
+    }
+
+    private static Item createHalloweenGhostPocoloReward() {
+        Item item = ItemService.gI().createNewItem((short) ConstItem.HON_MA_POCOLO);
+        item.itemOptions.add(new ItemOption(OPTION_KI_PERCENT,
+                Util.nextInt(HALLOWEEN_GHOST_POCOLO_KI_MIN, HALLOWEEN_GHOST_POCOLO_KI_MAX)));
+        addHalloweenCapsuleExpire(item);
+        return item;
+    }
+
+    private static Item createThanChetCuteReward() {
+        Item item = ItemService.gI().createNewItem((short) ConstItem.THAN_CHET_CUTE);
+        item.itemOptions.add(new ItemOption(OPTION_HP_PERCENT,
+                Util.nextInt(THAN_CHET_CUTE_HP_KI_MIN, THAN_CHET_CUTE_HP_KI_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_KI_PERCENT,
+                Util.nextInt(THAN_CHET_CUTE_HP_KI_MIN, THAN_CHET_CUTE_HP_KI_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_DEF_PERCENT,
+                Util.nextInt(THAN_CHET_CUTE_DEF_MIN, THAN_CHET_CUTE_DEF_MAX)));
+        addHalloweenCapsuleExpire(item);
+        return item;
+    }
+
+    private static Item createBiNgoNhiNhanhReward() {
+        Item item = ItemService.gI().createNewItem((short) ConstItem.BI_NGO_NHI_NHANH);
+        item.itemOptions.add(new ItemOption(OPTION_DAMAGE_PERCENT,
+                Util.nextInt(BI_NGO_NHI_NHANH_STAT_MIN, BI_NGO_NHI_NHANH_STAT_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_KI_PERCENT,
+                Util.nextInt(BI_NGO_NHI_NHANH_STAT_MIN, BI_NGO_NHI_NHANH_STAT_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_HP_PERCENT,
+                Util.nextInt(BI_NGO_NHI_NHANH_STAT_MIN, BI_NGO_NHI_NHANH_STAT_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_CRITICAL_DAMAGE_PERCENT,
+                Util.nextInt(BI_NGO_NHI_NHANH_CRITICAL_MIN, BI_NGO_NHI_NHANH_CRITICAL_MAX)));
+        addHalloweenCapsuleExpire(item);
+        return item;
+    }
+
+    private static Item createLuoiHaiThanChetReward() {
+        Item item = ItemService.gI().createNewItem((short) ConstItem.LUOI_HAI_THAN_CHET);
+        item.itemOptions.add(new ItemOption(OPTION_DAMAGE_PERCENT,
+                Util.nextInt(LUOI_HAI_THAN_CHET_STAT_MIN, LUOI_HAI_THAN_CHET_STAT_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_HP_PERCENT,
+                Util.nextInt(LUOI_HAI_THAN_CHET_STAT_MIN, LUOI_HAI_THAN_CHET_STAT_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_KI_PERCENT,
+                Util.nextInt(LUOI_HAI_THAN_CHET_STAT_MIN, LUOI_HAI_THAN_CHET_STAT_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_DEF_PERCENT,
+                Util.nextInt(LUOI_HAI_THAN_CHET_DEF_MIN, LUOI_HAI_THAN_CHET_DEF_MAX)));
+        item.itemOptions.add(new ItemOption(OPTION_CRITICAL_DAMAGE_PERCENT,
+                Util.nextInt(LUOI_HAI_THAN_CHET_CRITICAL_MIN, LUOI_HAI_THAN_CHET_CRITICAL_MAX)));
+        addHalloweenCapsuleExpire(item);
+        return item;
+    }
+
+    private static Item createSuperGodCostumeReward(int itemId) {
+        Item item = ItemService.gI().createNewItem((short) itemId);
+        item.itemOptions.add(new ItemOption(OPTION_DAMAGE_PERCENT, SUPER_GOD_COSTUME_DAMAGE_PERCENT));
+        item.itemOptions.add(new ItemOption(OPTION_HP_PERCENT, SUPER_GOD_COSTUME_HP_KI_PERCENT));
+        item.itemOptions.add(new ItemOption(OPTION_KI_PERCENT, SUPER_GOD_COSTUME_HP_KI_PERCENT));
+        item.itemOptions.add(new ItemOption(OPTION_DAMAGE_BOSS_PERCENT, SUPER_GOD_COSTUME_DAMAGE_BOSS_PERCENT));
+        item.itemOptions.add(new ItemOption(OPTION_TELEPORT, 0));
+        item.itemOptions.add(new ItemOption(OPTION_RESIST_TDHS, 0));
+        item.itemOptions.add(new ItemOption(OPTION_NO_COLD, 0));
+        addHalloweenCapsuleExpireAlways(item);
+        return item;
+    }
+
+    private static void addHalloweenCapsuleExpire(Item item) {
+        if (Util.isTrue(HALLOWEEN_CAPSULE_PERMANENT_RATE, 100)) {
+            refresh(item);
+            return;
+        }
+        item.itemOptions.add(new ItemOption(OPTION_EXPIRE_DAYS, randomHalloweenCapsuleExpireDays()));
+        refresh(item);
+    }
+
+    private static void addHalloweenCapsuleExpireAlways(Item item) {
+        item.itemOptions.add(new ItemOption(OPTION_EXPIRE_DAYS, randomHalloweenCapsuleExpireDays()));
+        refresh(item);
+    }
+
+    private static int randomHalloweenCapsuleExpireDays() {
+        return HALLOWEEN_CAPSULE_EXPIRE_DAYS[Util.nextInt(HALLOWEEN_CAPSULE_EXPIRE_DAYS.length)];
     }
 
     private static void drop(Boss boss, int itemId, int quantity, long playerId, int offsetX) {

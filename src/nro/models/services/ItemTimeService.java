@@ -21,6 +21,8 @@ import nro.models.utils.Logger;
 public class ItemTimeService {
 
     private static final String LIMITED_CHALLENGE_TEXT = "Thách thức giới hạn:";
+    private static final int ICON_BANH_TT_DAC_BIET = 4125;
+    private static final int ICON_HOP_BANH_TT = 4126;
 
     private static ItemTimeService i;
 
@@ -134,6 +136,14 @@ public class ItemTimeService {
         if (player.itemTime.isUsePumpkinDragonHpKi) {
             sendItemTime(player, 6583, (int) ((TIME_PUMPKIN_DRAGON_BUFF
                     - (System.currentTimeMillis() - player.itemTime.lastTimeUsePumpkinDragonHpKi)) / 1000));
+        }
+        if (player.itemTime.isUseBanhTTDB) {
+            sendItemTime(player, ICON_BANH_TT_DAC_BIET,
+                    (int) ((TIME_BANH_TT_DB - (System.currentTimeMillis() - player.itemTime.lastTimeBanhTTDB)) / 1000));
+        }
+        if (player.itemTime.isUseHopBanhTT) {
+            sendItemTime(player, ICON_HOP_BANH_TT,
+                    (int) ((TIME_HOP_BANH_TT - (System.currentTimeMillis() - player.itemTime.lastTimeHopBanhTT)) / 1000));
         }
     }
 

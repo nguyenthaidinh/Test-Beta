@@ -5,6 +5,7 @@ import nro.models.consts.ConstMap;
 import nro.models.consts.ConstNpc;
 import java.util.ArrayList;
 import nro.models.item.Item;
+import nro.models.map.Zone;
 import nro.models.services_dungeon.MajinBuu14HService;
 import nro.models.services_dungeon.MajinBuuService;
 import nro.models.npc.Npc;
@@ -116,8 +117,13 @@ public class Osin extends Npc {
     }
 
     private void enterPirateIsland(Player player) {
-        if (MapService.gI().getMapById(ConstMap.DAO_HAI_TAC_1) == null) {
-            Service.gI().sendThongBao(player, "Đảo Hải Tặc chưa được mở.");
+        Zone zoneJoin = getPirateIslandZone();
+        if (zoneJoin == null) {
+            Service.gI().sendThongBao(player, "Đảo Hải Tặc chưa được mở hoặc đang đầy.");
+            return;
+        }
+        if (player.idNRNM != -1 && !Util.canDoWithTime(player.lastTimePickNRNM, 30000)) {
+            Service.gI().sendThongBao(player, "Không thể chuyển map quá nhanh khi đeo Ngọc Rồng Namếc");
             return;
         }
 
@@ -129,8 +135,21 @@ public class Osin extends Npc {
 
         InventoryService.gI().subQuantityItemsBag(player, legendaryMap, 1);
         InventoryService.gI().sendItemBags(player);
-        ChangeMapService.gI().changeMap(player, ConstMap.DAO_HAI_TAC_1, -1,
-                PIRATE_ISLAND_ENTRY_X, PIRATE_ISLAND_ENTRY_Y);
+        ChangeMapService.gI().changeMap(player, zoneJoin, PIRATE_ISLAND_ENTRY_X, PIRATE_ISLAND_ENTRY_Y);
+    }
+
+    private Zone getPirateIslandZone() {
+        nro.models.map.Map pirateMap = MapService.gI().getMapById(ConstMap.DAO_HAI_TAC_1);
+        if (pirateMap == null) {
+            return null;
+        }
+        ArrayList<Zone> availableZones = new ArrayList<>();
+        for (Zone zone : pirateMap.zones) {
+            if (zone != null && zone.getNumOfPlayers() < zone.maxPlayer) {
+                availableZones.add(zone);
+            }
+        }
+        return availableZones.isEmpty() ? null : availableZones.get(Util.nextInt(availableZones.size()));
     }
 
     @Override

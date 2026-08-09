@@ -1043,6 +1043,9 @@ public class NPoint {
             hpMax += hpMax * 20 / 100;  // +20%
         }
         if (this.player.itemTime != null && this.player.itemTime.isUseBanhTTDB) {
+            hpMax += hpMax * 20 / 100;  // +20%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseHopBanhTT) {
             hpMax += hpMax * 30 / 100;  // +30%
         }
 
@@ -1195,6 +1198,9 @@ public class NPoint {
             mpMax += mpMax * 20 / 100;  // +20%
         }
         if (this.player.itemTime != null && this.player.itemTime.isUseBanhTTDB) {
+            mpMax += mpMax * 20 / 100;  // +20%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseHopBanhTT) {
             mpMax += mpMax * 30 / 100;  // +30%
         }
 
@@ -1344,7 +1350,10 @@ public class NPoint {
             dame += dame * 20 / 100;  // +20%
         }
         if (this.player.itemTime != null && this.player.itemTime.isUseBanhTTDB) {
-            dame += dame * 30 / 100;  // +30%
+            dame += dame * 15 / 100;  // +15%
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseHopBanhTT) {
+            dame += dame * 25 / 100;  // +25%
         }
         if (this.player.itemTime != null && this.player.itemTime.isUseCuongNo2) {
             dame *= 2.2;

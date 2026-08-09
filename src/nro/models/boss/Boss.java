@@ -673,7 +673,9 @@ public class Boss extends Player implements IBoss {
     private int getDaNguSacDropRate() {
         String className = getClass().getName();
         if ("nro.models.boss.than_huy_diet.WhisBoss".equals(className)
-                || "nro.models.boss.than_huy_diet.BeerusBoss".equals(className)) {
+                || "nro.models.boss.than_huy_diet.BeerusBoss".equals(className)
+                || "nro.models.boss.pirate.PirateCoolerBoss".equals(className)
+                || "nro.models.boss.pirate.PirateBlackBoss".equals(className)) {
             return DA_NGU_SAC_THAN_HUY_DIET_DROP_RATE;
         }
         return DA_NGU_SAC_DROP_RATE;

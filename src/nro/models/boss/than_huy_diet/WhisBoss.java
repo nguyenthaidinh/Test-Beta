@@ -3,6 +3,7 @@ package nro.models.boss.than_huy_diet;
 import nro.models.boss.Boss;
 import nro.models.boss.BossID;
 import nro.models.boss.BossesData;
+import nro.models.boss.pirate.PirateBossRewards;
 import nro.models.player.Player;
 import nro.models.services.EffectSkillService;
 import nro.models.services.Service;
@@ -41,12 +42,17 @@ public class WhisBoss extends Boss {
     }
 
     @Override
+    public void reward(Player plKill) {
+        PirateBossRewards.drop(this, plKill);
+    }
+
+    @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
         if (this.isDie() || damage <= 0) {
             return 0;
         }
         if (Util.isTrue(DODGE_PERCENT, 100)) {
-            this.chat("Xi hut");
+            this.chat("Xí hụt.");
             return 0;
         }
 

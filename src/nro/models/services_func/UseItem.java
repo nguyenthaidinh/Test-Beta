@@ -75,6 +75,47 @@ public class UseItem {
     private static final byte DO_THROW_ITEM = 1;
     private static final byte ACCEPT_THROW_ITEM = 2;
     private static final byte ACCEPT_USE_ITEM = 3;
+    private static final int BUFF_CUONG_NO_2_ID = 1150;
+    private static final int BUFF_BO_HUYET_2_ID = 1152;
+    private static final int BUFF_GIAP_XEN_2_ID = 1153;
+    private static final int SILVER_CHEST_GOLD_RATE = 70;
+    private static final int SILVER_CHEST_CARD_RATE = 45;
+    private static final int SILVER_CHEST_PUMPKIN_RATE = 50;
+    private static final int SILVER_CHEST_PUMPKIN_BALL_RATE = 20;
+    private static final int SILVER_CHEST_DA_NGU_SAC_RATE = 30;
+    private static final int SILVER_CHEST_DRAGON_BALL_RATE = 20;
+    private static final int SILVER_CHEST_BUFF_RATE = 25;
+    private static final int GOLD_CHEST_GOLD_RATE = 80;
+    private static final int GOLD_CHEST_CARD_RATE = 60;
+    private static final int GOLD_CHEST_PUMPKIN_RATE = 65;
+    private static final int GOLD_CHEST_PUMPKIN_BALL_RATE = 35;
+    private static final int GOLD_CHEST_DA_NGU_SAC_RATE = 50;
+    private static final int GOLD_CHEST_GEM_RATE = 55;
+    private static final int GOLD_CHEST_DRAGON_BALL_RATE = 35;
+    private static final int GOLD_CHEST_BUFF_RATE = 35;
+    private static final int GOLD_CHEST_BONUS_RATE = 25;
+    private static final int[] DRAGON_BALL_1_TO_3_IDS = {
+        ConstItem.NGOC_RONG_1_SAO,
+        ConstItem.NGOC_RONG_2_SAO,
+        ConstItem.NGOC_RONG_3_SAO
+    };
+    private static final int[] PIRATE_CHEST_BUFF_IDS = {
+        BUFF_CUONG_NO_2_ID,
+        BUFF_BO_HUYET_2_ID,
+        BUFF_GIAP_XEN_2_ID
+    };
+    private static final int[] GOLD_CHEST_BONUS_IDS = {
+        ConstItem.HOM_HALLOWEEN,
+        ConstItem.BANH_TRUNG_THU_DAC_BIET,
+        ConstItem.HOP_BANH_TRUNG_THU,
+        ConstItem.RUONG_BAC,
+        ConstItem.NGOC_RONG_1_SAO,
+        ConstItem.NGOC_RONG_2_SAO,
+        ConstItem.NGOC_RONG_3_SAO,
+        BUFF_CUONG_NO_2_ID,
+        BUFF_BO_HUYET_2_ID,
+        BUFF_GIAP_XEN_2_ID
+    };
 
     private static UseItem instance;
     private static final Random rand = new Random();
@@ -682,6 +723,13 @@ public class UseItem {
                             case ConstItem.HOM_HALLOWEEN:
                                 UseItem.gI().openHalloweenBox(pl, item);
                                 break;
+                            case ConstItem.CAPSULE_HALLOWEEN:
+                                UseItem.gI().openHalloweenCapsuleReward(pl, item);
+                                break;
+                            case ConstItem.RUONG_BAC:
+                            case ConstItem.RUONG_VANG:
+                                UseItem.gI().openPirateChest(pl, item);
+                                break;
                             case ConstItem.BI_NGO:
                             case ConstItem.THIEP_HALLOWEEN:
                                 HalloweenExchangeService.openExchangeMenu(pl);
@@ -809,6 +857,8 @@ public class UseItem {
                             case 1233:
                             case 1532:
                             case 1628:
+                            case ConstItem.BANH_TRUNG_THU_DAC_BIET:
+                            case ConstItem.HOP_BANH_TRUNG_THU:
 
                                 useItemTime(pl, item);
                                 break;
@@ -1564,6 +1614,137 @@ public class UseItem {
         CombineService.gI().sendEffectOpenItem(pl, item.template.iconID, reward.template.iconID);
     }
 
+    private void openHalloweenCapsuleReward(Player pl, Item item) {
+        if (InventoryService.gI().getCountEmptyBag(pl) <= 0) {
+            Service.gI().sendThongBao(pl, "Hành trang đã đầy");
+            return;
+        }
+
+        Item reward = HalloweenRewards.createHalloweenCapsuleReward();
+        if (reward == null || !reward.isNotNullItem()) {
+            Service.gI().sendThongBao(pl, "Không thể tạo phần thưởng Capsule Halloween");
+            return;
+        }
+
+        if (!InventoryService.gI().addItemBag(pl, reward)) {
+            Service.gI().sendThongBao(pl, "Hành trang đã đầy");
+            return;
+        }
+
+        InventoryService.gI().subQuantityItemsBag(pl, item, 1);
+        pl.point_halloween_capsule++;
+        Service.gI().updatePlayerPointHalloweenCapsule(pl);
+        Manager.isTopHalloweenCapsuleChanged = true;
+        InventoryService.gI().sendItemBags(pl);
+        Service.gI().sendThongBao(pl, "Bạn nhận được " + reward.template.name);
+        CombineService.gI().sendEffectOpenItem(pl, item.template.iconID, reward.template.iconID);
+    }
+
+    private void openPirateChest(Player pl, Item chest) {
+        boolean isGoldChest = chest.template.id == ConstItem.RUONG_VANG;
+        List<Item> rewards = isGoldChest ? createGoldPirateChestRewards() : createSilverPirateChestRewards();
+        int emptyNeed = countBagSlotsNeeded(rewards);
+        if (InventoryService.gI().getCountEmptyBag(pl) < emptyNeed) {
+            Service.gI().sendThongBao(pl, "Cần ít nhất " + emptyNeed + " ô trống hành trang để mở "
+                    + chest.template.name);
+            return;
+        }
+        String rewardMessage = buildPirateChestRewardMessage(chest, rewards);
+
+        for (Item reward : rewards) {
+            if (!InventoryService.gI().addItemBag(pl, reward)) {
+                Service.gI().sendThongBao(pl, "Hành trang đã đầy");
+                return;
+            }
+        }
+
+        InventoryService.gI().subQuantityItemsBag(pl, chest, 1);
+        InventoryService.gI().sendItemBags(pl);
+        Service.gI().sendThongBao(pl, rewardMessage);
+        CombineService.gI().sendEffectOpenItem(pl, chest.template.iconID, rewards.get(rewards.size() - 1).template.iconID);
+    }
+
+    private List<Item> createSilverPirateChestRewards() {
+        List<Item> rewards = new ArrayList<>();
+        addRewardByRate(rewards, SILVER_CHEST_GOLD_RATE, ConstItem.THOI_VANG, 1, 100);
+        addRewardByRate(rewards, SILVER_CHEST_CARD_RATE, ConstItem.THIEP_HALLOWEEN, 10, 15);
+        addRewardByRate(rewards, SILVER_CHEST_PUMPKIN_RATE, ConstItem.BI_NGO, 50, 100);
+        addPumpkinDragonBallByRate(rewards, SILVER_CHEST_PUMPKIN_BALL_RATE);
+        addRewardByRate(rewards, SILVER_CHEST_DA_NGU_SAC_RATE, ConstItem.DA_NGU_SAC, 2, 5);
+        addRandomItemByRate(rewards, SILVER_CHEST_DRAGON_BALL_RATE, DRAGON_BALL_1_TO_3_IDS);
+        addRandomItemByRate(rewards, SILVER_CHEST_BUFF_RATE, PIRATE_CHEST_BUFF_IDS);
+        ensurePirateChestReward(rewards, ConstItem.THOI_VANG, 1, 100);
+        return rewards;
+    }
+
+    private List<Item> createGoldPirateChestRewards() {
+        List<Item> rewards = new ArrayList<>();
+        addRewardByRate(rewards, GOLD_CHEST_GOLD_RATE, ConstItem.THOI_VANG, 300, 500);
+        addRewardByRate(rewards, GOLD_CHEST_CARD_RATE, ConstItem.THIEP_HALLOWEEN, 20, 50);
+        addRewardByRate(rewards, GOLD_CHEST_PUMPKIN_RATE, ConstItem.BI_NGO, 100, 200);
+        addPumpkinDragonBallByRate(rewards, GOLD_CHEST_PUMPKIN_BALL_RATE);
+        addRewardByRate(rewards, GOLD_CHEST_DA_NGU_SAC_RATE, ConstItem.DA_NGU_SAC, 10, 15);
+        addRewardByRate(rewards, GOLD_CHEST_GEM_RATE, ConstItem.NGOC, 1_000, 2_000);
+        addRandomItemByRate(rewards, GOLD_CHEST_DRAGON_BALL_RATE, DRAGON_BALL_1_TO_3_IDS);
+        addRandomItemByRate(rewards, GOLD_CHEST_BUFF_RATE, PIRATE_CHEST_BUFF_IDS);
+        addRandomItemByRate(rewards, GOLD_CHEST_BONUS_RATE, GOLD_CHEST_BONUS_IDS);
+        ensurePirateChestReward(rewards, ConstItem.THOI_VANG, 300, 500);
+        return rewards;
+    }
+
+    private void addRewardByRate(List<Item> rewards, int rate, int itemId, int minQuantity, int maxQuantity) {
+        if (Util.isTrue(rate, 100)) {
+            rewards.add(createRewardItem(itemId, Util.nextInt(minQuantity, maxQuantity)));
+        }
+    }
+
+    private void addRandomItemByRate(List<Item> rewards, int rate, int[] itemIds) {
+        if (Util.isTrue(rate, 100)) {
+            rewards.add(createRewardItem(randomFrom(itemIds), 1));
+        }
+    }
+
+    private void addPumpkinDragonBallByRate(List<Item> rewards, int rate) {
+        if (Util.isTrue(rate, 100)) {
+            rewards.add(HalloweenRewards.createRandomPumpkinDragonBallReward());
+        }
+    }
+
+    private void ensurePirateChestReward(List<Item> rewards, int fallbackItemId, int minQuantity, int maxQuantity) {
+        if (rewards.isEmpty()) {
+            rewards.add(createRewardItem(fallbackItemId, Util.nextInt(minQuantity, maxQuantity)));
+        }
+    }
+
+    private Item createRewardItem(int itemId, int quantity) {
+        return ItemService.gI().createNewItem((short) itemId, quantity);
+    }
+
+    private int randomFrom(int[] itemIds) {
+        return itemIds[Util.nextInt(itemIds.length)];
+    }
+
+    private int countBagSlotsNeeded(List<Item> rewards) {
+        int count = 0;
+        for (Item reward : rewards) {
+            if (reward.template.type != 9 && reward.template.type != 10 && reward.template.type != 34) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private String buildPirateChestRewardMessage(Item chest, List<Item> rewards) {
+        StringBuilder message = new StringBuilder("Mở ").append(chest.template.name).append(" nhận được:");
+        for (Item reward : rewards) {
+            message.append("\n").append(reward.template.name);
+            if (reward.quantity > 1) {
+                message.append(" x").append(reward.quantity);
+            }
+        }
+        return message.toString();
+    }
+
     private void useItemTime(Player pl, Item item) {
         switch (item.template.id) {
             case 379: // máy dò capsule
@@ -1697,6 +1878,16 @@ public class UseItem {
             case 1233: //Nồi cơm điện
                 pl.itemTime.lastTimeUseNCD = System.currentTimeMillis();
                 pl.itemTime.isUseNCD = true;
+                break;
+            case ConstItem.BANH_TRUNG_THU_DAC_BIET:
+                pl.itemTime.lastTimeBanhTTDB = System.currentTimeMillis();
+                pl.itemTime.isUseBanhTTDB = true;
+                Service.gI().sendThongBao(pl, "Dùng Bánh Trung Thu Đặc Biệt thành công: +15% SĐ, +20% HP/KI trong 60 phút");
+                break;
+            case ConstItem.HOP_BANH_TRUNG_THU:
+                pl.itemTime.lastTimeHopBanhTT = System.currentTimeMillis();
+                pl.itemTime.isUseHopBanhTT = true;
+                Service.gI().sendThongBao(pl, "Dùng Hộp bánh Trung Thu thành công: +25% SĐ, +30% HP/KI trong 90 phút");
                 break;
             case 579:
             case 1045: // Đuôi khỉ
@@ -1882,6 +2073,14 @@ public class UseItem {
             return;
         }
         Zone zoneChose = pl.mapCapsule.get(index);
+        boolean currentMapIsPirateIsland = pl.zone != null && pl.zone.map != null
+                && MapService.gI().isMapDaoHaiTac(pl.zone.map.mapId);
+        if (zoneChose.map != null && MapService.gI().isMapDaoHaiTac(zoneChose.map.mapId)) {
+            pl.mapBeforeCapsule = null;
+            Service.gI().sendThongBao(pl, "Muốn vào Đảo Hải Tặc phải gặp Ôsin và dùng Bản đồ truyền thuyết.");
+            Service.gI().hideWaitDialog(pl);
+            return;
+        }
         //Kiểm tra số lượng người trong khu
 
         if (zoneChose.getNumOfPlayers() > 25
@@ -1894,7 +2093,7 @@ public class UseItem {
         if (index != 0 || zoneChose.map.mapId == 21
                 || zoneChose.map.mapId == 22
                 || zoneChose.map.mapId == 23) {
-            pl.mapBeforeCapsule = pl.zone;
+            pl.mapBeforeCapsule = currentMapIsPirateIsland ? null : pl.zone;
         } else {
             zoneId = pl.mapBeforeCapsule != null ? pl.mapBeforeCapsule.zoneId : -1;
             pl.mapBeforeCapsule = null;

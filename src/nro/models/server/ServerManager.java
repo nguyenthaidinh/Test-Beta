@@ -167,6 +167,7 @@ public class ServerManager {
                 || Manager.isTopSukien1Changed
                 || Manager.isTopSukien2Changed
                 || Manager.isTopHalloweenBoxChanged
+                || Manager.isTopHalloweenCapsuleChanged
                 || Manager.isTopWhisChanged
                 || Manager.isTopLuckyRoundChanged;
     }
@@ -194,6 +195,9 @@ public class ServerManager {
             }
             if (Manager.isTopHalloweenBoxChanged) {
                 Manager.TopHalloweenBox = Manager.realTop(Manager.queryTopHalloweenBox, con);
+            }
+            if (Manager.isTopHalloweenCapsuleChanged) {
+                Manager.TopHalloweenCapsule = Manager.realTop(Manager.queryTopHalloweenCapsule, con);
             }
             if (Manager.isTopWhisChanged) {
                 Manager.Topwhis = Manager.realTop(Manager.queryTopwhis, con);
