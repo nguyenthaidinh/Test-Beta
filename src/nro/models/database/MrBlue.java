@@ -1373,10 +1373,14 @@ public class MrBlue {
         for (Object option : options) {
             JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(option));
             int optionId = Integer.parseInt(String.valueOf(opt.get(0)));
+            int optionParam = Integer.parseInt(String.valueOf(opt.get(1)));
+            int[] migratedDoThanThanhOption = migrateDoThanThanhOption(optionId, optionParam);
+            optionId = migratedDoThanThanhOption[0];
+            optionParam = migratedDoThanThanhOption[1];
             if (ItemService.gI().getItemOptionTemplate(optionId) == null) {
                 continue;
             }
-            item.itemOptions.add(new Item.ItemOption(optionId, Integer.parseInt(String.valueOf(opt.get(1)))));
+            item.itemOptions.add(new Item.ItemOption(optionId, optionParam));
         }
         ItemService.gI().normalizeLuckyRoundPetOptions(item);
         ItemService.gI().normalizeSsj4CostumeOptions(item);
@@ -1385,6 +1389,27 @@ public class MrBlue {
         ItemService.gI().normalizeAngelDemonWingsOptions(item);
         ItemService.gI().normalizeBrolyRedCostumeOptions(item);
         ItemService.gI().normalizeBrolyCostumeOptions(item);
+    }
+
+    private static int[] migrateDoThanThanhOption(int optionId, int optionParam) {
+        switch (optionId) {
+            case 251:
+                if (optionParam >= 1 && optionParam <= 6) {
+                    return new int[]{ItemService.DO_THAN_THANH_SET_OPTION,
+                        ItemService.DO_THAN_THANH_PARAM_SVK_CON + optionParam - 1};
+                }
+                break;
+            case 252:
+                return new int[]{ItemService.DO_THAN_THANH_SET_OPTION,
+                    ItemService.DO_THAN_THANH_PARAM_BI_CON};
+            case 253:
+                return new int[]{ItemService.DO_THAN_THANH_SET_OPTION,
+                    ItemService.DO_THAN_THANH_PARAM_CAY_CON};
+            case 254:
+                return new int[]{ItemService.DO_THAN_THANH_SET_OPTION,
+                    ItemService.DO_THAN_THANH_PARAM_BINH_CON};
+        }
+        return new int[]{optionId, optionParam};
     }
 
     private static void initJackyChunCostumeWearTime(Player player) {

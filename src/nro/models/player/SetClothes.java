@@ -154,58 +154,6 @@ public class SetClothes {
                         isActSet = true;
                         giamSatThuong++;
                         break;
-                    case 251:
-                        if (this.player.gender == 0) {
-                            switch (io.param) {
-                                case 1:
-                                    isActSet = true;
-                                    svkCon++;
-                                    break;
-                                case 2:
-                                    isActSet = true;
-                                    sonCon++;
-                                    break;
-                                case 3:
-                                    isActSet = true;
-                                    khanhCon++;
-                                    break;
-                            }
-                        } else if (this.player.gender == 1) {
-                            switch (io.param) {
-                                case 4:
-                                    isActSet = true;
-                                    sonEm++;
-                                    break;
-                                case 5:
-                                    isActSet = true;
-                                    ngaoCon++;
-                                    break;
-                                case 6:
-                                    isActSet = true;
-                                    ngaoEm++;
-                                    break;
-                            }
-                        }
-                        break;
-                    case 252:
-                        if (this.player.gender == 2) {
-                            isActSet = true;
-                            biCon++;
-                        }
-                        break;
-                    case 253:
-                        if (this.player.gender == 2) {
-                            isActSet = true;
-                            cayCon++;
-                        }
-                        break;
-                    case 254:
-                        if (this.player.gender == 2) {
-                            isActSet = true;
-                            binhCon++;
-                        }
-                        break;
-
                     case 21:
                         if (io.param == 80) {
                             setDHD++;
@@ -233,8 +181,67 @@ public class SetClothes {
                         cadicM++;
                         break;
                     case 233:
-                        isActSet = true;
-                        gohan++;
+                        if (ItemService.isDoThanThanhSetOption(io.optionTemplate.id, io.param)) {
+                            switch (io.param) {
+                                case ItemService.DO_THAN_THANH_PARAM_SVK_CON:
+                                    if (this.player.gender == 0) {
+                                        isActSet = true;
+                                        svkCon++;
+                                    }
+                                    break;
+                                case ItemService.DO_THAN_THANH_PARAM_SON_CON:
+                                    if (this.player.gender == 0) {
+                                        isActSet = true;
+                                        sonCon++;
+                                    }
+                                    break;
+                                case ItemService.DO_THAN_THANH_PARAM_KHANH_CON:
+                                    if (this.player.gender == 0) {
+                                        isActSet = true;
+                                        khanhCon++;
+                                    }
+                                    break;
+                                case ItemService.DO_THAN_THANH_PARAM_SON_EM:
+                                    if (this.player.gender == 1) {
+                                        isActSet = true;
+                                        sonEm++;
+                                    }
+                                    break;
+                                case ItemService.DO_THAN_THANH_PARAM_NGAO_CON:
+                                    if (this.player.gender == 1) {
+                                        isActSet = true;
+                                        ngaoCon++;
+                                    }
+                                    break;
+                                case ItemService.DO_THAN_THANH_PARAM_NGAO_EM:
+                                    if (this.player.gender == 1) {
+                                        isActSet = true;
+                                        ngaoEm++;
+                                    }
+                                    break;
+                                case ItemService.DO_THAN_THANH_PARAM_BI_CON:
+                                    if (this.player.gender == 2) {
+                                        isActSet = true;
+                                        biCon++;
+                                    }
+                                    break;
+                                case ItemService.DO_THAN_THANH_PARAM_CAY_CON:
+                                    if (this.player.gender == 2) {
+                                        isActSet = true;
+                                        cayCon++;
+                                    }
+                                    break;
+                                case ItemService.DO_THAN_THANH_PARAM_BINH_CON:
+                                    if (this.player.gender == 2) {
+                                        isActSet = true;
+                                        binhCon++;
+                                    }
+                                    break;
+                            }
+                        } else {
+                            isActSet = true;
+                            gohan++;
+                        }
                         break;
                 }
 
@@ -338,7 +345,8 @@ public class SetClothes {
             boolean isGohanPiece = false;
             for (Item.ItemOption option : item.itemOptions) {
                 if (option != null && option.optionTemplate != null
-                        && option.optionTemplate.id == 233) {
+                        && option.optionTemplate.id == 233
+                        && !ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {
                     isGohanPiece = true;
                     break;
                 }

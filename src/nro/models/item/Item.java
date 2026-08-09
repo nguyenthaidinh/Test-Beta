@@ -110,6 +110,10 @@ public class Item {
             if (this.optionTemplate == null) {
                 return "";
             }
+            String doThanThanhOption = getDoThanThanhOptionString(this.param);
+            if (doThanThanhOption != null) {
+                return doThanThanhOption;
+            }
             return Util.replace(this.optionTemplate.name, "#", String.valueOf(this.param));
         }
 
@@ -131,6 +135,10 @@ public class Item {
             if (this.optionTemplate == null) {
                 return "";
             }
+            String doThanThanhOption = getDoThanThanhOptionString(this.param);
+            if (doThanThanhOption != null) {
+                return doThanThanhOption;
+            }
             String key = this.optionTemplate.name + "#" + param + "#";
             String value = OPTION_STRING.get(key);
             if (value == null) {
@@ -138,6 +146,34 @@ public class Item {
                 OPTION_STRING.put(key, value);
             }
             return value;
+        }
+
+        private String getDoThanThanhOptionString(int optionParam) {
+            if (!ItemService.isDoThanThanhSetOption(this.optionTemplate.id, optionParam)) {
+                return null;
+            }
+            switch (optionParam) {
+                case ItemService.DO_THAN_THANH_PARAM_SVK_CON:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set SVK con (5 m\u00f3n +125% Kamejoko)";
+                case ItemService.DO_THAN_THANH_PARAM_SON_CON:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set S\u01a1n con (5 m\u00f3n +50% xuy\u00ean gi\u00e1p, +40% Kaioken)";
+                case ItemService.DO_THAN_THANH_PARAM_KHANH_CON:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Kh\u00e1nh con (5 m\u00f3n x2 Th\u00e1i D\u01b0\u01a1ng H\u1ea1 San, -50% th\u00f4i mi\u00ean)";
+                case ItemService.DO_THAN_THANH_PARAM_SON_EM:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set S\u01a1n em (5 m\u00f3n +150% KI)";
+                case ItemService.DO_THAN_THANH_PARAM_NGAO_CON:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Ngao con (5 m\u00f3n +130% Li\u00ean Ho\u00e0n)";
+                case ItemService.DO_THAN_THANH_PARAM_NGAO_EM:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Ngao em (5 m\u00f3n +150% \u0110\u1ebb Tr\u1ee9ng, x2 h\u1ed3i)";
+                case ItemService.DO_THAN_THANH_PARAM_BI_CON:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Bi con (5 m\u00f3n +120% HP)";
+                case ItemService.DO_THAN_THANH_PARAM_CAY_CON:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set C\u1ea7y con (5 m\u00f3n +50% HP, x2 ph\u1ea1m vi T\u1ef1 S\u00e1t)";
+                case ItemService.DO_THAN_THANH_PARAM_BINH_CON:
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set B\u00ecnh con (5 m\u00f3n +60% HP, +30% gi\u00e1p)";
+                default:
+                    return null;
+            }
         }
     }
 
@@ -154,8 +190,7 @@ public class Item {
             if (itemOption != null && itemOption.optionTemplate != null
                     && ((itemOption.optionTemplate.id >= 127 && itemOption.optionTemplate.id <= 135)
                     || itemOption.optionTemplate.id == 233
-                    || (itemOption.optionTemplate.id >= 237 && itemOption.optionTemplate.id <= 248)
-                    || (itemOption.optionTemplate.id >= 251 && itemOption.optionTemplate.id <= 254))) {
+                    || (itemOption.optionTemplate.id >= 237 && itemOption.optionTemplate.id <= 248))) {
                 return true;
             }
         }

@@ -142,6 +142,9 @@ public class ThachThucThanThanh {
                 continue;
             }
             int optionId = option.optionTemplate.id;
+            if (ItemService.isDoThanThanhSetOption(optionId, option.param)) {
+                continue;
+            }
             if ((optionId >= 127 && optionId <= 135)
                     || optionId == 233
                     || (optionId >= 237 && optionId <= 248)) {
@@ -153,13 +156,32 @@ public class ThachThucThanThanh {
 
     private static Item createRandomDoThanThanh(int gender) {
         switch (gender) {
-            case 0:
-                return ItemService.gI().createDoThanLinhKichHoat(0, 251, Util.nextInt(1, 3));
-            case 1:
-                return ItemService.gI().createDoThanLinhKichHoat(1, 251, Util.nextInt(4, 6));
+            case 0: {
+                int[] params = {
+                    ItemService.DO_THAN_THANH_PARAM_SVK_CON,
+                    ItemService.DO_THAN_THANH_PARAM_SON_CON,
+                    ItemService.DO_THAN_THANH_PARAM_KHANH_CON
+                };
+                return ItemService.gI().createDoThanLinhKichHoat(0,
+                        ItemService.DO_THAN_THANH_SET_OPTION, params[Util.nextInt(params.length)]);
+            }
+            case 1: {
+                int[] params = {
+                    ItemService.DO_THAN_THANH_PARAM_SON_EM,
+                    ItemService.DO_THAN_THANH_PARAM_NGAO_CON,
+                    ItemService.DO_THAN_THANH_PARAM_NGAO_EM
+                };
+                return ItemService.gI().createDoThanLinhKichHoat(1,
+                        ItemService.DO_THAN_THANH_SET_OPTION, params[Util.nextInt(params.length)]);
+            }
             case 2: {
-                int[] options = {252, 253, 254};
-                return ItemService.gI().createDoThanLinhKichHoat(2, options[Util.nextInt(options.length)], 1);
+                int[] params = {
+                    ItemService.DO_THAN_THANH_PARAM_BI_CON,
+                    ItemService.DO_THAN_THANH_PARAM_CAY_CON,
+                    ItemService.DO_THAN_THANH_PARAM_BINH_CON
+                };
+                return ItemService.gI().createDoThanLinhKichHoat(2,
+                        ItemService.DO_THAN_THANH_SET_OPTION, params[Util.nextInt(params.length)]);
             }
             default:
                 return null;
@@ -271,6 +293,15 @@ public class ThachThucThanThanh {
         if (option == null || option.optionTemplate == null) {
             return GENDER_UNKNOWN;
         }
+        if (ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {
+            if (option.param <= ItemService.DO_THAN_THANH_PARAM_KHANH_CON) {
+                return 0;
+            }
+            if (option.param <= ItemService.DO_THAN_THANH_PARAM_NGAO_EM) {
+                return 1;
+            }
+            return 2;
+        }
         switch (option.optionTemplate.id) {
             case 127:
             case 128:
@@ -304,18 +335,7 @@ public class ThachThucThanThanh {
             case 242:
             case 243:
             case 244:
-            case 252:
-            case 253:
-            case 254:
                 return 2;
-            case 251:
-                if (option.param >= 1 && option.param <= 3) {
-                    return 0;
-                }
-                if (option.param >= 4 && option.param <= 6) {
-                    return 1;
-                }
-                return GENDER_UNKNOWN;
             case 233:
             case 234:
                 return GENDER_NEUTRAL;

@@ -43,9 +43,18 @@ public class ItemService {
     private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
     private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 50, 77, 96, 103, 106, 108, 117, 204};
     private static final short COSTUME_JACKY_CHUN_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
-    private static final int DO_THAN_THANH_SET_OPTION = 251;
+    public static final int DO_THAN_THANH_SET_OPTION = 233;
+    public static final int DO_THAN_THANH_PARAM_SVK_CON = 101;
+    public static final int DO_THAN_THANH_PARAM_SON_CON = 102;
+    public static final int DO_THAN_THANH_PARAM_KHANH_CON = 103;
+    public static final int DO_THAN_THANH_PARAM_SON_EM = 104;
+    public static final int DO_THAN_THANH_PARAM_NGAO_CON = 105;
+    public static final int DO_THAN_THANH_PARAM_NGAO_EM = 106;
+    public static final int DO_THAN_THANH_PARAM_BI_CON = 107;
+    public static final int DO_THAN_THANH_PARAM_CAY_CON = 108;
+    public static final int DO_THAN_THANH_PARAM_BINH_CON = 109;
     private static final String COSTUME_JACKY_CHUN_DESCRIPTION = "C\u1ea3i trang th\u00e0nh Jacky Chun\nM\u1ed7i 1 ph\u00fat, \u0111\u00f2n ch\u01b0\u1edfng \u0111\u1ea7u ti\u00ean x4 s\u00e1t th\u01b0\u01a1ng";
-    private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117, DO_THAN_THANH_SET_OPTION};
+    private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117};
     private static final short ANGEL_DEMON_WINGS_ID = 1722;
     private static final String ANGEL_DEMON_WINGS_DESCRIPTION = "T\u0103ng 20% s\u1ee9c \u0111\u00e1nh, HP, KI v\u00e0 20% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss";
     private static final int[] ANGEL_DEMON_WINGS_CONTROLLED_OPTIONS = {50, 77, 103, 204};
@@ -755,7 +764,7 @@ public class ItemService {
         if (item != null) {
             item.itemOptions.addAll(ItemService.gI().getListOptionItemShop((short) itemId));
             item.itemOptions.add(new Item.ItemOption(skhId, skhParam));
-            for (int subId : getOptionIdsBySKH(skhId)) {
+            for (int subId : getOptionIdsBySKH(skhId, skhParam)) {
                 item.itemOptions.add(new Item.ItemOption(subId, 1));
             }
             item.itemOptions.add(new Item.ItemOption(30, 1));
@@ -819,14 +828,22 @@ public class ItemService {
                 return new int[]{242, 243, 244};
             case 245:
                 return new int[]{246, 247, 248};
-            case 251:
-            case 252:
-            case 253:
-            case 254:
-                return new int[]{};
             default:
                 return new int[]{};
         }
+    }
+
+    public int[] getOptionIdsBySKH(int skhId, int skhParam) {
+        if (isDoThanThanhSetOption(skhId, skhParam)) {
+            return new int[]{};
+        }
+        return getOptionIdsBySKH(skhId);
+    }
+
+    public static boolean isDoThanThanhSetOption(int optionId, int optionParam) {
+        return optionId == DO_THAN_THANH_SET_OPTION
+                && optionParam >= DO_THAN_THANH_PARAM_SVK_CON
+                && optionParam <= DO_THAN_THANH_PARAM_BINH_CON;
     }
 
     public int randomSKHId(byte gender) {
@@ -1632,7 +1649,7 @@ public class ItemService {
         item.itemOptions.clear();
         addDoThanLinhOptions(item.itemOptions, idTempTL, 207);
         item.itemOptions.add(new ItemOption(skhId, skhParam));
-        for (int subId : getOptionIdsBySKH(skhId)) {
+        for (int subId : getOptionIdsBySKH(skhId, skhParam)) {
             item.itemOptions.add(new ItemOption(subId, 1));
         }
         item.itemOptions.add(new ItemOption(30, 1));
@@ -1844,11 +1861,6 @@ public class ItemService {
                 return 137;
             case 135: // 3
                 return 138;
-            case 251:
-            case 252:
-            case 253:
-            case 254:
-                return 0;
         }
         return 0;
     }

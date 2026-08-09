@@ -746,10 +746,6 @@ public final class Manager {
             while (rs.next()) {
                 ensureItemOptionTemplate(rs.getInt("id"), rs.getString("name"));
             }
-            ensureItemOptionTemplate(251, "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set # (1 SVK, 2 S\u01a1n, 3 Kh\u00e1nh, 4 S\u01a1n em, 5 Ngao con, 6 Ngao em)");
-            ensureItemOptionTemplate(252, "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Bi con (5 m\u00f3n +120% HP)");
-            ensureItemOptionTemplate(253, "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set C\u1ea7y con (5 m\u00f3n +50% HP, x2 ph\u1ea1m vi T\u1ef1 S\u00e1t)");
-            ensureItemOptionTemplate(254, "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set B\u00ecnh con (5 m\u00f3n +60% HP, +30% gi\u00e1p)");
             Logger.success(Logger.PURPLE + "Successfully loaded map item option template (" + ITEM_OPTION_TEMPLATES.size() + ")\n");
 
             //load shop
