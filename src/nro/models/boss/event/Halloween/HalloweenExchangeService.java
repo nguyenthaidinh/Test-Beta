@@ -18,7 +18,6 @@ public final class HalloweenExchangeService {
     private static final int COSTUME_PUMPKIN_COST = 500;
     private static final int PET_CARD_COST = 400;
     private static final int PET_PUMPKIN_COST = 4_000;
-    private static final int EXCHANGE_COSTUME_EXPIRE_DAYS = 30;
 
     private HalloweenExchangeService() {
     }
@@ -44,7 +43,7 @@ public final class HalloweenExchangeService {
                 break;
             case 1:
                 exchange(player, COSTUME_CARD_COST, COSTUME_PUMPKIN_COST,
-                        HalloweenRewards.createHalloweenCostumeReward(EXCHANGE_COSTUME_EXPIRE_DAYS));
+                        HalloweenRewards.createHalloweenCostumeReward());
                 break;
             case 2:
                 exchange(player, PET_CARD_COST, PET_PUMPKIN_COST,

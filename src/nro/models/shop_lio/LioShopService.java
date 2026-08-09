@@ -445,10 +445,11 @@ public class LioShopService {
             msg.writer().writeByte(1);
         }
         msg.writer().writeByte(0);
-        msg.writer().writeByte(it.itemOptions.size());
-        for (int i = 0; i < it.itemOptions.size(); i++) {
-            msg.writer().writeByte(it.itemOptions.get(i).optionTemplate.id);
-            msg.writer().writeShort(it.itemOptions.get(i).param);
+        List<ItemOption> itemOptions = it.getClientItemOptions();
+        msg.writer().writeByte(itemOptions.size());
+        for (int i = 0; i < itemOptions.size(); i++) {
+            msg.writer().writeByte(itemOptions.get(i).optionTemplate.id);
+            msg.writer().writeShort(itemOptions.get(i).param);
         }
         msg.writer().writeByte(0);
         if (firstOpen) {
@@ -523,10 +524,11 @@ public class LioShopService {
             msg.writer().writeByte(shopItem.quantity);
         }
         msg.writer().writeByte(0); // isMe
-        msg.writer().writeByte(it.itemOptions.size());
-        for (int a = 0; a < it.itemOptions.size(); a++) {
-            msg.writer().writeByte(it.itemOptions.get(a).optionTemplate.id);
-            msg.writer().writeShort(it.itemOptions.get(a).param);
+        List<ItemOption> itemOptions = it.getClientItemOptions();
+        msg.writer().writeByte(itemOptions.size());
+        for (int a = 0; a < itemOptions.size(); a++) {
+            msg.writer().writeByte(itemOptions.get(a).optionTemplate.id);
+            msg.writer().writeShort(itemOptions.get(a).param);
         }
         msg.writer().writeByte(0);
         if (firstOpen) {

@@ -613,11 +613,12 @@ public class InventoryService {
                 msg.writer().writeInt(item.quantity);
                 msg.writer().writeUTF(item.getInfo());
                 msg.writer().writeUTF(item.getContent());
-                msg.writer().writeByte(item.itemOptions.size()); //options
-                for (int j = 0; j < item.itemOptions.size(); j++) {
-                    if (item.itemOptions.get(j).optionTemplate.id == 213) {
+                List<Item.ItemOption> itemOptions = item.getClientItemOptions();
+                msg.writer().writeByte(itemOptions.size()); //options
+                for (int j = 0; j < itemOptions.size(); j++) {
+                    if (itemOptions.get(j).optionTemplate.id == 213) {
                         int opId = 213;
-                        int param = item.itemOptions.get(j).param;
+                        int param = itemOptions.get(j).param;
                         if (param > 1_000_000) {
                             opId = 223;
                             param /= 1_000_000;
@@ -628,8 +629,8 @@ public class InventoryService {
                         msg.writer().writeByte(opId);
                         msg.writer().writeShort(param);
                     } else {
-                        msg.writer().writeByte(item.itemOptions.get(j).optionTemplate.id);
-                        msg.writer().writeShort(item.itemOptions.get(j).param);
+                        msg.writer().writeByte(itemOptions.get(j).optionTemplate.id);
+                        msg.writer().writeShort(itemOptions.get(j).param);
                     }
                 }
             }
@@ -657,7 +658,7 @@ public class InventoryService {
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
                     msg.writer().writeUTF(item.getContent());
-                    List<Item.ItemOption> itemOptions = item.itemOptions;
+                    List<Item.ItemOption> itemOptions = item.getClientItemOptions();
                     msg.writer().writeByte(itemOptions.size());
                     for (Item.ItemOption itemOption : itemOptions) {
                         if (itemOption.optionTemplate.id == 213) {
@@ -700,8 +701,9 @@ public class InventoryService {
                     msg.writer().writeInt(it.quantity);
                     msg.writer().writeUTF(it.getInfo());
                     msg.writer().writeUTF(it.getContent());
-                    msg.writer().writeByte(it.itemOptions.size());
-                    for (Item.ItemOption io : it.itemOptions) {
+                    List<Item.ItemOption> itemOptions = it.getClientItemOptions();
+                    msg.writer().writeByte(itemOptions.size());
+                    for (Item.ItemOption io : itemOptions) {
                         if (io.optionTemplate.id == 213) {
                             int opId = 213;
                             int param = io.param;

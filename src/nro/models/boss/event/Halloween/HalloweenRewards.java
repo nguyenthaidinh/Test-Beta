@@ -57,6 +57,8 @@ public final class HalloweenRewards {
     private static final int SUPER_GOD_COSTUME_DAMAGE_BOSS_PERCENT = 30;
     private static final int HALLOWEEN_CAPSULE_PERMANENT_RATE = 5;
     private static final int[] HALLOWEEN_CAPSULE_EXPIRE_DAYS = {1, 3, 5, 7};
+    private static final int HALLOWEEN_REWARD_PERMANENT_RATE = 10;
+    private static final int[] HALLOWEEN_REWARD_EXPIRE_DAYS = {3, 5, 7, 15};
 
     private static final int[] COSTUME_REWARDS = {
         ConstItem.CAI_TRANG_BONG_BANG_HALLOWEEN,
@@ -268,6 +270,12 @@ public final class HalloweenRewards {
         return costume;
     }
 
+    public static Item createHalloweenCostumeReward() {
+        Item costume = ItemService.gI().createNewItem((short) COSTUME_REWARDS[Util.nextInt(COSTUME_REWARDS.length)]);
+        addCostumeOptions(costume, randomHalloweenRewardExpireDays());
+        return costume;
+    }
+
     public static Item createHalloweenPetReward() {
         Item pet = ItemService.gI().createNewItem((short) ConstItem.PET_BI_MA_VUONG);
         addPetOptions(pet);
@@ -302,7 +310,7 @@ public final class HalloweenRewards {
         options.add(new ItemOption(OPTION_CRITICAL_DAMAGE_PERCENT, HALLOWEEN_COSTUME_EXTRA_PERCENT));
         options.add(new ItemOption(OPTION_DAMAGE_BOSS_PERCENT, HALLOWEEN_COSTUME_EXTRA_PERCENT));
         options.add(new ItemOption(OPTION_CAN_NOT_TRADE, 0));
-        options.add(new ItemOption(OPTION_EXPIRE_DAYS, expireDays));
+        addHalloweenExpireOption(options, expireDays);
     }
 
     private static void addPetOptions(Item item) {
@@ -320,6 +328,7 @@ public final class HalloweenRewards {
         options.add(new ItemOption(OPTION_CRITICAL_DAMAGE_PERCENT, randomHalloweenPetCriticalDamage()));
         options.add(new ItemOption(OPTION_DEF_PERCENT, 5));
         options.add(new ItemOption(OPTION_CAN_NOT_TRADE, 0));
+        addHalloweenExpireOption(options, randomHalloweenRewardExpireDays());
     }
 
     private static int randomHalloweenStat() {
@@ -328,6 +337,19 @@ public final class HalloweenRewards {
 
     private static int randomHalloweenPetCriticalDamage() {
         return Util.nextInt(HALLOWEEN_PET_CRITICAL_DAMAGE_MIN, HALLOWEEN_PET_CRITICAL_DAMAGE_MAX);
+    }
+
+    private static int randomHalloweenRewardExpireDays() {
+        if (Util.isTrue(HALLOWEEN_REWARD_PERMANENT_RATE, 100)) {
+            return -1;
+        }
+        return HALLOWEEN_REWARD_EXPIRE_DAYS[Util.nextInt(HALLOWEEN_REWARD_EXPIRE_DAYS.length)];
+    }
+
+    private static void addHalloweenExpireOption(java.util.List<ItemOption> options, int expireDays) {
+        if (expireDays > 0) {
+            options.add(new ItemOption(OPTION_EXPIRE_DAYS, expireDays));
+        }
     }
 
     private static boolean isHalloweenCostume(int itemId) {

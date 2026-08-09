@@ -633,8 +633,9 @@ public class ShopService {
                 ItemService.gI().normalizeLuckyRoundPetOptions(item);
                 msg.writer().writeShort(item.template.id);
                 msg.writer().writeUTF("|7| LUCKY REWARD");
-                msg.writer().writeByte(item.itemOptions.size() + 1);
-                for (Item.ItemOption io : item.itemOptions) {
+                List<Item.ItemOption> itemOptions = item.getClientItemOptions();
+                msg.writer().writeByte(itemOptions.size() + 1);
+                for (Item.ItemOption io : itemOptions) {
                     msg.writer().writeByte(io.optionTemplate.id);
                     msg.writer().writeShort(io.param);
                 }
@@ -682,8 +683,9 @@ public class ShopService {
                 msg.writer().writeInt(giamualaivang);
                 msg.writer().writeInt(giamualaingoc);
                 msg.writer().writeInt(item.quantity);
-                msg.writer().writeByte(item.itemOptions.size());
-                for (Item.ItemOption io : item.itemOptions) {
+                List<Item.ItemOption> itemOptions = item.getClientItemOptions();
+                msg.writer().writeByte(itemOptions.size());
+                for (Item.ItemOption io : itemOptions) {
                     msg.writer().writeByte(io.optionTemplate.id);
                     msg.writer().writeShort(io.param);
                 }

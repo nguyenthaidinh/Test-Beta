@@ -744,7 +744,11 @@ public final class Manager {
             ps = ConnectionDatabase.prepareStatement("select id, name from item_option_template");
             rs = ps.executeQuery();
             while (rs.next()) {
-                ensureItemOptionTemplate(rs.getInt("id"), rs.getString("name"));
+                int optionTemplateId = rs.getInt("id");
+                if (optionTemplateId > 250) {
+                    continue;
+                }
+                ensureItemOptionTemplate(optionTemplateId, rs.getString("name"));
             }
             Logger.success(Logger.PURPLE + "Successfully loaded map item option template (" + ITEM_OPTION_TEMPLATES.size() + ")\n");
 

@@ -307,8 +307,9 @@ public class Trade {
                     } else {
                         msg.writer().writeInt(item.quantity);
                     }
-                    msg.writer().writeByte(item.itemOptions.size());
-                    for (Item.ItemOption io : item.itemOptions) {
+                    List<Item.ItemOption> itemOptions = item.getClientItemOptions();
+                    msg.writer().writeByte(itemOptions.size());
+                    for (Item.ItemOption io : itemOptions) {
                         msg.writer().writeByte(io.optionTemplate.id);
                         msg.writer().writeShort(io.param);
                     }
@@ -324,8 +325,9 @@ public class Trade {
                     } else {
                         msg.writer().writeInt(item.quantity);
                     }
-                    msg.writer().writeByte(item.itemOptions.size());
-                    for (Item.ItemOption io : item.itemOptions) {
+                    List<Item.ItemOption> itemOptions = item.getClientItemOptions();
+                    msg.writer().writeByte(itemOptions.size());
+                    for (Item.ItemOption io : itemOptions) {
                         msg.writer().writeByte(io.optionTemplate.id);
                         msg.writer().writeShort(io.param);
                     }

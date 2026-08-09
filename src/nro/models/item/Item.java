@@ -61,7 +61,38 @@ public class Item {
     }
 
     public String getContent() {
+        String doThanThanhInfo = getDoThanThanhInfo();
+        if (doThanThanhInfo != null) {
+            return doThanThanhInfo + "\n" + this.template.description;
+        }
         return "Yêu cầu sức mạnh " + this.template.strRequire + " trở lên";
+    }
+
+    public List<ItemOption> getClientItemOptions() {
+        List<ItemOption> clientOptions = new ArrayList<>();
+        for (ItemOption itemOption : itemOptions) {
+            if (itemOption == null || itemOption.optionTemplate == null) {
+                continue;
+            }
+            if (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
+                continue;
+            }
+            clientOptions.add(itemOption);
+        }
+        return clientOptions;
+    }
+
+    private String getDoThanThanhInfo() {
+        for (ItemOption itemOption : itemOptions) {
+            if (itemOption == null || itemOption.optionTemplate == null) {
+                continue;
+            }
+            String optionString = ItemOption.getDoThanThanhOptionString(itemOption.optionTemplate.id, itemOption.param);
+            if (optionString != null) {
+                return optionString;
+            }
+        }
+        return null;
     }
 
     public void dispose() {
@@ -110,7 +141,7 @@ public class Item {
             if (this.optionTemplate == null) {
                 return "";
             }
-            String doThanThanhOption = getDoThanThanhOptionString(this.param);
+            String doThanThanhOption = getDoThanThanhOptionString(this.optionTemplate.id, this.param);
             if (doThanThanhOption != null) {
                 return doThanThanhOption;
             }
@@ -135,7 +166,7 @@ public class Item {
             if (this.optionTemplate == null) {
                 return "";
             }
-            String doThanThanhOption = getDoThanThanhOptionString(this.param);
+            String doThanThanhOption = getDoThanThanhOptionString(this.optionTemplate.id, this.param);
             if (doThanThanhOption != null) {
                 return doThanThanhOption;
             }
@@ -148,8 +179,8 @@ public class Item {
             return value;
         }
 
-        private String getDoThanThanhOptionString(int optionParam) {
-            if (!ItemService.isDoThanThanhSetOption(this.optionTemplate.id, optionParam)) {
+        private static String getDoThanThanhOptionString(int optionId, int optionParam) {
+            if (!ItemService.isDoThanThanhSetOption(optionId, optionParam)) {
                 return null;
             }
             switch (optionParam) {
@@ -164,7 +195,7 @@ public class Item {
                 case ItemService.DO_THAN_THANH_PARAM_NGAO_CON:
                     return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Ngao con (5 m\u00f3n +130% Li\u00ean Ho\u00e0n)";
                 case ItemService.DO_THAN_THANH_PARAM_NGAO_EM:
-                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Ngao em (5 m\u00f3n +150% \u0110\u1ebb Tr\u1ee9ng, x2 h\u1ed3i)";
+                    return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Ngao em (5 m\u00f3n +150% \u0110\u1ebb Tr\u1ee9ng, x2 th\u1eddi gian h\u1ed3i)";
                 case ItemService.DO_THAN_THANH_PARAM_BI_CON:
                     return "\u0110\u1ed3 th\u1ea7n th\u00e1nh: Set Bi con (5 m\u00f3n +120% HP)";
                 case ItemService.DO_THAN_THANH_PARAM_CAY_CON:

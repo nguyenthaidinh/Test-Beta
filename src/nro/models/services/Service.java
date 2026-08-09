@@ -896,7 +896,7 @@ public class Service {
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
                     msg.writer().writeUTF(item.getContent());
-                    List<ItemOption> itemOptions = item.itemOptions;
+                    List<ItemOption> itemOptions = item.getClientItemOptions();
                     msg.writer().writeByte(itemOptions.size());
                     for (ItemOption itemOption : itemOptions) {
                         msg.writer().writeByte(itemOption.optionTemplate.id);
@@ -917,7 +917,7 @@ public class Service {
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
                     msg.writer().writeUTF(item.getContent());
-                    List<ItemOption> itemOptions = item.itemOptions;
+                    List<ItemOption> itemOptions = item.getClientItemOptions();
                     msg.writer().writeByte(itemOptions.size());
                     for (ItemOption itemOption : itemOptions) {
                         msg.writer().writeByte(itemOption.optionTemplate.id);
@@ -938,7 +938,7 @@ public class Service {
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
                     msg.writer().writeUTF(item.getContent());
-                    List<ItemOption> itemOptions = item.itemOptions;
+                    List<ItemOption> itemOptions = item.getClientItemOptions();
                     msg.writer().writeByte(itemOptions.size());
                     for (ItemOption itemOption : itemOptions) {
                         msg.writer().writeByte(itemOption.optionTemplate.id);
@@ -1629,9 +1629,10 @@ public class Service {
                         msg.writer().writeUTF(item.getInfo());
                         msg.writer().writeUTF(item.getContent());
 
-                        int countOption = item.itemOptions.size();
+                        List<ItemOption> itemOptions = item.getClientItemOptions();
+                        int countOption = itemOptions.size();
                         msg.writer().writeByte(countOption);
-                        for (ItemOption iop : item.itemOptions) {
+                        for (ItemOption iop : itemOptions) {
                             msg.writer().writeByte(iop.optionTemplate.id);
                             msg.writer().writeShort(iop.param);
                         }
