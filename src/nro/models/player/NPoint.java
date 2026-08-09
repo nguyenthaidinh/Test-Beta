@@ -925,13 +925,13 @@ public class NPoint {
         if (this.player.setClothes.nappa == 5) {
             hpMax += (hpMax * 80L / 100L);
         }
-        if (this.player.setClothes.biCon == 5) {
+        if (this.player.setClothes.biCon >= 5) {
             hpMax += (hpMax * 120L / 100L);
         }
-        if (this.player.setClothes.cayCon == 5) {
+        if (this.player.setClothes.cayCon >= 5) {
             hpMax += (hpMax * 50L / 100L);
         }
-        if (this.player.setClothes.binhCon == 5) {
+        if (this.player.setClothes.binhCon >= 5) {
             hpMax += (hpMax * 60L / 100L);
         }
 
@@ -1106,7 +1106,7 @@ public class NPoint {
         if (this.player.setClothes.picolo == 5) {
             mpMax += (mpMax * 100L / 100L);
         }
-        if (this.player.setClothes.sonEm == 5) {
+        if (this.player.setClothes.sonEm >= 5) {
             mpMax += (mpMax * 150L / 100L);
         }
         if (this.isNguyetAn) {
@@ -1476,7 +1476,7 @@ public class NPoint {
         this.def = this.defg * 4;
         this.def += this.defAdd;
 
-        if (this.player.setClothes.binhCon == 5) {
+        if (this.player.setClothes.binhCon >= 5) {
             this.def += this.def * 30 / 100;
         }
         if (this.player.itemTime != null && this.player.itemTime.isUseNuocMia3) {
@@ -1637,7 +1637,7 @@ public class NPoint {
                 if (this.player.setClothes.songoku == 5) {
                     percentXDame += 100;
                 }
-                if (this.player.setClothes.svkCon == 5) {
+                if (this.player.setClothes.svkCon >= 5) {
                     percentXDame += 125;
                 }
                 break;
@@ -1689,7 +1689,7 @@ public class NPoint {
                 if (this.player.setClothes.ocTieu == 5) {
                     percentXDame += 100;
                 }
-                if (this.player.setClothes.ngaoCon == 5) {
+                if (this.player.setClothes.ngaoCon >= 5) {
                     percentXDame += 130;
                 }
                 break;
@@ -1698,7 +1698,7 @@ public class NPoint {
                 if (player.setClothes.thanVuTruKaio == 5) {
                     percentXDame += 30;
                 }
-                if (player.setClothes.sonCon == 5) {
+                if (player.setClothes.sonCon >= 5) {
                     percentXDame += 40;
                 }
                 break;
@@ -1742,7 +1742,7 @@ public class NPoint {
                 if (player.setClothes.pikkoroDaimao == 5) {
                     dameAttack *= 4;
                 }
-                if (player.setClothes.ngaoEm == 5) {
+                if (player.setClothes.ngaoEm >= 5) {
                     dameAttack += dameAttack * 150 / 100;
                 }
                 return Math.min(dameAttack, MAX_PLAYER_DAME);

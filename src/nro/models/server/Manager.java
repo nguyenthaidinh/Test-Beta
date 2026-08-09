@@ -750,6 +750,7 @@ public final class Manager {
                 }
                 ensureItemOptionTemplate(optionTemplateId, rs.getString("name"));
             }
+            ensureItemOptionTemplate(233, "\u0110\u1ed3 th\u1ea7n th\u00e1nh");
             Logger.success(Logger.PURPLE + "Successfully loaded map item option template (" + ITEM_OPTION_TEMPLATES.size() + ")\n");
 
             //load shop

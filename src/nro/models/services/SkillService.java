@@ -619,7 +619,7 @@ public class SkillService {
                 if (player.setClothes.thienXinHang == 5) {
                     timeStun *= 2;
                 }
-                if (player.setClothes.khanhCon == 5) {
+                if (player.setClothes.khanhCon >= 5) {
                     timeStun *= 2;
                 }
                 mobs = new ArrayList<>();
@@ -778,7 +778,7 @@ public class SkillService {
         if (player.setClothes.cadicM == 2) {
             rangeBom += 200;
         }
-        if (player.setClothes.cayCon == 5) {
+        if (player.setClothes.cayCon >= 5) {
             rangeBom *= 2;
         }
         long dame = player.nPoint.hp;
@@ -1334,7 +1334,7 @@ public class SkillService {
                 if (intrinsic.id == 12) {
                     subTimeParam = intrinsic.param1;
                 }
-                if (player.setClothes.ngaoEm == 5) {
+                if (player.setClothes.ngaoEm >= 5) {
                     subTimeParam += 50;
                 }
             }
@@ -1349,7 +1349,7 @@ public class SkillService {
                 }
             }
             case Skill.THOI_MIEN -> {
-                if (player.setClothes.khanhCon == 5) {
+                if (player.setClothes.khanhCon >= 5) {
                     subTimeParam += 50;
                 }
             }

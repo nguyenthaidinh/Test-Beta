@@ -230,7 +230,7 @@ public abstract class SuperRank extends Boss {
                         break;
                 }
 
-                int bonusXuyenGiapSonCon = plAtt.setClothes != null && plAtt.setClothes.sonCon == 5 ? 50 : 0;
+                int bonusXuyenGiapSonCon = plAtt.setClothes != null && plAtt.setClothes.sonCon >= 5 ? 50 : 0;
                 int tlXuyenGiapChuong = plAtt.nPoint.tlxgc + bonusXuyenGiapSonCon;
                 int tlXuyenGiapCanChien = plAtt.nPoint.tlxgcc + bonusXuyenGiapSonCon;
 

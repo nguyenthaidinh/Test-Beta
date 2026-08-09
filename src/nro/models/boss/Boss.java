@@ -759,7 +759,7 @@ public class Boss extends Player implements IBoss {
         if (reductionPercent <= 0) {
             return 0;
         }
-        if (plAtt != null && plAtt.setClothes != null && plAtt.setClothes.sonCon == 5) {
+        if (plAtt != null && plAtt.setClothes != null && plAtt.setClothes.sonCon >= 5) {
             return Math.max(0, reductionPercent - 50);
         }
         return reductionPercent;

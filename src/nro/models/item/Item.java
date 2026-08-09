@@ -51,11 +51,17 @@ public class Item {
     }
 
     public String getInfo() {
-        String strInfo = "";
+        String doThanThanhInfo = getDoThanThanhInfo();
+        String strInfo = doThanThanhInfo == null ? "" : doThanThanhInfo + "\n";
         for (ItemOption itemOption : itemOptions) {
-            if (itemOption != null) {
-                strInfo += itemOption.getOptionString();
+            if (itemOption == null) {
+                continue;
             }
+            if (itemOption.optionTemplate != null
+                    && ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
+                continue;
+            }
+            strInfo += itemOption.getOptionString();
         }
         return strInfo;
     }
@@ -74,7 +80,8 @@ public class Item {
             if (itemOption == null || itemOption.optionTemplate == null) {
                 continue;
             }
-            if (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
+            if (itemOption.optionTemplate.id == ItemService.DO_THAN_THANH_SET_OPTION
+                    && !ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
                 continue;
             }
             clientOptions.add(itemOption);
@@ -606,10 +613,19 @@ public class Item {
 
     public String getInfoItem() {
         String strInfo = "|1|" + template.name + "\n|0|";
+        String doThanThanhInfo = getDoThanThanhInfo();
+        if (doThanThanhInfo != null) {
+            strInfo += doThanThanhInfo + "\n";
+        }
         for (ItemOption itemOption : itemOptions) {
-            if (itemOption != null) {
-                strInfo += itemOption.getOptionString() + "\n";
+            if (itemOption == null) {
+                continue;
             }
+            if (itemOption.optionTemplate != null
+                    && ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
+                continue;
+            }
+            strInfo += itemOption.getOptionString() + "\n";
         }
         strInfo += "|2|" + template.description;
         return strInfo;
