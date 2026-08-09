@@ -622,6 +622,7 @@ public class ConstItem {
     public static final int CAI_TRANG_XAYDA = 609;
     public static final int BONG_HOA_610 = 610;
     public static final int BAN_DO_KHO_BAU = 611;
+    public static final int BAN_DO_TRUYEN_THUYET = 1565;
     public static final int CAI_TRANG_ARALE = 612;
     public static final int CAI_TRANG_GATCHAN = 613;
     public static final int CAI_TRANG_OBOTCHAMAN = 614;

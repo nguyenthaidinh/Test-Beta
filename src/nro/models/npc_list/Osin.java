@@ -1,7 +1,10 @@
 package nro.models.npc_list;
 
+import nro.models.consts.ConstItem;
+import nro.models.consts.ConstMap;
 import nro.models.consts.ConstNpc;
 import java.util.ArrayList;
+import nro.models.item.Item;
 import nro.models.services_dungeon.MajinBuu14HService;
 import nro.models.services_dungeon.MajinBuuService;
 import nro.models.npc.Npc;
@@ -19,6 +22,9 @@ import nro.models.utils.Util;
 
 public class Osin extends Npc {
 
+    private static final int PIRATE_ISLAND_ENTRY_X = 120;
+    private static final int PIRATE_ISLAND_ENTRY_Y = 312;
+
     public Osin(int mapId, int status, int cx, int cy, int tempId, int avartar) {
         super(mapId, status, cx, cy, tempId, avartar);
     }
@@ -33,7 +39,7 @@ public class Osin extends Npc {
                             "Đến\nKaio", "Đến\nhành tinh\nBill", "Từ chối");
                 case 154 ->
                     this.createOtherMenu(player, ConstNpc.BASE_MENU, "Ta có thể giúp gì cho ngươi ?",
-                            "Đến\nhành tinh\nngục tù", "Từ chối");
+                            "Đến\nhành tinh\nngục tù", "Đảo\nHải Tặc", "Từ chối");
                 case 155 ->
                     this.createOtherMenu(player, ConstNpc.BASE_MENU, "Ta có thể giúp gì cho ngươi ?",
                             "Quay về", "Từ chối");
@@ -109,6 +115,24 @@ public class Osin extends Npc {
         }
     }
 
+    private void enterPirateIsland(Player player) {
+        if (MapService.gI().getMapById(ConstMap.DAO_HAI_TAC_1) == null) {
+            Service.gI().sendThongBao(player, "Đảo Hải Tặc chưa được mở.");
+            return;
+        }
+
+        Item legendaryMap = InventoryService.gI().findItemBag(player, ConstItem.BAN_DO_TRUYEN_THUYET);
+        if (legendaryMap == null || legendaryMap.quantity < 1) {
+            Service.gI().sendThongBao(player, "Bạn cần có 1 Bản đồ truyền thuyết để vào Đảo Hải Tặc.");
+            return;
+        }
+
+        InventoryService.gI().subQuantityItemsBag(player, legendaryMap, 1);
+        InventoryService.gI().sendItemBags(player);
+        ChangeMapService.gI().changeMap(player, ConstMap.DAO_HAI_TAC_1, -1,
+                PIRATE_ISLAND_ENTRY_X, PIRATE_ISLAND_ENTRY_Y);
+    }
+
     @Override
     public void confirmMenu(Player player, int select) {
         if (!canOpenNpc(player)) {
@@ -132,8 +156,11 @@ public class Osin extends Npc {
 
             case 154 -> {
                 if (player.idMark.isBaseMenu()) {
-                    if (select == 0) {
-                        ChangeMapService.gI().changeMap(player, 155, -1, 111, 792);
+                    switch (select) {
+                        case 0 ->
+                            ChangeMapService.gI().changeMap(player, 155, -1, 111, 792);
+                        case 1 ->
+                            enterPirateIsland(player);
                     }
                 }
             }

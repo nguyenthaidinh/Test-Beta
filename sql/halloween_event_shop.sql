@@ -1,5 +1,5 @@
 -- Shop sự kiện Halloween tại NPC ChiChi.
--- Giá dùng Thỏi vàng: Thiệp Halloween 10 TV, Bí ngô 5 TV, Đá ngũ sắc 1000 TV.
+-- Giá dùng Thỏi vàng: Thiệp Halloween 10 TV, Bí ngô 5 TV, Đá ngũ sắc 1000 TV, Bản đồ truyền thuyết 500 TV.
 -- `icon_spec` 4028 là icon_id của item 457 - Thỏi vàng.
 
 START TRANSACTION;
@@ -112,6 +112,23 @@ WHERE NOT EXISTS (
       AND `temp_id` = 674
 );
 
+SET @item_shop_id := (
+    SELECT `id`
+    FROM `item_shop`
+    WHERE `tab_id` = @tab_id
+      AND `temp_id` = 1565
+    LIMIT 1
+);
+SET @item_shop_id := COALESCE(@item_shop_id, (SELECT COALESCE(MAX(`id`), 0) + 1 FROM `item_shop`));
+INSERT INTO `item_shop` (`id`, `tab_id`, `temp_id`, `is_new`, `is_sell`, `type_sell`, `cost`, `icon_spec`, `create_time`)
+SELECT @item_shop_id, @tab_id, 1565, 1, 1, 1, 500, 4028, NOW()
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM `item_shop`
+    WHERE `tab_id` = @tab_id
+      AND `temp_id` = 1565
+);
+
 UPDATE `item_shop`
 SET `is_new` = 1,
     `is_sell` = 1,
@@ -120,17 +137,18 @@ SET `is_new` = 1,
         WHEN 1117 THEN 10
         WHEN 585 THEN 5
         WHEN 674 THEN 1000
+        WHEN 1565 THEN 500
         ELSE `cost`
     END,
     `icon_spec` = 4028
 WHERE `tab_id` = @tab_id
-  AND `temp_id` IN (1117, 585, 674);
+  AND `temp_id` IN (1117, 585, 674, 1565);
 
 DELETE iso
 FROM `item_shop_option` AS iso
 INNER JOIN `item_shop` AS ish
     ON ish.`id` = iso.`item_shop_id`
 WHERE ish.`tab_id` = @tab_id
-  AND ish.`temp_id` IN (1117, 585, 674);
+  AND ish.`temp_id` IN (1117, 585, 674, 1565);
 
 COMMIT;

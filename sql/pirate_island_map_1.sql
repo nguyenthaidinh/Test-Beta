@@ -1,5 +1,6 @@
 -- Khu 1 cua Dao Hai Tac dung nguyen dia hinh va quai cua map 151.
--- Cong sang khu 2 va NPC vao map se duoc noi sau khi cac khu con lai duoc chot.
+-- Whis va Than Huy Diet Beerus se duoc spawn bang BossManager.
+-- Cong sang khu 2 va NPC trong map se duoc noi sau khi cac khu con lai duoc chot.
 
 INSERT INTO `map_template`
     (`id`, `NAME`, `zones`, `max_player`, `data`, `type`, `planet_id`,
@@ -29,9 +30,21 @@ WHERE source.`id` = 151
 LIMIT 1;
 
 -- Sua ban ghi neu migration ban dau da duoc chay truoc khi type map duoc tach khoi Khi Gas.
-UPDATE `map_template`
-SET `type` = 0,
-    `waypoints` = '[]',
-    `npcs` = '[]'
-WHERE `id` = 186
-  AND `NAME` = 'Đảo Hải Tặc';
+-- Dong thoi ep lai quai/dia hinh tu map 151 neu DB da co map 186 tu truoc.
+UPDATE `map_template` AS target
+INNER JOIN `map_template` AS source
+    ON source.`id` = 151
+SET target.`zones` = source.`zones`,
+    target.`max_player` = source.`max_player`,
+    target.`data` = source.`data`,
+    target.`type` = 0,
+    target.`planet_id` = source.`planet_id`,
+    target.`bg_type` = source.`bg_type`,
+    target.`tile_id` = source.`tile_id`,
+    target.`bg_id` = source.`bg_id`,
+    target.`waypoints` = '[]',
+    target.`mobs` = source.`mobs`,
+    target.`npcs` = '[]',
+    target.`is_map_double` = source.`is_map_double`
+WHERE target.`id` = 186
+  AND target.`NAME` = 'Đảo Hải Tặc';

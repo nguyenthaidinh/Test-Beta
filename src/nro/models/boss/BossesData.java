@@ -2595,7 +2595,7 @@ public class BossesData {
             new short[] { 838, 839, 840, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             10000, // dame, se can bang sau
             new int[] { 2_000_000_000 }, // hp
-            new int[] { ConstMap.HANH_TINH_BILL }, // map tam, chua bat tu dong xuat hien
+            new int[] { ConstMap.DAO_HAI_TAC_1 }, // map Dao Hai Tac
             new int[][] {
                     { Skill.DRAGON, 7, 500 } },
             new String[] { "|-1|Hay thu bat kip ta." },
@@ -2609,7 +2609,7 @@ public class BossesData {
             new short[] { 508, 509, 510, -1, -1, -1 }, // outfit {head, body, leg, bag, aura, eff}
             10000, // dame, se can bang sau
             new int[] { 2_000_000_000 }, // hp
-            new int[] { ConstMap.HANH_TINH_BILL }, // map tam, chua bat tu dong xuat hien
+            new int[] { ConstMap.DAO_HAI_TAC_1 }, // map Dao Hai Tac
             new int[][] {
                     { Skill.GALICK, 7, 500 } },
             new String[] { "|-1|Nguoi dam thach thuc Than Huy Diet sao?" },
