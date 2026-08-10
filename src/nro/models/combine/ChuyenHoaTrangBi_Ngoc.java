@@ -83,7 +83,7 @@ public class ChuyenHoaTrangBi_Ngoc {
 
         for (ItemOption io : trangBiGoc.itemOptions) {
             int id = io.optionTemplate.id;
-            if (!isIgnoredOption(id) && !isBaseStatOption(id)) {
+            if (!isIgnoredOption(io) && !isBaseStatOption(id)) {
                 npcSay.append(io.getOptionString()).append("\n");
             }
         }
@@ -116,7 +116,7 @@ public class ChuyenHoaTrangBi_Ngoc {
         Item newItem = ItemService.gI().createNewItem(trangBiCanChuyenHoa.template.id);
         for (ItemOption io : trangBiCanChuyenHoa.itemOptions) {
             int id = io.optionTemplate.id;
-            if (!isIgnoredOption(id)) {
+            if (shouldCopyOption(newItem, io)) {
                 int value = isBaseStatOption(id) ? chisogoc : io.param;
                 newItem.itemOptions.add(new ItemOption(io.optionTemplate, value));
             }
@@ -124,7 +124,7 @@ public class ChuyenHoaTrangBi_Ngoc {
 
         for (ItemOption io : trangBiGoc.itemOptions) {
             int id = io.optionTemplate.id;
-            if (!isIgnoredOption(id) && !isBaseStatOption(id)) {
+            if (shouldCopyOption(newItem, io) && !isBaseStatOption(id)) {
                 if (id == 72) {
                     newItem.itemOptions.add(new ItemOption(io.optionTemplate, io.param));
                 } else {
@@ -201,5 +201,36 @@ public class ChuyenHoaTrangBi_Ngoc {
                 || (id >= 233 && id <= 248) || (id >= 136 && id <= 144)
                 || (id >= 251 && id <= 254)
                 || (id >= 210 && id <= 218) || (id >= 224 && id <= 227));
+    }
+
+    private static boolean isIgnoredOption(ItemOption io) {
+        if (io == null || io.optionTemplate == null) {
+            return true;
+        }
+        if (ItemService.isDoThanThanhSetOption(io.optionTemplate.id, io.param)) {
+            return false;
+        }
+        return isIgnoredOption(io.optionTemplate.id);
+    }
+
+    private static boolean shouldCopyOption(Item item, ItemOption io) {
+        if (isIgnoredOption(io)) {
+            return false;
+        }
+        return !ItemService.isDoThanThanhSetOption(io.optionTemplate.id, io.param)
+                || !hasDoThanThanhSetOption(item);
+    }
+
+    private static boolean hasDoThanThanhSetOption(Item item) {
+        if (item == null || item.itemOptions == null) {
+            return false;
+        }
+        for (ItemOption option : item.itemOptions) {
+            if (option != null && option.optionTemplate != null
+                    && ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

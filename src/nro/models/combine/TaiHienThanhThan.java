@@ -144,13 +144,12 @@ public class TaiHienThanhThan {
             return -1;
         }
         for (Item.ItemOption option : item.itemOptions) {
-            int optionId = getOptionId(option);
-            if (isMainKichHoatOption(optionId)) {
-                return optionId;
+            if (isMainKichHoatOption(option)) {
+                return getOptionId(option);
             }
         }
         for (Item.ItemOption option : item.itemOptions) {
-            int mainOption = normalizeKichHoatOption(getOptionId(option));
+            int mainOption = normalizeKichHoatOption(option);
             if (mainOption != -1) {
                 return mainOption;
             }
@@ -165,7 +164,12 @@ public class TaiHienThanhThan {
         return option.optionTemplate.id;
     }
 
-    private static boolean isMainKichHoatOption(int optionId) {
+    private static boolean isMainKichHoatOption(Item.ItemOption option) {
+        if (option == null || option.optionTemplate == null
+                || ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {
+            return false;
+        }
+        int optionId = option.optionTemplate.id;
         return optionId >= 127 && optionId <= 135
                 || optionId == 233
                 || optionId == 237
@@ -177,7 +181,12 @@ public class TaiHienThanhThan {
         return optionId != 233;
     }
 
-    private static int normalizeKichHoatOption(int optionId) {
+    private static int normalizeKichHoatOption(Item.ItemOption option) {
+        if (option == null || option.optionTemplate == null
+                || ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {
+            return -1;
+        }
+        int optionId = option.optionTemplate.id;
         switch (optionId) {
             case 127:
             case 139:

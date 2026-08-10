@@ -58,7 +58,8 @@ public class Item {
                 continue;
             }
             if (itemOption.optionTemplate != null
-                    && ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
+                    && (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)
+                    || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id))) {
                 continue;
             }
             strInfo += itemOption.getOptionString();
@@ -76,11 +77,22 @@ public class Item {
 
     public List<ItemOption> getClientItemOptions() {
         List<ItemOption> clientOptions = new ArrayList<>();
+        boolean addedDoThanThanhDisplay = false;
         for (ItemOption itemOption : itemOptions) {
             if (itemOption == null || itemOption.optionTemplate == null) {
                 continue;
             }
             if (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
+                if (!addedDoThanThanhDisplay) {
+                    ItemOption displayOption = ItemService.getDoThanThanhDisplayOption(itemOption.param);
+                    if (displayOption != null && displayOption.optionTemplate != null) {
+                        clientOptions.add(displayOption);
+                        addedDoThanThanhDisplay = true;
+                    }
+                }
+                continue;
+            }
+            if (ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)) {
                 continue;
             }
             clientOptions.add(itemOption);
@@ -226,7 +238,8 @@ public class Item {
         for (ItemOption itemOption : itemOptions) {
             if (itemOption != null && itemOption.optionTemplate != null
                     && ((itemOption.optionTemplate.id >= 127 && itemOption.optionTemplate.id <= 135)
-                    || itemOption.optionTemplate.id == 233
+                    || (itemOption.optionTemplate.id == 233
+                    && !ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param))
                     || (itemOption.optionTemplate.id >= 237 && itemOption.optionTemplate.id <= 248))) {
                 return true;
             }
@@ -402,7 +415,9 @@ public class Item {
             if (io == null || io.optionTemplate == null) {
                 continue;
             }
-            if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102 && io.optionTemplate.id != 107 && io.optionTemplate.id != 218) {
+            if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
+                    && io.optionTemplate.id != 107 && io.optionTemplate.id != 218
+                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -439,7 +454,9 @@ public class Item {
                 io.param += iodpl.param;
                 haveOption = true;
             }
-            if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102 && io.optionTemplate.id != 107) {
+            if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
+                    && io.optionTemplate.id != 107
+                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -461,7 +478,9 @@ public class Item {
             if (io == null || io.optionTemplate == null) {
                 continue;
             }
-            if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102 && io.optionTemplate.id != 107 && io.optionTemplate.id != 218) {
+            if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
+                    && io.optionTemplate.id != 107 && io.optionTemplate.id != 218
+                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -621,7 +640,8 @@ public class Item {
                 continue;
             }
             if (itemOption.optionTemplate != null
-                    && ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
+                    && (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)
+                    || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id))) {
                 continue;
             }
             strInfo += itemOption.getOptionString() + "\n";

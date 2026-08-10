@@ -17,7 +17,7 @@ import nro.models.task.BadgesTaskService;
  */
 public class Inventory {
 
-    public static final long LIMIT_GOLD = 200_000_000_000L;
+    public static final long LIMIT_GOLD = 10_000_000_000_000L;
     public static final int MAX_ITEMS_BAG = 124;
     public static final int MAX_ITEMS_BOX = 100;
     public Item trainArmor;

@@ -106,6 +106,9 @@ public class PhanRaTrangBiKichHoat {
                 if (option == null || option.optionTemplate == null) {
                     continue;
                 }
+                if (ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {
+                    continue;
+                }
                 for (int[] optionsForRace : optionIds) {
                     for (int validOptionId : optionsForRace) {
                         if (option.optionTemplate.id == validOptionId) {

@@ -751,6 +751,10 @@ public final class Manager {
                 ensureItemOptionTemplate(optionTemplateId, rs.getString("name"));
             }
             ensureItemOptionTemplate(233, "Set Gohan");
+            ensureItemOptionTemplate(251, "Set Th\u1ea7n Th\u00e1nh #");
+            ensureItemOptionTemplate(252, "Set Bi con (5 m\u00f3n +120% HP)");
+            ensureItemOptionTemplate(253, "Set C\u1ea7y con (5 m\u00f3n +50% HP, x2 ph\u1ea1m vi T\u1ef1 S\u00e1t)");
+            ensureItemOptionTemplate(254, "Set B\u00ecnh con (5 m\u00f3n +60% HP, +30% gi\u00e1p)");
             Logger.success(Logger.PURPLE + "Successfully loaded map item option template (" + ITEM_OPTION_TEMPLATES.size() + ")\n");
 
             //load shop
