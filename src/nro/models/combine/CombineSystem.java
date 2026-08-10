@@ -55,6 +55,10 @@ public class CombineSystem {
                 return 10;
 
             }
+            case 9 -> {
+                return 10;
+
+            }
         }
         return 0;
     }
@@ -155,6 +159,8 @@ public class CombineSystem {
                 return 200000000;
             case 8:
                 return 300000000;
+            case 9:
+                return 500000000;
 
         }
         return 0;

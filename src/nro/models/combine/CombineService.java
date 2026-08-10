@@ -21,7 +21,7 @@ import nro.models.shop_lio.LioShopService;
 
 public class CombineService {
     
-    public static final byte MAX_STAR_ITEM = 9;
+    public static final byte MAX_STAR_ITEM = 10;
     public static final byte MAX_LEVEL_ITEM = 8;
     public static final int DANG_SINH_LE = 8999;
     
@@ -518,10 +518,8 @@ public class CombineService {
             return true;
         }
         for (ItemOption io : trangBi.itemOptions) {
-            if (starEmpty == 8 && io.optionTemplate.id == 228) {
-                return io.param >= 8;
-            } else if (starEmpty == 9 && io.optionTemplate.id == 228) {
-                return io.param >= 9;
+            if (io.optionTemplate.id == 228) {
+                return io.param >= starEmpty;
             }
         }
         
