@@ -58,8 +58,7 @@ public class Item {
                 continue;
             }
             if (itemOption.optionTemplate != null
-                    && (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)
-                    || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id))) {
+                    && ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
                 continue;
             }
             strInfo += itemOption.getOptionString();
@@ -77,22 +76,11 @@ public class Item {
 
     public List<ItemOption> getClientItemOptions() {
         List<ItemOption> clientOptions = new ArrayList<>();
-        boolean addedDoThanThanhDisplay = false;
         for (ItemOption itemOption : itemOptions) {
             if (itemOption == null || itemOption.optionTemplate == null) {
                 continue;
             }
             if (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
-                if (!addedDoThanThanhDisplay) {
-                    ItemOption displayOption = ItemService.getDoThanThanhDisplayOption(itemOption.param);
-                    if (displayOption != null && displayOption.optionTemplate != null) {
-                        clientOptions.add(displayOption);
-                        addedDoThanThanhDisplay = true;
-                    }
-                }
-                continue;
-            }
-            if (ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)) {
                 continue;
             }
             clientOptions.add(itemOption);
@@ -416,8 +404,7 @@ public class Item {
                 continue;
             }
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
-                    && io.optionTemplate.id != 107 && io.optionTemplate.id != 218
-                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
+                    && io.optionTemplate.id != 107 && io.optionTemplate.id != 218) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -455,8 +442,7 @@ public class Item {
                 haveOption = true;
             }
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
-                    && io.optionTemplate.id != 107
-                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
+                    && io.optionTemplate.id != 107) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -479,8 +465,7 @@ public class Item {
                 continue;
             }
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
-                    && io.optionTemplate.id != 107 && io.optionTemplate.id != 218
-                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
+                    && io.optionTemplate.id != 107 && io.optionTemplate.id != 218) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -640,8 +625,7 @@ public class Item {
                 continue;
             }
             if (itemOption.optionTemplate != null
-                    && (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)
-                    || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id))) {
+                    && ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
                 continue;
             }
             strInfo += itemOption.getOptionString() + "\n";

@@ -1,11 +1,7 @@
 SET NAMES utf8mb4;
 
 -- Do than thanh uses option 233 with params 101-109 as a server-side marker.
--- Options 251-254 are display-only fallbacks sent to the client.
+-- The marker is hidden from client option lists so option 233 can stay Set Gohan for old gear.
+-- Do not insert item_option_template ids above 250, because old clients can break display.
+DELETE FROM `item_option_template` WHERE `id` IN (251, 252, 253, 254);
 UPDATE `item_option_template` SET `NAME` = 'Set Gohan' WHERE `id` = 233;
-INSERT INTO `item_option_template` (`id`, `NAME`) VALUES
-(251, 'Set Thần Thánh #'),
-(252, 'Set Bi con (5 món +120% HP)'),
-(253, 'Set Cầy con (5 món +50% HP, x2 phạm vi Tự Sát)'),
-(254, 'Set Bình con (5 món +60% HP, +30% giáp)')
-ON DUPLICATE KEY UPDATE `NAME` = VALUES(`NAME`);

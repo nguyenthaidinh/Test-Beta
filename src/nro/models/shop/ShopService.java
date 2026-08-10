@@ -414,6 +414,23 @@ public class ShopService {
         return s;
     }
 
+    private List<Item.ItemOption> getClientShopOptions(List<Item.ItemOption> options) {
+        List<Item.ItemOption> clientOptions = new ArrayList<>();
+        if (options == null) {
+            return clientOptions;
+        }
+        for (Item.ItemOption option : options) {
+            if (option == null || option.optionTemplate == null) {
+                continue;
+            }
+            if (ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {
+                continue;
+            }
+            clientOptions.add(option);
+        }
+        return clientOptions;
+    }
+
     private void openShopType0(Player player, Shop shop) {
         if (shop != null) {
             player.idMark.setShopOpen(shop);
@@ -441,8 +458,9 @@ public class ShopService {
                             msg.writer().writeInt(0);
                             msg.writer().writeInt(itemShop.cost);
                         }
-                        msg.writer().writeByte(itemShop.options.size());
-                        for (Item.ItemOption option : itemShop.options) {
+                        List<Item.ItemOption> itemOptions = getClientShopOptions(itemShop.options);
+                        msg.writer().writeByte(itemOptions.size());
+                        for (Item.ItemOption option : itemOptions) {
                             msg.writer().writeByte(option.optionTemplate.id);
                             msg.writer().writeShort(option.param);
                         }
@@ -496,8 +514,9 @@ public class ShopService {
                             msg.writer().writeInt(0);
                             msg.writer().writeInt(itemShop.cost);
                         }
-                        msg.writer().writeByte(itemShop.options.size());
-                        for (Item.ItemOption option : itemShop.options) {
+                        List<Item.ItemOption> itemOptions = getClientShopOptions(itemShop.options);
+                        msg.writer().writeByte(itemOptions.size());
+                        for (Item.ItemOption option : itemOptions) {
                             msg.writer().writeByte(option.optionTemplate.id);
                             msg.writer().writeShort(option.param);
                         }
@@ -550,8 +569,9 @@ public class ShopService {
                                 .orElse(0); // Giá trị mặc định là int
                         msg.writer().writeLong(costPotential);
 
-                        msg.writer().writeByte(itemShop.options.size());
-                        for (Item.ItemOption option : itemShop.options) {
+                        List<Item.ItemOption> itemOptions = getClientShopOptions(itemShop.options);
+                        msg.writer().writeByte(itemOptions.size());
+                        for (Item.ItemOption option : itemOptions) {
                             msg.writer().writeByte(option.optionTemplate.id);
                             msg.writer().writeShort(option.param);
                         }
@@ -588,8 +608,9 @@ public class ShopService {
                         msg.writer().writeShort(itemShop.temp.id);
                         msg.writer().writeShort(itemShop.iconSpec);
                         msg.writer().writeInt(itemShop.cost);
-                        msg.writer().writeByte(itemShop.options.size());
-                        for (Item.ItemOption option : itemShop.options) {
+                        List<Item.ItemOption> itemOptions = getClientShopOptions(itemShop.options);
+                        msg.writer().writeByte(itemOptions.size());
+                        for (Item.ItemOption option : itemOptions) {
                             msg.writer().writeByte(option.optionTemplate.id);
                             msg.writer().writeShort(option.param);
                         }

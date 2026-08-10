@@ -878,10 +878,11 @@ public class Service {
                     msg.writer().writeShort(skill.skillId);
                 }
             }
+            pl.inventory.clampGold();
             if (pl.getSession().version >= 214) {
                 msg.writer().writeLong(pl.inventory.gold);
             } else {
-                msg.writer().writeInt((int) pl.inventory.gold);
+                msg.writer().writeInt((int) Math.min(pl.inventory.gold, Integer.MAX_VALUE));
             }
             msg.writer().writeInt(pl.inventory.ruby);
             msg.writer().writeInt(pl.inventory.gem);
@@ -1367,10 +1368,11 @@ public class Service {
         Message msg;
         try {
             msg = new Message(6);
+            pl.inventory.clampGold();
             if (pl.getSession().version >= 214) {
                 msg.writer().writeLong(pl.inventory.gold);
             } else {
-                msg.writer().writeInt((int) pl.inventory.gold);
+                msg.writer().writeInt((int) Math.min(pl.inventory.gold, Integer.MAX_VALUE));
             }
             msg.writer().writeInt(pl.inventory.gem);
             msg.writer().writeInt(pl.inventory.ruby);

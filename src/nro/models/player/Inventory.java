@@ -70,14 +70,23 @@ public class Inventory {
         this.gem -= num;
     }
 
-    public void subGold(int num) {
+    public void subGold(long num) {
         this.gold -= num;
+        if (this.gold < 0) {
+            this.gold = 0;
+        }
     }
 
-    public void addGold(int gold) {
+    public void addGold(long gold) {
         this.gold += gold;
+        clampGold();
+    }
+
+    public void clampGold() {
         if (this.gold > LIMIT_GOLD) {
             this.gold = LIMIT_GOLD;
+        } else if (this.gold < 0) {
+            this.gold = 0;
         }
     }
 

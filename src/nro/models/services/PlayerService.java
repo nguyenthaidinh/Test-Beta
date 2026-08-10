@@ -126,14 +126,15 @@ public class PlayerService {
         Message msg;
         try {
             msg = Service.gI().messageSubCommand((byte) 4);
+            player.inventory.clampGold();
             try {
                 if (player.getSession().version >= 214) {
                     msg.writer().writeLong(player.inventory.gold);
                 } else {
-                    msg.writer().writeInt((int) player.inventory.gold);
+                    msg.writer().writeInt((int) Math.min(player.inventory.gold, Integer.MAX_VALUE));
                 }
             } catch (Exception e) {
-                msg.writer().writeInt((int) player.inventory.gold);
+                msg.writer().writeInt((int) Math.min(player.inventory.gold, Integer.MAX_VALUE));
             }
             msg.writer().writeInt(player.inventory.gem);//luong
             msg.writer().writeInt(player.nPoint.getClientHp());//chp

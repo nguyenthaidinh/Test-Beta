@@ -53,10 +53,6 @@ public class ItemService {
     public static final int DO_THAN_THANH_PARAM_BI_CON = 107;
     public static final int DO_THAN_THANH_PARAM_CAY_CON = 108;
     public static final int DO_THAN_THANH_PARAM_BINH_CON = 109;
-    public static final int DO_THAN_THANH_DISPLAY_PARAM_GROUP = 251;
-    public static final int DO_THAN_THANH_DISPLAY_PARAM_BI_CON = 252;
-    public static final int DO_THAN_THANH_DISPLAY_PARAM_CAY_CON = 253;
-    public static final int DO_THAN_THANH_DISPLAY_PARAM_BINH_CON = 254;
     private static final String COSTUME_JACKY_CHUN_DESCRIPTION = "C\u1ea3i trang th\u00e0nh Jacky Chun\nM\u1ed7i 1 ph\u00fat, \u0111\u00f2n ch\u01b0\u1edfng \u0111\u1ea7u ti\u00ean x4 s\u00e1t th\u01b0\u01a1ng";
     private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117};
     private static final short ANGEL_DEMON_WINGS_ID = 1722;
@@ -848,40 +844,6 @@ public class ItemService {
         return optionId == DO_THAN_THANH_SET_OPTION
                 && optionParam >= DO_THAN_THANH_PARAM_SVK_CON
                 && optionParam <= DO_THAN_THANH_PARAM_BINH_CON;
-    }
-
-    public static boolean isDoThanThanhDisplayOption(int optionId) {
-        return optionId >= DO_THAN_THANH_DISPLAY_PARAM_GROUP
-                && optionId <= DO_THAN_THANH_DISPLAY_PARAM_BINH_CON;
-    }
-
-    public static ItemOption getDoThanThanhDisplayOption(int optionParam) {
-        if (!isDoThanThanhSetOption(DO_THAN_THANH_SET_OPTION, optionParam)) {
-            return null;
-        }
-        int optionId = switch (optionParam) {
-            case DO_THAN_THANH_PARAM_SVK_CON,
-                    DO_THAN_THANH_PARAM_SON_CON,
-                    DO_THAN_THANH_PARAM_KHANH_CON,
-                    DO_THAN_THANH_PARAM_SON_EM,
-                    DO_THAN_THANH_PARAM_NGAO_CON,
-                    DO_THAN_THANH_PARAM_NGAO_EM ->
-                DO_THAN_THANH_DISPLAY_PARAM_GROUP;
-            case DO_THAN_THANH_PARAM_BI_CON ->
-                DO_THAN_THANH_DISPLAY_PARAM_BI_CON;
-            case DO_THAN_THANH_PARAM_CAY_CON ->
-                DO_THAN_THANH_DISPLAY_PARAM_CAY_CON;
-            case DO_THAN_THANH_PARAM_BINH_CON ->
-                DO_THAN_THANH_DISPLAY_PARAM_BINH_CON;
-            default ->
-                -1;
-        };
-        if (optionId < 0 || gI().getItemOptionTemplate(optionId) == null) {
-            return null;
-        }
-        int displayParam = optionId == DO_THAN_THANH_DISPLAY_PARAM_GROUP
-                ? optionParam - DO_THAN_THANH_PARAM_SVK_CON + 1 : 1;
-        return new ItemOption(optionId, displayParam);
     }
 
     public int randomSKHId(byte gender) {
