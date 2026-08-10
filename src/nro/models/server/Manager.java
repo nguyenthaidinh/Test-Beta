@@ -751,10 +751,15 @@ public final class Manager {
                 ensureItemOptionTemplate(optionTemplateId, rs.getString("name"));
             }
             ensureItemOptionTemplate(233, "Set Gohan");
-            ensureItemOptionTemplate(251, "Set Th\u1ea7n Th\u00e1nh #");
-            ensureItemOptionTemplate(252, "Set Bi con (5 m\u00f3n +120% HP)");
-            ensureItemOptionTemplate(253, "Set C\u1ea7y con (5 m\u00f3n +50% HP, x2 ph\u1ea1m vi T\u1ef1 S\u00e1t)");
-            ensureItemOptionTemplate(254, "Set B\u00ecnh con (5 m\u00f3n +60% HP, +30% gi\u00e1p)");
+            ensureItemOptionTemplate(191, "Set SVK con\n(5 m\u00f3n +125% s\u00e1t th\u01b0\u01a1ng Kamejoko)");
+            ensureItemOptionTemplate(192, "Set S\u01a1n con\n(5 m\u00f3n +50% xuy\u00ean gi\u00e1p, +40% s\u00e1t th\u01b0\u01a1ng Kaioken)");
+            ensureItemOptionTemplate(193, "Set Kh\u00e1nh con\n(5 m\u00f3n x2 Th\u00e1i D\u01b0\u01a1ng H\u1ea1 San, -50% th\u1eddi gian Th\u00f4i Mi\u00ean)");
+            ensureItemOptionTemplate(194, "Set S\u01a1n em\n(5 m\u00f3n +150% KI)");
+            ensureItemOptionTemplate(195, "Set Ngao con\n(5 m\u00f3n +130% s\u00e1t th\u01b0\u01a1ng Li\u00ean Ho\u00e0n)");
+            ensureItemOptionTemplate(196, "Set Ngao em\n(5 m\u00f3n +150% s\u00e1t th\u01b0\u01a1ng \u0110\u1ebb Tr\u1ee9ng, x2 th\u1eddi gian h\u1ed3i)");
+            ensureItemOptionTemplate(197, "Set Bi con\n(5 m\u00f3n +120% HP)");
+            ensureItemOptionTemplate(198, "Set C\u1ea7y con\n(5 m\u00f3n +50% HP, x2 ph\u1ea1m vi T\u1ef1 S\u00e1t)");
+            ensureItemOptionTemplate(199, "Set B\u00ecnh con\n(5 m\u00f3n +60% HP, +30% gi\u00e1p)");
             Logger.success(Logger.PURPLE + "Successfully loaded map item option template (" + ITEM_OPTION_TEMPLATES.size() + ")\n");
 
             //load shop

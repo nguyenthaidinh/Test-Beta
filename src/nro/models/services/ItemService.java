@@ -53,10 +53,19 @@ public class ItemService {
     public static final int DO_THAN_THANH_PARAM_BI_CON = 107;
     public static final int DO_THAN_THANH_PARAM_CAY_CON = 108;
     public static final int DO_THAN_THANH_PARAM_BINH_CON = 109;
-    public static final int DO_THAN_THANH_DISPLAY_PARAM_GROUP = 251;
-    public static final int DO_THAN_THANH_DISPLAY_PARAM_BI_CON = 252;
-    public static final int DO_THAN_THANH_DISPLAY_PARAM_CAY_CON = 253;
-    public static final int DO_THAN_THANH_DISPLAY_PARAM_BINH_CON = 254;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_SVK_CON = 191;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_SON_CON = 192;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_KHANH_CON = 193;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_SON_EM = 194;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_NGAO_CON = 195;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_NGAO_EM = 196;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_BI_CON = 197;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_CAY_CON = 198;
+    public static final int DO_THAN_THANH_DISPLAY_PARAM_BINH_CON = 199;
+    private static final int DO_THAN_THANH_LEGACY_DISPLAY_PARAM_GROUP = 251;
+    private static final int DO_THAN_THANH_LEGACY_DISPLAY_PARAM_BI_CON = 252;
+    private static final int DO_THAN_THANH_LEGACY_DISPLAY_PARAM_CAY_CON = 253;
+    private static final int DO_THAN_THANH_LEGACY_DISPLAY_PARAM_BINH_CON = 254;
     private static final String COSTUME_JACKY_CHUN_DESCRIPTION = "C\u1ea3i trang th\u00e0nh Jacky Chun\nM\u1ed7i 1 ph\u00fat, \u0111\u00f2n ch\u01b0\u1edfng \u0111\u1ea7u ti\u00ean x4 s\u00e1t th\u01b0\u01a1ng";
     private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117};
     private static final short ANGEL_DEMON_WINGS_ID = 1722;
@@ -851,8 +860,10 @@ public class ItemService {
     }
 
     public static boolean isDoThanThanhDisplayOption(int optionId) {
-        return optionId >= DO_THAN_THANH_DISPLAY_PARAM_GROUP
-                && optionId <= DO_THAN_THANH_DISPLAY_PARAM_BINH_CON;
+        return (optionId >= DO_THAN_THANH_DISPLAY_PARAM_SVK_CON
+                && optionId <= DO_THAN_THANH_DISPLAY_PARAM_BINH_CON)
+                || (optionId >= DO_THAN_THANH_LEGACY_DISPLAY_PARAM_GROUP
+                && optionId <= DO_THAN_THANH_LEGACY_DISPLAY_PARAM_BINH_CON);
     }
 
     public static ItemOption getDoThanThanhDisplayOption(int optionParam) {
@@ -860,13 +871,18 @@ public class ItemService {
             return null;
         }
         int optionId = switch (optionParam) {
-            case DO_THAN_THANH_PARAM_SVK_CON,
-                    DO_THAN_THANH_PARAM_SON_CON,
-                    DO_THAN_THANH_PARAM_KHANH_CON,
-                    DO_THAN_THANH_PARAM_SON_EM,
-                    DO_THAN_THANH_PARAM_NGAO_CON,
-                    DO_THAN_THANH_PARAM_NGAO_EM ->
-                DO_THAN_THANH_DISPLAY_PARAM_GROUP;
+            case DO_THAN_THANH_PARAM_SVK_CON ->
+                DO_THAN_THANH_DISPLAY_PARAM_SVK_CON;
+            case DO_THAN_THANH_PARAM_SON_CON ->
+                DO_THAN_THANH_DISPLAY_PARAM_SON_CON;
+            case DO_THAN_THANH_PARAM_KHANH_CON ->
+                DO_THAN_THANH_DISPLAY_PARAM_KHANH_CON;
+            case DO_THAN_THANH_PARAM_SON_EM ->
+                DO_THAN_THANH_DISPLAY_PARAM_SON_EM;
+            case DO_THAN_THANH_PARAM_NGAO_CON ->
+                DO_THAN_THANH_DISPLAY_PARAM_NGAO_CON;
+            case DO_THAN_THANH_PARAM_NGAO_EM ->
+                DO_THAN_THANH_DISPLAY_PARAM_NGAO_EM;
             case DO_THAN_THANH_PARAM_BI_CON ->
                 DO_THAN_THANH_DISPLAY_PARAM_BI_CON;
             case DO_THAN_THANH_PARAM_CAY_CON ->
@@ -879,23 +895,39 @@ public class ItemService {
         if (optionId < 0 || gI().getItemOptionTemplate(optionId) == null) {
             return null;
         }
-        int displayParam = optionId == DO_THAN_THANH_DISPLAY_PARAM_GROUP
-                ? optionParam - DO_THAN_THANH_PARAM_SVK_CON + 1 : 1;
-        return new ItemOption(optionId, displayParam);
+        return new ItemOption(optionId, 1);
     }
 
     public static int[] migrateDoThanThanhDisplayOption(int optionId, int optionParam) {
         switch (optionId) {
-            case DO_THAN_THANH_DISPLAY_PARAM_GROUP:
-                if (optionParam >= 1 && optionParam <= 6) {
-                    return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_SVK_CON + optionParam - 1};
-                }
-                break;
+            case DO_THAN_THANH_DISPLAY_PARAM_SVK_CON:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_SVK_CON};
+            case DO_THAN_THANH_DISPLAY_PARAM_SON_CON:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_SON_CON};
+            case DO_THAN_THANH_DISPLAY_PARAM_KHANH_CON:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_KHANH_CON};
+            case DO_THAN_THANH_DISPLAY_PARAM_SON_EM:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_SON_EM};
+            case DO_THAN_THANH_DISPLAY_PARAM_NGAO_CON:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_NGAO_CON};
+            case DO_THAN_THANH_DISPLAY_PARAM_NGAO_EM:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_NGAO_EM};
             case DO_THAN_THANH_DISPLAY_PARAM_BI_CON:
                 return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_BI_CON};
             case DO_THAN_THANH_DISPLAY_PARAM_CAY_CON:
                 return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_CAY_CON};
             case DO_THAN_THANH_DISPLAY_PARAM_BINH_CON:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_BINH_CON};
+            case DO_THAN_THANH_LEGACY_DISPLAY_PARAM_GROUP:
+                if (optionParam >= 1 && optionParam <= 6) {
+                    return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_SVK_CON + optionParam - 1};
+                }
+                break;
+            case DO_THAN_THANH_LEGACY_DISPLAY_PARAM_BI_CON:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_BI_CON};
+            case DO_THAN_THANH_LEGACY_DISPLAY_PARAM_CAY_CON:
+                return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_CAY_CON};
+            case DO_THAN_THANH_LEGACY_DISPLAY_PARAM_BINH_CON:
                 return new int[]{DO_THAN_THANH_SET_OPTION, DO_THAN_THANH_PARAM_BINH_CON};
         }
         return new int[]{optionId, optionParam};
