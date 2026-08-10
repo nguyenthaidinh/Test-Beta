@@ -115,7 +115,10 @@ public class ShopDAO {
             ps.setInt(1, itemShop.id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                itemShop.options.add(new Item.ItemOption(rs.getInt("option_id"), rs.getInt("param")));
+                int optionId = rs.getInt("option_id");
+                int optionParam = rs.getInt("param");
+                int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(optionId, optionParam);
+                itemShop.options.add(new Item.ItemOption(migratedOption[0], migratedOption[1]));
             }
             try {
                 if (rs != null) {

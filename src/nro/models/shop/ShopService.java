@@ -419,11 +419,22 @@ public class ShopService {
         if (options == null) {
             return clientOptions;
         }
+        boolean addedDoThanThanhDisplay = false;
         for (Item.ItemOption option : options) {
             if (option == null || option.optionTemplate == null) {
                 continue;
             }
             if (ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {
+                if (!addedDoThanThanhDisplay) {
+                    Item.ItemOption displayOption = ItemService.getDoThanThanhDisplayOption(option.param);
+                    if (displayOption != null && displayOption.optionTemplate != null) {
+                        clientOptions.add(displayOption);
+                        addedDoThanThanhDisplay = true;
+                    }
+                }
+                continue;
+            }
+            if (ItemService.isDoThanThanhDisplayOption(option.optionTemplate.id)) {
                 continue;
             }
             clientOptions.add(option);

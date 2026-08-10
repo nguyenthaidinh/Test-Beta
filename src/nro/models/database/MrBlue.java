@@ -1375,7 +1375,7 @@ public class MrBlue {
             JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(option));
             int optionId = Integer.parseInt(String.valueOf(opt.get(0)));
             int optionParam = Integer.parseInt(String.valueOf(opt.get(1)));
-            int[] migratedDoThanThanhOption = migrateDoThanThanhOption(optionId, optionParam);
+            int[] migratedDoThanThanhOption = ItemService.migrateDoThanThanhDisplayOption(optionId, optionParam);
             optionId = migratedDoThanThanhOption[0];
             optionParam = migratedDoThanThanhOption[1];
             if (ItemService.gI().getItemOptionTemplate(optionId) == null) {
@@ -1390,27 +1390,6 @@ public class MrBlue {
         ItemService.gI().normalizeAngelDemonWingsOptions(item);
         ItemService.gI().normalizeBrolyRedCostumeOptions(item);
         ItemService.gI().normalizeBrolyCostumeOptions(item);
-    }
-
-    private static int[] migrateDoThanThanhOption(int optionId, int optionParam) {
-        switch (optionId) {
-            case 251:
-                if (optionParam >= 1 && optionParam <= 6) {
-                    return new int[]{ItemService.DO_THAN_THANH_SET_OPTION,
-                        ItemService.DO_THAN_THANH_PARAM_SVK_CON + optionParam - 1};
-                }
-                break;
-            case 252:
-                return new int[]{ItemService.DO_THAN_THANH_SET_OPTION,
-                    ItemService.DO_THAN_THANH_PARAM_BI_CON};
-            case 253:
-                return new int[]{ItemService.DO_THAN_THANH_SET_OPTION,
-                    ItemService.DO_THAN_THANH_PARAM_CAY_CON};
-            case 254:
-                return new int[]{ItemService.DO_THAN_THANH_SET_OPTION,
-                    ItemService.DO_THAN_THANH_PARAM_BINH_CON};
-        }
-        return new int[]{optionId, optionParam};
     }
 
     private static void initJackyChunCostumeWearTime(Player player) {
