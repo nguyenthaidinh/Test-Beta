@@ -364,6 +364,14 @@ public class ChangeMapService {
             zoneJoin = checkMapCanJoinByYardart(pl, zoneJoin);
         }
 
+        if (isBlockedPirateIslandEntry(pl, zoneJoin)) {
+            if (pl.zone != null) {
+                resetPoint(pl);
+            }
+            Service.gI().sendThongBao(pl, "Muốn vào Đảo Hải Tặc phải gặp Ôsin và dùng Bản đồ truyền thuyết.");
+            return;
+        }
+
         zoneJoin = checkMapCanJoin(pl, zoneJoin);
 
         if (zoneJoin != null && pl.zone != null) {
@@ -1119,10 +1127,34 @@ public class ChangeMapService {
     }
 
     public Zone checkMapCanJoinByYardart(Player player, Zone zoneJoin) {
+        if (zoneJoin == null || zoneJoin.map == null) {
+            return null;
+        }
         if ((!player.isBoss && !player.isAdmin()) && (zoneJoin.map.mapId == 122 || zoneJoin.map.mapId == 123 || zoneJoin.map.mapId == 124)) {
             return null;
         }
         return zoneJoin;
+    }
+
+    private boolean isBlockedPirateIslandEntry(Player player, Zone zoneJoin) {
+        if (player == null || zoneJoin == null || zoneJoin.map == null) {
+            return false;
+        }
+        if (!MapService.gI().isMapDaoHaiTac(zoneJoin.map.mapId)) {
+            return false;
+        }
+        if (!player.isPl() || player.isAdmin()) {
+            return false;
+        }
+        if (player.allowEnterPirateIsland) {
+            player.allowEnterPirateIsland = false;
+            return false;
+        }
+        if (player.zone != null && player.zone.map != null
+                && MapService.gI().isMapDaoHaiTac(player.zone.map.mapId)) {
+            return false;
+        }
+        return true;
     }
 
     private void checkJoinSpecialMap(Player player) {

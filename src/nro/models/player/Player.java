@@ -184,6 +184,7 @@ public class Player implements Runnable {
     public List<String> textRuongGo = new ArrayList<>();
     public Zone zone;
     public Zone mapBeforeCapsule;
+    public boolean allowEnterPirateIsland;
     public List<Zone> mapCapsule;
     public Pet pet;
     public NewPet newPet;
@@ -1735,6 +1736,7 @@ public class Player implements Runnable {
         }
         zone = null;
         mapBeforeCapsule = null;
+        allowEnterPirateIsland = false;
         if (mapMaBu != null) {
             mapMaBu.clear();
             mapMaBu = null;

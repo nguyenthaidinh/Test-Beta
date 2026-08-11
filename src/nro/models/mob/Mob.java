@@ -1087,10 +1087,10 @@ public class Mob {
         if (!isPirateIslandMap(mapid)) {
             return;
         }
-        if (Util.isTrue(1, 500)) {
+        if (Util.isTrue(1, 5000)) {
             list.add(new ItemMap(zone, ConstItem.RUONG_VANG, 1, x + 12, yEnd, player.id));
         }
-        if (Util.isTrue(1, 100)) {
+        if (Util.isTrue(1, 1000)) {
             list.add(new ItemMap(zone, ConstItem.RUONG_BAC, 1, x, yEnd, player.id));
         }
     }

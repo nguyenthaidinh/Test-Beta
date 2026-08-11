@@ -286,7 +286,8 @@ public class MrBlue {
                 player.location.y = Integer.parseInt(String.valueOf(dataArray.get(2)));
                 player.location.lastTimeplayerMove = System.currentTimeMillis();
                 if (mapId == 51 || MapService.gI().isMapDoanhTrai(mapId) || MapService.gI().isMapBlackBallWar(mapId)
-                        || MapService.gI().isMapVoDaiSieuCap(mapId) || MapService.gI().isMapSieuThanhThuy(mapId) || MapService.gI().isMapMabu2H(mapId)) {
+                        || MapService.gI().isMapVoDaiSieuCap(mapId) || MapService.gI().isMapDaoHaiTac(mapId)
+                        || MapService.gI().isMapSieuThanhThuy(mapId) || MapService.gI().isMapMabu2H(mapId)) {
                     mapId = player.gender + 21;
                     player.location.x = 300;
                     player.location.y = 336;

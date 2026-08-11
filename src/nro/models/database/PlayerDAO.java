@@ -379,6 +379,7 @@ public class PlayerDAO {
                 } else {
                     if (MapService.gI().isMapDoanhTrai(mapId) || MapService.gI().isMapBlackBallWar(mapId)
                             || MapService.gI().isMapVoDaiSieuCap(mapId)
+                            || MapService.gI().isMapDaoHaiTac(mapId)
                             || ChangeMapService.gI().checkMapCanJoin(player, MapService.gI().getMapCanJoin(player, mapId, 0)) == null) {
                         mapId = player.gender + 21;
                         x = 300;

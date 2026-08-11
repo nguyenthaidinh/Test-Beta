@@ -1670,7 +1670,7 @@ public class UseItem {
         addRewardByRate(rewards, SILVER_CHEST_CARD_RATE, ConstItem.THIEP_HALLOWEEN, 10, 15);
         addRewardByRate(rewards, SILVER_CHEST_PUMPKIN_RATE, ConstItem.BI_NGO, 50, 100);
         addPumpkinDragonBallByRate(rewards, SILVER_CHEST_PUMPKIN_BALL_RATE);
-        addRewardByRate(rewards, SILVER_CHEST_DA_NGU_SAC_RATE, ConstItem.DA_NGU_SAC, 2, 5);
+        addRewardByRate(rewards, SILVER_CHEST_DA_NGU_SAC_RATE, ConstItem.DA_NGU_SAC, 1, 2);
         addRandomItemByRate(rewards, SILVER_CHEST_DRAGON_BALL_RATE, DRAGON_BALL_1_TO_3_IDS);
         addRandomItemByRate(rewards, SILVER_CHEST_BUFF_RATE, PIRATE_CHEST_BUFF_IDS);
         ensurePirateChestReward(rewards, ConstItem.THOI_VANG, 1, 100);
@@ -1679,16 +1679,16 @@ public class UseItem {
 
     private List<Item> createGoldPirateChestRewards() {
         List<Item> rewards = new ArrayList<>();
-        addRewardByRate(rewards, GOLD_CHEST_GOLD_RATE, ConstItem.THOI_VANG, 300, 500);
+        addRewardByRate(rewards, GOLD_CHEST_GOLD_RATE, ConstItem.THOI_VANG, 100, 500);
         addRewardByRate(rewards, GOLD_CHEST_CARD_RATE, ConstItem.THIEP_HALLOWEEN, 20, 50);
         addRewardByRate(rewards, GOLD_CHEST_PUMPKIN_RATE, ConstItem.BI_NGO, 100, 200);
         addPumpkinDragonBallByRate(rewards, GOLD_CHEST_PUMPKIN_BALL_RATE);
-        addRewardByRate(rewards, GOLD_CHEST_DA_NGU_SAC_RATE, ConstItem.DA_NGU_SAC, 10, 15);
+        addRewardByRate(rewards, GOLD_CHEST_DA_NGU_SAC_RATE, ConstItem.DA_NGU_SAC, 2, 4);
         addRewardByRate(rewards, GOLD_CHEST_GEM_RATE, ConstItem.NGOC, 1_000, 2_000);
         addRandomItemByRate(rewards, GOLD_CHEST_DRAGON_BALL_RATE, DRAGON_BALL_1_TO_3_IDS);
         addRandomItemByRate(rewards, GOLD_CHEST_BUFF_RATE, PIRATE_CHEST_BUFF_IDS);
         addRandomItemByRate(rewards, GOLD_CHEST_BONUS_RATE, GOLD_CHEST_BONUS_IDS);
-        ensurePirateChestReward(rewards, ConstItem.THOI_VANG, 300, 500);
+        ensurePirateChestReward(rewards, ConstItem.THOI_VANG, 100, 500);
         return rewards;
     }
 

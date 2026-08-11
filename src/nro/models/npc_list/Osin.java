@@ -135,7 +135,12 @@ public class Osin extends Npc {
 
         InventoryService.gI().subQuantityItemsBag(player, legendaryMap, 1);
         InventoryService.gI().sendItemBags(player);
-        ChangeMapService.gI().changeMap(player, zoneJoin, PIRATE_ISLAND_ENTRY_X, PIRATE_ISLAND_ENTRY_Y);
+        player.allowEnterPirateIsland = true;
+        try {
+            ChangeMapService.gI().changeMap(player, zoneJoin, PIRATE_ISLAND_ENTRY_X, PIRATE_ISLAND_ENTRY_Y);
+        } finally {
+            player.allowEnterPirateIsland = false;
+        }
     }
 
     private Zone getPirateIslandZone() {
