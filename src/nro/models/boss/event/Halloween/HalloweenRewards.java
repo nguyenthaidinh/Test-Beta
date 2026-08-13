@@ -375,6 +375,9 @@ public final class HalloweenRewards {
     private static boolean isTimedHalloweenOpenedReward(int itemId) {
         return isHalloweenCostume(itemId)
                 || itemId == ConstItem.PET_BI_MA_VUONG
+                || itemId == ConstItem.HON_MA_GOKU
+                || itemId == ConstItem.HON_MA_CA_DIC
+                || itemId == ConstItem.HON_MA_POCOLO
                 || itemId == ConstItem.THAN_CHET_CUTE
                 || itemId == ConstItem.BI_NGO_NHI_NHANH
                 || itemId == ConstItem.CAI_TRANG_SIEU_THAN_TRAI_DAT
