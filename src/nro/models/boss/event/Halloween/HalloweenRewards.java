@@ -55,7 +55,6 @@ public final class HalloweenRewards {
     private static final int SUPER_GOD_COSTUME_DAMAGE_PERCENT = 70;
     private static final int SUPER_GOD_COSTUME_HP_KI_PERCENT = 80;
     private static final int SUPER_GOD_COSTUME_DAMAGE_BOSS_PERCENT = 30;
-    private static final int HALLOWEEN_CAPSULE_PERMANENT_RATE = 5;
     private static final int[] HALLOWEEN_CAPSULE_EXPIRE_DAYS = {1, 3, 5, 7};
     private static final int HALLOWEEN_REWARD_PERMANENT_RATE = 10;
     private static final int[] HALLOWEEN_REWARD_EXPIRE_DAYS = {3, 5, 7, 15};
@@ -248,20 +247,11 @@ public final class HalloweenRewards {
         item.itemOptions.add(new ItemOption(OPTION_TELEPORT, 0));
         item.itemOptions.add(new ItemOption(OPTION_RESIST_TDHS, 0));
         item.itemOptions.add(new ItemOption(OPTION_NO_COLD, 0));
-        addHalloweenCapsuleExpireAlways(item);
+        addHalloweenCapsuleExpire(item);
         return item;
     }
 
     private static void addHalloweenCapsuleExpire(Item item) {
-        if (Util.isTrue(HALLOWEEN_CAPSULE_PERMANENT_RATE, 100)) {
-            refresh(item);
-            return;
-        }
-        item.itemOptions.add(new ItemOption(OPTION_EXPIRE_DAYS, randomHalloweenCapsuleExpireDays()));
-        refresh(item);
-    }
-
-    private static void addHalloweenCapsuleExpireAlways(Item item) {
         item.itemOptions.add(new ItemOption(OPTION_EXPIRE_DAYS, randomHalloweenCapsuleExpireDays()));
         refresh(item);
     }
