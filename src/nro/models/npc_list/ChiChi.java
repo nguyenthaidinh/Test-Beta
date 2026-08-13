@@ -28,10 +28,8 @@ public class ChiChi extends Npc {
     private static final int MENU_BUY_TRAIN_ARMOR_5 = 186900;
     private static final int MENU_BUY_CLAN_CAPSULE = 186901;
     private static final int MENU_BUY_100_CLAN_CAPSULE = 186902;
-    private static final int MENU_BUY_GOLD_BAR = 186903;
     private static final short TRAIN_ARMOR_5_ITEM_ID = 1869;
     private static final long TRAIN_ARMOR_5_GOLD_COST = 36_000_000_000L;
-    private static final long GOLD_BAR_COST = 50_000_000L;
     private static final int CLAN_CAPSULE_AMOUNT = 1;
     private static final int CLAN_CAPSULE_COST_TV = 10;
     private static final int CLAN_CAPSULE_BULK_AMOUNT = 100;
@@ -49,7 +47,6 @@ public class ChiChi extends Npc {
                     "Giáp\nluyện tập\ncấp 5",
                     "1 Capsule\nBang\n10 TV",
                     "100 Capsule\nBang\n1K2 TV",
-                    "Mua 1\nthỏi vàng\n50tr vàng",
                     "Đóng"));
 
             menu.add(menu.size() - 1, "Shop\nsự kiện");
@@ -91,24 +88,19 @@ public class ChiChi extends Npc {
                                     "Mua", "Từ chối");
                             break;
                         case 4:
-                            createOtherMenu(player, MENU_BUY_GOLD_BAR,
-                                    "Con có muốn mua 1 thỏi vàng với giá 50 triệu vàng không?",
-                                    "Mua", "Từ chối");
-                            break;
-                        case 5:
                             ShopService.gI().opendShop(player, HALLOWEEN_EVENT_SHOP_TAG, false);
                             break;
-                        case 6:
+                        case 5:
                             createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_BOX_TOP,
                                     "Đua top mở Hòm Halloween.\nMỗi lần mở thành công 1 Hòm Halloween sẽ được tính 1 điểm.",
                                     "Top 100\nHòm\nHalloween",
                                     "Xem điểm",
                                     "Đóng");
                             break;
-                        case 7:
+                        case 6:
                             HalloweenExchangeService.openExchangeMenu(player, this);
                             break;
-                        case 8:
+                        case 7:
                             createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_CAPSULE_TOP,
                                     "Đua top mở Capsule Halloween.\nMỗi lần mở thành công 1 Capsule Halloween sẽ được tính 1 điểm.",
                                     "Top 100\nCapsule\nHalloween",
@@ -145,10 +137,6 @@ public class ChiChi extends Npc {
                 } else if (player.idMark.getIndexMenu() == MENU_BUY_100_CLAN_CAPSULE) {
                     if (select == 0) {
                         buyClanCapsule(player, CLAN_CAPSULE_BULK_AMOUNT, CLAN_CAPSULE_BULK_COST_TV);
-                    }
-                } else if (player.idMark.getIndexMenu() == MENU_BUY_GOLD_BAR) {
-                    if (select == 0) {
-                        buyGoldBar(player);
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_EXCHANGE) {
                     HalloweenExchangeService.handleExchange(player, select);
@@ -210,26 +198,4 @@ public class ChiChi extends Npc {
                 + " Capsule Bang cho bang hội với giá " + Util.numberToMoney(cost) + " thỏi vàng.");
     }
 
-    private void buyGoldBar(Player player) {
-        if (player.inventory.gold < GOLD_BAR_COST) {
-            Service.gI().sendThongBao(player, "Bạn không đủ vàng, còn thiếu "
-                    + Util.numberToMoney(GOLD_BAR_COST - player.inventory.gold) + " vàng.");
-            return;
-        }
-
-        Item goldBar = ItemService.gI().createNewItem((short) ConstItem.THOI_VANG, 1);
-        if (goldBar.template == null) {
-            Service.gI().sendThongBao(player, "Vật phẩm không tồn tại.");
-            return;
-        }
-        if (!InventoryService.gI().addItemBag(player, goldBar)) {
-            Service.gI().sendThongBao(player, "Hành trang đã đầy.");
-            return;
-        }
-
-        player.inventory.gold -= GOLD_BAR_COST;
-        InventoryService.gI().sendItemBags(player);
-        Service.gI().sendMoney(player);
-        Service.gI().sendThongBao(player, "Mua thành công 1 thỏi vàng với giá 50 triệu vàng.");
-    }
 }

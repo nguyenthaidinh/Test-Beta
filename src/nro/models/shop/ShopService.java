@@ -49,6 +49,8 @@ public class ShopService {
     private static final byte KINANG_SHOP = 1;
     private static final String SHOP_CHI_CHI = "SHOP_CHI_CHI";
     private static final int TAB_CHI_CHI_EVENT_ID = 58;
+    private static final short GOLD_BAR_ITEM_ID = (short) ConstItem.THOI_VANG;
+    private static final int GOLD_BAR_GOLD_COST = 50_000_000;
     private static final short TRUM_TOP_1_ITEM_ID = 1870;
     private static final int TRUM_TOP_1_GEM_COST = 1_200_000;
     private static final short[] SSJ4_COSTUME_ITEM_IDS = {1553, 1693};
@@ -89,6 +91,7 @@ public class ShopService {
                 ensureSsj4CostumesInChiChiShop(shop);
                 ensureJackyChunCostumeInChiChiShop(shop);
                 ensureFeaturedEventItemsInChiChiShop(shop);
+                ensureGoldBarInChiChiShop(shop);
             }
             for (TabShop tabShop : shop.tabShops) {
                 for (ItemShop item : tabShop.itemShops) {
@@ -357,6 +360,55 @@ public class ShopService {
         for (ItemOption option : item.itemOptions) {
             itemShop.options.add(new ItemOption(option));
         }
+        return true;
+    }
+
+    private void ensureGoldBarInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        for (TabShop tabShop : shop.tabShops) {
+            for (ItemShop itemShop : tabShop.itemShops) {
+                if (itemShop.temp != null && itemShop.temp.id == GOLD_BAR_ITEM_ID) {
+                    configureGoldBarShopItem(itemShop, tabShop);
+                    return;
+                }
+            }
+        }
+
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null && !shop.tabShops.isEmpty()) {
+            eventTab = shop.tabShops.get(0);
+        }
+        if (eventTab == null) {
+            return;
+        }
+
+        ItemShop goldBarShopItem = new ItemShop();
+        goldBarShopItem.id = -GOLD_BAR_ITEM_ID;
+        if (!configureGoldBarShopItem(goldBarShopItem, eventTab)) {
+            return;
+        }
+        eventTab.itemShops.add(goldBarShopItem);
+    }
+
+    private boolean configureGoldBarShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(GOLD_BAR_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GOLD;
+        itemShop.cost = GOLD_BAR_GOLD_COST;
+        itemShop.iconSpec = 0;
+        itemShop.options.clear();
         return true;
     }
 

@@ -15,6 +15,7 @@ public final class HalloweenRewards {
     private static final int GEM_ID = 77;
 
     private static final int OPTION_CAN_NOT_TRADE = 30;
+    private static final int OPTION_PERMANENT = 73;
     private static final int OPTION_EXPIRE_DAYS = 93;
     private static final int OPTION_DAMAGE_PERCENT = 50;
     private static final int OPTION_HP_PERCENT = 77;
@@ -132,18 +133,14 @@ public final class HalloweenRewards {
         return ItemService.gI().createNewItem((short) randomPumpkinDragonBallId(), 1);
     }
 
-    public static boolean removeExpireFromOpenedReward(Item item) {
+    public static boolean isTimedOpenedRewardWithExpire(Item item) {
         if (item == null || item.template == null || item.itemOptions == null
                 || !isTimedHalloweenOpenedReward(item.template.id)) {
             return false;
         }
-        boolean removed = item.itemOptions.removeIf(option -> option != null
+        return item.itemOptions.stream().anyMatch(option -> option != null
                 && option.optionTemplate != null
                 && option.optionTemplate.id == OPTION_EXPIRE_DAYS);
-        if (removed) {
-            refresh(item);
-        }
-        return removed;
     }
 
     public static Item createHalloweenCapsuleReward() {
@@ -253,7 +250,9 @@ public final class HalloweenRewards {
     }
 
     private static void addHalloweenCapsuleExpire(Item item) {
+        removeHalloweenDurationOptions(item);
         if (Util.isTrue(HALLOWEEN_CAPSULE_PERMANENT_RATE, 100)) {
+            item.itemOptions.add(new ItemOption(OPTION_PERMANENT, 0));
             refresh(item);
             return;
         }
@@ -262,8 +261,19 @@ public final class HalloweenRewards {
     }
 
     private static void addHalloweenCapsuleExpireAlways(Item item) {
+        removeHalloweenDurationOptions(item);
         item.itemOptions.add(new ItemOption(OPTION_EXPIRE_DAYS, randomHalloweenCapsuleExpireDays()));
         refresh(item);
+    }
+
+    private static void removeHalloweenDurationOptions(Item item) {
+        if (item == null || item.itemOptions == null) {
+            return;
+        }
+        item.itemOptions.removeIf(option -> option != null
+                && option.optionTemplate != null
+                && (option.optionTemplate.id == OPTION_PERMANENT
+                || option.optionTemplate.id == OPTION_EXPIRE_DAYS));
     }
 
     private static int randomHalloweenCapsuleExpireDays() {

@@ -1,6 +1,5 @@
 package nro.models.boss.event.Halloween;
 
-import java.util.List;
 import nro.models.consts.ConstItem;
 import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
@@ -66,7 +65,7 @@ public final class HalloweenExchangeService {
                 + "\n\n20 Thiệp + 200 Bí ngô = 1 Hòm Halloween"
                 + "\n50 Thiệp + 500 Bí ngô = Cải trang Halloween random"
                 + "\n400 Thiệp + 4000 Bí ngô = Pet Bí Ma Vương"
-                + "\nXóa HSD cho vật phẩm Halloween trong hành trang và rương";
+                + "\nXóa vật phẩm Halloween HSD trong hành trang và rương";
     }
 
     private static String[] createMenuOptions() {
@@ -112,27 +111,43 @@ public final class HalloweenExchangeService {
             return;
         }
 
-        int removed = removeExpireFromItems(player.inventory.itemsBag)
-                + removeExpireFromItems(player.inventory.itemsBox);
+        int removed = removeExpireFromBag(player)
+                + removeExpireFromBox(player);
         if (removed > 0) {
             InventoryService.gI().sendItemBags(player);
             InventoryService.gI().sendItemBox(player);
-            Service.gI().sendThongBao(player, "Đã xóa HSD cho " + removed
-                    + " vật phẩm Halloween.");
+            Service.gI().sendThongBao(player, "Đã xóa " + removed
+                    + " vật phẩm Halloween HSD.");
         } else {
             Service.gI().sendThongBao(player,
                     "Không có vật phẩm Halloween HSD trong hành trang hoặc rương.");
         }
     }
 
-    private static int removeExpireFromItems(List<Item> items) {
-        if (items == null) {
+    private static int removeExpireFromBag(Player player) {
+        if (player.inventory.itemsBag == null) {
             return 0;
         }
 
         int removed = 0;
-        for (Item item : items) {
-            if (HalloweenRewards.removeExpireFromOpenedReward(item)) {
+        for (Item item : player.inventory.itemsBag) {
+            if (HalloweenRewards.isTimedOpenedRewardWithExpire(item)) {
+                InventoryService.gI().subQuantityItemsBag(player, item, Math.max(1, item.quantity));
+                removed++;
+            }
+        }
+        return removed;
+    }
+
+    private static int removeExpireFromBox(Player player) {
+        if (player.inventory.itemsBox == null) {
+            return 0;
+        }
+
+        int removed = 0;
+        for (Item item : player.inventory.itemsBox) {
+            if (HalloweenRewards.isTimedOpenedRewardWithExpire(item)) {
+                InventoryService.gI().subQuantityItemsBox(player, item, Math.max(1, item.quantity));
                 removed++;
             }
         }
