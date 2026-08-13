@@ -37,6 +37,9 @@ public class NPoint {
     public static final byte MAX_LIMIT = 15;
     public static final long MAX_PLAYER_HP = 20_000_000_000L;
     public static final long MAX_PLAYER_DAME = 20_000_000_000L;
+    private static final long BASE_CRIT_UPGRADE_TIEM_NANG = 12_500L;
+    private static final long HIGH_CRIT_UPGRADE_TIEM_NANG_DIVISOR = 30L;
+    private static final int HIGH_CRIT_UPGRADE_FROM = 12;
 
     @Setter
     private Player player;
@@ -2270,10 +2273,7 @@ public class NPoint {
             }
         }
         if (type == 4) {
-            tiemNangUse = 250000L; // giảm 200 lần (gốc 50000000L)
-            for (int i = 0; i < this.critg; i++) {
-                tiemNangUse *= 5L;
-            }
+            tiemNangUse = getCritUpgradeTiemNangUse(this.critg);
             if ((this.critg + point) <= getCritLimit()) {
                 if (doUseTiemNang(tiemNangUse)) {
                     critg += point;
@@ -2299,6 +2299,25 @@ public class NPoint {
         return false;
     }
 
+    private long getCritUpgradeTiemNangUse(int currentCritg) {
+        long tiemNangUse = BASE_CRIT_UPGRADE_TIEM_NANG;
+        for (int i = 0; i < currentCritg; i++) {
+            tiemNangUse *= 5L;
+        }
+        if (currentCritg >= HIGH_CRIT_UPGRADE_FROM) {
+            tiemNangUse /= HIGH_CRIT_UPGRADE_TIEM_NANG_DIVISOR;
+        }
+        return Math.max(1L, tiemNangUse);
+    }
+
+    private long getFullCritTiemNang() {
+        long total = 0;
+        for (int i = 0; i < critg; i++) {
+            total = safeAdd(total, getCritUpgradeTiemNangUse(i));
+        }
+        return total;
+    }
+
     public long getFullTN() {
         long tnhp = 0, tnki = 0, tnsd = 0, tng = 0, tncm = 0;
 
@@ -2315,7 +2334,7 @@ public class NPoint {
             tng = ((defg * (500000L + (500000L + (defg - 1L) * 100000L))) / 2L);
         }
         if (critg > 0) {
-            tncm = ((50L * (((long) Math.pow(5L, critg) - 1L)) / (5L - 1L) * 1000000L));
+            tncm = getFullCritTiemNang();
         }
         return safeAdd(safeAdd(safeAdd(safeAdd(tnhp, tnki), tnsd), tng), tncm);
     }

@@ -132,6 +132,20 @@ public final class HalloweenRewards {
         return ItemService.gI().createNewItem((short) randomPumpkinDragonBallId(), 1);
     }
 
+    public static boolean removeExpireFromOpenedReward(Item item) {
+        if (item == null || item.template == null || item.itemOptions == null
+                || !isTimedHalloweenOpenedReward(item.template.id)) {
+            return false;
+        }
+        boolean removed = item.itemOptions.removeIf(option -> option != null
+                && option.optionTemplate != null
+                && option.optionTemplate.id == OPTION_EXPIRE_DAYS);
+        if (removed) {
+            refresh(item);
+        }
+        return removed;
+    }
+
     public static Item createHalloweenCapsuleReward() {
         int roll = Util.nextInt(10);
         switch (roll) {
@@ -356,6 +370,16 @@ public final class HalloweenRewards {
         return itemId == ConstItem.CAI_TRANG_BONG_BANG_HALLOWEEN
                 || itemId == ConstItem.CAI_TRANG_VUA_QUY_SATAN_HALLOWEEN
                 || itemId == ConstItem.CAI_TRANG_DRACULA_HALLOWEEN;
+    }
+
+    private static boolean isTimedHalloweenOpenedReward(int itemId) {
+        return isHalloweenCostume(itemId)
+                || itemId == ConstItem.PET_BI_MA_VUONG
+                || itemId == ConstItem.THAN_CHET_CUTE
+                || itemId == ConstItem.BI_NGO_NHI_NHANH
+                || itemId == ConstItem.CAI_TRANG_SIEU_THAN_TRAI_DAT
+                || itemId == ConstItem.CAI_TRANG_SIEU_THAN_NAMEC
+                || itemId == ConstItem.CAI_TRANG_SIEU_THAN_XAYDA;
     }
 
     private static void refresh(Item item) {

@@ -1,5 +1,6 @@
 package nro.models.boss.event.Halloween;
 
+import java.util.List;
 import nro.models.consts.ConstItem;
 import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
@@ -49,6 +50,9 @@ public final class HalloweenExchangeService {
                 exchange(player, PET_CARD_COST, PET_PUMPKIN_COST,
                         HalloweenRewards.createHalloweenPetReward());
                 break;
+            case 3:
+                removeExpireFromHalloweenItems(player);
+                break;
             default:
                 break;
         }
@@ -61,7 +65,8 @@ public final class HalloweenExchangeService {
                 + "\nĐang có: " + cardCount + " Thiệp, " + pumpkinCount + " Bí ngô"
                 + "\n\n20 Thiệp + 200 Bí ngô = 1 Hòm Halloween"
                 + "\n50 Thiệp + 500 Bí ngô = Cải trang Halloween random"
-                + "\n400 Thiệp + 4000 Bí ngô = Pet Bí Ma Vương";
+                + "\n400 Thiệp + 4000 Bí ngô = Pet Bí Ma Vương"
+                + "\nXóa HSD cho vật phẩm Halloween trong hành trang và rương";
     }
 
     private static String[] createMenuOptions() {
@@ -69,6 +74,7 @@ public final class HalloweenExchangeService {
             "Đổi\nHòm",
             "Đổi\nCải trang",
             "Đổi\nPet",
+            "Xóa\nHSD",
             "Đóng"
         };
     }
@@ -99,6 +105,38 @@ public final class HalloweenExchangeService {
         subItemBag(player, ConstItem.BI_NGO, pumpkinCost);
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendThongBao(player, "Đổi thành công " + reward.template.name + ".");
+    }
+
+    private static void removeExpireFromHalloweenItems(Player player) {
+        if (player == null || player.inventory == null) {
+            return;
+        }
+
+        int removed = removeExpireFromItems(player.inventory.itemsBag)
+                + removeExpireFromItems(player.inventory.itemsBox);
+        if (removed > 0) {
+            InventoryService.gI().sendItemBags(player);
+            InventoryService.gI().sendItemBox(player);
+            Service.gI().sendThongBao(player, "Đã xóa HSD cho " + removed
+                    + " vật phẩm Halloween.");
+        } else {
+            Service.gI().sendThongBao(player,
+                    "Không có vật phẩm Halloween HSD trong hành trang hoặc rương.");
+        }
+    }
+
+    private static int removeExpireFromItems(List<Item> items) {
+        if (items == null) {
+            return 0;
+        }
+
+        int removed = 0;
+        for (Item item : items) {
+            if (HalloweenRewards.removeExpireFromOpenedReward(item)) {
+                removed++;
+            }
+        }
+        return removed;
     }
 
     private static int countItemBag(Player player, int itemId) {

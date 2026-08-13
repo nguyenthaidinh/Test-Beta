@@ -1597,6 +1597,7 @@ public class UseItem {
             Service.gI().sendThongBao(pl, "Không thể tạo phần thưởng Halloween");
             return;
         }
+        HalloweenRewards.removeExpireFromOpenedReward(reward);
         int rewardQuantity = reward.quantity;
 
         if (!InventoryService.gI().addItemBag(pl, reward)) {
@@ -1625,6 +1626,7 @@ public class UseItem {
             Service.gI().sendThongBao(pl, "Không thể tạo phần thưởng Capsule Halloween");
             return;
         }
+        HalloweenRewards.removeExpireFromOpenedReward(reward);
 
         if (!InventoryService.gI().addItemBag(pl, reward)) {
             Service.gI().sendThongBao(pl, "Hành trang đã đầy");
