@@ -892,9 +892,13 @@ public class InventoryService {
         }
         boolean isStackable = itemAdd.template.isUpToUp || isForcedStackableItem(itemAdd.template.id);
         if (isStackable) {
+            boolean isForcedStackable = isForcedStackableItem(itemAdd.template.id);
             for (Item it : items) {
+                if (isForcedStackable) {
+                    normalizeForcedStackableItem(it);
+                }
                 if (!it.isNotNullItem() || it.template.id != itemAdd.template.id
-                        || (!isForcedStackableItem(itemAdd.template.id) && !checkListsEqual(it.itemOptions, itemAdd.itemOptions)
+                        || (!isForcedStackable && !checkListsEqual(it.itemOptions, itemAdd.itemOptions)
                         && itemAdd.template.id != 2074 && !itemAdd.isDaNangCap() && !itemAdd.isManhTS())
                         || it.quantity >= 100_000_000) {
                     continue;
@@ -951,6 +955,7 @@ public class InventoryService {
         Item lastStack = null;
         for (Item item : items) {
             if (item != null && item.isNotNullItem() && item.template.id == itemId) {
+                normalizeForcedStackableItem(item);
                 totalQuantity += item.quantity;
                 lastStack = item;
             }
@@ -982,6 +987,12 @@ public class InventoryService {
         return itemId == ConstItem.BI_NGO || itemId == ConstItem.THIEP_HALLOWEEN
                 || itemId == ConstItem.KEO_BAN_TAY || itemId == ConstItem.KEO_NAO_NGUOI
                 || itemId == ConstItem.KEO_BI_NGO || itemId == ConstItem.HOP_KEO_MA_QUY;
+    }
+
+    private void normalizeForcedStackableItem(Item item) {
+        if (item != null && item.isNotNullItem() && isForcedStackableItem(item.template.id)) {
+            ItemService.gI().normalizePumpkinCarriageMountOptions(item);
+        }
     }
 
     public static boolean checkListsEqual(List<ItemOption> list1, List<ItemOption> list2) {

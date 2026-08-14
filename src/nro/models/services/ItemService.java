@@ -468,8 +468,7 @@ public class ItemService {
             return;
         }
         normalizePumpkinCandyTemplate(item.template);
-        if ((item.template.id == BRAIN_CANDY_ID || item.template.id == PUMPKIN_CANDY_ID)
-                && item.itemOptions != null) {
+        if (isPermanentHalloweenCandy(item.template.id) && item.itemOptions != null) {
             item.itemOptions.removeIf(option -> option != null && option.optionTemplate != null
                     && option.optionTemplate.id == 93);
         }
@@ -1177,9 +1176,15 @@ public class ItemService {
     }
 
     public boolean isOutOfDateTime(Item item) {
-        if (item != null) {
+        if (item != null && item.template != null && item.itemOptions != null) {
+            if (isPermanentHalloweenCandy(item.template.id)) {
+                item.itemOptions.removeIf(io -> io != null && io.optionTemplate != null && io.optionTemplate.id == 93);
+                item.info = item.getInfo();
+                item.content = item.getContent();
+                return false;
+            }
             for (Item.ItemOption io : item.itemOptions) {
-                if (io.optionTemplate.id == 93) {
+                if (io != null && io.optionTemplate != null && io.optionTemplate.id == 93) {
                     int dayPass = (int) TimeUtil.diffDate(new Date(), new Date(item.createTime), TimeUtil.DAY);
                     if (dayPass != 0) {
                         io.param -= dayPass;
@@ -1193,6 +1198,10 @@ public class ItemService {
             }
         }
         return false;
+    }
+
+    private boolean isPermanentHalloweenCandy(int itemId) {
+        return itemId == BRAIN_CANDY_ID || itemId == PUMPKIN_CANDY_ID;
     }
 
     public void OpenItem736(Player player, Item itemUse) {
