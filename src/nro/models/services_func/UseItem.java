@@ -128,6 +128,7 @@ public class UseItem {
     private static final int DEVIL_CANDY_BOX_EVENT_ITEM_MAX = 100;
     private static final int DEVIL_CANDY_BOX_HSD_OPTION_ID = 93;
     private static final int DEVIL_CANDY_BOX_RATE_TOTAL = 10000;
+    private static final int DEVIL_CANDY_BOX_EVENT_GEAR_PERMANENT_RATE = 5;
     private static final int DEVIL_CANDY_BOX_XEN_FLAG_PERMANENT_RATE = 5;
     private static final int[] DEVIL_CANDY_BOX_HSD_DAYS = {1, 3, 5, 7, 10, 15};
     private static final int[] DEVIL_CANDY_BOX_XEN_FLAG_HSD_DAYS = {1, 3, 5, 7, 10};
@@ -1744,8 +1745,7 @@ public class UseItem {
         if (item == null || item.template == null || item.itemOptions == null || !isDevilCandyBoxTimedReward(item.template.id)) {
             return;
         }
-        if (item.template.id == ConstItem.CO_HON_XEN_BO_HUNG
-                && Util.isTrue(DEVIL_CANDY_BOX_XEN_FLAG_PERMANENT_RATE, 100)) {
+        if (isDevilCandyBoxPermanentReward(item.template.id)) {
             return;
         }
         for (ItemOption option : item.itemOptions) {
@@ -1767,10 +1767,24 @@ public class UseItem {
         return DEVIL_CANDY_BOX_HSD_DAYS[Util.nextInt(DEVIL_CANDY_BOX_HSD_DAYS.length)];
     }
 
+    private boolean isDevilCandyBoxPermanentReward(int itemId) {
+        if (itemId == ConstItem.CO_HON_XEN_BO_HUNG) {
+            return Util.isTrue(DEVIL_CANDY_BOX_XEN_FLAG_PERMANENT_RATE, 100);
+        }
+        return isDevilCandyBoxEventGearReward(itemId)
+                && Util.isTrue(DEVIL_CANDY_BOX_EVENT_GEAR_PERMANENT_RATE, 100);
+    }
+
     private boolean isDevilCandyBoxTimedReward(int itemId) {
         return itemId != ConstItem.THOI_VANG && itemId != ConstItem.KEO_BAN_TAY
+                && itemId != ConstItem.KEO_NAO_NGUOI && itemId != ConstItem.KEO_BI_NGO
                 && !isDevilCandyBoxBuffReward(itemId)
                 && !isDevilCandyBoxEventMaterialReward(itemId);
+    }
+
+    private boolean isDevilCandyBoxEventGearReward(int itemId) {
+        return itemId == ConstItem.XE_BI_NGO || itemId == ConstItem.PET_MEO_PHU_THUY
+                || itemId == ConstItem.CO_HON_MABU;
     }
 
     private boolean isDevilCandyBoxBuffReward(int itemId) {
