@@ -52,6 +52,8 @@ public class ChiChi extends Npc {
             menu.add(menu.size() - 1, "Shop\nsự kiện");
             menu.add(menu.size() - 1, "Top\nHòm\nHalloween");
             menu.add(menu.size() - 1, "Đổi quà\nHalloween");
+            menu.add(menu.size() - 1, "Đổi\nKẹo\nbàn tay");
+            menu.add(menu.size() - 1, "Top\nHộp Kẹo\nMa Quỷ");
             menu.add(menu.size() - 1, "Top\nCapsule\nHalloween");
             String[] menus = menu.toArray(new String[0]);
 
@@ -101,6 +103,16 @@ public class ChiChi extends Npc {
                             HalloweenExchangeService.openExchangeMenu(player, this);
                             break;
                         case 7:
+                            HalloweenExchangeService.openHandCandyExchangeMenu(player, this);
+                            break;
+                        case 8:
+                            createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_CANDY_BOX_TOP,
+                                    "Đua top mở Hộp Kẹo Ma Quỷ.\nMỗi lần mở thành công 1 Hộp Kẹo Ma Quỷ sẽ được tính 1 điểm.",
+                                    "Top 100\nHộp Kẹo\nMa Quỷ",
+                                    "Xem điểm",
+                                    "Đóng");
+                            break;
+                        case 9:
                             createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_CAPSULE_TOP,
                                     "Đua top mở Capsule Halloween.\nMỗi lần mở thành công 1 Capsule Halloween sẽ được tính 1 điểm.",
                                     "Top 100\nCapsule\nHalloween",
@@ -126,6 +138,15 @@ public class ChiChi extends Npc {
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_capsule + " Capsule Halloween.");
                             break;
                     }
+                } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_CANDY_BOX_TOP) {
+                    switch (select) {
+                        case 0:
+                            Service.gI().showListTop(player, Manager.TopHalloweenCandyBox);
+                            break;
+                        case 1:
+                            Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_candy_box + " Hộp Kẹo Ma Quỷ.");
+                            break;
+                    }
                 } else if (player.idMark.getIndexMenu() == MENU_BUY_TRAIN_ARMOR_5) {
                     if (select == 0) {
                         buyTrainArmor5(player);
@@ -140,6 +161,8 @@ public class ChiChi extends Npc {
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_EXCHANGE) {
                     HalloweenExchangeService.handleExchange(player, select);
+                } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HAND_CANDY_EXCHANGE) {
+                    HalloweenExchangeService.handleHandCandyExchange(player, select);
                 }
             }
         }

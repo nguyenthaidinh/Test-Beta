@@ -1,5 +1,6 @@
 package nro.models.item;
 
+import nro.models.consts.ConstItem;
 import nro.models.player_system.Template;
 import nro.models.player_system.Template.ItemTemplate;
 import nro.models.services.ItemService;
@@ -69,6 +70,13 @@ public class Item {
 
     public String getContent() {
         String doThanThanhInfo = getDoThanThanhInfo();
+        if (this.template != null
+                && (this.template.id == ConstItem.KEO_NAO_NGUOI || this.template.id == ConstItem.KEO_BI_NGO
+                || this.template.id == ConstItem.KEO_BAN_TAY || this.template.id == ConstItem.HOP_KEO_MA_QUY
+                || this.template.id == ConstItem.MAY_DO_LINH_HON)
+                && this.template.description != null && !this.template.description.isEmpty()) {
+            return this.template.description;
+        }
         if (doThanThanhInfo != null) {
             return doThanThanhInfo + "\n" + this.template.description;
         }

@@ -23,6 +23,9 @@ public class ItemTimeService {
     private static final String LIMITED_CHALLENGE_TEXT = "Thách thức giới hạn:";
     private static final int ICON_BANH_TT_DAC_BIET = 4125;
     private static final int ICON_HOP_BANH_TT = 4126;
+    private static final int ICON_KEO_NAO_NGUOI = 11737;
+    private static final int ICON_KEO_BI_NGO = 11749;
+    private static final int ICON_MAY_DO_LINH_HON = 11493;
 
     private static ItemTimeService i;
 
@@ -80,6 +83,21 @@ public class ItemTimeService {
         }
         if (player.itemTime.isUseNCD) {
             sendItemTime(player, 11173, (int) ((TIME_NCD - (System.currentTimeMillis() - player.itemTime.lastTimeUseNCD)) / 1000));
+        }
+        if (player.itemTime.isUseKeoNaoNguoi) {
+            sendItemTime(player, ICON_KEO_NAO_NGUOI,
+                    (int) ((TIME_KEO_NAO_NGUOI - (System.currentTimeMillis() - player.itemTime.lastTimeUseKeoNaoNguoi)) / 1000));
+        }
+        if (player.itemTime.isUseKeoBiNgo) {
+            sendItemTime(player, ICON_KEO_BI_NGO,
+                    (int) ((TIME_KEO_BI_NGO - (System.currentTimeMillis() - player.itemTime.lastTimeUseKeoBiNgo)) / 1000));
+        }
+        if (player.itemTime.isUseMayDoLinhHon) {
+            long remaining = player.itemTime.timeMayDoLinhHon
+                    - (System.currentTimeMillis() - player.itemTime.lastTimeUseMayDoLinhHon);
+            if (remaining > 0) {
+                sendItemTime(player, ICON_MAY_DO_LINH_HON, (int) (remaining / 1000));
+            }
         }
         if (player.itemTime.isUseGTPT) {
             sendItemTime(player, 3778, (int) ((TIME_ITEM - (System.currentTimeMillis() - player.itemTime.lastTimeUseGTPT)) / 1000));

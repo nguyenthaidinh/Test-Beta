@@ -1,5 +1,6 @@
 package nro.models.player;
 
+import nro.models.consts.ConstItem;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.mob.Mob;
@@ -221,6 +222,9 @@ public class EffectSkin {
                             Player pl = playersMap.get(i);
                             if (pl != null && pl.nPoint != null && !this.player.equals(pl) && !pl.isBoss && !pl.isDie()
                                     && Util.getDistance(this.player, pl) <= 200) {
+                                if (canResistDraculaPhet(pl)) {
+                                    continue;
+                                }
                                 long subHp = pl.nPoint.hpMax * param / 100;
                                 if (subHp >= pl.nPoint.hp) {
                                     subHp = pl.nPoint.hp - 1;
@@ -357,6 +361,9 @@ public class EffectSkin {
                         Player pl = playersMap.get(i);
                         if (pl != null && pl.nPoint != null && !this.player.equals(pl) && !pl.isBoss && !pl.isDie()
                                 && Util.getDistance(this.player, pl) <= 200) {
+                            if (canResistDraculaPhet(pl)) {
+                                continue;
+                            }
                             EffectSkillService.gI().setIsStone(pl, 6000);
                         }
 
@@ -367,6 +374,24 @@ public class EffectSkin {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean canResistDraculaPhet(Player target) {
+        return target != null && target.itemTime != null && target.itemTime.isUseKeoBiNgo
+                && isDraculaCostumeSource();
+    }
+
+    private boolean isDraculaCostumeSource() {
+        if (this.player == null || this.player.inventory == null
+                || this.player.inventory.itemsBody == null || this.player.inventory.itemsBody.size() <= 5) {
+            return false;
+        }
+        Item costume = this.player.inventory.itemsBody.get(5);
+        if (costume == null || !costume.isNotNullItem() || costume.template == null) {
+            return false;
+        }
+        return costume.template.id == ConstItem.CAI_TRANG_DRACULA
+                || costume.template.id == ConstItem.CAI_TRANG_DRACULA_HALLOWEEN;
     }
 
     private void updateLamCham() {

@@ -106,6 +106,7 @@ public class Player implements Runnable {
     public int point_sukien2;
     public int point_halloween_box;
     public int point_halloween_capsule;
+    public int point_halloween_candy_box;
     public long lastTimeWearJackyChunCostume;
     public int thachdauwhis = 0;
     public int DuaHau;

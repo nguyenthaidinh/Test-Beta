@@ -1039,6 +1039,9 @@ public class NPoint {
         }
 
         // Xử lý Bánh Trung Thu (+HP)
+        if (this.player.itemTime != null && this.player.itemTime.isUseKeoNaoNguoi) {
+            hpMax += hpMax * 15 / 100;
+        }
         if (this.player.itemTime != null && this.player.itemTime.isUseBanhTT1) {
             hpMax += hpMax * 10 / 100;  // +10%
         }
@@ -1191,6 +1194,9 @@ public class NPoint {
         // Xử lý item sieu cap
         if (this.player.itemTime != null && this.player.itemTime.isUseBoKhi2) {
             mpMax *= 2.2;
+        }
+        if (this.player.itemTime != null && this.player.itemTime.isUseKeoNaoNguoi) {
+            mpMax += mpMax * 15 / 100;
         }
 
         // Xử lý Bánh Trung Thu (+KI)
@@ -1415,6 +1421,9 @@ public class NPoint {
         }
         if (player.itemTime != null && player.itemTime.isUsePumpkinDragonDame) {
             dame += (dame * 20L / 100L);
+        }
+        if (player.itemTime != null && player.itemTime.isUseKeoNaoNguoi) {
+            dame += dame * 10 / 100;
         }
 
         // Xử lý phù

@@ -37,6 +37,9 @@ public class ItemTime {
     public static final int TIME_CMS = 3600000;
     public static final int TIME_DK = 1800000;
     public static final int TIME_NCD = 1800000;
+    public static final int TIME_KEO_NAO_NGUOI = 600000;
+    public static final int TIME_KEO_BI_NGO = 300000;
+    public static final long TIME_MAY_DO_LINH_HON = 30 * 60 * 1000L;
 
     private Player player;
 
@@ -104,6 +107,16 @@ public class ItemTime {
 
     public boolean isUseNCD;
     public long lastTimeUseNCD;
+
+    public boolean isUseKeoNaoNguoi;
+    public long lastTimeUseKeoNaoNguoi;
+
+    public boolean isUseKeoBiNgo;
+    public long lastTimeUseKeoBiNgo;
+
+    public boolean isUseMayDoLinhHon;
+    public long lastTimeUseMayDoLinhHon;
+    public long timeMayDoLinhHon;
 
     public boolean isUseGTPT;
     public long lastTimeUseGTPT;
@@ -214,6 +227,23 @@ public class ItemTime {
         if (isUseCMS) {
             if (Util.canDoWithTime(lastTimeUseCMS, TIME_CMS)) {
                 isUseCMS = false;
+            }
+        }
+        if (isUseKeoNaoNguoi) {
+            if (Util.canDoWithTime(lastTimeUseKeoNaoNguoi, TIME_KEO_NAO_NGUOI)) {
+                isUseKeoNaoNguoi = false;
+                Service.gI().point(player);
+            }
+        }
+        if (isUseKeoBiNgo) {
+            if (Util.canDoWithTime(lastTimeUseKeoBiNgo, TIME_KEO_BI_NGO)) {
+                isUseKeoBiNgo = false;
+            }
+        }
+        if (isUseMayDoLinhHon) {
+            if (Util.canDoWithTime(lastTimeUseMayDoLinhHon, timeMayDoLinhHon)) {
+                isUseMayDoLinhHon = false;
+                timeMayDoLinhHon = 0;
             }
         }
         if (isUseGTPT) {

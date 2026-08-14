@@ -63,6 +63,17 @@ public class Service {
 
     private static Service instance;
 
+    private static class TopDisplayEntry {
+
+        private final TOP top;
+        private final Player player;
+
+        private TopDisplayEntry(TOP top, Player player) {
+            this.top = top;
+            this.player = player;
+        }
+    }
+
     public static Service gI() {
         if (instance == null) {
             instance = new Service();
@@ -229,30 +240,14 @@ public class Service {
     public void showListTop(Player player, List<TOP> tops) {
         Message msg;
         try {
+            List<TopDisplayEntry> entries = buildTopDisplayEntries(tops, -1);
             msg = new Message(-96);
             msg.writer().writeByte(0);
             msg.writer().writeUTF("Bảng Xếp Hạng");
-            msg.writer().writeByte(tops.size());
+            msg.writer().writeByte(entries.size());
 
-            for (int i = 0; i < tops.size(); i++) {
-                TOP top = tops.get(i);
-                Player pl = MrBlue.loadById(top.getId_player());
-
-                if (pl == null) {
-                    continue;
-                }
-
-                msg.writer().writeInt(i + 1);
-                msg.writer().writeInt((int) pl.id);
-                msg.writer().writeShort(pl.getHead());
-                if (player.getSession().version > 214) {
-                    msg.writer().writeShort(-1);
-                }
-                msg.writer().writeShort(pl.getBody());
-                msg.writer().writeShort(pl.getLeg());
-                msg.writer().writeUTF(pl.name);
-                msg.writer().writeUTF(top.getInfo1());
-                msg.writer().writeUTF(top.getInfo2());
+            for (int i = 0; i < entries.size(); i++) {
+                writeTopDisplayEntry(msg, player, entries.get(i), i + 1);
             }
 
             player.sendMessage(msg);
@@ -265,32 +260,14 @@ public class Service {
     public void showListTopTraiDat(Player player, List<TOP> tops) {
         Message msg;
         try {
-            List<TOP> filteredTops = new ArrayList<>();
-            for (TOP top : tops) {
-                Player pl = MrBlue.loadById(top.getId_player());
-                if (pl != null && pl.gender == 0) {
-                    filteredTops.add(top);
-                }
-            }
+            List<TopDisplayEntry> entries = buildTopDisplayEntries(tops, 0);
 
             msg = new Message(-96);
             msg.writer().writeByte(0);
             msg.writer().writeUTF("Bảng Xếp Hạng");
-            msg.writer().writeByte(filteredTops.size());
-            for (int i = 0; i < filteredTops.size(); i++) {
-                TOP top = filteredTops.get(i);
-                Player pl = MrBlue.loadById(top.getId_player());
-                msg.writer().writeInt(i + 1);
-                msg.writer().writeInt((int) pl.id);
-                msg.writer().writeShort(pl.getHead());
-                if (player.getSession().version > 214) {
-                    msg.writer().writeShort(-1);
-                }
-                msg.writer().writeShort(pl.getBody());
-                msg.writer().writeShort(pl.getLeg());
-                msg.writer().writeUTF(pl.name);
-                msg.writer().writeUTF(top.getInfo1());
-                msg.writer().writeUTF(top.getInfo2());
+            msg.writer().writeByte(entries.size());
+            for (int i = 0; i < entries.size(); i++) {
+                writeTopDisplayEntry(msg, player, entries.get(i), i + 1);
             }
             player.sendMessage(msg);
             msg.cleanup();
@@ -302,32 +279,14 @@ public class Service {
     public void showListTopNamek(Player player, List<TOP> tops) {
         Message msg;
         try {
-            List<TOP> filteredTops = new ArrayList<>();
-            for (TOP top : tops) {
-                Player pl = MrBlue.loadById(top.getId_player());
-                if (pl != null && pl.gender == 1) {
-                    filteredTops.add(top);
-                }
-            }
+            List<TopDisplayEntry> entries = buildTopDisplayEntries(tops, 1);
 
             msg = new Message(-96);
             msg.writer().writeByte(0);
             msg.writer().writeUTF("Bảng Xếp Hạng");
-            msg.writer().writeByte(filteredTops.size());
-            for (int i = 0; i < filteredTops.size(); i++) {
-                TOP top = filteredTops.get(i);
-                Player pl = MrBlue.loadById(top.getId_player());
-                msg.writer().writeInt(i + 1);
-                msg.writer().writeInt((int) pl.id);
-                msg.writer().writeShort(pl.getHead());
-                if (player.getSession().version > 214) {
-                    msg.writer().writeShort(-1);
-                }
-                msg.writer().writeShort(pl.getBody());
-                msg.writer().writeShort(pl.getLeg());
-                msg.writer().writeUTF(pl.name);
-                msg.writer().writeUTF(top.getInfo1());
-                msg.writer().writeUTF(top.getInfo2());
+            msg.writer().writeByte(entries.size());
+            for (int i = 0; i < entries.size(); i++) {
+                writeTopDisplayEntry(msg, player, entries.get(i), i + 1);
             }
             player.sendMessage(msg);
             msg.cleanup();
@@ -339,38 +298,92 @@ public class Service {
     public void showListTopXayda(Player player, List<TOP> tops) {
         Message msg;
         try {
-            List<TOP> filteredTops = new ArrayList<>();
-            for (TOP top : tops) {
-                Player pl = MrBlue.loadById(top.getId_player());
-                if (pl != null && pl.gender == 2) {
-                    filteredTops.add(top);
-                }
-            }
+            List<TopDisplayEntry> entries = buildTopDisplayEntries(tops, 2);
 
             msg = new Message(-96);
             msg.writer().writeByte(0);
             msg.writer().writeUTF("Bảng Xếp Hạng");
-            msg.writer().writeByte(filteredTops.size());
-            for (int i = 0; i < filteredTops.size(); i++) {
-                TOP top = filteredTops.get(i);
-                Player pl = MrBlue.loadById(top.getId_player());
-                msg.writer().writeInt(i + 1);
-                msg.writer().writeInt((int) pl.id);
-                msg.writer().writeShort(pl.getHead());
-                if (player.getSession().version > 214) {
-                    msg.writer().writeShort(-1);
-                }
-                msg.writer().writeShort(pl.getBody());
-                msg.writer().writeShort(pl.getLeg());
-                msg.writer().writeUTF(pl.name);
-                msg.writer().writeUTF(top.getInfo1());
-                msg.writer().writeUTF(top.getInfo2());
+            msg.writer().writeByte(entries.size());
+            for (int i = 0; i < entries.size(); i++) {
+                writeTopDisplayEntry(msg, player, entries.get(i), i + 1);
             }
             player.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private List<TopDisplayEntry> buildTopDisplayEntries(List<TOP> tops, int genderFilter) {
+        List<TopDisplayEntry> entries = new ArrayList<>();
+        if (tops == null) {
+            return entries;
+        }
+        for (TOP top : tops) {
+            if (top == null) {
+                continue;
+            }
+            Player pl = MrBlue.loadById(top.getId_player());
+            byte gender = pl != null ? pl.gender : top.getGender();
+            if ((pl != null || hasTopFallbackData(top)) && (genderFilter < 0 || gender == genderFilter)) {
+                entries.add(new TopDisplayEntry(top, pl));
+            }
+        }
+        return entries;
+    }
+
+    private void writeTopDisplayEntry(Message msg, Player viewer, TopDisplayEntry entry, int rank) throws IOException {
+        Player pl = entry.player;
+        TOP top = entry.top;
+        byte gender = pl != null ? pl.gender : top.getGender();
+        msg.writer().writeInt(rank);
+        msg.writer().writeInt(pl != null ? (int) pl.id : top.getId_player());
+        msg.writer().writeShort(pl != null ? pl.getHead() : normalizeTopHead(top.getHead(), gender));
+        if (viewer.getSession().version > 214) {
+            msg.writer().writeShort(-1);
+        }
+        msg.writer().writeShort(pl != null ? pl.getBody() : normalizeTopBody(top.getBody(), gender));
+        msg.writer().writeShort(pl != null ? pl.getLeg() : normalizeTopLeg(top.getLeg(), gender));
+        msg.writer().writeUTF(pl != null ? pl.name : safeText(top.getName()));
+        msg.writer().writeUTF(normalizeRankInfo(top.getInfo1(), rank));
+        msg.writer().writeUTF(top.getInfo2() == null ? "" : top.getInfo2());
+    }
+
+    private boolean hasTopFallbackData(TOP top) {
+        return top.getName() != null && !top.getName().trim().isEmpty();
+    }
+
+    private short normalizeTopHead(short head, byte gender) {
+        if (head != -1) {
+            return head;
+        }
+        switch (gender) {
+            case ConstPlayer.NAMEC:
+                return 9;
+            case ConstPlayer.XAYDA:
+                return 6;
+            default:
+                return 64;
+        }
+    }
+
+    private short normalizeTopBody(short body, byte gender) {
+        return body > 0 ? body : (short) (gender == ConstPlayer.NAMEC ? 59 : 57);
+    }
+
+    private short normalizeTopLeg(short leg, byte gender) {
+        return leg > 0 ? leg : (short) (gender == ConstPlayer.NAMEC ? 60 : 58);
+    }
+
+    private String safeText(String text) {
+        return text == null ? "" : text;
+    }
+
+    private String normalizeRankInfo(String info, int rank) {
+        if (info == null) {
+            return "";
+        }
+        return info.startsWith("Hạng: ") ? "Hạng: " + rank : info;
     }
 
     public void showTopClanBDKB(Player player) {
@@ -2818,6 +2831,18 @@ public class Service {
             ps.executeUpdate();
         } catch (Exception e) {
             Logger.logException(PlayerDAO.class, e, "Loi update point_halloween_capsule");
+        }
+    }
+
+    public void updatePlayerPointHalloweenCandyBox(Player pl) {
+        java.sql.PreparedStatement ps = null;
+        try (java.sql.Connection con = LocalManager.getConnection()) {
+            ps = con.prepareStatement("UPDATE player SET point_halloween_candy_box = ? WHERE id = ?");
+            ps.setInt(1, pl.point_halloween_candy_box);
+            ps.setLong(2, pl.id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            Logger.logException(PlayerDAO.class, e, "Loi update point_halloween_candy_box");
         }
     }
 

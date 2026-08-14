@@ -17,6 +17,7 @@ import nro.models.consts.ConstNpc;
 import nro.models.consts.ConstPlayer;
 import nro.models.services.shenron.Shenron_Service;
 import nro.models.item.Item.ItemOption;
+import nro.models.item.ItemTime;
 import static java.awt.SystemColor.text;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -116,6 +117,14 @@ public class UseItem {
         BUFF_BO_HUYET_2_ID,
         BUFF_GIAP_XEN_2_ID
     };
+    private static final int DEVIL_CANDY_BOX_GOLD_MIN = 50;
+    private static final int DEVIL_CANDY_BOX_GOLD_MAX = 150;
+    private static final int DEVIL_CANDY_BOX_HAND_CANDY_MIN = 1;
+    private static final int DEVIL_CANDY_BOX_HAND_CANDY_MAX = 150;
+    private static final int DEVIL_CANDY_BOX_BUFF_MIN = 1;
+    private static final int DEVIL_CANDY_BOX_BUFF_MAX = 5;
+    private static final int DEVIL_CANDY_BOX_HSD_OPTION_ID = 93;
+    private static final int[] DEVIL_CANDY_BOX_HSD_DAYS = {1, 3, 5, 7, 10, 15};
 
     private static UseItem instance;
     private static final Random rand = new Random();
@@ -726,6 +735,9 @@ public class UseItem {
                             case ConstItem.CAPSULE_HALLOWEEN:
                                 UseItem.gI().openHalloweenCapsuleReward(pl, item);
                                 break;
+                            case ConstItem.HOP_KEO_MA_QUY:
+                                UseItem.gI().openDevilCandyBox(pl, item);
+                                break;
                             case ConstItem.RUONG_BAC:
                             case ConstItem.RUONG_VANG:
                                 UseItem.gI().openPirateChest(pl, item);
@@ -733,6 +745,9 @@ public class UseItem {
                             case ConstItem.BI_NGO:
                             case ConstItem.THIEP_HALLOWEEN:
                                 HalloweenExchangeService.openExchangeMenu(pl);
+                                break;
+                            case ConstItem.KEO_BAN_TAY:
+                                HalloweenExchangeService.openHandCandyExchangeMenu(pl);
                                 break;
                             case 1822: // rada ngọc rồng
                                 UseItem.gI().RadaNgocRong(pl, item.template.id);
@@ -834,6 +849,9 @@ public class UseItem {
                             case 1614:
                             case 1615:
                             case 1616:
+                            case ConstItem.MAY_DO_LINH_HON:
+                            case ConstItem.KEO_NAO_NGUOI:
+                            case ConstItem.KEO_BI_NGO:
                             case 381: //cuồng nộ
                             case 382: //bổ huyết
                             case 383: //bổ khí
@@ -1639,6 +1657,81 @@ public class UseItem {
         CombineService.gI().sendEffectOpenItem(pl, item.template.iconID, reward.template.iconID);
     }
 
+    private void openDevilCandyBox(Player pl, Item box) {
+        if (InventoryService.gI().getCountEmptyBag(pl) <= 0) {
+            Service.gI().sendThongBao(pl, "Hành trang đã đầy");
+            return;
+        }
+
+        int[] rewardIds = {
+            ConstItem.XE_BI_NGO,
+            ConstItem.PET_MEO_PHU_THUY,
+            ConstItem.CO_HON_MABU,
+            ConstItem.KEO_NAO_NGUOI,
+            ConstItem.KEO_BI_NGO,
+            ConstItem.KEO_BAN_TAY,
+            ConstItem.THOI_VANG,
+            BUFF_CUONG_NO_2_ID,
+            BUFF_BO_HUYET_2_ID,
+            BUFF_GIAP_XEN_2_ID
+        };
+        int rewardId = rewardIds[Util.nextInt(rewardIds.length)];
+        int rewardQuantity = getDevilCandyBoxRewardQuantity(rewardId);
+        Item reward = ItemService.gI().createNewItem((short) rewardId, rewardQuantity);
+        ItemService.gI().normalizePumpkinCarriageMountOptions(reward);
+        addDevilCandyBoxHsdIfNeeded(reward);
+        if (!InventoryService.gI().addItemBag(pl, reward)) {
+            Service.gI().sendThongBao(pl, "Hành trang đã đầy");
+            return;
+        }
+
+        InventoryService.gI().subQuantityItemsBag(pl, box, 1);
+        pl.point_halloween_candy_box++;
+        Service.gI().updatePlayerPointHalloweenCandyBox(pl);
+        Manager.isTopHalloweenCandyBoxChanged = true;
+        InventoryService.gI().sendItemBags(pl);
+        Service.gI().sendThongBao(pl, "Bạn nhận được " + reward.template.name
+                + (rewardQuantity > 1 ? " x" + rewardQuantity : ""));
+        CombineService.gI().sendEffectOpenItem(pl, box.template.iconID, reward.template.iconID);
+    }
+
+    private int getDevilCandyBoxRewardQuantity(int rewardId) {
+        if (rewardId == ConstItem.KEO_BAN_TAY) {
+            return Util.nextInt(DEVIL_CANDY_BOX_HAND_CANDY_MIN, DEVIL_CANDY_BOX_HAND_CANDY_MAX);
+        }
+        if (rewardId == ConstItem.THOI_VANG) {
+            return Util.nextInt(DEVIL_CANDY_BOX_GOLD_MIN, DEVIL_CANDY_BOX_GOLD_MAX);
+        }
+        if (isDevilCandyBoxBuffReward(rewardId)) {
+            return Util.nextInt(DEVIL_CANDY_BOX_BUFF_MIN, DEVIL_CANDY_BOX_BUFF_MAX);
+        }
+        return 1;
+    }
+
+    private void addDevilCandyBoxHsdIfNeeded(Item item) {
+        if (item == null || item.template == null || item.itemOptions == null || !isDevilCandyBoxTimedReward(item.template.id)) {
+            return;
+        }
+        for (ItemOption option : item.itemOptions) {
+            if (option != null && option.optionTemplate != null
+                    && option.optionTemplate.id == DEVIL_CANDY_BOX_HSD_OPTION_ID) {
+                return;
+            }
+        }
+        int hsdDay = DEVIL_CANDY_BOX_HSD_DAYS[Util.nextInt(DEVIL_CANDY_BOX_HSD_DAYS.length)];
+        item.itemOptions.add(new ItemOption(DEVIL_CANDY_BOX_HSD_OPTION_ID, hsdDay));
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private boolean isDevilCandyBoxTimedReward(int itemId) {
+        return itemId != ConstItem.THOI_VANG && itemId != ConstItem.KEO_BAN_TAY;
+    }
+
+    private boolean isDevilCandyBoxBuffReward(int itemId) {
+        return itemId == BUFF_CUONG_NO_2_ID || itemId == BUFF_BO_HUYET_2_ID || itemId == BUFF_GIAP_XEN_2_ID;
+    }
+
     private void openPirateChest(Player pl, Item chest) {
         boolean isGoldChest = chest.template.id == ConstItem.RUONG_VANG;
         List<Item> rewards = isGoldChest ? createGoldPirateChestRewards() : createSilverPirateChestRewards();
@@ -1754,6 +1847,15 @@ public class UseItem {
                 pl.itemTime.lastTimeUseCoBonLa = System.currentTimeMillis();
                 pl.itemTime.isUseCoBonLa = true;
                 break;
+            case ConstItem.MAY_DO_LINH_HON:
+                long now = System.currentTimeMillis();
+                long remaining = pl.itemTime.isUseMayDoLinhHon
+                        ? Math.max(0, pl.itemTime.timeMayDoLinhHon - (now - pl.itemTime.lastTimeUseMayDoLinhHon)) : 0;
+                pl.itemTime.timeMayDoLinhHon = remaining + ItemTime.TIME_MAY_DO_LINH_HON;
+                pl.itemTime.lastTimeUseMayDoLinhHon = now;
+                pl.itemTime.isUseMayDoLinhHon = true;
+                Service.gI().sendThongBao(pl, "Dung May do linh hon thanh cong: +30 phut, co the cong don");
+                break;
             case 1614: // nuoc mia 1
                 if (pl.itemTime.isUseNuocMia2 || pl.itemTime.isUseNuocMia3) {
                     Service.gI().sendThongBao(pl, "Chỉ có thể sự dụng cùng lúc 1 vật phẩm bổ trợ cùng loại");
@@ -1780,6 +1882,16 @@ public class UseItem {
                 pl.itemTime.lastTimeUseNuocMia3 = System.currentTimeMillis();
                 pl.itemTime.isUseNuocMia3 = true;
                 Service.gI().point(pl);
+                break;
+            case ConstItem.KEO_NAO_NGUOI:
+                pl.itemTime.lastTimeUseKeoNaoNguoi = System.currentTimeMillis();
+                pl.itemTime.isUseKeoNaoNguoi = true;
+                Service.gI().sendThongBao(pl, "Dung Keo nao nguoi thanh cong: +10% SD, +15% HP/KI trong 10 phut");
+                break;
+            case ConstItem.KEO_BI_NGO:
+                pl.itemTime.lastTimeUseKeoBiNgo = System.currentTimeMillis();
+                pl.itemTime.isUseKeoBiNgo = true;
+                Service.gI().sendThongBao(pl, "Dung Keo bi ngo thanh cong: khang phet Dracula trong 5 phut");
                 break;
             case 381: // cuồng nộ
                 if (pl.itemTime.isUseCuongNo2) {

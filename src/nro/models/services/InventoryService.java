@@ -402,6 +402,7 @@ public class InventoryService {
         }
 
         sItem = player.inventory.itemsBody.get(index);
+        ItemService.gI().normalizePumpkinCarriageMountOptions(item);
         player.inventory.itemsBody.set(index, item);
         syncJackyChunCostumeWearTime(player, index, item, true);
         return sItem;
@@ -607,6 +608,7 @@ public class InventoryService {
                 if (!item.isNotNullItem()) {
                     continue;
                 }
+                ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                 ItemService.gI().normalizeGokuNgayXuaOptions(item);
                 ItemService.gI().normalizeJackyChunCostumeOptions(item);
                 msg.writer().writeShort(item.template.id);
@@ -652,6 +654,7 @@ public class InventoryService {
                 if (!item.isNotNullItem()) {
                     msg.writer().writeShort(-1);
                 } else {
+                    ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                     ItemService.gI().normalizeGokuNgayXuaOptions(item);
                     ItemService.gI().normalizeJackyChunCostumeOptions(item);
                     msg.writer().writeShort(item.template.id);
@@ -696,6 +699,7 @@ public class InventoryService {
             for (Item it : player.inventory.itemsBox) {
                 msg.writer().writeShort(it.isNotNullItem() ? it.template.id : -1);
                 if (it.isNotNullItem()) {
+                    ItemService.gI().normalizePumpkinCarriageMountOptions(it);
                     ItemService.gI().normalizeGokuNgayXuaOptions(it);
                     ItemService.gI().normalizeJackyChunCostumeOptions(it);
                     msg.writer().writeInt(it.quantity);
@@ -869,6 +873,7 @@ public class InventoryService {
         if (itemAdd.itemOptions.isEmpty()) {
             itemAdd.itemOptions.add(new Item.ItemOption(73, 0));
         }
+        ItemService.gI().normalizePumpkinCarriageMountOptions(itemAdd);
 
         int[] idParam = isItemIncrementalOption(itemAdd);
         if (idParam[0] != -1) {
@@ -934,6 +939,7 @@ public class InventoryService {
     private void compactForcedStackableItems(List<Item> items) {
         compactItemStacks(items, ConstItem.BI_NGO);
         compactItemStacks(items, ConstItem.THIEP_HALLOWEEN);
+        compactItemStacks(items, ConstItem.KEO_BAN_TAY);
     }
 
     private void compactItemStacks(List<Item> items, int itemId) {
@@ -969,7 +975,8 @@ public class InventoryService {
     }
 
     private boolean isForcedStackableItem(int itemId) {
-        return itemId == ConstItem.BI_NGO || itemId == ConstItem.THIEP_HALLOWEEN;
+        return itemId == ConstItem.BI_NGO || itemId == ConstItem.THIEP_HALLOWEEN
+                || itemId == ConstItem.KEO_BAN_TAY;
     }
 
     public static boolean checkListsEqual(List<ItemOption> list1, List<ItemOption> list2) {

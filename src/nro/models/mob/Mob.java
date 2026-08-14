@@ -35,6 +35,8 @@ import nro.models.task.BadgesTaskService;
 public class Mob {
 
     private static final int GOHAN_EXTRA_GOLD_DROP_PERCENT = 150;
+    private static final int SOUL_DETECTOR_HAND_CANDY_RATE = 1;
+    private static final int SOUL_DETECTOR_HAND_CANDY_TOTAL = 500;
 
     public int id;
     public Zone zone;
@@ -735,6 +737,10 @@ public class Mob {
             }
         }
         if (MapService.gI().isMapTuongLai(mapid)) {
+            if (player.itemTime != null && player.itemTime.isUseMayDoLinhHon
+                    && Util.isTrue(SOUL_DETECTOR_HAND_CANDY_RATE, SOUL_DETECTOR_HAND_CANDY_TOTAL)) {
+                list.add(new ItemMap(zone, ConstItem.KEO_BAN_TAY, 1, x, yEnd, player.id));
+            }
             if (Util.isTrue(15, 100)) {
                 int vang = Util.nextInt(80000, 150000);
                 if (vang < 6000) {

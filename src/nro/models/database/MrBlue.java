@@ -132,6 +132,11 @@ public class MrBlue {
                                 } catch (Exception ignored) {
                                     player.point_halloween_capsule = 0;
                                 }
+                                try {
+                                    player.point_halloween_candy_box = rs.getInt("point_halloween_candy_box");
+                                } catch (Exception ignored) {
+                                    player.point_halloween_candy_box = 0;
+                                }
                                 player.thachdauwhis = rs.getInt("thachdauwhis");
                                 player.point_maydam = rs.getInt("point_maydam");
                                 player.total_damage_maydam = rs.getLong("total_damage_maydam");
@@ -369,6 +374,7 @@ public class MrBlue {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
                     loadItemOptions(item, options);
+                    ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                     item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                     if (ItemService.gI().isOutOfDateTime(item)) {
                         item = ItemService.gI().createItemNull();
@@ -394,6 +400,7 @@ public class MrBlue {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
                     loadItemOptions(item, options);
+                    ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                     item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                     if (ItemService.gI().isOutOfDateTime(item)) {
                         item = ItemService.gI().createItemNull();
@@ -415,6 +422,7 @@ public class MrBlue {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
                     loadItemOptions(item, options);
+                    ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                     item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                     if (item.template.id == 2132) {
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -450,6 +458,7 @@ public class MrBlue {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
                     loadItemOptions(item, options);
+                    ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                     player.inventory.itemsBoxCrackBall.add(item);
                 }
             }
@@ -465,6 +474,7 @@ public class MrBlue {
                     item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                     JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
                     loadItemOptions(item, options);
+                    ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                     item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                     if (item.template.id == 2322) {
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -567,6 +577,9 @@ public class MrBlue {
             long timeNuocMia3 = 0;
             long timePumpkinDragonDame = 0;
             long timePumpkinDragonHpKi = 0;
+            long timeKeoNaoNguoi = 0;
+            long timeKeoBiNgo = 0;
+            long timeMayDoLinhHon = 0;
             int timeBoHuyet = Integer.parseInt(String.valueOf(dataArray.get(0)));
             int timeBoHuyet2 = Integer.parseInt(String.valueOf(dataArray.get(1)));
             int timeBoKhi = Integer.parseInt(String.valueOf(dataArray.get(2)));
@@ -642,6 +655,15 @@ public class MrBlue {
             if (dataArray.size() > 31) {
                 timePumpkinDragonHpKi = Long.parseLong(String.valueOf(dataArray.get(31)));
             }
+            if (dataArray.size() > 32) {
+                timeKeoNaoNguoi = Long.parseLong(String.valueOf(dataArray.get(32)));
+            }
+            if (dataArray.size() > 33) {
+                timeKeoBiNgo = Long.parseLong(String.valueOf(dataArray.get(33)));
+            }
+            if (dataArray.size() > 34) {
+                timeMayDoLinhHon = Long.parseLong(String.valueOf(dataArray.get(34)));
+            }
 
             player.itemTime.lastTimeBoHuyet = System.currentTimeMillis() - (ItemTime.TIME_ITEM - timeBoHuyet);
             player.itemTime.lastTimeBoKhi = System.currentTimeMillis() - (ItemTime.TIME_ITEM - timeBoKhi);
@@ -672,6 +694,12 @@ public class MrBlue {
                     - (ItemTime.TIME_PUMPKIN_DRAGON_BUFF - timePumpkinDragonDame);
             player.itemTime.lastTimeUsePumpkinDragonHpKi = System.currentTimeMillis()
                     - (ItemTime.TIME_PUMPKIN_DRAGON_BUFF - timePumpkinDragonHpKi);
+            player.itemTime.lastTimeUseKeoNaoNguoi = System.currentTimeMillis()
+                    - (ItemTime.TIME_KEO_NAO_NGUOI - timeKeoNaoNguoi);
+            player.itemTime.lastTimeUseKeoBiNgo = System.currentTimeMillis()
+                    - (ItemTime.TIME_KEO_BI_NGO - timeKeoBiNgo);
+            player.itemTime.lastTimeUseMayDoLinhHon = System.currentTimeMillis();
+            player.itemTime.timeMayDoLinhHon = timeMayDoLinhHon;
 
             player.itemTime.iconMeal = iconMeal;
             player.itemTime.isEatMeal = timeMeal != 0;
@@ -704,6 +732,9 @@ public class MrBlue {
             player.itemTime.isUseNuocMia3 = timeNuocMia3 != 0;
             player.itemTime.isUsePumpkinDragonDame = timePumpkinDragonDame != 0;
             player.itemTime.isUsePumpkinDragonHpKi = timePumpkinDragonHpKi != 0;
+            player.itemTime.isUseKeoNaoNguoi = timeKeoNaoNguoi > 0;
+            player.itemTime.isUseKeoBiNgo = timeKeoBiNgo > 0;
+            player.itemTime.isUseMayDoLinhHon = timeMayDoLinhHon > 0;
             dataArray.clear();
 
             //data nhiệm vụ
@@ -851,6 +882,7 @@ public class MrBlue {
                         item = ItemService.gI().createNewItem(tempId, Integer.parseInt(String.valueOf(dataItem.get(1))));
                         JSONArray options = (JSONArray) JSONValue.parse(String.valueOf(dataItem.get(2)).replaceAll("\"", ""));
                         loadItemOptions(item, options);
+                        ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                         item.createTime = Long.parseLong(String.valueOf(dataItem.get(3)));
                         if (item.template.id == 2132) {
                             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");

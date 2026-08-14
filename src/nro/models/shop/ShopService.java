@@ -48,9 +48,13 @@ public class ShopService {
     private static final byte SPEC_SHOP = 3;
     private static final byte KINANG_SHOP = 1;
     private static final String SHOP_CHI_CHI = "SHOP_CHI_CHI";
+    private static final String HALLOWEEN_EVENT_SHOP = "HALLOWEEN_EVENT_SHOP";
     private static final int TAB_CHI_CHI_EVENT_ID = 58;
     private static final short GOLD_BAR_ITEM_ID = (short) ConstItem.THOI_VANG;
+    private static final int GOLD_BAR_ICON_ID = 4028;
     private static final int GOLD_BAR_GOLD_COST = 50_000_000;
+    private static final short SOUL_DETECTOR_ITEM_ID = (short) ConstItem.MAY_DO_LINH_HON;
+    private static final int SOUL_DETECTOR_GOLD_BAR_COST = 100;
     private static final short TRUM_TOP_1_ITEM_ID = 1870;
     private static final int TRUM_TOP_1_GEM_COST = 1_200_000;
     private static final short[] SSJ4_COSTUME_ITEM_IDS = {1553, 1693};
@@ -92,6 +96,8 @@ public class ShopService {
                 ensureJackyChunCostumeInChiChiShop(shop);
                 ensureFeaturedEventItemsInChiChiShop(shop);
                 ensureGoldBarInChiChiShop(shop);
+            } else if (HALLOWEEN_EVENT_SHOP.equals(tagName)) {
+                ensureSoulDetectorInHalloweenEventShop(shop);
             }
             for (TabShop tabShop : shop.tabShops) {
                 for (ItemShop item : tabShop.itemShops) {
@@ -408,6 +414,50 @@ public class ShopService {
         itemShop.typeSell = COST_GOLD;
         itemShop.cost = GOLD_BAR_GOLD_COST;
         itemShop.iconSpec = 0;
+        itemShop.options.clear();
+        return true;
+    }
+
+    private void ensureSoulDetectorInHalloweenEventShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        shop.typeShop = SPEC_SHOP;
+        TabShop eventTab = shop.tabShops.isEmpty() ? null : shop.tabShops.get(0);
+        if (eventTab == null) {
+            return;
+        }
+        ItemShop soulDetector = null;
+        for (ItemShop itemShop : eventTab.itemShops) {
+            if (itemShop.temp != null && itemShop.temp.id == SOUL_DETECTOR_ITEM_ID) {
+                soulDetector = itemShop;
+                break;
+            }
+        }
+        boolean isNewShopItem = soulDetector == null;
+        if (soulDetector == null) {
+            soulDetector = new ItemShop();
+            soulDetector.id = -SOUL_DETECTOR_ITEM_ID;
+        }
+        if (!configureSoulDetectorShopItem(soulDetector, eventTab)) {
+            return;
+        }
+        if (isNewShopItem) {
+            eventTab.itemShops.add(0, soulDetector);
+        }
+    }
+
+    private boolean configureSoulDetectorShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(SOUL_DETECTOR_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        ItemService.gI().normalizePumpkinCandyTemplate(itemShop.temp);
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = SOUL_DETECTOR_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
         itemShop.options.clear();
         return true;
     }
@@ -1346,7 +1396,8 @@ public class ShopService {
 
     private boolean subIemByItemShop(Player pl, ItemShop itemShop) {
         boolean isBuy = false;
-        short itSpec = ItemService.gI().getItemIdByIcon((short) itemShop.iconSpec);
+        short itSpec = itemShop.iconSpec == GOLD_BAR_ICON_ID
+                ? GOLD_BAR_ITEM_ID : ItemService.gI().getItemIdByIcon((short) itemShop.iconSpec);
         int buySpec = itemShop.cost;
         Item itS = ItemService.gI().createNewItem(itSpec);
         switch (itS.template.id) {

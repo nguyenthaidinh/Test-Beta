@@ -37,12 +37,12 @@ public class MyClanTopBanDoKhoBau {
     }
 
     public void load2(int idLeader) {
-        list.clear();
         long now = System.currentTimeMillis();
         if (now - lastLoadedTime < 5000) {
             return;
         }
         lastLoadedTime = now;
+        list.clear();
 
         try (Connection con = LocalManager.getConnection(); PreparedStatement ps = con.prepareStatement(
                 "SELECT *, "

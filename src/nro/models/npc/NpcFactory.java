@@ -539,6 +539,8 @@ public class NpcFactory {
                         BossManager.gI().handleBossAction(player, select);
                     case ConstNpc.MENU_HALLOWEEN_EXCHANGE ->
                         HalloweenExchangeService.handleExchange(player, select);
+                    case ConstNpc.MENU_HAND_CANDY_EXCHANGE ->
+                        HalloweenExchangeService.handleHandCandyExchange(player, select);
                     case ConstNpc.CONFIRM_DISSOLUTION_CLAN -> {
                         switch (select) {
                             case 0 -> {

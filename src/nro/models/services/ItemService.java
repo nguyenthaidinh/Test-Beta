@@ -80,6 +80,19 @@ public class ItemService {
     private static final short TRAIN_ARMOR_5_ID = 1869;
     private static final byte TRAIN_ARMOR_TYPE = 32;
     private static final int TRAIN_ARMOR_5_POWER_REQUIRE = 1_500_000;
+    private static final short PUMPKIN_CARRIAGE_MOUNT_ID = (short) ConstItem.XE_BI_NGO;
+    private static final short WITCH_CAT_PET_ID = (short) ConstItem.PET_MEO_PHU_THUY;
+    private static final short MABU_SOUL_FLAG_ID = (short) ConstItem.CO_HON_MABU;
+    private static final short BRAIN_CANDY_ID = (short) ConstItem.KEO_NAO_NGUOI;
+    private static final String BRAIN_CANDY_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 t\u0103ng 10% s\u1ee9c \u0111\u00e1nh, 15% HP v\u00e0 15% KI trong 10 ph\u00fat.";
+    private static final short PUMPKIN_CANDY_ID = (short) ConstItem.KEO_BI_NGO;
+    private static final String PUMPKIN_CANDY_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 kh\u00e1ng ph\u1eb9t t\u1eeb C\u1ea3i trang Dracula/Dracula Halloween trong 5 ph\u00fat. Khi c\u00f2n hi\u1ec7u l\u1ef1c, kh\u00f4ng b\u1ecb ph\u1eb9t Dracula tr\u1eeb HP ho\u1eb7c h\u00f3a \u0111\u00e1.";
+    private static final short HAND_CANDY_ID = (short) ConstItem.KEO_BAN_TAY;
+    private static final String HAND_CANDY_DESCRIPTION = "T\u00edch \u0111\u1ee7 100 K\u1eb9o b\u00e0n tay c\u00f3 th\u1ec3 \u0111\u1ed5i 1 H\u1ed9p K\u1eb9o Ma Qu\u1ef7 t\u1ea1i Chi Chi. C\u00f3 th\u1ec3 s\u1eed d\u1ee5ng K\u1eb9o b\u00e0n tay \u0111\u1ec3 m\u1edf nhanh menu \u0110\u1ed5i K\u1eb9o b\u00e0n tay.";
+    private static final short DEVIL_CANDY_BOX_ID = (short) ConstItem.HOP_KEO_MA_QUY;
+    private static final String DEVIL_CANDY_BOX_DESCRIPTION = "M\u1edf c\u00f3 t\u1ec9 l\u1ec7 nh\u1eadn Xe b\u00ed ng\u00f4, Pet M\u00e8o Ph\u00f9 Th\u1ee7y, C\u1edd h\u1ed3n Mab\u01b0, K\u1eb9o n\u00e3o ng\u01b0\u1eddi, K\u1eb9o b\u00ed ng\u00f4, K\u1eb9o b\u00e0n tay x1-150, Th\u1ecfi v\u00e0ng x50-150, Cu\u1ed3ng n\u1ed9 2, B\u1ed5 huy\u1ebft 2 ho\u1eb7c Gi\u00e1p x\u00ean 2 x1-5. C\u00e1c v\u1eadt ph\u1ea9m tr\u1eeb K\u1eb9o b\u00e0n tay v\u00e0 Th\u1ecfi v\u00e0ng c\u00f3 HSD ng\u1eabu nhi\u00ean 1/3/5/7/10/15 ng\u00e0y.";
+    private static final short SOUL_DETECTOR_ID = (short) ConstItem.MAY_DO_LINH_HON;
+    private static final String SOUL_DETECTOR_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 k\u00edch ho\u1ea1t M\u00e1y d\u00f2 linh h\u1ed3n trong 30 ph\u00fat, c\u00f3 th\u1ec3 c\u1ed9ng d\u1ed3n th\u1eddi gian. Khi \u0111\u00e1nh qu\u00e1i \u1edf T\u01b0\u01a1ng lai c\u00f3 t\u1ec9 l\u1ec7 th\u1ea5p nh\u1eadn K\u1eb9o b\u00e0n tay.";
     private static final short MOTO_BUN_MA_ID = 1541;
     private static final short PET_BABY_SHARK_ID = 1620;
 
@@ -108,6 +121,7 @@ public class ItemService {
         Item item = new Item();
         item.template = itemShop.temp;
         item.quantity = 1;
+        normalizePumpkinCandyTemplate(item.template);
         item.content = item.getContent();
         item.info = item.getInfo();
         for (Item.ItemOption io : itemShop.options) {
@@ -144,6 +158,7 @@ public class ItemService {
         normalizeAngelDemonWingsOptions(it);
         normalizeBrolyRedCostumeOptions(it);
         normalizeBrolyCostumeOptions(it);
+        normalizePumpkinCarriageMountOptions(it);
         return it;
     }
 
@@ -157,6 +172,7 @@ public class ItemService {
         normalizeTrainArmorTemplate(item.template);
         normalizeFusionGokuTemplate(item.template);
         normalizeGokuNgayXuaTemplate(item.template);
+        normalizePumpkinCandyTemplate(item.template);
         item.quantity = quantity;
         item.createTime = System.currentTimeMillis();
 
@@ -347,6 +363,116 @@ public class ItemService {
         }
         item.info = item.getInfo();
         item.content = item.getContent();
+    }
+
+    public void normalizePumpkinCarriageMountOptions(Item item) {
+        normalizePumpkinCarriageOptions(item);
+        normalizeWitchCatPetOptions(item);
+        normalizeMabuSoulFlagOptions(item);
+        normalizePumpkinCandyItem(item);
+        normalizeSoulDetectorItem(item);
+    }
+
+    public void normalizePumpkinCandyTemplate(Template.ItemTemplate template) {
+        if (template == null) {
+            return;
+        }
+        if (template.id == BRAIN_CANDY_ID) {
+            template.description = BRAIN_CANDY_DESCRIPTION;
+        } else if (template.id == PUMPKIN_CANDY_ID) {
+            template.description = PUMPKIN_CANDY_DESCRIPTION;
+        } else if (template.id == HAND_CANDY_ID) {
+            template.description = HAND_CANDY_DESCRIPTION;
+        } else if (template.id == DEVIL_CANDY_BOX_ID) {
+            template.description = DEVIL_CANDY_BOX_DESCRIPTION;
+        } else if (template.id == SOUL_DETECTOR_ID) {
+            template.description = SOUL_DETECTOR_DESCRIPTION;
+        }
+    }
+
+    private void normalizePumpkinCarriageOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != PUMPKIN_CARRIAGE_MOUNT_ID) {
+            return;
+        }
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        addOptionIfMissing(item, 77, 20, 50);
+        addOptionIfMissing(item, 103, 20, 50);
+        addOptionIfMissing(item, 50, 15, 40);
+        addOptionIfMissing(item, 14, 2, 15);
+        addOptionIfMissing(item, 94, 5, 25);
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private void normalizeWitchCatPetOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != WITCH_CAT_PET_ID) {
+            return;
+        }
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        addOptionIfMissing(item, 50, 20, 40);
+        addOptionIfMissing(item, 77, 25, 50);
+        addOptionIfMissing(item, 103, 25, 50);
+        addOptionIfMissing(item, 14, 5, 20);
+        addOptionIfMissing(item, 204, 20, 30);
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private void normalizeMabuSoulFlagOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != MABU_SOUL_FLAG_ID) {
+            return;
+        }
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        addOptionIfMissing(item, 77, 30, 60);
+        addOptionIfMissing(item, 103, 30, 60);
+        addOptionIfMissing(item, 94, 5, 15);
+        addOptionIfMissing(item, 106, 0, 0);
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private void normalizePumpkinCandyItem(Item item) {
+        if (item == null || item.template == null
+                || (item.template.id != BRAIN_CANDY_ID && item.template.id != PUMPKIN_CANDY_ID
+                && item.template.id != HAND_CANDY_ID && item.template.id != DEVIL_CANDY_BOX_ID)) {
+            return;
+        }
+        normalizePumpkinCandyTemplate(item.template);
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private void normalizeSoulDetectorItem(Item item) {
+        if (item == null || item.template == null || item.template.id != SOUL_DETECTOR_ID) {
+            return;
+        }
+        normalizePumpkinCandyTemplate(item.template);
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private void addOptionIfMissing(Item item, int optionId, int min, int max) {
+        if (!hasOption(item, optionId)) {
+            item.itemOptions.add(new ItemOption(optionId, Util.nextInt(min, max)));
+        }
+    }
+
+    private boolean hasOption(Item item, int optionId) {
+        if (item == null || item.itemOptions == null) {
+            return false;
+        }
+        for (ItemOption option : item.itemOptions) {
+            if (option != null && option.optionTemplate != null && option.optionTemplate.id == optionId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void normalizeTrainArmorTemplate(Template.ItemTemplate template) {

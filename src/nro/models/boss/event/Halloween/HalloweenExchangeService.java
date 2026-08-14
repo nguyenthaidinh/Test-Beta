@@ -18,6 +18,7 @@ public final class HalloweenExchangeService {
     private static final int COSTUME_PUMPKIN_COST = 500;
     private static final int PET_CARD_COST = 400;
     private static final int PET_PUMPKIN_COST = 4_000;
+    private static final int HAND_CANDY_COST = 100;
 
     private HalloweenExchangeService() {
     }
@@ -33,6 +34,20 @@ public final class HalloweenExchangeService {
             return;
         }
         npc.createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_EXCHANGE, createMenuText(player), createMenuOptions());
+    }
+
+    public static void openHandCandyExchangeMenu(Player player) {
+        NpcService.gI().createMenuConMeo(player, ConstNpc.MENU_HAND_CANDY_EXCHANGE, -1,
+                createHandCandyMenuText(player), createHandCandyMenuOptions());
+    }
+
+    public static void openHandCandyExchangeMenu(Player player, Npc npc) {
+        if (npc == null) {
+            openHandCandyExchangeMenu(player);
+            return;
+        }
+        npc.createOtherMenu(player, ConstNpc.MENU_HAND_CANDY_EXCHANGE,
+                createHandCandyMenuText(player), createHandCandyMenuOptions());
     }
 
     public static void handleExchange(Player player, int select) {
@@ -57,6 +72,16 @@ public final class HalloweenExchangeService {
         }
     }
 
+    public static void handleHandCandyExchange(Player player, int select) {
+        switch (select) {
+            case 0:
+                exchangeHandCandyForDevilCandyBox(player);
+                break;
+            default:
+                break;
+        }
+    }
+
     private static String createMenuText(Player player) {
         int cardCount = countItemBag(player, ConstItem.THIEP_HALLOWEEN);
         int pumpkinCount = countItemBag(player, ConstItem.BI_NGO);
@@ -74,6 +99,20 @@ public final class HalloweenExchangeService {
             "Đổi\nCải trang",
             "Đổi\nPet",
             "Xóa\nHSD",
+            "Đóng"
+        };
+    }
+
+    private static String createHandCandyMenuText(Player player) {
+        int handCandyCount = countItemBag(player, ConstItem.KEO_BAN_TAY);
+        return "Đổi Kẹo bàn tay"
+                + "\nĐang có: " + handCandyCount + " Kẹo bàn tay"
+                + "\n\n100 Kẹo bàn tay = 1 Hộp Kẹo Ma Quỷ";
+    }
+
+    private static String[] createHandCandyMenuOptions() {
+        return new String[]{
+            "Đổi\nHộp\nKẹo",
             "Đóng"
         };
     }
@@ -102,6 +141,33 @@ public final class HalloweenExchangeService {
 
         subItemBag(player, ConstItem.THIEP_HALLOWEEN, cardCost);
         subItemBag(player, ConstItem.BI_NGO, pumpkinCost);
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendThongBao(player, "Đổi thành công " + reward.template.name + ".");
+    }
+
+    private static void exchangeHandCandyForDevilCandyBox(Player player) {
+        int handCandyCount = countItemBag(player, ConstItem.KEO_BAN_TAY);
+        if (handCandyCount < HAND_CANDY_COST) {
+            Service.gI().sendThongBao(player, "Không đủ Kẹo bàn tay. Cần "
+                    + HAND_CANDY_COST + " Kẹo bàn tay.");
+            return;
+        }
+
+        Item reward = ItemService.gI().createNewItem((short) ConstItem.HOP_KEO_MA_QUY, 1);
+        if (reward == null || !reward.isNotNullItem()) {
+            Service.gI().sendThongBao(player, "Không thể tạo Hộp Kẹo Ma Quỷ.");
+            return;
+        }
+
+        subItemBag(player, ConstItem.KEO_BAN_TAY, HAND_CANDY_COST);
+        if (!InventoryService.gI().addItemBag(player, reward)) {
+            InventoryService.gI().addItemBag(player,
+                    ItemService.gI().createNewItem((short) ConstItem.KEO_BAN_TAY, HAND_CANDY_COST));
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendThongBao(player, "Hành trang đã đầy.");
+            return;
+        }
+
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendThongBao(player, "Đổi thành công " + reward.template.name + ".");
     }

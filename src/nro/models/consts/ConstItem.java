@@ -1233,6 +1233,13 @@ public class ConstItem {
     public static final int VOT_BAT_BO = 1251;
     public static final int VE_SAU_XEN = 1252;
     public static final int VE_SAU_XEN_TIEN_HOA = 1253;
+    public static final int MAY_DO_LINH_HON = 1264;
+    public static final int XE_BI_NGO = 1346;
+    public static final int PET_MEO_PHU_THUY = 1347;
+    public static final int KEO_NAO_NGUOI = 1350;
+    public static final int HOP_KEO_MA_QUY = 1356;
+    public static final int KEO_BI_NGO = 1357;
+    public static final int CO_HON_MABU = 1358;
     public static final int BO_KEO_KINH_DI = 1352;
     public static final int HAC_VO_THUONG = 1401;
     public static final int BACH_VO_THUONG = 1402;

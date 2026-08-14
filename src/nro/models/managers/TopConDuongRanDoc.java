@@ -62,10 +62,10 @@ public class TopConDuongRanDoc {
         player.gender = rs.getByte("gender");
 
         player.nameClan = rs.getString("so1");
-        player.levelKhiGasDone = rs.getInt("so2");
-        player.timeKhiGasDone = rs.getLong("so3");
+        player.levelCDRDDone = rs.getInt("so2");
+        player.timeCDRDDone = rs.getLong("so3");
 
-        player.lastTimeUpdateTopKhiGas = (System.currentTimeMillis() - rs.getLong("so4")) / 1000;
+        player.lastTimeUpdateTopCDRD = (System.currentTimeMillis() - rs.getLong("so4")) / 1000;
 
         extractDataPoint(rs.getString("data_point"), player);
         extractItemsBody(rs.getString("items_body"), player);

@@ -114,17 +114,19 @@ public final class Manager {
     public static List<TOP> Topsukien2 = new ArrayList<>();
     public static List<TOP> TopHalloweenBox = new ArrayList<>();
     public static List<TOP> TopHalloweenCapsule = new ArrayList<>();
+    public static List<TOP> TopHalloweenCandyBox = new ArrayList<>();
     public static List<TOP> Topwhis;
     public static List<TOP> Topmaydam;
     public static List<TOP> TopLuckyRound = new ArrayList<>();
-    public static final String queryTopmaydam = "SELECT id, point_maydam, total_damage_maydam FROM player ORDER BY point_maydam DESC LIMIT 100";
-    public static final String queryTopsukien1 = "SELECT id, point_sukien1 FROM player ORDER BY point_sukien1 DESC LIMIT 100";
-    public static final String queryTopsukien2 = "SELECT id, point_sukien2 FROM player ORDER BY point_sukien2 DESC LIMIT 100";
-    public static final String queryTopHalloweenBox = "SELECT id, point_halloween_box FROM player WHERE point_halloween_box > 0 ORDER BY point_halloween_box DESC, id ASC LIMIT 100";
-    public static final String queryTopHalloweenCapsule = "SELECT id, point_halloween_capsule FROM player WHERE point_halloween_capsule > 0 ORDER BY point_halloween_capsule DESC, id ASC LIMIT 100";
-    public static final String queryTopwhis = "SELECT id, thachdauwhis FROM player ORDER BY thachdauwhis DESC LIMIT 100";
-    public static final String queryTopsukien = "SELECT id, point_sukien FROM player ORDER BY point_sukien DESC LIMIT 100";
-    public static final String queryTopLuckyRound = "SELECT l.player_id AS id, l.point AS lucky_round_point FROM lucky_round_top l INNER JOIN player p ON p.id = l.player_id WHERE l.point > 0 ORDER BY l.point DESC, l.player_id ASC LIMIT 100";
+    public static final String queryTopmaydam = "SELECT id, name, head, gender, point_maydam, total_damage_maydam FROM player ORDER BY point_maydam DESC LIMIT 100";
+    public static final String queryTopsukien1 = "SELECT id, name, head, gender, point_sukien1 FROM player ORDER BY point_sukien1 DESC LIMIT 100";
+    public static final String queryTopsukien2 = "SELECT id, name, head, gender, point_sukien2 FROM player ORDER BY point_sukien2 DESC LIMIT 100";
+    public static final String queryTopHalloweenBox = "SELECT id, name, head, gender, point_halloween_box FROM player WHERE point_halloween_box > 0 ORDER BY point_halloween_box DESC, id ASC LIMIT 100";
+    public static final String queryTopHalloweenCapsule = "SELECT id, name, head, gender, point_halloween_capsule FROM player WHERE point_halloween_capsule > 0 ORDER BY point_halloween_capsule DESC, id ASC LIMIT 100";
+    public static final String queryTopHalloweenCandyBox = "SELECT id, name, head, gender, point_halloween_candy_box FROM player WHERE point_halloween_candy_box > 0 ORDER BY point_halloween_candy_box DESC, id ASC LIMIT 100";
+    public static final String queryTopwhis = "SELECT id, name, head, gender, thachdauwhis FROM player ORDER BY thachdauwhis DESC LIMIT 100";
+    public static final String queryTopsukien = "SELECT id, name, head, gender, point_sukien FROM player ORDER BY point_sukien DESC LIMIT 100";
+    public static final String queryTopLuckyRound = "SELECT l.player_id AS id, p.name, p.head, p.gender, l.point AS lucky_round_point FROM lucky_round_top l INNER JOIN player p ON p.id = l.player_id WHERE l.point > 0 ORDER BY l.point DESC, l.player_id ASC LIMIT 100";
     private static final short RADAR_NAMEK_DRAGON_CARD_ID = 1204;
     private static final short MOB_NAMEK_DRAGON_ID = 27;
     public static boolean isTopMaydamChanged = false;
@@ -133,6 +135,7 @@ public final class Manager {
     public static boolean isTopSukien2Changed = false;
     public static boolean isTopHalloweenBoxChanged = false;
     public static boolean isTopHalloweenCapsuleChanged = false;
+    public static boolean isTopHalloweenCandyBoxChanged = false;
     public static boolean isTopWhisChanged = false;
     public static boolean isTopLuckyRoundChanged = false;
 
@@ -144,7 +147,7 @@ public final class Manager {
     }
 
     public static boolean hasNewTopScores() {
-        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopHalloweenBoxChanged || isTopHalloweenCapsuleChanged || isTopWhisChanged || isTopLuckyRoundChanged;
+        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopHalloweenBoxChanged || isTopHalloweenCapsuleChanged || isTopHalloweenCandyBoxChanged || isTopWhisChanged || isTopLuckyRoundChanged;
     }
 
     public static void resetTopFlags() {
@@ -154,6 +157,7 @@ public final class Manager {
         isTopSukien2Changed = false;
         isTopHalloweenBoxChanged = false;
         isTopHalloweenCapsuleChanged = false;
+        isTopHalloweenCandyBoxChanged = false;
         isTopWhisChanged = false;
         isTopLuckyRoundChanged = false;
     }
@@ -1069,6 +1073,8 @@ public final class Manager {
             Logger.success(Logger.PURPLE + "Successfully Top Halloween Box (" + TopHalloweenBox.size() + ")\n");
             TopHalloweenCapsule = realTop(queryTopHalloweenCapsule, ConnectionDatabase);
             Logger.success(Logger.PURPLE + "Successfully Top Halloween Capsule (" + TopHalloweenCapsule.size() + ")\n");
+            TopHalloweenCandyBox = realTop(queryTopHalloweenCandyBox, ConnectionDatabase);
+            Logger.success(Logger.PURPLE + "Successfully Top Halloween Candy Box (" + TopHalloweenCandyBox.size() + ")\n");
             Topwhis = realTop(queryTopwhis, ConnectionDatabase);
             Logger.success(Logger.RED + "Successfully top Thach Dau Whis (" + Topwhis.size() + ")\n");
             Topmaydam = realTop(queryTopmaydam, ConnectionDatabase);
@@ -1100,8 +1106,14 @@ public final class Manager {
         try (PreparedStatement ps = con.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+                byte gender = rs.getByte("gender");
                 TOP top = TOP.builder()
                         .id_player(rs.getInt("id"))
+                        .name(rs.getString("name"))
+                        .gender(gender)
+                        .head(normalizeTopHead(rs.getShort("head"), gender))
+                        .body(defaultTopBody(gender))
+                        .leg(defaultTopLeg(gender))
                         .build();
 
                 if (query.equals(Manager.queryTopsukien)) {
@@ -1129,14 +1141,20 @@ public final class Manager {
                     top.setInfo1(point + " lần mở");
                     top.setInfo2(point + " lần mở Capsule Halloween");
 
+                } else if (query.equals(Manager.queryTopHalloweenCandyBox)) {
+                    int point = rs.getInt("point_halloween_candy_box");
+                    top.setInfo1(point + " lần mở");
+                    top.setInfo2(point + " lần mở Hộp Kẹo Ma Quỷ");
+
                 } else if (query.equals(Manager.queryTopwhis)) {
                     int whis = rs.getInt("thachdauwhis");
                     top.setInfo1(whis + " Level");
                     top.setInfo2(whis + " Level");
 
                 } else if (query.equals(Manager.queryTopLuckyRound)) {
+                    String point = rs.getString("lucky_round_point");
                     top.setInfo1("Hạng: " + (tops.size() + 1));
-                    top.setInfo2("");
+                    top.setInfo2((point == null ? "0" : point) + " lần mở");
 
                 } else if (query.equals(Manager.queryTopmaydam)) {
                     int maydam = rs.getInt("point_maydam");
@@ -1156,6 +1174,28 @@ public final class Manager {
         }
 
         return tops;
+    }
+
+    private static short normalizeTopHead(short head, byte gender) {
+        if (head != -1) {
+            return head;
+        }
+        switch (gender) {
+            case ConstPlayer.NAMEC:
+                return 9;
+            case ConstPlayer.XAYDA:
+                return 6;
+            default:
+                return 64;
+        }
+    }
+
+    private static short defaultTopBody(byte gender) {
+        return (short) (gender == ConstPlayer.NAMEC ? 59 : 57);
+    }
+
+    private static short defaultTopLeg(byte gender) {
+        return (short) (gender == ConstPlayer.NAMEC ? 60 : 58);
     }
 
     public void loadProperties() throws IOException {
