@@ -691,6 +691,7 @@ public class InventoryService {
     }
 
     public void sendItemBox(Player player) {
+        compactForcedStackableItems(player.inventory.itemsBox);
         Message msg;
         try {
             msg = new Message(-35);
@@ -940,6 +941,7 @@ public class InventoryService {
         compactItemStacks(items, ConstItem.BI_NGO);
         compactItemStacks(items, ConstItem.THIEP_HALLOWEEN);
         compactItemStacks(items, ConstItem.KEO_BAN_TAY);
+        compactItemStacks(items, ConstItem.HOP_KEO_MA_QUY);
     }
 
     private void compactItemStacks(List<Item> items, int itemId) {
@@ -976,7 +978,7 @@ public class InventoryService {
 
     private boolean isForcedStackableItem(int itemId) {
         return itemId == ConstItem.BI_NGO || itemId == ConstItem.THIEP_HALLOWEEN
-                || itemId == ConstItem.KEO_BAN_TAY;
+                || itemId == ConstItem.KEO_BAN_TAY || itemId == ConstItem.HOP_KEO_MA_QUY;
     }
 
     public static boolean checkListsEqual(List<ItemOption> list1, List<ItemOption> list2) {

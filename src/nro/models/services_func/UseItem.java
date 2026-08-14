@@ -1769,6 +1769,7 @@ public class UseItem {
 
     private boolean isDevilCandyBoxTimedReward(int itemId) {
         return itemId != ConstItem.THOI_VANG && itemId != ConstItem.KEO_BAN_TAY
+                && !isDevilCandyBoxBuffReward(itemId)
                 && !isDevilCandyBoxEventMaterialReward(itemId);
     }
 
