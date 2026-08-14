@@ -1687,7 +1687,7 @@ public class UseItem {
     }
 
     private void openDevilCandyBox(Player pl, Item box) {
-        int boxIconId = box.template.iconID;
+        short boxIconId = box.template.iconID;
         int rewardId = getDevilCandyBoxRewardId();
         int rewardQuantity = getDevilCandyBoxRewardQuantity(rewardId);
         Item reward = ItemService.gI().createNewItem((short) rewardId, rewardQuantity);
