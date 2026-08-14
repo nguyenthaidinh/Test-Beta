@@ -1687,22 +1687,21 @@ public class UseItem {
     }
 
     private void openDevilCandyBox(Player pl, Item box) {
-        if (InventoryService.gI().getCountEmptyBag(pl) <= 0) {
-            Service.gI().sendThongBao(pl, "Hành trang đã đầy");
-            return;
-        }
-
+        int boxIconId = box.template.iconID;
         int rewardId = getDevilCandyBoxRewardId();
         int rewardQuantity = getDevilCandyBoxRewardQuantity(rewardId);
         Item reward = ItemService.gI().createNewItem((short) rewardId, rewardQuantity);
         ItemService.gI().normalizePumpkinCarriageMountOptions(reward);
         addDevilCandyBoxHsdIfNeeded(reward);
+
+        InventoryService.gI().subQuantityItemsBag(pl, box, 1);
         if (!InventoryService.gI().addItemBag(pl, reward)) {
+            InventoryService.gI().addItemBag(pl, ItemService.gI().createNewItem((short) ConstItem.HOP_KEO_MA_QUY));
+            InventoryService.gI().sendItemBags(pl);
             Service.gI().sendThongBao(pl, "Hành trang đã đầy");
             return;
         }
 
-        InventoryService.gI().subQuantityItemsBag(pl, box, 1);
         pl.point_halloween_candy_box = EventLeaderboardService.gI().addPoint(
                 pl, EventLeaderboardService.HALLOWEEN_CANDY_BOX, pl.point_halloween_candy_box, 1);
         Service.gI().updatePlayerPointHalloweenCandyBox(pl);
@@ -1710,7 +1709,7 @@ public class UseItem {
         InventoryService.gI().sendItemBags(pl);
         Service.gI().sendThongBao(pl, "Bạn nhận được " + reward.template.name
                 + (rewardQuantity > 1 ? " x" + rewardQuantity : ""));
-        CombineService.gI().sendEffectOpenItem(pl, box.template.iconID, reward.template.iconID);
+        CombineService.gI().sendEffectOpenItem(pl, boxIconId, reward.template.iconID);
     }
 
     private int getDevilCandyBoxRewardId() {
@@ -1746,6 +1745,7 @@ public class UseItem {
             return;
         }
         if (isDevilCandyBoxPermanentReward(item.template.id)) {
+            addDevilCandyBoxPermanentOptionIfMissing(item);
             return;
         }
         for (ItemOption option : item.itemOptions) {
@@ -1756,6 +1756,17 @@ public class UseItem {
         }
         int hsdDay = getDevilCandyBoxHsdDay(item.template.id);
         item.itemOptions.add(new ItemOption(DEVIL_CANDY_BOX_HSD_OPTION_ID, hsdDay));
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private void addDevilCandyBoxPermanentOptionIfMissing(Item item) {
+        for (ItemOption option : item.itemOptions) {
+            if (option != null && option.optionTemplate != null && option.optionTemplate.id == 73) {
+                return;
+            }
+        }
+        item.itemOptions.add(new ItemOption(73, 0));
         item.info = item.getInfo();
         item.content = item.getContent();
     }

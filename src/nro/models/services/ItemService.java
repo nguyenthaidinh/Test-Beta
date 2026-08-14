@@ -375,6 +375,9 @@ public class ItemService {
         normalizeXenSoulFlagOptions(item);
         normalizePumpkinCandyItem(item);
         normalizeSoulDetectorItem(item);
+        if (item != null && item.itemOptions != null) {
+            normalizePermanentHsdOption(item);
+        }
     }
 
     public void normalizePumpkinCandyTemplate(Template.ItemTemplate template) {
@@ -471,6 +474,7 @@ public class ItemService {
         if (isPermanentHalloweenCandy(item.template.id) && item.itemOptions != null) {
             item.itemOptions.removeIf(option -> option != null && option.optionTemplate != null
                     && option.optionTemplate.id == 93);
+            addOptionIfMissing(item, 73, 0, 0);
         }
         item.info = item.getInfo();
         item.content = item.getContent();
@@ -1179,8 +1183,12 @@ public class ItemService {
         if (item != null && item.template != null && item.itemOptions != null) {
             if (isPermanentHalloweenCandy(item.template.id)) {
                 item.itemOptions.removeIf(io -> io != null && io.optionTemplate != null && io.optionTemplate.id == 93);
+                addOptionIfMissing(item, 73, 0, 0);
                 item.info = item.getInfo();
                 item.content = item.getContent();
+                return false;
+            }
+            if (normalizePermanentHsdOption(item)) {
                 return false;
             }
             for (Item.ItemOption io : item.itemOptions) {
@@ -1198,6 +1206,25 @@ public class ItemService {
             }
         }
         return false;
+    }
+
+    private boolean normalizePermanentHsdOption(Item item) {
+        boolean hasPermanentHsdOption = false;
+        for (Item.ItemOption io : item.itemOptions) {
+            if (io != null && io.optionTemplate != null && io.optionTemplate.id == 93 && io.param <= 0) {
+                hasPermanentHsdOption = true;
+                break;
+            }
+        }
+        if (!hasPermanentHsdOption) {
+            return false;
+        }
+        item.itemOptions.removeIf(io -> io != null && io.optionTemplate != null
+                && io.optionTemplate.id == 93 && io.param <= 0);
+        addOptionIfMissing(item, 73, 0, 0);
+        item.info = item.getInfo();
+        item.content = item.getContent();
+        return true;
     }
 
     private boolean isPermanentHalloweenCandy(int itemId) {
