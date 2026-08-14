@@ -570,9 +570,7 @@ public class MapService {
     }
 
     public boolean isMapTuongLai(int mapId) {
-        return (mapId >= 92 && mapId <= 94)
-                || (mapId >= 96 && mapId <= 100)
-                || mapId == 102 || mapId == 103;
+        return mapId >= 92 && mapId <= 103;
     }
 
     public boolean isMapEvent8_3(int mapId) {

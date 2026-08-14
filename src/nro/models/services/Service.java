@@ -2813,7 +2813,7 @@ public class Service {
     public void updatePlayerPointHalloweenBox(Player pl) {
         java.sql.PreparedStatement ps = null;
         try (java.sql.Connection con = LocalManager.getConnection()) {
-            ps = con.prepareStatement("UPDATE player SET point_halloween_box = ? WHERE id = ?");
+            ps = con.prepareStatement("UPDATE player SET point_halloween_box = GREATEST(point_halloween_box, ?) WHERE id = ?");
             ps.setInt(1, pl.point_halloween_box);
             ps.setLong(2, pl.id);
             ps.executeUpdate();
@@ -2825,7 +2825,7 @@ public class Service {
     public void updatePlayerPointHalloweenCapsule(Player pl) {
         java.sql.PreparedStatement ps = null;
         try (java.sql.Connection con = LocalManager.getConnection()) {
-            ps = con.prepareStatement("UPDATE player SET point_halloween_capsule = ? WHERE id = ?");
+            ps = con.prepareStatement("UPDATE player SET point_halloween_capsule = GREATEST(point_halloween_capsule, ?) WHERE id = ?");
             ps.setInt(1, pl.point_halloween_capsule);
             ps.setLong(2, pl.id);
             ps.executeUpdate();
@@ -2837,7 +2837,7 @@ public class Service {
     public void updatePlayerPointHalloweenCandyBox(Player pl) {
         java.sql.PreparedStatement ps = null;
         try (java.sql.Connection con = LocalManager.getConnection()) {
-            ps = con.prepareStatement("UPDATE player SET point_halloween_candy_box = ? WHERE id = ?");
+            ps = con.prepareStatement("UPDATE player SET point_halloween_candy_box = GREATEST(point_halloween_candy_box, ?) WHERE id = ?");
             ps.setInt(1, pl.point_halloween_candy_box);
             ps.setLong(2, pl.id);
             ps.executeUpdate();

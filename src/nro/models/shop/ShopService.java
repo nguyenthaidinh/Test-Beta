@@ -55,6 +55,8 @@ public class ShopService {
     private static final int GOLD_BAR_GOLD_COST = 50_000_000;
     private static final short SOUL_DETECTOR_ITEM_ID = (short) ConstItem.MAY_DO_LINH_HON;
     private static final int SOUL_DETECTOR_GOLD_BAR_COST = 100;
+    private static final short DEVIL_CANDY_BOX_ITEM_ID = (short) ConstItem.HOP_KEO_MA_QUY;
+    private static final int DEVIL_CANDY_BOX_GOLD_BAR_COST = 200;
     private static final short TRUM_TOP_1_ITEM_ID = 1870;
     private static final int TRUM_TOP_1_GEM_COST = 1_200_000;
     private static final short[] SSJ4_COSTUME_ITEM_IDS = {1553, 1693};
@@ -98,6 +100,7 @@ public class ShopService {
                 ensureGoldBarInChiChiShop(shop);
             } else if (HALLOWEEN_EVENT_SHOP.equals(tagName)) {
                 ensureSoulDetectorInHalloweenEventShop(shop);
+                ensureDevilCandyBoxInHalloweenEventShop(shop);
             }
             for (TabShop tabShop : shop.tabShops) {
                 for (ItemShop item : tabShop.itemShops) {
@@ -457,6 +460,50 @@ public class ShopService {
         itemShop.isNew = true;
         itemShop.typeSell = COST_GEM;
         itemShop.cost = SOUL_DETECTOR_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
+        itemShop.options.clear();
+        return true;
+    }
+
+    private void ensureDevilCandyBoxInHalloweenEventShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        shop.typeShop = SPEC_SHOP;
+        TabShop eventTab = shop.tabShops.isEmpty() ? null : shop.tabShops.get(0);
+        if (eventTab == null) {
+            return;
+        }
+        ItemShop devilCandyBox = null;
+        for (ItemShop itemShop : eventTab.itemShops) {
+            if (itemShop.temp != null && itemShop.temp.id == DEVIL_CANDY_BOX_ITEM_ID) {
+                devilCandyBox = itemShop;
+                break;
+            }
+        }
+        boolean isNewShopItem = devilCandyBox == null;
+        if (devilCandyBox == null) {
+            devilCandyBox = new ItemShop();
+            devilCandyBox.id = -DEVIL_CANDY_BOX_ITEM_ID;
+        }
+        if (!configureDevilCandyBoxShopItem(devilCandyBox, eventTab)) {
+            return;
+        }
+        if (isNewShopItem) {
+            eventTab.itemShops.add(Math.min(1, eventTab.itemShops.size()), devilCandyBox);
+        }
+    }
+
+    private boolean configureDevilCandyBoxShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(DEVIL_CANDY_BOX_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        ItemService.gI().normalizePumpkinCandyTemplate(itemShop.temp);
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = DEVIL_CANDY_BOX_GOLD_BAR_COST;
         itemShop.iconSpec = GOLD_BAR_ICON_ID;
         itemShop.options.clear();
         return true;

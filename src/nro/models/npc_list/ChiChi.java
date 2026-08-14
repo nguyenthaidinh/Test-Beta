@@ -13,6 +13,7 @@ import nro.models.player.Player;
 import nro.models.services.InventoryService;
 import nro.models.server.Manager;
 import nro.models.services.ItemService;
+import nro.models.services.EventLeaderboardService;
 import nro.models.services.Service;
 import nro.models.shop.ShopService;
 import nro.models.utils.Util;
@@ -126,6 +127,8 @@ public class ChiChi extends Npc {
                             Service.gI().showListTop(player, Manager.TopHalloweenBox);
                             break;
                         case 1:
+                            player.point_halloween_box = Math.max(player.point_halloween_box,
+                                    EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_BOX, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_box + " Hòm Halloween.");
                             break;
                     }
@@ -135,6 +138,8 @@ public class ChiChi extends Npc {
                             Service.gI().showListTop(player, Manager.TopHalloweenCapsule);
                             break;
                         case 1:
+                            player.point_halloween_capsule = Math.max(player.point_halloween_capsule,
+                                    EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_CAPSULE, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_capsule + " Capsule Halloween.");
                             break;
                     }
@@ -144,6 +149,8 @@ public class ChiChi extends Npc {
                             Service.gI().showListTop(player, Manager.TopHalloweenCandyBox);
                             break;
                         case 1:
+                            player.point_halloween_candy_box = Math.max(player.point_halloween_candy_box,
+                                    EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_CANDY_BOX, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_candy_box + " Hộp Kẹo Ma Quỷ.");
                             break;
                     }

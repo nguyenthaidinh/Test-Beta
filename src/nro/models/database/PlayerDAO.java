@@ -1024,7 +1024,7 @@ public class PlayerDAO {
                         + "baovetaikhoan = ?, data_card = ?, lasttimepkcommeson = ?, bandokhobau = ?, doanhtrai = ?, conduongrandoc = ?, masterDoesNotAttack = ?, "
                         + "nhanthoivang = ?, ruonggo = ?, sieuthanthuy = ?, vodaisinhtu = ?, rongxuong = ?, data_item_event = ?, data_luyentap = ?, data_clan_task = ?, data_vip = ?, "
                         + "rank = ?, data_achievement = ?, giftcode = ?, event_point = ?, data_event = ?, dataBadges = ?, dataTaskBadges = ?, BoughtSkill = ?, LearnSkill = ?, "
-                        + "firstTimeLogin = ?,  dailyGift = ?, point_sukien = ?, thachdauwhis = ?, point_sukien1 = ?, point_maydam = ?, total_damage_maydam = ?, data_duahau_egg = ?, checkNhanQua = ?, nhiem_vu_kol = ?, point_sukien2 = ?, point_halloween_box = ?, point_halloween_capsule = ?, point_halloween_candy_box = ? where id = ?";
+                        + "firstTimeLogin = ?,  dailyGift = ?, point_sukien = ?, thachdauwhis = ?, point_sukien1 = ?, point_maydam = ?, total_damage_maydam = ?, data_duahau_egg = ?, checkNhanQua = ?, nhiem_vu_kol = ?, point_sukien2 = ?, point_halloween_box = GREATEST(point_halloween_box, ?), point_halloween_capsule = GREATEST(point_halloween_capsule, ?), point_halloween_candy_box = GREATEST(point_halloween_candy_box, ?) where id = ?";
                 LocalManager.executeUpdate(query,
                         player.head,
                         player.haveTennisSpaceShip,

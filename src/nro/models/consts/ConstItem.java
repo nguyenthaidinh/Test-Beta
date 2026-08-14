@@ -1240,6 +1240,7 @@ public class ConstItem {
     public static final int HOP_KEO_MA_QUY = 1356;
     public static final int KEO_BI_NGO = 1357;
     public static final int CO_HON_MABU = 1358;
+    public static final int CO_HON_XEN_BO_HUNG = 1359;
     public static final int BO_KEO_KINH_DI = 1352;
     public static final int HAC_VO_THUONG = 1401;
     public static final int BACH_VO_THUONG = 1402;

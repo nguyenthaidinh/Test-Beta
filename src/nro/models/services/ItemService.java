@@ -83,6 +83,8 @@ public class ItemService {
     private static final short PUMPKIN_CARRIAGE_MOUNT_ID = (short) ConstItem.XE_BI_NGO;
     private static final short WITCH_CAT_PET_ID = (short) ConstItem.PET_MEO_PHU_THUY;
     private static final short MABU_SOUL_FLAG_ID = (short) ConstItem.CO_HON_MABU;
+    private static final short XEN_SOUL_FLAG_ID = (short) ConstItem.CO_HON_XEN_BO_HUNG;
+    private static final String XEN_SOUL_FLAG_DESCRIPTION = "C\u1edd h\u1ed3n X\u00ean B\u1ecd Hung: HP, KI +20-60%, s\u1ee9c \u0111\u00e1nh +20-40%, gi\u00e1p +5-25%, ch\u00ed m\u1ea1ng +10-15%. Khi \u0111eo, m\u1ed7i 60 gi\u00e2y ph\u1eb9t gi\u1ea3m 5% HP ng\u01b0\u1eddi xung quanh nh\u01b0 Dracula.";
     private static final short BRAIN_CANDY_ID = (short) ConstItem.KEO_NAO_NGUOI;
     private static final String BRAIN_CANDY_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 t\u0103ng 10% s\u1ee9c \u0111\u00e1nh, 15% HP v\u00e0 15% KI trong 10 ph\u00fat.";
     private static final short PUMPKIN_CANDY_ID = (short) ConstItem.KEO_BI_NGO;
@@ -90,7 +92,7 @@ public class ItemService {
     private static final short HAND_CANDY_ID = (short) ConstItem.KEO_BAN_TAY;
     private static final String HAND_CANDY_DESCRIPTION = "T\u00edch \u0111\u1ee7 100 K\u1eb9o b\u00e0n tay c\u00f3 th\u1ec3 \u0111\u1ed5i 1 H\u1ed9p K\u1eb9o Ma Qu\u1ef7 t\u1ea1i Chi Chi. C\u00f3 th\u1ec3 s\u1eed d\u1ee5ng K\u1eb9o b\u00e0n tay \u0111\u1ec3 m\u1edf nhanh menu \u0110\u1ed5i K\u1eb9o b\u00e0n tay.";
     private static final short DEVIL_CANDY_BOX_ID = (short) ConstItem.HOP_KEO_MA_QUY;
-    private static final String DEVIL_CANDY_BOX_DESCRIPTION = "M\u1edf c\u00f3 t\u1ec9 l\u1ec7 nh\u1eadn Xe b\u00ed ng\u00f4, Pet M\u00e8o Ph\u00f9 Th\u1ee7y, C\u1edd h\u1ed3n Mab\u01b0, K\u1eb9o n\u00e3o ng\u01b0\u1eddi, K\u1eb9o b\u00ed ng\u00f4, K\u1eb9o b\u00e0n tay x1-150, Th\u1ecfi v\u00e0ng x50-150, Cu\u1ed3ng n\u1ed9 2, B\u1ed5 huy\u1ebft 2 ho\u1eb7c Gi\u00e1p x\u00ean 2 x1-5. C\u00e1c v\u1eadt ph\u1ea9m tr\u1eeb K\u1eb9o b\u00e0n tay v\u00e0 Th\u1ecfi v\u00e0ng c\u00f3 HSD ng\u1eabu nhi\u00ean 1/3/5/7/10/15 ng\u00e0y.";
+    private static final String DEVIL_CANDY_BOX_DESCRIPTION = "M\u1edf c\u00f3 t\u1ec9 l\u1ec7: Xe b\u00ed ng\u00f4, Pet M\u00e8o Ph\u00f9 Th\u1ee7y, C\u1edd h\u1ed3n Mab\u01b0, K\u1eb9o n\u00e3o ng\u01b0\u1eddi, K\u1eb9o b\u00ed ng\u00f4 m\u1ed7i m\u00f3n 5%; C\u1edd h\u1ed3n X\u00ean B\u1ecd Hung 0.5%; Thi\u1ec7p Halloween x10-100 v\u00e0 B\u00ed ng\u00f4 x10-100 m\u1ed7i m\u00f3n 2.25%; K\u1eb9o b\u00e0n tay x1-150, Th\u1ecfi v\u00e0ng x50-150, Cu\u1ed3ng n\u1ed9 2, B\u1ed5 huy\u1ebft 2, Gi\u00e1p x\u00ean 2 x1-5 m\u1ed7i m\u00f3n 14%. C\u00e1c v\u1eadt ph\u1ea9m tr\u1eeb K\u1eb9o b\u00e0n tay, Th\u1ecfi v\u00e0ng, Thi\u1ec7p Halloween v\u00e0 B\u00ed ng\u00f4 c\u00f3 HSD ng\u1eabu nhi\u00ean 1/3/5/7/10/15 ng\u00e0y; ri\u00eang C\u1edd h\u1ed3n X\u00ean B\u1ecd Hung HSD 1/3/5/7/10 ng\u00e0y, 5% v\u0129nh vi\u1ec5n khi tr\u00fang c\u1edd.";
     private static final short SOUL_DETECTOR_ID = (short) ConstItem.MAY_DO_LINH_HON;
     private static final String SOUL_DETECTOR_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 k\u00edch ho\u1ea1t M\u00e1y d\u00f2 linh h\u1ed3n trong 30 ph\u00fat, c\u00f3 th\u1ec3 c\u1ed9ng d\u1ed3n th\u1eddi gian. Khi \u0111\u00e1nh qu\u00e1i \u1edf T\u01b0\u01a1ng lai c\u00f3 t\u1ec9 l\u1ec7 th\u1ea5p nh\u1eadn K\u1eb9o b\u00e0n tay.";
     private static final short MOTO_BUN_MA_ID = 1541;
@@ -135,6 +137,7 @@ public class ItemService {
         normalizeAngelDemonWingsOptions(item);
         normalizeBrolyRedCostumeOptions(item);
         normalizeBrolyCostumeOptions(item);
+        normalizePumpkinCarriageMountOptions(item);
         item.content = item.getContent();
         item.info = item.getInfo();
         return item;
@@ -369,6 +372,7 @@ public class ItemService {
         normalizePumpkinCarriageOptions(item);
         normalizeWitchCatPetOptions(item);
         normalizeMabuSoulFlagOptions(item);
+        normalizeXenSoulFlagOptions(item);
         normalizePumpkinCandyItem(item);
         normalizeSoulDetectorItem(item);
     }
@@ -387,6 +391,8 @@ public class ItemService {
             template.description = DEVIL_CANDY_BOX_DESCRIPTION;
         } else if (template.id == SOUL_DETECTOR_ID) {
             template.description = SOUL_DETECTOR_DESCRIPTION;
+        } else if (template.id == XEN_SOUL_FLAG_ID) {
+            template.description = XEN_SOUL_FLAG_DESCRIPTION;
         }
     }
 
@@ -433,6 +439,24 @@ public class ItemService {
         addOptionIfMissing(item, 103, 30, 60);
         addOptionIfMissing(item, 94, 5, 15);
         addOptionIfMissing(item, 106, 0, 0);
+        item.info = item.getInfo();
+        item.content = item.getContent();
+    }
+
+    private void normalizeXenSoulFlagOptions(Item item) {
+        if (item == null || item.template == null || item.template.id != XEN_SOUL_FLAG_ID) {
+            return;
+        }
+        item.template.description = XEN_SOUL_FLAG_DESCRIPTION;
+        if (item.itemOptions == null) {
+            item.itemOptions = new ArrayList<>();
+        }
+        addOptionIfMissing(item, 77, 20, 60);
+        addOptionIfMissing(item, 103, 20, 60);
+        addOptionIfMissing(item, 50, 20, 40);
+        addOptionIfMissing(item, 94, 5, 25);
+        addOptionIfMissing(item, 14, 10, 15);
+        addOptionIfMissing(item, 109, 5, 5);
         item.info = item.getInfo();
         item.content = item.getContent();
     }

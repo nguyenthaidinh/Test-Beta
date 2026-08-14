@@ -27,6 +27,8 @@ public class EffectSkin {
         "Hôi quá, tránh xa ta ra", "Biến đi", "Trời ơi đồ ở dơ",
         "Thúi quá", "Mùi gì hôi quá"
     };
+    private static final int ODO_COOLDOWN = 10_000;
+    private static final int XEN_SOUL_FLAG_PHET_COOLDOWN = 60_000;
 
     public static final String[] textXinbato = new String[]{
         "Im đi, ông xinbato", "Thôi ông câm mẹ mồm đi", "Phân tâm quá",
@@ -216,7 +218,7 @@ public class EffectSkin {
             if (this.player.nPoint != null) {
                 int param = this.player.nPoint.tlHpGiamODo;
                 if (param > 0) {
-                    if (Util.canDoWithTime(lastTimeOdo, 10000)) {
+                    if (Util.canDoWithTime(lastTimeOdo, getOdoCooldown())) {
                         List<Player> playersMap = this.player.zone.getNotBosses();
                         for (int i = playersMap.size() - 1; i >= 0; i--) {
                             Player pl = playersMap.get(i);
@@ -378,7 +380,11 @@ public class EffectSkin {
 
     private boolean canResistDraculaPhet(Player target) {
         return target != null && target.itemTime != null && target.itemTime.isUseKeoBiNgo
-                && isDraculaCostumeSource();
+                && (isDraculaCostumeSource() || isXenSoulFlagSource());
+    }
+
+    private int getOdoCooldown() {
+        return isXenSoulFlagSource() && !isDraculaCostumeSource() ? XEN_SOUL_FLAG_PHET_COOLDOWN : ODO_COOLDOWN;
     }
 
     private boolean isDraculaCostumeSource() {
@@ -392,6 +398,16 @@ public class EffectSkin {
         }
         return costume.template.id == ConstItem.CAI_TRANG_DRACULA
                 || costume.template.id == ConstItem.CAI_TRANG_DRACULA_HALLOWEEN;
+    }
+
+    private boolean isXenSoulFlagSource() {
+        if (this.player == null || this.player.inventory == null
+                || this.player.inventory.itemsBody == null || this.player.inventory.itemsBody.size() <= 8) {
+            return false;
+        }
+        Item flag = this.player.inventory.itemsBody.get(8);
+        return flag != null && flag.isNotNullItem() && flag.template != null
+                && flag.template.id == ConstItem.CO_HON_XEN_BO_HUNG;
     }
 
     private void updateLamCham() {

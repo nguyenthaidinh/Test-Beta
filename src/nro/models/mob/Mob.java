@@ -615,8 +615,9 @@ public class Mob {
             return list;
         }
         int mapid = player.zone.map.mapId;
-        addHalloweenMobReward(player, list, x, yEnd, mapid);
-        addPirateIslandChestMobReward(player, list, x, yEnd, mapid);
+        Player rewardOwner = getRewardOwner(player);
+        addHalloweenMobReward(rewardOwner, list, x, yEnd, mapid);
+        addPirateIslandChestMobReward(rewardOwner, list, x, yEnd, mapid);
         //========================Capsul Kì Bí========================
         if (player.itemTime.isUseMayDo
                 && (Util.isTrue(20, 100))
@@ -737,9 +738,9 @@ public class Mob {
             }
         }
         if (MapService.gI().isMapTuongLai(mapid)) {
-            if (player.itemTime != null && player.itemTime.isUseMayDoLinhHon
+            if (isSoulDetectorActive(rewardOwner)
                     && Util.isTrue(SOUL_DETECTOR_HAND_CANDY_RATE, SOUL_DETECTOR_HAND_CANDY_TOTAL)) {
-                list.add(new ItemMap(zone, ConstItem.KEO_BAN_TAY, 1, x, yEnd, player.id));
+                list.add(new ItemMap(zone, ConstItem.KEO_BAN_TAY, 1, x, yEnd, rewardOwner.id));
             }
             if (Util.isTrue(15, 100)) {
                 int vang = Util.nextInt(80000, 150000);
@@ -1108,6 +1109,9 @@ public class Mob {
     }
 
     private void addHalloweenMobReward(Player player, List<ItemMap> list, int x, int yEnd, int mapid) {
+        if (player == null) {
+            return;
+        }
         boolean isHalloweenDropMap = MapService.gI().AllMap(mapid) || MapService.gI().isMapEventHalloween(mapid);
         if (!EventManager.HALLOWEEN || MapService.gI().isMapPhoBan(mapid) || !isHalloweenDropMap) {
             return;
@@ -1131,14 +1135,23 @@ public class Mob {
         }
     }
 
-    private void applyGoldBonus(Player killer, List<ItemMap> rewards) {
-        Player rewardOwner = killer;
+    private Player getRewardOwner(Player killer) {
         if (killer != null && killer.isPet) {
             Pet pet = (Pet) killer;
             if (pet.master != null) {
-                rewardOwner = pet.master;
+                return pet.master;
             }
         }
+        return killer;
+    }
+
+    private boolean isSoulDetectorActive(Player player) {
+        return player != null && player.itemTime != null && player.itemTime.isUseMayDoLinhHon
+                && !Util.canDoWithTime(player.itemTime.lastTimeUseMayDoLinhHon, player.itemTime.timeMayDoLinhHon);
+    }
+
+    private void applyGoldBonus(Player killer, List<ItemMap> rewards) {
+        Player rewardOwner = getRewardOwner(killer);
         if (rewardOwner == null || rewardOwner.nPoint == null) {
             return;
         }

@@ -19,6 +19,7 @@ public final class HalloweenExchangeService {
     private static final int PET_CARD_COST = 400;
     private static final int PET_PUMPKIN_COST = 4_000;
     private static final int HAND_CANDY_COST = 100;
+    private static final int DEVIL_CANDY_BOX_GOLD_BAR_COST = 200;
 
     private HalloweenExchangeService() {
     }
@@ -65,6 +66,9 @@ public final class HalloweenExchangeService {
                         HalloweenRewards.createHalloweenPetReward());
                 break;
             case 3:
+                buyDevilCandyBox(player);
+                break;
+            case 4:
                 removeExpireFromHalloweenItems(player);
                 break;
             default:
@@ -85,11 +89,14 @@ public final class HalloweenExchangeService {
     private static String createMenuText(Player player) {
         int cardCount = countItemBag(player, ConstItem.THIEP_HALLOWEEN);
         int pumpkinCount = countItemBag(player, ConstItem.BI_NGO);
+        int goldBarCount = countItemBag(player, ConstItem.THOI_VANG);
         return "Đổi quà Halloween"
-                + "\nĐang có: " + cardCount + " Thiệp, " + pumpkinCount + " Bí ngô"
+                + "\nĐang có: " + cardCount + " Thiệp, " + pumpkinCount + " Bí ngô, "
+                + goldBarCount + " Thỏi vàng"
                 + "\n\n20 Thiệp + 200 Bí ngô = 1 Hòm Halloween"
                 + "\n50 Thiệp + 500 Bí ngô = Cải trang Halloween random"
                 + "\n400 Thiệp + 4000 Bí ngô = Pet Bí Ma Vương"
+                + "\n200 Thỏi vàng = 1 Hộp Kẹo Ma Quỷ"
                 + "\nXóa vật phẩm Halloween HSD trong hành trang và rương";
     }
 
@@ -98,6 +105,7 @@ public final class HalloweenExchangeService {
             "Đổi\nHòm",
             "Đổi\nCải trang",
             "Đổi\nPet",
+            "Mua\nHộp Kẹo\n200 TV",
             "Xóa\nHSD",
             "Đóng"
         };
@@ -143,6 +151,42 @@ public final class HalloweenExchangeService {
         subItemBag(player, ConstItem.BI_NGO, pumpkinCost);
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendThongBao(player, "Đổi thành công " + reward.template.name + ".");
+    }
+
+    private static void buyDevilCandyBox(Player player) {
+        int goldBarCount = countItemBag(player, ConstItem.THOI_VANG);
+        if (goldBarCount < DEVIL_CANDY_BOX_GOLD_BAR_COST) {
+            Service.gI().sendThongBao(player, "Không đủ thỏi vàng. Cần "
+                    + DEVIL_CANDY_BOX_GOLD_BAR_COST + " thỏi vàng.");
+            return;
+        }
+
+        if (InventoryService.gI().getCountEmptyBag(player) <= 0
+                && !canCreateEmptySlotAfterSubItem(player, ConstItem.THOI_VANG,
+                        DEVIL_CANDY_BOX_GOLD_BAR_COST)) {
+            Service.gI().sendThongBao(player, "Hành trang đã đầy.");
+            return;
+        }
+
+        Item reward = ItemService.gI().createNewItem((short) ConstItem.HOP_KEO_MA_QUY, 1);
+        if (reward == null || !reward.isNotNullItem()) {
+            Service.gI().sendThongBao(player, "Không thể tạo Hộp Kẹo Ma Quỷ.");
+            return;
+        }
+
+        subItemBag(player, ConstItem.THOI_VANG, DEVIL_CANDY_BOX_GOLD_BAR_COST);
+        if (!InventoryService.gI().addItemBag(player, reward)) {
+            InventoryService.gI().addItemBag(player,
+                    ItemService.gI().createNewItem((short) ConstItem.THOI_VANG,
+                            DEVIL_CANDY_BOX_GOLD_BAR_COST));
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendThongBao(player, "Hành trang đã đầy.");
+            return;
+        }
+
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendThongBao(player, "Mua thành công " + reward.template.name
+                + " với giá " + DEVIL_CANDY_BOX_GOLD_BAR_COST + " thỏi vàng.");
     }
 
     private static void exchangeHandCandyForDevilCandyBox(Player player) {
@@ -242,5 +286,23 @@ public final class HalloweenExchangeService {
                 remain -= quantitySub;
             }
         }
+    }
+
+    private static boolean canCreateEmptySlotAfterSubItem(Player player, int itemId, int quantity) {
+        int remain = quantity;
+        for (Item item : player.inventory.itemsBag) {
+            if (item == null || !item.isNotNullItem() || item.template.id != itemId || item.quantity <= 0) {
+                continue;
+            }
+            int quantitySub = Math.min(remain, item.quantity);
+            if (quantitySub >= item.quantity) {
+                return true;
+            }
+            remain -= quantitySub;
+            if (remain <= 0) {
+                return false;
+            }
+        }
+        return false;
     }
 }
