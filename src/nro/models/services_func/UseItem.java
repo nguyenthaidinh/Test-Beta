@@ -80,6 +80,7 @@ public class UseItem {
     private static final int BUFF_CUONG_NO_2_ID = 1150;
     private static final int BUFF_BO_HUYET_2_ID = 1152;
     private static final int BUFF_GIAP_XEN_2_ID = 1153;
+    private static final int TRANG_SACH_CU_ID = 1281;
     private static final int SILVER_CHEST_GOLD_RATE = 70;
     private static final int SILVER_CHEST_CARD_RATE = 45;
     private static final int SILVER_CHEST_PUMPKIN_RATE = 50;
@@ -126,6 +127,8 @@ public class UseItem {
     private static final int DEVIL_CANDY_BOX_BUFF_MAX = 5;
     private static final int DEVIL_CANDY_BOX_EVENT_ITEM_MIN = 10;
     private static final int DEVIL_CANDY_BOX_EVENT_ITEM_MAX = 100;
+    private static final int DEVIL_CANDY_BOX_OLD_PAGE_MIN = 150;
+    private static final int DEVIL_CANDY_BOX_OLD_PAGE_MAX = 500;
     private static final int DEVIL_CANDY_BOX_HSD_OPTION_ID = 93;
     private static final int DEVIL_CANDY_BOX_RATE_TOTAL = 10000;
     private static final int DEVIL_CANDY_BOX_EVENT_GEAR_PERMANENT_RATE = 5;
@@ -145,12 +148,14 @@ public class UseItem {
         ConstItem.THOI_VANG,
         BUFF_CUONG_NO_2_ID,
         BUFF_BO_HUYET_2_ID,
-        BUFF_GIAP_XEN_2_ID
+        BUFF_GIAP_XEN_2_ID,
+        TRANG_SACH_CU_ID
     };
     private static final int[] DEVIL_CANDY_BOX_REWARD_RATES = {
         500, 500, 500, 500, 500,
         50, 225, 225,
-        1400, 1400, 1400, 1400, 1400
+        1200, 1200, 1200, 1200, 1200,
+        1000
     };
 
     private static UseItem instance;
@@ -1737,6 +1742,9 @@ public class UseItem {
         if (isDevilCandyBoxEventMaterialReward(rewardId)) {
             return Util.nextInt(DEVIL_CANDY_BOX_EVENT_ITEM_MIN, DEVIL_CANDY_BOX_EVENT_ITEM_MAX);
         }
+        if (rewardId == TRANG_SACH_CU_ID) {
+            return Util.nextInt(DEVIL_CANDY_BOX_OLD_PAGE_MIN, DEVIL_CANDY_BOX_OLD_PAGE_MAX);
+        }
         return 1;
     }
 
@@ -1789,6 +1797,7 @@ public class UseItem {
     private boolean isDevilCandyBoxTimedReward(int itemId) {
         return itemId != ConstItem.THOI_VANG && itemId != ConstItem.KEO_BAN_TAY
                 && itemId != ConstItem.KEO_NAO_NGUOI && itemId != ConstItem.KEO_BI_NGO
+                && itemId != TRANG_SACH_CU_ID
                 && !isDevilCandyBoxBuffReward(itemId)
                 && !isDevilCandyBoxEventMaterialReward(itemId);
     }

@@ -36,7 +36,7 @@ public class Mob {
 
     private static final int GOHAN_EXTRA_GOLD_DROP_PERCENT = 150;
     private static final int SOUL_DETECTOR_HAND_CANDY_RATE = 1;
-    private static final int SOUL_DETECTOR_HAND_CANDY_TOTAL = 500;
+    private static final int SOUL_DETECTOR_HAND_CANDY_TOTAL = 100;
 
     public int id;
     public Zone zone;
