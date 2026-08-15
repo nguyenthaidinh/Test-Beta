@@ -104,6 +104,25 @@ public class ItemService {
         {650, 651, 657, 658, 656},
         {652, 653, 659, 660, 656}
     };
+    private static final short GOLD_ACTIVATION_CAPSULE_ID = (short) ConstItem.CAPSULE_VANG;
+    private static final String GOLD_ACTIVATION_CAPSULE_DESCRIPTION = "Sử dụng để chọn hành tinh và nhận ngẫu nhiên đủ 1 set kích hoạt mới: Xayda có Bi con/Cầy con/Bình con; Trái Đất có SVK con/Sơn con/Khánh con; Namek có Sơn em/Ngao con/Ngao em.";
+    private static final int GOLD_ACTIVATION_SET_SIZE = 5;
+    private static final String[] GOLD_ACTIVATION_PLANET_NAMES = {"Xayda", "Trái Đất", "Namek"};
+    private static final short[][] GOLD_ACTIVATION_SET_ITEM_IDS = {
+        {559, 560, 566, 567, 561},
+        {555, 556, 562, 563, 561},
+        {557, 558, 564, 565, 561}
+    };
+    private static final int[][] GOLD_ACTIVATION_SET_PARAMS = {
+        {DO_THAN_THANH_PARAM_BI_CON, DO_THAN_THANH_PARAM_CAY_CON, DO_THAN_THANH_PARAM_BINH_CON},
+        {DO_THAN_THANH_PARAM_SVK_CON, DO_THAN_THANH_PARAM_SON_CON, DO_THAN_THANH_PARAM_KHANH_CON},
+        {DO_THAN_THANH_PARAM_SON_EM, DO_THAN_THANH_PARAM_NGAO_CON, DO_THAN_THANH_PARAM_NGAO_EM}
+    };
+    private static final String[][] GOLD_ACTIVATION_SET_NAMES = {
+        {"Bi con", "Cầy con", "Bình con"},
+        {"SVK con", "Sơn con", "Khánh con"},
+        {"Sơn em", "Ngao con", "Ngao em"}
+    };
     private static final short MOTO_BUN_MA_ID = 1541;
     private static final short PET_BABY_SHARK_ID = 1620;
 
@@ -405,6 +424,8 @@ public class ItemService {
             template.description = SOUL_DETECTOR_DESCRIPTION;
         } else if (template.id == HUY_DIET_CAPSULE_ID) {
             template.description = HUY_DIET_CAPSULE_DESCRIPTION;
+        } else if (template.id == GOLD_ACTIVATION_CAPSULE_ID) {
+            template.description = GOLD_ACTIVATION_CAPSULE_DESCRIPTION;
         } else if (template.id == XEN_SOUL_FLAG_ID) {
             template.description = XEN_SOUL_FLAG_DESCRIPTION;
         }
@@ -1625,6 +1646,56 @@ public class ItemService {
                 || optionId == 27 || optionId == 28 || optionId == 47;
     }
 
+    public void openGoldActivationSetCapsule(Player player, int select) {
+        if (player == null) {
+            return;
+        }
+        if (select < 0 || select >= GOLD_ACTIVATION_SET_ITEM_IDS.length) {
+            Service.gI().sendThongBao(player, "Lựa chọn không hợp lệ.");
+            return;
+        }
+        Item capsule = InventoryService.gI().findItemBag(player, GOLD_ACTIVATION_CAPSULE_ID);
+        if (capsule == null || !capsule.isNotNullItem() || capsule.quantity < 1) {
+            Service.gI().sendThongBao(player, "Bạn không có Capsule Vàng.");
+            return;
+        }
+        int emptyAfterUse = InventoryService.gI().getCountEmptyBag(player) + (capsule.quantity <= 1 ? 1 : 0);
+        if (emptyAfterUse < GOLD_ACTIVATION_SET_SIZE) {
+            Service.gI().sendThongBao(player, "Cần đủ 5 ô trống sau khi dùng Capsule Vàng để nhận set kích hoạt mới.");
+            return;
+        }
+
+        int setIndex = Util.nextInt(GOLD_ACTIVATION_SET_PARAMS[select].length);
+        int setParam = GOLD_ACTIVATION_SET_PARAMS[select][setIndex];
+        List<Item> rewards = createGoldActivationSet(select, setParam);
+        if (rewards.size() != GOLD_ACTIVATION_SET_SIZE) {
+            Service.gI().sendThongBao(player, "Không thể tạo set kích hoạt mới, vui lòng thử lại.");
+            return;
+        }
+
+        short capsuleIconId = capsule.template.iconID;
+        InventoryService.gI().subQuantityItemsBag(player, capsule, 1);
+        for (Item reward : rewards) {
+            InventoryService.gI().addItemBag(player, reward);
+        }
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendThongBao(player, "Bạn nhận được 1 set kích hoạt mới "
+                + GOLD_ACTIVATION_PLANET_NAMES[select] + " - " + GOLD_ACTIVATION_SET_NAMES[select][setIndex] + ".");
+        CombineService.gI().sendEffectOpenItem(player, capsuleIconId, rewards.get(0).template.iconID);
+    }
+
+    private List<Item> createGoldActivationSet(int planetIndex, int setParam) {
+        List<Item> rewards = new ArrayList<>();
+        for (short itemId : GOLD_ACTIVATION_SET_ITEM_IDS[planetIndex]) {
+            Item item = createDoThanLinhKichHoatByTemplate(itemId, DO_THAN_THANH_SET_OPTION, setParam);
+            if (item == null || !item.isNotNullItem()) {
+                return Collections.emptyList();
+            }
+            rewards.add(item);
+        }
+        return rewards;
+    }
+
     public int randTempItemDoSao(int gender) {
         // Mảng chứa các item theo từng loại (type)
         int[][] ao = {{3, 34, 136, 137, 138, 139}, {4, 42, 152, 153, 154, 155}, {5, 50, 168, 169, 170, 171}};
@@ -2072,6 +2143,26 @@ public class ItemService {
     public Item createDoThanLinhKichHoat(int gender, int skhId, int skhParam) {
         short idTempTL = randomDoThanLinhTemplateId(gender);
         Item item = createItemSetKichHoat(idTempTL, 1);
+        item.itemOptions.clear();
+        addDoThanLinhOptions(item.itemOptions, idTempTL, 207);
+        item.itemOptions.add(new ItemOption(skhId, skhParam));
+        for (int subId : getOptionIdsBySKH(skhId, skhParam)) {
+            item.itemOptions.add(new ItemOption(subId, 1));
+        }
+        item.itemOptions.add(new ItemOption(30, 1));
+        item.content = item.getContent();
+        item.info = item.getInfo();
+        return item;
+    }
+
+    private Item createDoThanLinhKichHoatByTemplate(short idTempTL, int skhId, int skhParam) {
+        if (idTempTL < 555 || idTempTL > 567) {
+            return null;
+        }
+        Item item = createItemSetKichHoat(idTempTL, 1);
+        if (item == null || item.template == null) {
+            return null;
+        }
         item.itemOptions.clear();
         addDoThanLinhOptions(item.itemOptions, idTempTL, 207);
         item.itemOptions.add(new ItemOption(skhId, skhParam));

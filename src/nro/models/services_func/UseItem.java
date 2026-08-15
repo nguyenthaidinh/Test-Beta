@@ -746,6 +746,9 @@ public class UseItem {
                             case ConstItem.HOP_CAPSULE:
                                 UseItem.gI().openHuyDietCapsuleMenu(pl);
                                 break;
+                            case ConstItem.CAPSULE_VANG:
+                                UseItem.gI().openGoldActivationCapsuleMenu(pl);
+                                break;
                             case 1787: // capule kich hoat
                                 UseItem.gI().MapRiengTu(pl, item);
                                 break;
@@ -3140,6 +3143,12 @@ public class UseItem {
     private void openHuyDietCapsuleMenu(Player pl) {
         NpcService.gI().createMenuConMeo(pl, ConstNpc.MENU_HUY_DIET_CAPSULE, -1,
                 "Hãy chọn hành tinh để nhận 1 set Hủy Diệt",
+                "Xayda", "Trái Đất", "Namek");
+    }
+
+    private void openGoldActivationCapsuleMenu(Player pl) {
+        NpcService.gI().createMenuConMeo(pl, ConstNpc.MENU_CAPSULE_VANG_KICH_HOAT, -1,
+                "Hãy chọn hành tinh để nhận ngẫu nhiên 1 set kích hoạt mới",
                 "Xayda", "Trái Đất", "Namek");
     }
 

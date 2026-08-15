@@ -239,6 +239,7 @@ public class ConstNpc {
     public static final int MENU_HAND_CANDY_EXCHANGE = 539;
     public static final int MENU_HALLOWEEN_CANDY_BOX_TOP = 540;
     public static final int MENU_HUY_DIET_CAPSULE = 541;
+    public static final int MENU_CAPSULE_VANG_KICH_HOAT = 542;
     public static final int MENU_OPTION_USE_ITEM726 = 726;
     public static final int MENU_SIEU_THAN_THUY = 2006;
     public static final int MENU_XUONG_TANG_DUOI = 2007;

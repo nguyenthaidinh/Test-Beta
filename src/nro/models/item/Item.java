@@ -69,12 +69,15 @@ public class Item {
     }
 
     public String getContent() {
+        if (this.template != null) {
+            ItemService.gI().normalizePumpkinCandyTemplate(this.template);
+        }
         String doThanThanhInfo = getDoThanThanhInfo();
         if (this.template != null
                 && (this.template.id == ConstItem.KEO_NAO_NGUOI || this.template.id == ConstItem.KEO_BI_NGO
                 || this.template.id == ConstItem.KEO_BAN_TAY || this.template.id == ConstItem.HOP_KEO_MA_QUY
                 || this.template.id == ConstItem.MAY_DO_LINH_HON || this.template.id == ConstItem.CO_HON_XEN_BO_HUNG
-                || this.template.id == ConstItem.HOP_CAPSULE)
+                || this.template.id == ConstItem.HOP_CAPSULE || this.template.id == ConstItem.CAPSULE_VANG)
                 && this.template.description != null && !this.template.description.isEmpty()) {
             return this.template.description;
         }

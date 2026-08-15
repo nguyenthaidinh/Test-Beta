@@ -396,6 +396,9 @@ public class NpcFactory {
                     case ConstNpc.MENU_HUY_DIET_CAPSULE -> {
                         ItemService.gI().openHuyDietSetCapsule(player, select);
                     }
+                    case ConstNpc.MENU_CAPSULE_VANG_KICH_HOAT -> {
+                        ItemService.gI().openGoldActivationSetCapsule(player, select);
+                    }
                     case 900 -> {
                         if (select == 0) {
                             Input.gI().createFormFindPlayer1(player);
