@@ -743,6 +743,9 @@ public class UseItem {
                             case 1655: // capule kich hoat
                                 UseItem.gI().CapsuleKichHoat(pl, item);
                                 break;
+                            case ConstItem.HOP_CAPSULE:
+                                UseItem.gI().openHuyDietCapsuleMenu(pl);
+                                break;
                             case 1787: // capule kich hoat
                                 UseItem.gI().MapRiengTu(pl, item);
                                 break;
@@ -3132,6 +3135,12 @@ public class UseItem {
 
     private void CapsuleKichHoat(Player pl, Item item) {
         NpcService.gI().createMenuConMeo(pl, item.template.id, -1, "Hãy chọn một món quà", "Áo", "Quần", "Găng", "Giày", "Rada");
+    }
+
+    private void openHuyDietCapsuleMenu(Player pl) {
+        NpcService.gI().createMenuConMeo(pl, ConstNpc.MENU_HUY_DIET_CAPSULE, -1,
+                "Hãy chọn hành tinh để nhận 1 set Hủy Diệt",
+                "Xayda", "Trái Đất", "Namek");
     }
 
     private void MapRiengTu(Player pl, Item item) {

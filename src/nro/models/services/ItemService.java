@@ -94,7 +94,16 @@ public class ItemService {
     private static final short DEVIL_CANDY_BOX_ID = (short) ConstItem.HOP_KEO_MA_QUY;
     private static final String DEVIL_CANDY_BOX_DESCRIPTION = "Mở có tỉ lệ: Xe bí ngô, Pet Mèo Phù Thủy, Cờ hồn Mabư, Kẹo não người, Kẹo bí ngô mỗi món 5%; Cờ hồn Xên Bọ Hung 0.5%; Thiệp Halloween x10-100 và Bí ngô x10-100 mỗi món 2.25%; Kẹo bàn tay x1-150, Thỏi vàng x50-150, Cuồng nộ 2, Bổ huyết 2, Giáp xên 2 x1-5 mỗi món 12%; Trang sách cũ x150-500 tỉ lệ 10%. Xe bí ngô, Pet Mèo Phù Thủy, Cờ hồn Mabư có 5% vĩnh viễn, còn lại HSD ngẫu nhiên 1/3/5/7/10/15 ngày; Cờ hồn Xên Bọ Hung HSD 1/3/5/7/10 ngày, 5% vĩnh viễn khi trúng cờ. Kẹo não người, Kẹo bí ngô, Kẹo bàn tay, Thỏi vàng, Thiệp Halloween, Bí ngô, Trang sách cũ và buff cấp 2 không có HSD.";
     private static final short SOUL_DETECTOR_ID = (short) ConstItem.MAY_DO_LINH_HON;
-    private static final String SOUL_DETECTOR_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 k\u00edch ho\u1ea1t M\u00e1y d\u00f2 linh h\u1ed3n trong 30 ph\u00fat, c\u00f3 th\u1ec3 c\u1ed9ng d\u1ed3n th\u1eddi gian. Khi \u0111\u00e1nh qu\u00e1i \u1edf T\u01b0\u01a1ng lai c\u00f3 1% t\u1ec9 l\u1ec7 nh\u1eadn K\u1eb9o b\u00e0n tay.";
+    private static final String SOUL_DETECTOR_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 k\u00edch ho\u1ea1t M\u00e1y d\u00f2 linh h\u1ed3n trong 30 ph\u00fat, c\u00f3 th\u1ec3 c\u1ed9ng d\u1ed3n th\u1eddi gian. Khi \u0111\u00e1nh qu\u00e1i \u1edf T\u01b0\u01a1ng lai c\u00f3 5% t\u1ec9 l\u1ec7 nh\u1eadn K\u1eb9o b\u00e0n tay.";
+    private static final short HUY_DIET_CAPSULE_ID = (short) ConstItem.HOP_CAPSULE;
+    private static final String HUY_DIET_CAPSULE_DESCRIPTION = "Sử dụng để chọn hành tinh Xayda, Trái Đất hoặc Namek và nhận đủ 1 set Hủy Diệt của hành tinh đã chọn.";
+    private static final int HUY_DIET_SET_SIZE = 5;
+    private static final String[] HUY_DIET_CAPSULE_PLANET_NAMES = {"Xayda", "Trái Đất", "Namek"};
+    private static final short[][] HUY_DIET_CAPSULE_SET_IDS = {
+        {654, 655, 661, 662, 656},
+        {650, 651, 657, 658, 656},
+        {652, 653, 659, 660, 656}
+    };
     private static final short MOTO_BUN_MA_ID = 1541;
     private static final short PET_BABY_SHARK_ID = 1620;
 
@@ -394,6 +403,8 @@ public class ItemService {
             template.description = DEVIL_CANDY_BOX_DESCRIPTION;
         } else if (template.id == SOUL_DETECTOR_ID) {
             template.description = SOUL_DETECTOR_DESCRIPTION;
+        } else if (template.id == HUY_DIET_CAPSULE_ID) {
+            template.description = HUY_DIET_CAPSULE_DESCRIPTION;
         } else if (template.id == XEN_SOUL_FLAG_ID) {
             template.description = XEN_SOUL_FLAG_DESCRIPTION;
         }
@@ -1475,6 +1486,143 @@ public class ItemService {
             }
         })));
         return list;
+    }
+
+    public void openHuyDietSetCapsule(Player player, int select) {
+        if (player == null) {
+            return;
+        }
+        if (select < 0 || select >= HUY_DIET_CAPSULE_SET_IDS.length) {
+            Service.gI().sendThongBao(player, "Lựa chọn không hợp lệ.");
+            return;
+        }
+        Item capsule = InventoryService.gI().findItemBag(player, HUY_DIET_CAPSULE_ID);
+        if (capsule == null || !capsule.isNotNullItem() || capsule.quantity < 1) {
+            Service.gI().sendThongBao(player, "Bạn không có Hộp Capsule.");
+            return;
+        }
+        int emptyAfterUse = InventoryService.gI().getCountEmptyBag(player) + (capsule.quantity <= 1 ? 1 : 0);
+        if (emptyAfterUse < HUY_DIET_SET_SIZE) {
+            Service.gI().sendThongBao(player, "Cần đủ 5 ô trống sau khi dùng Hộp Capsule để nhận set Hủy Diệt.");
+            return;
+        }
+
+        List<Item> rewards = createHuyDietSet(select);
+        if (rewards.size() != HUY_DIET_SET_SIZE) {
+            Service.gI().sendThongBao(player, "Không thể tạo set Hủy Diệt, vui lòng thử lại.");
+            return;
+        }
+
+        InventoryService.gI().subQuantityItemsBag(player, capsule, 1);
+        for (Item reward : rewards) {
+            InventoryService.gI().addItemBag(player, reward);
+        }
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendThongBao(player, "Bạn nhận được 1 set Hủy Diệt " + HUY_DIET_CAPSULE_PLANET_NAMES[select] + ".");
+    }
+
+    private List<Item> createHuyDietSet(int planetIndex) {
+        List<Item> rewards = new ArrayList<>();
+        for (short itemId : HUY_DIET_CAPSULE_SET_IDS[planetIndex]) {
+            Item item = createHuyDietRewardItem(itemId);
+            if (item == null || !item.isNotNullItem()) {
+                return Collections.emptyList();
+            }
+            rewards.add(item);
+        }
+        return rewards;
+    }
+
+    private Item createHuyDietRewardItem(short itemId) {
+        Item item = createHuyDietItemFromBillShop(itemId);
+        if (item == null || item.template == null) {
+            item = createNewItem(itemId);
+            if (item == null || item.template == null) {
+                return null;
+            }
+            RewardService.gI().initChiSoItem(item);
+        }
+        applyHuyDietRewardOptions(item);
+        item.info = item.getInfo();
+        item.content = item.getContent();
+        return item;
+    }
+
+    private Item createHuyDietItemFromBillShop(short itemId) {
+        if (Manager.SHOPS == null) {
+            return null;
+        }
+        for (nro.models.shop.Shop shop : Manager.SHOPS) {
+            if (!"BILL".equals(shop.tagName)) {
+                continue;
+            }
+            ItemShop itemShop = shop.getItemShop(itemId);
+            return itemShop == null ? null : createItemFromItemShop(itemShop);
+        }
+        return null;
+    }
+
+    private void applyHuyDietRewardOptions(Item item) {
+        if (item == null || item.template == null || item.itemOptions == null) {
+            return;
+        }
+        int param = 0;
+        if (item.template.level == 14) {
+            int random = Util.nextInt(1, 100);
+            if (random <= 1) {
+                param = 15;
+            } else if (random <= 15) {
+                param = Util.nextInt(11, 14);
+            } else if (random <= 35) {
+                param = Util.nextInt(7, 10);
+            } else if (random <= 60) {
+                param = Util.nextInt(4, 6);
+            } else {
+                param = Util.nextInt(0, 3);
+            }
+        }
+
+        List<Item.ItemOption> itemOptions = new ArrayList<>();
+        boolean hasTradeLock = false;
+        if (!item.itemOptions.isEmpty()) {
+            for (Item.ItemOption option : item.itemOptions) {
+                if (option == null || option.optionTemplate == null || option.optionTemplate.id == 164) {
+                    continue;
+                }
+                int optionId = option.optionTemplate.id;
+                if (optionId == 30) {
+                    hasTradeLock = true;
+                }
+                int optionParam = option.param;
+                if (item.template.level == 14 && canUpgradeHuyDietRewardOption(optionId) && param > 0) {
+                    optionParam += (optionParam * param) / 100;
+                }
+                itemOptions.add(new Item.ItemOption(optionId, optionParam));
+            }
+        } else {
+            itemOptions.add(new Item.ItemOption(73, 0));
+        }
+        if (!hasTradeLock) {
+            itemOptions.add(new Item.ItemOption(30, 0));
+        }
+
+        if (item.template.level == 14) {
+            switch (Util.nextInt(3)) {
+                case 0 ->
+                    itemOptions.add(new Item.ItemOption(77, Util.nextInt(1, 5)));
+                case 1 ->
+                    itemOptions.add(new Item.ItemOption(50, Util.nextInt(1, 3)));
+                case 2 ->
+                    itemOptions.add(new Item.ItemOption(103, Util.nextInt(1, 5)));
+            }
+        }
+        item.itemOptions.clear();
+        item.itemOptions.addAll(itemOptions);
+    }
+
+    private boolean canUpgradeHuyDietRewardOption(int optionId) {
+        return optionId == 0 || optionId == 22 || optionId == 23 || optionId == 14
+                || optionId == 27 || optionId == 28 || optionId == 47;
     }
 
     public int randTempItemDoSao(int gender) {
