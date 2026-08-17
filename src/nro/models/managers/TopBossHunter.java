@@ -9,6 +9,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import nro.models.data.LocalManager;
 import nro.models.item.Item;
 import nro.models.player.Player;
@@ -22,20 +24,23 @@ public class TopBossHunter {
     private static final int TOP_LIMIT = 100;
 
     private final List<Player> list = new ArrayList<>();
+    private final Set<Long> adminsViewingDetails = ConcurrentHashMap.newKeySet();
     private static final TopBossHunter INSTANCE = new TopBossHunter();
-    private volatile boolean publicDetailsVisible;
 
     public static TopBossHunter getInstance() {
         return INSTANCE;
     }
 
-    public boolean isPublicDetailsVisible() {
-        return publicDetailsVisible;
+    public boolean isAdminDetailsVisible(long adminId) {
+        return adminsViewingDetails.contains(adminId);
     }
 
-    public synchronized boolean togglePublicDetailsVisible() {
-        publicDetailsVisible = !publicDetailsVisible;
-        return publicDetailsVisible;
+    public synchronized boolean toggleAdminDetailsVisible(long adminId) {
+        if (adminsViewingDetails.remove(adminId)) {
+            return false;
+        }
+        adminsViewingDetails.add(adminId);
+        return true;
     }
 
     public int getRank(List<Player> leaderboard, long playerId) {

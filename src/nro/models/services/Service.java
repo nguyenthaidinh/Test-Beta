@@ -551,7 +551,8 @@ public class Service {
             return;
         }
 
-        boolean canViewAllDetails = player.isAdmin() || topBossHunter.isPublicDetailsVisible();
+        boolean canViewAllDetails = player.isAdmin()
+                && topBossHunter.isAdminDetailsVisible(player.id);
         int playerRank = topBossHunter.getRank(list, player.id);
         String playerRankText = playerRank > 0 ? "Top " + playerRank : "Ngoài Top 100";
         Message msg = new Message(-96);
@@ -573,7 +574,7 @@ public class Service {
                 }
                 msg.writer().writeShort(avatar.getBody());
                 msg.writer().writeShort(avatar.getLeg());
-                msg.writer().writeUTF(showDetails ? pl.name : "Player");
+                msg.writer().writeUTF(showDetails ? pl.name : "player");
                 msg.writer().writeUTF(showDetails
                         ? "Điểm săn Boss: " + Util.formatNumber(pl.event.getEventPoint())
                         : "Điểm săn Boss: Ẩn");

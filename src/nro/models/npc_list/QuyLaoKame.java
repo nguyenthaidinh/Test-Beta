@@ -100,7 +100,7 @@ public class QuyLaoKame extends Npc {
                 menu.add("Nhận quà\nKOL");
                 menu.add("Nhận quà\nKOL VIP");
                 if (player.isAdmin()) {
-                    menu.add(TopBossHunter.getInstance().isPublicDetailsVisible()
+                    menu.add(TopBossHunter.getInstance().isAdminDetailsVisible(player.id)
                             ? "Ẩn tên + điểm\nBXH Săn Boss"
                             : "Bật tên + điểm\nBXH Săn Boss");
                 }
@@ -195,10 +195,10 @@ public class QuyLaoKame extends Npc {
         if (!player.isAdmin()) {
             return;
         }
-        boolean visible = TopBossHunter.getInstance().togglePublicDetailsVisible();
+        boolean visible = TopBossHunter.getInstance().toggleAdminDetailsVisible(player.id);
         Service.gI().sendThongBao(player, visible
-                ? "Đã công khai tên và điểm BXH Săn Boss."
-                : "Đã ẩn tên và điểm BXH Săn Boss.");
+                ? "Đã bật tên và điểm BXH Săn Boss cho tài khoản admin này."
+                : "Đã trở về chế độ xem ẩn của BXH Săn Boss.");
     }
 
     private void handleTalk(Player player) {
