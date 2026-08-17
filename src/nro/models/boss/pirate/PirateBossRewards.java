@@ -24,11 +24,15 @@ public final class PirateBossRewards {
     private PirateBossRewards() {
     }
 
-    public static void drop(Boss boss, Player plKill) {
+    public static void drop(Boss boss, Player plKill, int eventPoints) {
         if (boss == null || plKill == null || boss.zone == null || boss.zone.map == null || boss.location == null) {
             return;
         }
         TaskService.gI().checkDoneTaskKillBoss(plKill, boss);
+        if (eventPoints > 0) {
+            plKill.event.addEventPoint(eventPoints);
+            Service.gI().sendThongBao(plKill, "+" + eventPoints + " Point");
+        }
 
         int x = boss.location.x;
         int y = boss.zone.map.yPhysicInTop(x, boss.location.y - 24);

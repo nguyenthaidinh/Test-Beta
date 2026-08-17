@@ -11,6 +11,7 @@ import nro.models.utils.Util;
 
 public class WhisBoss extends Boss {
 
+    private static final int EVENT_POINTS = 40;
     private static final int DAMAGE_REDUCTION_PERCENT = 90;
     private static final int DODGE_PERCENT = 50;
     private static final int MIN_TELEPORT_DELAY = 3_000;
@@ -43,7 +44,7 @@ public class WhisBoss extends Boss {
 
     @Override
     public void reward(Player plKill) {
-        PirateBossRewards.drop(this, plKill);
+        PirateBossRewards.drop(this, plKill, EVENT_POINTS);
     }
 
     @Override

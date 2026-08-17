@@ -7,6 +7,7 @@ import nro.models.player.Player;
 
 public class PirateCoolerBoss extends Boss {
 
+    private static final int EVENT_POINTS = 35;
     private static final int DAMAGE_REDUCTION_PERCENT = 90;
 
     public PirateCoolerBoss() throws Exception {
@@ -15,7 +16,7 @@ public class PirateCoolerBoss extends Boss {
 
     @Override
     public void reward(Player plKill) {
-        PirateBossRewards.drop(this, plKill);
+        PirateBossRewards.drop(this, plKill, EVENT_POINTS);
     }
 
     @Override

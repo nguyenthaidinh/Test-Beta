@@ -544,31 +544,43 @@ public class Service {
     }
 
     public void showTopBossHunter(Player player) {
-        TopBossHunter.getInstance().load();
-        List<Player> list = TopBossHunter.getInstance().getList();
+        TopBossHunter topBossHunter = TopBossHunter.getInstance();
+        List<Player> list = topBossHunter.loadSnapshot();
         if (list.isEmpty()) {
             NpcService.gI().createTutorial(player, -1, "Chưa có dữ liệu BXH Săn Boss.");
             return;
         }
 
+        boolean canViewAllDetails = player.isAdmin() || topBossHunter.isPublicDetailsVisible();
+        int playerRank = topBossHunter.getRank(list, player.id);
+        String playerRankText = playerRank > 0 ? "Top " + playerRank : "Ngoài Top 100";
         Message msg = new Message(-96);
         try {
             msg.writer().writeByte(0);
-            msg.writer().writeUTF("BXH Săn Boss");
+            msg.writer().writeUTF("BXH Săn Boss\nHạng của bạn: " + playerRankText
+                    + "\nĐiểm của bạn: " + Util.formatNumber(player.event.getEventPoint()));
             msg.writer().writeByte(list.size());
             for (int i = 0; i < list.size(); i++) {
                 Player pl = list.get(i);
+                boolean isCurrentPlayer = pl.id == player.id;
+                boolean showDetails = canViewAllDetails || isCurrentPlayer;
+                Player avatar = showDetails ? pl : player;
                 msg.writer().writeInt(i + 1);
-                msg.writer().writeInt((int) pl.id);
-                msg.writer().writeShort(pl.getHead());
+                msg.writer().writeInt(showDetails ? (int) pl.id : 0);
+                msg.writer().writeShort(avatar.getHead());
                 if (player.getSession().version > 214) {
                     msg.writer().writeShort(-1);
                 }
-                msg.writer().writeShort(pl.getBody());
-                msg.writer().writeShort(pl.getLeg());
-                msg.writer().writeUTF(pl.name);
-                msg.writer().writeUTF("Điểm săn Boss: " + Util.formatNumber(pl.event.getEventPoint()));
-                msg.writer().writeUTF(pl.id == player.id ? "Điểm của bạn: " + Util.formatNumber(player.event.getEventPoint()) : "");
+                msg.writer().writeShort(avatar.getBody());
+                msg.writer().writeShort(avatar.getLeg());
+                msg.writer().writeUTF(showDetails ? pl.name : "Player");
+                msg.writer().writeUTF(showDetails
+                        ? "Điểm săn Boss: " + Util.formatNumber(pl.event.getEventPoint())
+                        : "Điểm săn Boss: Ẩn");
+                msg.writer().writeUTF(isCurrentPlayer
+                        ? "Hạng của bạn: Top " + (i + 1)
+                        + "\nĐiểm của bạn: " + Util.formatNumber(player.event.getEventPoint())
+                        : "");
             }
             player.sendMessage(msg);
             msg.cleanup();

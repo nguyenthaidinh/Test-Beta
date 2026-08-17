@@ -58,7 +58,7 @@ public class Odo extends Boss {
                 new String[]{}, //text chat 1
                 new String[]{}, //text chat 2
                 new String[]{},
-                600000));
+                30 * 60));
     }
 
     @Override

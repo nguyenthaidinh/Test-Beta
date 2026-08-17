@@ -3,6 +3,7 @@ package nro.models.npc_list;
 import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
 import nro.models.map.phoban.BanDoKhoBau;
+import nro.models.managers.TopBossHunter;
 import nro.models.services_dungeon.TreasureUnderSeaService;
 import nro.models.npc.Npc;
 import static nro.models.npc.NpcFactory.PLAYERID_OBJECT;
@@ -98,6 +99,11 @@ public class QuyLaoKame extends Npc {
                 menu.add("BXH\nSăn Boss");
                 menu.add("Nhận quà\nKOL");
                 menu.add("Nhận quà\nKOL VIP");
+                if (player.isAdmin()) {
+                    menu.add(TopBossHunter.getInstance().isPublicDetailsVisible()
+                            ? "Ẩn tên + điểm\nBXH Săn Boss"
+                            : "Bật tên + điểm\nBXH Săn Boss");
+                }
                 if (ruacon != null && ruacon.quantity >= 1) {
                     menu.add("Giao\nRùa con");
                 }
@@ -171,9 +177,28 @@ public class QuyLaoKame extends Npc {
                 handleKOLQuest(player, true);
                 break;
             case 5:
-                handleTradeRuacon(player);
+                if (player.isAdmin()) {
+                    toggleBossHunterLeaderboardVisibility(player);
+                } else {
+                    handleTradeRuacon(player);
+                }
+                break;
+            case 6:
+                if (player.isAdmin()) {
+                    handleTradeRuacon(player);
+                }
                 break;
         }
+    }
+
+    private void toggleBossHunterLeaderboardVisibility(Player player) {
+        if (!player.isAdmin()) {
+            return;
+        }
+        boolean visible = TopBossHunter.getInstance().togglePublicDetailsVisible();
+        Service.gI().sendThongBao(player, visible
+                ? "Đã công khai tên và điểm BXH Săn Boss."
+                : "Đã ẩn tên và điểm BXH Săn Boss.");
     }
 
     private void handleTalk(Player player) {

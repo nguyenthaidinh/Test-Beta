@@ -42,7 +42,7 @@ public class MatTroi extends Boss {
                 new String[]{}, // Text chat 1
                 new String[]{}, // Text chat 2
                 new String[]{},
-                600));
+                30 * 60));
     }
 
     @Override

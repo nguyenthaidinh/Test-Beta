@@ -40,7 +40,7 @@ public class AnTrom extends Boss {
                 new String[]{}, //text chat 1
                 new String[]{}, //text chat 2
                 new String[]{}, //text chat 3
-                600));
+                30 * 60));
 
     }
 

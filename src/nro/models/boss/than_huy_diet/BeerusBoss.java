@@ -12,6 +12,7 @@ import nro.models.utils.Util;
 
 public class BeerusBoss extends Boss {
 
+    private static final int EVENT_POINTS = 50;
     private static final int DAMAGE_REDUCTION_PERCENT = 99;
     private static final int ANGRY_HP_PERCENT = 20;
     private static final int ANGRY_WARNING_TIME = 3_000;
@@ -49,7 +50,7 @@ public class BeerusBoss extends Boss {
 
     @Override
     public void reward(Player plKill) {
-        PirateBossRewards.drop(this, plKill);
+        PirateBossRewards.drop(this, plKill, EVENT_POINTS);
     }
 
     @Override

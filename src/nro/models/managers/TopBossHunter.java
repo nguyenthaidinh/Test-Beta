@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
 import nro.models.data.LocalManager;
 import nro.models.item.Item;
 import nro.models.player.Player;
@@ -22,15 +21,38 @@ public class TopBossHunter {
 
     private static final int TOP_LIMIT = 100;
 
-    @Getter
     private final List<Player> list = new ArrayList<>();
     private static final TopBossHunter INSTANCE = new TopBossHunter();
+    private volatile boolean publicDetailsVisible;
 
     public static TopBossHunter getInstance() {
         return INSTANCE;
     }
 
-    public void load() {
+    public boolean isPublicDetailsVisible() {
+        return publicDetailsVisible;
+    }
+
+    public synchronized boolean togglePublicDetailsVisible() {
+        publicDetailsVisible = !publicDetailsVisible;
+        return publicDetailsVisible;
+    }
+
+    public int getRank(List<Player> leaderboard, long playerId) {
+        for (int i = 0; i < leaderboard.size(); i++) {
+            if (leaderboard.get(i).id == playerId) {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+
+    public synchronized List<Player> loadSnapshot() {
+        load();
+        return new ArrayList<>(list);
+    }
+
+    private void load() {
         list.clear();
         Map<Long, Player> playersById = new HashMap<>();
 
