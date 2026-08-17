@@ -1,6 +1,7 @@
 package nro.models.services;
 
 import nro.models.consts.ConstItem;
+import nro.models.database.GoldBarSpendHistoryDAO;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.npc.MabuEgg;
@@ -191,7 +192,25 @@ public class InventoryService {
     }
 
     public void subQuantityItemsBag(Player player, Item item, int quantity) {
+        int goldBarBefore = shouldLogGoldBarSpend(player, item, quantity)
+                ? countItemQuantity(player.inventory.itemsBag, ConstItem.THOI_VANG)
+                : -1;
         subQuantityItem(player.inventory.itemsBag, item, quantity);
+        if (goldBarBefore >= 0) {
+            int goldBarAfter = countItemQuantity(player.inventory.itemsBag, ConstItem.THOI_VANG);
+            int spent = goldBarBefore - goldBarAfter;
+            if (spent > 0) {
+                GoldBarSpendHistoryDAO.insert(
+                        player,
+                        spent,
+                        goldBarBefore,
+                        goldBarAfter,
+                        getGoldBarSpendActionCode(),
+                        getGoldBarSpendReason(),
+                        getGoldBarSpendDetails(item, quantity),
+                        player.id + ":" + System.currentTimeMillis());
+            }
+        }
     }
 
     public void subQuantityItemsBody(Player player, Item item, int quantity) {
@@ -993,6 +1012,72 @@ public class InventoryService {
         if (item != null && item.isNotNullItem() && isForcedStackableItem(item.template.id)) {
             ItemService.gI().normalizePumpkinCarriageMountOptions(item);
         }
+    }
+
+    private boolean shouldLogGoldBarSpend(Player player, Item item, int quantity) {
+        return player != null
+                && player.isPl()
+                && player.inventory != null
+                && player.inventory.itemsBag != null
+                && item != null
+                && item.isNotNullItem()
+                && item.template != null
+                && item.template.id == ConstItem.THOI_VANG
+                && quantity > 0;
+    }
+
+    private int countItemQuantity(List<Item> items, int itemId) {
+        int total = 0;
+        if (items == null) {
+            return total;
+        }
+        for (Item item : items) {
+            if (item != null && item.isNotNullItem() && item.template != null && item.template.id == itemId && item.quantity > 0) {
+                total += item.quantity;
+            }
+        }
+        return total;
+    }
+
+    private String getGoldBarSpendActionCode() {
+        StackTraceElement source = getGoldBarSpendSource();
+        if (source == null) {
+            return "unknown";
+        }
+        return simpleClassName(source.getClassName()) + "." + source.getMethodName();
+    }
+
+    private String getGoldBarSpendReason() {
+        StackTraceElement source = getGoldBarSpendSource();
+        if (source == null) {
+            return "Tiêu Thỏi Vàng";
+        }
+        return "Tiêu Thỏi Vàng tại " + simpleClassName(source.getClassName()) + "." + source.getMethodName();
+    }
+
+    private String getGoldBarSpendDetails(Item item, int requestedQuantity) {
+        String itemName = item.template != null ? item.template.name : "Thỏi Vàng";
+        return "Item: " + itemName
+                + " (ID " + ConstItem.THOI_VANG + ")"
+                + "\nSố lượng yêu cầu trừ: " + requestedQuantity
+                + "\nNguồn gọi: " + getGoldBarSpendActionCode();
+    }
+
+    private StackTraceElement getGoldBarSpendSource() {
+        StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+        String inventoryClass = InventoryService.class.getName();
+        for (StackTraceElement element : trace) {
+            String className = element.getClassName();
+            if (!className.equals(Thread.class.getName()) && !className.equals(inventoryClass)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    private String simpleClassName(String className) {
+        int index = className.lastIndexOf('.');
+        return index >= 0 ? className.substring(index + 1) : className;
     }
 
     public static boolean checkListsEqual(List<ItemOption> list1, List<ItemOption> list2) {
