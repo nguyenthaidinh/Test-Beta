@@ -14,6 +14,7 @@ import nro.models.item.Item.ItemOption;
 import nro.models.network.Message;
 import nro.models.player.Player;
 import nro.models.services.InventoryService;
+import nro.models.services.GoldBarSpendService;
 import nro.models.services.ItemService;
 import nro.models.services.Service;
 
@@ -134,7 +135,6 @@ public class LioShopService {
             Service.gI().sendMoney(player);
             LioShopManager.gI().save();
             increaseDailySellCount(player.id);
-
             Service.gI().sendThongBao(player, "Bán thành công! Nhận được " + LioShopManager.PRICE_BUY_IN + " thỏi vàng.");
         }
     }
@@ -196,6 +196,7 @@ public class LioShopService {
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendMoney(player);
         LioShopManager.gI().save();
+        GoldBarSpendService.gI().addPoint(player, LioShopManager.PRICE_SELL_OUT);
 
         Service.gI().sendThongBao(player, "Mua thành công " + newItem.template.name + "!");
         openShop(player);
@@ -264,6 +265,7 @@ public class LioShopService {
 
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendMoney(player);
+        GoldBarSpendService.gI().addPoint(player, PRICE_BE_TAC);
         Service.gI().sendThongBao(player, "Mua thanh cong " + item.template.name + "!");
         openBeTacShop(player);
     }
@@ -322,6 +324,7 @@ public class LioShopService {
 
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendMoney(player);
+        GoldBarSpendService.gI().addPoint(player, PRICE_BE_TAC_SET);
         Service.gI().sendThongBao(player, "Mua nhanh thành công Set Thần Linh "
                 + BE_TAC_TAB_NAMES[planetIndex] + " gồm đủ 5 món với giá "
                 + PRICE_BE_TAC_SET + " thỏi vàng!");

@@ -15,6 +15,7 @@ import nro.models.interfaces.ISession;
 import nro.models.item.Item.ItemOption;
 import nro.models.server.Client;
 import nro.models.services.Service;
+import nro.models.services.GoldBarSpendService;
 import nro.models.services.GiftCodeService;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
@@ -583,6 +584,7 @@ public class Input {
                             InventoryService.gI().sendItemBags(player);
                             player.inventory.gold += cost;
                             Service.gI().sendMoney(player);
+                            GoldBarSpendService.gI().addPoint(player, sltv);
                             Service.gI().sendThongBao(player, "Đã bán " + sltv + " Thỏi vàng thu được " + Util.numberToMoney(cost) + " vàng");
                         }
                     }

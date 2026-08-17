@@ -13,6 +13,7 @@ import nro.models.network.Message;
 import nro.models.item.Item.ItemOption;
 import java.util.ArrayList;
 import nro.models.server.Manager;
+import nro.models.services.GoldBarSpendService;
 import nro.models.services.InventoryService;
 import nro.models.utils.Logger;
 import nro.models.utils.Util;
@@ -52,7 +53,12 @@ public class ShopService {
     private static final int TAB_CHI_CHI_EVENT_ID = 58;
     private static final short GOLD_BAR_ITEM_ID = (short) ConstItem.THOI_VANG;
     private static final int GOLD_BAR_ICON_ID = 4028;
-    private static final int GOLD_BAR_GOLD_COST = 50_000_000;
+    private static final short GOLD_CURRENCY_ITEM_ID = 76;
+    private static final short GEM_CURRENCY_ITEM_ID = 77;
+    private static final short RUBY_CURRENCY_ITEM_ID = (short) ConstItem.HONG_NGOC;
+    private static final int CHI_CHI_GEM_PACKAGE_SHOP_ID = -1_000_077;
+    private static final int CHI_CHI_GEM_PACKAGE_AMOUNT = 1_000_000;
+    private static final int CHI_CHI_GEM_PACKAGE_GOLD_BAR_COST = 15_000;
     private static final short SOUL_DETECTOR_ITEM_ID = (short) ConstItem.MAY_DO_LINH_HON;
     private static final int SOUL_DETECTOR_GOLD_BAR_COST = 100;
     private static final short DEVIL_CANDY_BOX_ITEM_ID = (short) ConstItem.HOP_KEO_MA_QUY;
@@ -99,7 +105,9 @@ public class ShopService {
                 ensureSsj4CostumesInChiChiShop(shop);
                 ensureJackyChunCostumeInChiChiShop(shop);
                 ensureFeaturedEventItemsInChiChiShop(shop);
-                ensureGoldBarInChiChiShop(shop);
+                hideGoldBarInChiChiShop(shop);
+                ensureGemPackageInChiChiShop(shop);
+                configureChiChiSpecialShop(shop);
             } else if (HALLOWEEN_EVENT_SHOP.equals(tagName)) {
                 ensureSoulDetectorInHalloweenEventShop(shop);
                 ensureDevilCandyBoxInHalloweenEventShop(shop);
@@ -375,19 +383,21 @@ public class ShopService {
         return true;
     }
 
-    private void ensureGoldBarInChiChiShop(Shop shop) {
+    private void hideGoldBarInChiChiShop(Shop shop) {
         if (shop == null || shop.tabShops == null) {
             return;
         }
         for (TabShop tabShop : shop.tabShops) {
-            for (ItemShop itemShop : tabShop.itemShops) {
-                if (itemShop.temp != null && itemShop.temp.id == GOLD_BAR_ITEM_ID) {
-                    configureGoldBarShopItem(itemShop, tabShop);
-                    return;
-                }
-            }
+            tabShop.itemShops.removeIf(itemShop -> itemShop != null
+                    && itemShop.temp != null
+                    && itemShop.temp.id == GOLD_BAR_ITEM_ID);
         }
+    }
 
+    private void ensureGemPackageInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
         TabShop eventTab = null;
         for (TabShop tabShop : shop.tabShops) {
             if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
@@ -402,26 +412,70 @@ public class ShopService {
             return;
         }
 
-        ItemShop goldBarShopItem = new ItemShop();
-        goldBarShopItem.id = -GOLD_BAR_ITEM_ID;
-        if (!configureGoldBarShopItem(goldBarShopItem, eventTab)) {
+        ItemShop gemPackage = null;
+        for (ItemShop itemShop : eventTab.itemShops) {
+            if (itemShop.id == CHI_CHI_GEM_PACKAGE_SHOP_ID) {
+                gemPackage = itemShop;
+                break;
+            }
+        }
+        boolean isNewShopItem = gemPackage == null;
+        if (gemPackage == null) {
+            gemPackage = new ItemShop();
+            gemPackage.id = CHI_CHI_GEM_PACKAGE_SHOP_ID;
+        }
+        if (!configureGemPackageShopItem(gemPackage, eventTab)) {
             return;
         }
-        eventTab.itemShops.add(goldBarShopItem);
+        if (isNewShopItem) {
+            eventTab.itemShops.add(0, gemPackage);
+        }
     }
 
-    private boolean configureGoldBarShopItem(ItemShop itemShop, TabShop eventTab) {
+    private boolean configureGemPackageShopItem(ItemShop itemShop, TabShop eventTab) {
         itemShop.tabShop = eventTab;
-        itemShop.temp = ItemService.gI().getTemplate(GOLD_BAR_ITEM_ID);
+        itemShop.temp = ItemService.gI().getTemplate(GEM_CURRENCY_ITEM_ID);
         if (itemShop.temp == null) {
             return false;
         }
         itemShop.isNew = true;
-        itemShop.typeSell = COST_GOLD;
-        itemShop.cost = GOLD_BAR_GOLD_COST;
-        itemShop.iconSpec = 0;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = CHI_CHI_GEM_PACKAGE_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
         itemShop.options.clear();
         return true;
+    }
+
+    private void configureChiChiSpecialShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        shop.typeShop = SPEC_SHOP;
+        for (TabShop tabShop : shop.tabShops) {
+            for (ItemShop itemShop : tabShop.itemShops) {
+                if (itemShop == null || itemShop.temp == null
+                        || itemShop.id == CHI_CHI_GEM_PACKAGE_SHOP_ID) {
+                    continue;
+                }
+                short currencyItemId;
+                switch (itemShop.typeSell) {
+                    case COST_GOLD:
+                        currencyItemId = GOLD_CURRENCY_ITEM_ID;
+                        break;
+                    case COST_GEM:
+                        currencyItemId = GEM_CURRENCY_ITEM_ID;
+                        break;
+                    case COST_RUBY:
+                        currencyItemId = RUBY_CURRENCY_ITEM_ID;
+                        break;
+                    default:
+                        continue;
+                }
+                if (ItemService.gI().getTemplate(currencyItemId) != null) {
+                    itemShop.iconSpec = ItemService.gI().getTemplate(currencyItemId).iconID;
+                }
+            }
+        }
     }
 
     private void ensureSoulDetectorInHalloweenEventShop(Shop shop) {
@@ -1058,6 +1112,7 @@ public class ShopService {
             Service.gI().sendThongBao(player, "Không thể thực hiện");
             return;
         }
+
         if (!subMoneyByItemShop(player, is)) {
             return;
         }
@@ -1143,6 +1198,11 @@ public class ShopService {
 
         if (is == null) {
             Service.gI().sendThongBao(player, "Không thể thực hiện");
+            return;
+        }
+
+        if (isChiChiGemPackage(shop, is)) {
+            buyChiChiGemPackage(player);
             return;
         }
 
@@ -1350,6 +1410,8 @@ public class ShopService {
         }
 
         // Shop thường
+        boolean paidWithGoldBar = shop.typeShop == ShopService.SPEC_SHOP && isGoldBarCost(is);
+
         if (shop.typeShop == ShopService.NORMAL_SHOP) {
             if (!subMoneyByItemShop(player, is)) {
                 return;
@@ -1389,6 +1451,10 @@ public class ShopService {
         InventoryService.gI().addItemBag(player, item);
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendThongBao(player, "Mua thành công " + is.temp.name);
+
+        if (paidWithGoldBar) {
+            GoldBarSpendService.gI().addPoint(player, is.cost);
+        }
 
         if (itemTempId == 1523 || itemTempId == 1524 || itemTempId == 521) {
             updateAutoTrainPurchase(player, itemTempId);
@@ -1488,6 +1554,45 @@ public class ShopService {
         Service.gI().Send_Info_NV(pl);
     }
 
+    private boolean isGoldBarCost(ItemShop itemShop) {
+        if (itemShop == null) {
+            return false;
+        }
+        short itSpec = itemShop.iconSpec == GOLD_BAR_ICON_ID
+                ? GOLD_BAR_ITEM_ID : ItemService.gI().getItemIdByIcon((short) itemShop.iconSpec);
+        return itSpec == GOLD_BAR_ITEM_ID;
+    }
+
+    private boolean isChiChiGemPackage(Shop shop, ItemShop itemShop) {
+        return shop != null
+                && SHOP_CHI_CHI.equals(shop.tagName)
+                && itemShop != null
+                && itemShop.id == CHI_CHI_GEM_PACKAGE_SHOP_ID;
+    }
+
+    private void buyChiChiGemPackage(Player player) {
+        Item goldBar = InventoryService.gI().findItemBag(player, GOLD_BAR_ITEM_ID);
+        int currentGoldBars = goldBar == null ? 0 : goldBar.quantity;
+        if (currentGoldBars < CHI_CHI_GEM_PACKAGE_GOLD_BAR_COST) {
+            Service.gI().sendThongBao(player, "Bạn không đủ Thỏi Vàng, còn thiếu "
+                    + (CHI_CHI_GEM_PACKAGE_GOLD_BAR_COST - currentGoldBars) + " Thỏi Vàng.");
+            return;
+        }
+        if ((long) player.inventory.gem + CHI_CHI_GEM_PACKAGE_AMOUNT > Integer.MAX_VALUE) {
+            Service.gI().sendThongBao(player, "Số Ngọc sau khi mua sẽ vượt quá giới hạn nhân vật.");
+            return;
+        }
+
+        InventoryService.gI().subQuantityItemsBag(player, goldBar, CHI_CHI_GEM_PACKAGE_GOLD_BAR_COST);
+        player.inventory.gem += CHI_CHI_GEM_PACKAGE_AMOUNT;
+        InventoryService.gI().sendItemBags(player);
+        Service.gI().sendMoney(player);
+        GoldBarSpendService.gI().addPoint(player, CHI_CHI_GEM_PACKAGE_GOLD_BAR_COST);
+        Service.gI().sendThongBao(player, "Mua thành công "
+                + Util.numberToMoney(CHI_CHI_GEM_PACKAGE_AMOUNT) + " Ngọc với giá "
+                + Util.numberToMoney(CHI_CHI_GEM_PACKAGE_GOLD_BAR_COST) + " Thỏi Vàng.");
+    }
+
     private boolean subIemByItemShop(Player pl, ItemShop itemShop) {
         boolean isBuy = false;
         short itSpec = itemShop.iconSpec == GOLD_BAR_ICON_ID
@@ -1509,9 +1614,19 @@ public class ShopService {
                 break;
             case 77:
                 if (pl.inventory.gem >= buySpec) {
+                    pl.inventory.gem -= buySpec;
                     isBuy = true;
                 } else {
                     Service.gI().sendThongBao(pl, "Bạn Không Đủ Ngọc Để Mua Vật Phẩm");
+                    isBuy = false;
+                }
+                break;
+            case ConstItem.HONG_NGOC:
+                if (pl.inventory.ruby >= buySpec) {
+                    pl.inventory.ruby -= buySpec;
+                    isBuy = true;
+                } else {
+                    Service.gI().sendThongBao(pl, "Bạn Không Đủ Hồng Ngọc Để Mua Vật Phẩm");
                     isBuy = false;
                 }
                 break;

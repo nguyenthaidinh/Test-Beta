@@ -10,7 +10,6 @@ public class EventLeaderboardService {
     public static final String HALLOWEEN_BOX = "halloween_box";
     public static final String HALLOWEEN_CAPSULE = "halloween_capsule";
     public static final String HALLOWEEN_CANDY_BOX = "halloween_candy_box";
-
     private static EventLeaderboardService instance;
     private static boolean loggedUpdateError;
 

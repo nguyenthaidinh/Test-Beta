@@ -7,6 +7,7 @@ import nro.models.map.service.NpcService;
 import nro.models.npc.Npc;
 import nro.models.player.Player;
 import nro.models.services.InventoryService;
+import nro.models.services.GoldBarSpendService;
 import nro.models.services.ItemService;
 import nro.models.services.Service;
 
@@ -184,6 +185,7 @@ public final class HalloweenExchangeService {
             return;
         }
 
+        GoldBarSpendService.gI().addPoint(player, DEVIL_CANDY_BOX_GOLD_BAR_COST);
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendThongBao(player, "Mua thành công " + reward.template.name
                 + " với giá " + DEVIL_CANDY_BOX_GOLD_BAR_COST + " thỏi vàng.");

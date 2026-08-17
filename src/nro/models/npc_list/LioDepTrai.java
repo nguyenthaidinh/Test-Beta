@@ -22,6 +22,8 @@ import nro.models.shop_lio.LioShopService;
  */
 public class LioDepTrai extends Npc {
 
+    private static final boolean SHOP_TEMPORARILY_CLOSED = true;
+
     public LioDepTrai(int mapId, int status, int cx, int cy, int tempId, int avartar) {
         super(mapId, status, cx, cy, tempId, avartar);
     }
@@ -29,6 +31,10 @@ public class LioDepTrai extends Npc {
     @Override
     public void openBaseMenu(Player player) {
         if (canOpenNpc(player)) {
+            if (SHOP_TEMPORARILY_CLOSED) {
+                npcChat(player, "Cửa hàng Lio Đẹp Trai tạm thời bị đóng");
+                return;
+            }
             int soLuongShop = LioShopManager.gI() != null ? LioShopManager.gI().getAvailableCount() : 0;
             int luotBanConLai = LioShopService.gI().getRemainingDailySellCount(player.id);
             String npcSay = "|2|Chào " + player.name + "! Ta là Lio Đẹp Trai!\n"
@@ -49,6 +55,10 @@ public class LioDepTrai extends Npc {
     @Override
     public void confirmMenu(Player player, int select) {
         if (canOpenNpc(player)) {
+            if (SHOP_TEMPORARILY_CLOSED) {
+                npcChat(player, "Cửa hàng Lio Đẹp Trai tạm thời bị đóng");
+                return;
+            }
             switch (player.idMark.getIndexMenu()) {
                 case ConstNpc.BASE_MENU -> {
                     switch (select) {

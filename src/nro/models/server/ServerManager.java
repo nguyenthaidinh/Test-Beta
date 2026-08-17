@@ -169,6 +169,7 @@ public class ServerManager {
                 || Manager.isTopHalloweenBoxChanged
                 || Manager.isTopHalloweenCapsuleChanged
                 || Manager.isTopHalloweenCandyBoxChanged
+                || Manager.isTopGoldBarSpendChanged
                 || Manager.isTopWhisChanged
                 || Manager.isTopLuckyRoundChanged;
     }
@@ -202,6 +203,10 @@ public class ServerManager {
             }
             if (Manager.isTopHalloweenCandyBoxChanged) {
                 Manager.TopHalloweenCandyBox = Manager.realTop(Manager.queryTopHalloweenCandyBox, con);
+            }
+            if (Manager.isTopGoldBarSpendChanged) {
+                Manager.isTopGoldBarSpendChanged = false;
+                Manager.TopGoldBarSpend = Manager.realTop(Manager.queryTopGoldBarSpend, con);
             }
             if (Manager.isTopWhisChanged) {
                 Manager.Topwhis = Manager.realTop(Manager.queryTopwhis, con);

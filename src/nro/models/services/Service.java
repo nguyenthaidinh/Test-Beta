@@ -257,6 +257,30 @@ public class Service {
         }
     }
 
+    public void showListTopHiddenPoint(Player player, List<TOP> tops) {
+        if (player != null && player.isAdmin()) {
+            showListTop(player, tops);
+            return;
+        }
+        Message msg;
+        try {
+            List<TopDisplayEntry> entries = buildTopDisplayEntries(tops, -1);
+            msg = new Message(-96);
+            msg.writer().writeByte(0);
+            msg.writer().writeUTF("B\u1ea3ng X\u1ebfp H\u1ea1ng");
+            msg.writer().writeByte(entries.size());
+
+            for (int i = 0; i < entries.size(); i++) {
+                writeTopDisplayEntryHiddenPoint(msg, player, entries.get(i), i + 1);
+            }
+
+            player.sendMessage(msg);
+            msg.cleanup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void showListTopTraiDat(Player player, List<TOP> tops) {
         Message msg;
         try {
@@ -347,6 +371,23 @@ public class Service {
         msg.writer().writeUTF(pl != null ? pl.name : safeText(top.getName()));
         msg.writer().writeUTF(normalizeRankInfo(top.getInfo1(), rank));
         msg.writer().writeUTF(top.getInfo2() == null ? "" : top.getInfo2());
+    }
+
+    private void writeTopDisplayEntryHiddenPoint(Message msg, Player viewer, TopDisplayEntry entry, int rank) throws IOException {
+        Player pl = entry.player;
+        TOP top = entry.top;
+        byte gender = pl != null ? pl.gender : top.getGender();
+        msg.writer().writeInt(rank);
+        msg.writer().writeInt(pl != null ? (int) pl.id : top.getId_player());
+        msg.writer().writeShort(pl != null ? pl.getHead() : normalizeTopHead(top.getHead(), gender));
+        if (viewer.getSession().version > 214) {
+            msg.writer().writeShort(-1);
+        }
+        msg.writer().writeShort(pl != null ? pl.getBody() : normalizeTopBody(top.getBody(), gender));
+        msg.writer().writeShort(pl != null ? pl.getLeg() : normalizeTopLeg(top.getLeg(), gender));
+        msg.writer().writeUTF(pl != null ? pl.name : safeText(top.getName()));
+        msg.writer().writeUTF("\u0110i\u1ec3m \u0111ang \u1ea9n");
+        msg.writer().writeUTF("Ch\u1ec9 admin m\u1edbi xem \u0111\u01b0\u1ee3c \u0111i\u1ec3m");
     }
 
     private boolean hasTopFallbackData(TOP top) {

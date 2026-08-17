@@ -115,6 +115,7 @@ public final class Manager {
     public static List<TOP> TopHalloweenBox = new ArrayList<>();
     public static List<TOP> TopHalloweenCapsule = new ArrayList<>();
     public static List<TOP> TopHalloweenCandyBox = new ArrayList<>();
+    public static volatile List<TOP> TopGoldBarSpend = new ArrayList<>();
     public static List<TOP> Topwhis;
     public static List<TOP> Topmaydam;
     public static List<TOP> TopLuckyRound = new ArrayList<>();
@@ -124,6 +125,7 @@ public final class Manager {
     public static final String queryTopHalloweenBox = "SELECT p.id, p.name, p.head, p.gender, GREATEST(COALESCE(e.point, 0), p.point_halloween_box) AS event_point FROM player p LEFT JOIN event_leaderboard e ON p.id = e.player_id AND e.event_key = 'halloween_box' WHERE GREATEST(COALESCE(e.point, 0), p.point_halloween_box) > 0 ORDER BY event_point DESC, p.id ASC LIMIT 100";
     public static final String queryTopHalloweenCapsule = "SELECT p.id, p.name, p.head, p.gender, GREATEST(COALESCE(e.point, 0), p.point_halloween_capsule) AS event_point FROM player p LEFT JOIN event_leaderboard e ON p.id = e.player_id AND e.event_key = 'halloween_capsule' WHERE GREATEST(COALESCE(e.point, 0), p.point_halloween_capsule) > 0 ORDER BY event_point DESC, p.id ASC LIMIT 100";
     public static final String queryTopHalloweenCandyBox = "SELECT p.id, p.name, p.head, p.gender, GREATEST(COALESCE(e.point, 0), p.point_halloween_candy_box) AS event_point FROM player p LEFT JOIN event_leaderboard e ON p.id = e.player_id AND e.event_key = 'halloween_candy_box' WHERE GREATEST(COALESCE(e.point, 0), p.point_halloween_candy_box) > 0 ORDER BY event_point DESC, p.id ASC LIMIT 100";
+    public static final String queryTopGoldBarSpend = "SELECT p.id, p.name, p.head, p.gender, g.point AS gold_bar_spend_point FROM gold_bar_spend_top g INNER JOIN player p ON p.id = g.player_id WHERE g.point > 0 ORDER BY g.point DESC, g.player_id ASC LIMIT 100";
     public static final String queryTopwhis = "SELECT id, name, head, gender, thachdauwhis FROM player ORDER BY thachdauwhis DESC LIMIT 100";
     public static final String queryTopsukien = "SELECT id, name, head, gender, point_sukien FROM player ORDER BY point_sukien DESC LIMIT 100";
     public static final String queryTopLuckyRound = "SELECT l.player_id AS id, p.name, p.head, p.gender, l.point AS lucky_round_point FROM lucky_round_top l INNER JOIN player p ON p.id = l.player_id WHERE l.point > 0 ORDER BY l.point DESC, l.player_id ASC LIMIT 100";
@@ -136,6 +138,7 @@ public final class Manager {
     public static boolean isTopHalloweenBoxChanged = false;
     public static boolean isTopHalloweenCapsuleChanged = false;
     public static boolean isTopHalloweenCandyBoxChanged = false;
+    public static volatile boolean isTopGoldBarSpendChanged = false;
     public static boolean isTopWhisChanged = false;
     public static boolean isTopLuckyRoundChanged = false;
 
@@ -147,7 +150,7 @@ public final class Manager {
     }
 
     public static boolean hasNewTopScores() {
-        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopHalloweenBoxChanged || isTopHalloweenCapsuleChanged || isTopHalloweenCandyBoxChanged || isTopWhisChanged || isTopLuckyRoundChanged;
+        return isTopMaydamChanged || isTopSukien2Changed || isTopSukienChanged || isTopSukien1Changed || isTopHalloweenBoxChanged || isTopHalloweenCapsuleChanged || isTopHalloweenCandyBoxChanged || isTopGoldBarSpendChanged || isTopWhisChanged || isTopLuckyRoundChanged;
     }
 
     public static void resetTopFlags() {
@@ -1075,6 +1078,8 @@ public final class Manager {
             Logger.success(Logger.PURPLE + "Successfully Top Halloween Capsule (" + TopHalloweenCapsule.size() + ")\n");
             TopHalloweenCandyBox = realTop(queryTopHalloweenCandyBox, ConnectionDatabase);
             Logger.success(Logger.PURPLE + "Successfully Top Halloween Candy Box (" + TopHalloweenCandyBox.size() + ")\n");
+            TopGoldBarSpend = realTop(queryTopGoldBarSpend, ConnectionDatabase);
+            Logger.success(Logger.PURPLE + "Successfully Top Gold Bar Spend (" + TopGoldBarSpend.size() + ")\n");
             Topwhis = realTop(queryTopwhis, ConnectionDatabase);
             Logger.success(Logger.RED + "Successfully top Thach Dau Whis (" + Topwhis.size() + ")\n");
             Topmaydam = realTop(queryTopmaydam, ConnectionDatabase);
@@ -1145,6 +1150,11 @@ public final class Manager {
                     String point = rs.getString("event_point");
                     top.setInfo1(point + " lần mở");
                     top.setInfo2(point + " lần mở Hộp Kẹo Ma Quỷ");
+
+                } else if (query.equals(Manager.queryTopGoldBarSpend)) {
+                    String point = rs.getString("gold_bar_spend_point");
+                    top.setInfo1(point + " \u0111i\u1ec3m");
+                    top.setInfo2(point + " \u0111i\u1ec3m ti\u00eau Th\u1ecfi V\u00e0ng");
 
                 } else if (query.equals(Manager.queryTopwhis)) {
                     int whis = rs.getInt("thachdauwhis");

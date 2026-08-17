@@ -14,6 +14,7 @@ import nro.models.services.InventoryService;
 import nro.models.server.Manager;
 import nro.models.services.ItemService;
 import nro.models.services.EventLeaderboardService;
+import nro.models.services.GoldBarSpendService;
 import nro.models.services.Service;
 import nro.models.shop.ShopService;
 import nro.models.utils.Util;
@@ -56,6 +57,7 @@ public class ChiChi extends Npc {
             menu.add(menu.size() - 1, "Đổi\nKẹo\nbàn tay");
             menu.add(menu.size() - 1, "Top\nHộp Kẹo\nMa Quỷ");
             menu.add(menu.size() - 1, "Top\nCapsule\nHalloween");
+            menu.add(menu.size() - 1, "Top\nTi\u00eau\nTh\u1ecfi V\u00e0ng");
             String[] menus = menu.toArray(new String[0]);
 
             createOtherMenu(player, ConstNpc.BASE_MENU,
@@ -120,13 +122,23 @@ public class ChiChi extends Npc {
                                     "Xem điểm",
                                     "Đóng");
                             break;
+                        case 10:
+                            createOtherMenu(player, ConstNpc.MENU_GOLD_BAR_SPEND_TOP,
+                                    "\u0110ua top ti\u00eau Th\u1ecfi V\u00e0ng.\nM\u1ed7i 1 Th\u1ecfi V\u00e0ng th\u1ef1c t\u1ebf d\u00f9ng \u0111\u1ec3 mua/b\u00e1n v\u1eadt ph\u1ea9m s\u1ebd t\u00ednh 1 \u0111i\u1ec3m.",
+                                    "Top 100\nTi\u00eau\nTh\u1ecfi V\u00e0ng",
+                                    "Xem \u0111i\u1ec3m",
+                                    "\u0110\u00f3ng");
+                            break;
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_BOX_TOP) {
                     switch (select) {
                         case 0:
-                            Service.gI().showListTop(player, Manager.TopHalloweenBox);
+                            Service.gI().showListTopHiddenPoint(player, Manager.TopHalloweenBox);
                             break;
                         case 1:
+                            if (hideTopPointForPlayer(player)) {
+                                break;
+                            }
                             player.point_halloween_box = Math.max(player.point_halloween_box,
                                     EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_BOX, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_box + " Hòm Halloween.");
@@ -135,9 +147,12 @@ public class ChiChi extends Npc {
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_CAPSULE_TOP) {
                     switch (select) {
                         case 0:
-                            Service.gI().showListTop(player, Manager.TopHalloweenCapsule);
+                            Service.gI().showListTopHiddenPoint(player, Manager.TopHalloweenCapsule);
                             break;
                         case 1:
+                            if (hideTopPointForPlayer(player)) {
+                                break;
+                            }
                             player.point_halloween_capsule = Math.max(player.point_halloween_capsule,
                                     EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_CAPSULE, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_capsule + " Capsule Halloween.");
@@ -146,12 +161,29 @@ public class ChiChi extends Npc {
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_CANDY_BOX_TOP) {
                     switch (select) {
                         case 0:
-                            Service.gI().showListTop(player, Manager.TopHalloweenCandyBox);
+                            Service.gI().showListTopHiddenPoint(player, Manager.TopHalloweenCandyBox);
                             break;
                         case 1:
+                            if (hideTopPointForPlayer(player)) {
+                                break;
+                            }
                             player.point_halloween_candy_box = Math.max(player.point_halloween_candy_box,
                                     EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_CANDY_BOX, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_candy_box + " Hộp Kẹo Ma Quỷ.");
+                            break;
+                    }
+                } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_GOLD_BAR_SPEND_TOP) {
+                    switch (select) {
+                        case 0:
+                            Service.gI().showListTopHiddenPoint(player, Manager.TopGoldBarSpend);
+                            break;
+                        case 1:
+                            String point = GoldBarSpendService.gI().getPoint(player.id);
+                            if (point == null) {
+                                Service.gI().sendThongBao(player, "Kh\u00f4ng th\u1ec3 t\u1ea3i \u0111i\u1ec3m ti\u00eau Th\u1ecfi V\u00e0ng l\u00fac n\u00e0y.");
+                                break;
+                            }
+                            Service.gI().sendThongBao(player, "B\u1ea1n \u0111ang c\u00f3 " + point + " \u0111i\u1ec3m ti\u00eau Th\u1ecfi V\u00e0ng.");
                             break;
                     }
                 } else if (player.idMark.getIndexMenu() == MENU_BUY_TRAIN_ARMOR_5) {
@@ -173,6 +205,14 @@ public class ChiChi extends Npc {
                 }
             }
         }
+    }
+
+    private boolean hideTopPointForPlayer(Player player) {
+        if (player != null && !player.isAdmin()) {
+            Service.gI().sendThongBao(player, "\u0110i\u1ec3m top \u0111ang \u0111\u01b0\u1ee3c \u1ea9n.");
+            return true;
+        }
+        return false;
     }
 
     private void buyTrainArmor5(Player player) {
@@ -224,6 +264,7 @@ public class ChiChi extends Npc {
         }
         InventoryService.gI().sendItemBags(player);
         player.clan.sendMyClanForAllMember();
+        GoldBarSpendService.gI().addPoint(player, cost);
         Service.gI().sendThongBao(player, "Mua thành công " + amount
                 + " Capsule Bang cho bang hội với giá " + Util.numberToMoney(cost) + " thỏi vàng.");
     }
