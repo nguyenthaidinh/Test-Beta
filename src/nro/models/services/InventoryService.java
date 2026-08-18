@@ -961,6 +961,7 @@ public class InventoryService {
     }
 
     private void compactForcedStackableItems(List<Item> items) {
+        compactItemStacks(items, ConstItem.DUOI_KHI_1045);
         compactItemStacks(items, ConstItem.BI_NGO);
         compactItemStacks(items, ConstItem.THIEP_HALLOWEEN);
         compactItemStacks(items, ConstItem.KEO_BAN_TAY);
@@ -1003,7 +1004,8 @@ public class InventoryService {
     }
 
     private boolean isForcedStackableItem(int itemId) {
-        return itemId == ConstItem.BI_NGO || itemId == ConstItem.THIEP_HALLOWEEN
+        return itemId == ConstItem.DUOI_KHI_1045 || itemId == ConstItem.BI_NGO
+                || itemId == ConstItem.THIEP_HALLOWEEN
                 || itemId == ConstItem.KEO_BAN_TAY || itemId == ConstItem.KEO_NAO_NGUOI
                 || itemId == ConstItem.KEO_BI_NGO || itemId == ConstItem.HOP_KEO_MA_QUY;
     }
