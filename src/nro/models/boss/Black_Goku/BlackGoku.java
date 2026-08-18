@@ -22,6 +22,7 @@ public class BlackGoku extends Boss {
     private static final int EVENT_POINT = 40;
     private static final int THAN_LINH_DROP_RATE = 50;
     private static final int DAMAGE_REDUCTION_PERCENT = 40;
+    private static final int ADDITIONAL_DAMAGE_REDUCTION_PERCENT = 60;
 
     private long st;
     private int timeLeaveMap;
@@ -101,6 +102,7 @@ public class BlackGoku extends Boss {
                 return 0;
             }
             damage -= damage * getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT) / 100;
+            damage -= damage * getEffectiveDamageReductionPercent(plAtt, ADDITIONAL_DAMAGE_REDUCTION_PERCENT) / 100;
             if (this.currentLevel != 0) {
                 damage /= 2;
             }

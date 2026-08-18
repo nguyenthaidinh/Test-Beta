@@ -22,6 +22,7 @@ public class Cooler extends Boss {
     private static final int EVENT_POINT = 30;
     private static final int THAN_LINH_DROP_RATE = 60;
     private static final int DAMAGE_REDUCTION_PERCENT = 50;
+    private static final int ADDITIONAL_DAMAGE_REDUCTION_PERCENT = 70;
 
     private long st;
 
@@ -98,6 +99,7 @@ public class Cooler extends Boss {
                 return 0;
             }
             damage -= damage * getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT) / 100;
+            damage -= damage * getEffectiveDamageReductionPercent(plAtt, ADDITIONAL_DAMAGE_REDUCTION_PERCENT) / 100;
             damage = this.nPoint.subDameInjureWithDeff(damage);
             this.nPoint.subHP(damage);
             if (isDie()) {

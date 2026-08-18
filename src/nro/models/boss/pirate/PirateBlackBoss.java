@@ -9,6 +9,7 @@ public class PirateBlackBoss extends Boss {
 
     private static final int EVENT_POINTS = 35;
     private static final int DAMAGE_REDUCTION_PERCENT = 90;
+    private static final int ADDITIONAL_DAMAGE_REDUCTION_PERCENT = 60;
 
     public PirateBlackBoss() throws Exception {
         super(BossID.PIRATE_BLACK, false, true, BossesData.PIRATE_BLACK);
@@ -26,6 +27,8 @@ public class PirateBlackBoss extends Boss {
         }
         int effectiveReduction = getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT);
         long reducedDamage = Math.max(1L, damage * (100 - effectiveReduction) / 100);
+        int additionalReduction = getEffectiveDamageReductionPercent(plAtt, ADDITIONAL_DAMAGE_REDUCTION_PERCENT);
+        reducedDamage = Math.max(1L, reducedDamage * (100 - additionalReduction) / 100);
         return super.injured(plAtt, reducedDamage, true, isMobAttack);
     }
 }

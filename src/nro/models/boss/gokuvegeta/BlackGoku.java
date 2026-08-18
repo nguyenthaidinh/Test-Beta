@@ -16,6 +16,7 @@ public class BlackGoku extends Boss {
     private static final int ESCAPE_HP_PERCENT = 20;
     private static final int ESCAPE_HEAL_PERCENT = 70;
     private static final int DAMAGE_REDUCTION_PERCENT = 40;
+    private static final int ADDITIONAL_DAMAGE_REDUCTION_PERCENT = 60;
 
     private boolean usedEscapeSkill;
 
@@ -39,6 +40,7 @@ public class BlackGoku extends Boss {
         }
 
         damage -= damage * getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT) / 100;
+        damage -= damage * getEffectiveDamageReductionPercent(plAtt, ADDITIONAL_DAMAGE_REDUCTION_PERCENT) / 100;
         damage = this.nPoint.subDameInjureWithDeff(damage - Util.nextInt(100000));
         if (!piercing && this.effectSkill != null && this.effectSkill.isShielding) {
             if (damage > this.nPoint.hpMax) {

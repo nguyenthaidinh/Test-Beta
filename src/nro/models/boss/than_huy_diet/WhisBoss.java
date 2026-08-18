@@ -13,6 +13,7 @@ public class WhisBoss extends Boss {
 
     private static final int EVENT_POINTS = 40;
     private static final int DAMAGE_REDUCTION_PERCENT = 90;
+    private static final int ADDITIONAL_DAMAGE_REDUCTION_PERCENT = 70;
     private static final int DODGE_PERCENT = 50;
     private static final int MIN_TELEPORT_DELAY = 3_000;
     private static final int MAX_TELEPORT_DELAY = 5_000;
@@ -59,6 +60,8 @@ public class WhisBoss extends Boss {
 
         int effectiveReduction = getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT);
         long reducedDamage = Math.max(1L, damage - damage * effectiveReduction / 100);
+        int additionalReduction = getEffectiveDamageReductionPercent(plAtt, ADDITIONAL_DAMAGE_REDUCTION_PERCENT);
+        reducedDamage = Math.max(1L, reducedDamage - reducedDamage * additionalReduction / 100);
         return super.injured(plAtt, reducedDamage, true, isMobAttack);
     }
 

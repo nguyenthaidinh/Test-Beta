@@ -26,6 +26,7 @@ import nro.models.task.BadgesTaskService;
 public class SieuBoHung extends Boss {
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(10);
+    private static final int ADDITIONAL_DAMAGE_REDUCTION_PERCENT = 50;
     private long st;
     public boolean callCellCon;
     private long lastTimeChat;
@@ -166,6 +167,7 @@ public class SieuBoHung extends Boss {
                 return 0;
             }
 
+            damage -= damage * getEffectiveDamageReductionPercent(plAtt, ADDITIONAL_DAMAGE_REDUCTION_PERCENT) / 100;
             damage = this.nPoint.subDameInjureWithDeff(damage / 3);
 
             if (!piercing && effectSkill.isShielding) {

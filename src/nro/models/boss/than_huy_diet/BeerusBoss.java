@@ -14,6 +14,7 @@ public class BeerusBoss extends Boss {
 
     private static final int EVENT_POINTS = 50;
     private static final int DAMAGE_REDUCTION_PERCENT = 99;
+    private static final int ADDITIONAL_DAMAGE_REDUCTION_PERCENT = 60;
     private static final int ANGRY_HP_PERCENT = 20;
     private static final int ANGRY_WARNING_TIME = 3_000;
 
@@ -65,6 +66,8 @@ public class BeerusBoss extends Boss {
 
         int effectiveReduction = getEffectiveDamageReductionPercent(plAtt, DAMAGE_REDUCTION_PERCENT);
         long reducedDamage = Math.max(1L, damage * (100 - effectiveReduction) / 100);
+        int additionalReduction = getEffectiveDamageReductionPercent(plAtt, ADDITIONAL_DAMAGE_REDUCTION_PERCENT);
+        reducedDamage = Math.max(1L, reducedDamage * (100 - additionalReduction) / 100);
         if (!this.angry) {
             long angryHp = this.nPoint.hpMax * ANGRY_HP_PERCENT / 100;
             if (this.nPoint.hp - reducedDamage <= angryHp) {
