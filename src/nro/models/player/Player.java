@@ -364,6 +364,8 @@ public class Player implements Runnable {
     public LocalDateTime lastCheckIn;
     public int dailyFragmentBought;
     public long lastTimeFragmentBought;
+    public int dailyDendeFlourBought;
+    public long lastDendeFlourPurchaseTime;
 
     public Player() {
         LearnSkill = new LearnSkill();
@@ -1159,10 +1161,15 @@ public class Player implements Runnable {
                             tlGiap = 0;
                         }
                     }
-                    case Skill.QUA_CAU_KENH_KHI, Skill.MAKANKOSAPPO, Skill.DICH_CHUYEN_TUC_THOI -> {
+                    case Skill.QUA_CAU_KENH_KHI, Skill.DICH_CHUYEN_TUC_THOI -> {
                         if (bonusXuyenGiapSonCon > 0) {
                             tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon);
                         }
+                    }
+                    case Skill.MAKANKOSAPPO -> {
+                        tlGiap = Math.min(86, Math.max(0, tlGiap));
+                        tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon);
+                        tlGiap = plAtt.applyFlourLazeArmorPenetration(tlGiap);
                     }
                 }
             }
@@ -1374,6 +1381,28 @@ public class Player implements Runnable {
 
     public boolean isActive() {
         return (this.isPl() && this.session != null && this.session.actived) || (this.isPet && ((Pet) this).master.session != null && ((Pet) this).master.session.actived);
+    }
+
+    public boolean hasFlourLazeArmorPenetration() {
+        return this.isPl()
+                && this.gender == ConstPlayer.NAMEC
+                && this.itemTime != null
+                && this.itemTime.isUseFlourLazeArmorPenetration
+                && !Util.canDoWithTime(this.itemTime.lastTimeUseFlourLazeArmorPenetration,
+                        ItemTime.TIME_FLOUR_LAZE_ARMOR_PENETRATION)
+                && this.playerSkill != null
+                && this.playerSkill.skillSelect != null
+                && this.playerSkill.skillSelect.template != null
+                && this.playerSkill.skillSelect.template.id == Skill.MAKANKOSAPPO;
+    }
+
+    public int applyFlourLazeArmorPenetration(int armorPercent) {
+        int normalizedArmor = Math.max(0, armorPercent);
+        if (!hasFlourLazeArmorPenetration()) {
+            return normalizedArmor;
+        }
+        return normalizedArmor
+                * (100 - ItemTime.FLOUR_LAZE_ARMOR_PENETRATION_PERCENT) / 100;
     }
 
     public void sendNewPet() {

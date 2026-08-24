@@ -3,6 +3,7 @@ package nro.models.server;
 import nro.models.radar.OptionCard;
 import nro.models.services.RadarService;
 import nro.models.services.ItemService;
+import nro.models.services.HellWolfPetService;
 import nro.models.radar.RadarCard;
 import nro.models.data.LocalManager;
 import nro.models.consts.ConstPlayer;
@@ -725,6 +726,9 @@ public final class Manager {
                         ItemService.gI().normalizeTrainArmorTemplate(itemTemp);
                         ItemService.gI().normalizeGokuNgayXuaTemplate(itemTemp);
                         ItemService.gI().normalizeJackyChunCostumeTemplate(itemTemp);
+                        ItemService.gI().normalizeFriedShrimpTemplate(itemTemp);
+                        ItemService.gI().normalizeFlourTemplate(itemTemp);
+                        HellWolfPetService.gI().normalizeTemplate(itemTemp);
                         ITEM_TEMPLATES.add(itemTemp);
                     } while (rs.next());
                     offset += batchSize;
@@ -752,11 +756,15 @@ public final class Manager {
             rs = ps.executeQuery();
             while (rs.next()) {
                 int optionTemplateId = rs.getInt("id");
-                if (optionTemplateId > 250) {
+                if (optionTemplateId > 254) {
                     continue;
                 }
                 ensureItemOptionTemplate(optionTemplateId, rs.getString("name"));
             }
+            ensureItemOptionTemplate(251, "Xuyên giáp +#%");
+            ensureItemOptionTemplate(252, "Sát thương Tự sát +#%");
+            ensureItemOptionTemplate(253, "Sát thương Laze +#%");
+            ensureItemOptionTemplate(254, "Sát thương Quả cầu Kênh Khi +#%");
             ensureItemOptionTemplate(233, "Set Gohan");
             ensureItemOptionTemplate(191, "Set SVK con\n(5 m\u00f3n +125% s\u00e1t th\u01b0\u01a1ng Kamejoko)");
             ensureItemOptionTemplate(192, "Set S\u01a1n con\n(5 m\u00f3n +50% xuy\u00ean gi\u00e1p, +40% s\u00e1t th\u01b0\u01a1ng Kaioken)");
@@ -816,7 +824,7 @@ public final class Manager {
                     JSONObject jso2 = (JSONObject) jsa2.get(j);
                     int idOptions = Integer.parseInt(jso2.get("id").toString());
                     int param = Integer.parseInt(jso2.get("param").toString());
-                    int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(idOptions, param);
+                    int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(itemId, idOptions, param);
                     idOptions = migratedOption[0];
                     param = migratedOption[1];
                     op.add(new Item.ItemOption(idOptions, param));
@@ -843,7 +851,7 @@ public final class Manager {
                         JSONObject jso3 = (JSONObject) jsa3.get(j);
                         int idOptions = Integer.parseInt(jso3.get("id").toString());
                         int param = Integer.parseInt(jso3.get("param").toString());
-                        int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(idOptions, param);
+                        int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(itemId, idOptions, param);
                         idOptions = migratedOption[0];
                         param = migratedOption[1];
                         op.add(new Item.ItemOption(idOptions, param));
@@ -901,6 +909,10 @@ public final class Manager {
                         JSONObject jsonobject = (JSONObject) option.get(u);
                         int optionId = Integer.parseInt(jsonobject.get("id").toString());
                         int param = Integer.parseInt(jsonobject.get("param").toString());
+                        int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(
+                                template.idItem, optionId, param);
+                        optionId = migratedOption[0];
+                        param = migratedOption[1];
                         template.options.add(new Item.ItemOption(optionId, param));
                     }
                 }
@@ -1055,6 +1067,10 @@ public final class Manager {
                                 JSONObject jsonobject = (JSONObject) option.get(u);
                                 int optionId = Integer.parseInt(jsonobject.get("id").toString());
                                 int param = Integer.parseInt(jsonobject.get("param").toString());
+                                int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(
+                                        id, optionId, param);
+                                optionId = migratedOption[0];
+                                param = migratedOption[1];
                                 optionList.add(new Item.ItemOption(optionId, param));
                             }
                         }

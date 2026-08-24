@@ -759,10 +759,15 @@ public class Boss extends Player implements IBoss {
         if (reductionPercent <= 0) {
             return 0;
         }
+        int effectiveReduction = reductionPercent;
         if (plAtt != null && plAtt.setClothes != null && plAtt.setClothes.sonCon >= 5) {
-            return Math.max(0, reductionPercent - 50);
+            effectiveReduction -= 50;
         }
-        return reductionPercent;
+        effectiveReduction = Math.max(0, effectiveReduction);
+        if (plAtt != null) {
+            effectiveReduction = plAtt.applyFlourLazeArmorPenetration(effectiveReduction);
+        }
+        return effectiveReduction;
     }
 
     @Override

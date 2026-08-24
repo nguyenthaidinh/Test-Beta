@@ -44,7 +44,7 @@ public class NangChiSoBongTai {
                 player.combineNew.ratioCombine = RATIO_NANG_CAP;
 
                 // Lấy số lượng Mảnh hồn bông tai từ param (option 31)
-                int currentHonSoLuong = InventoryService.gI().getParam(player, ITEM_PARAM_INDEX, HON_BONG_TAI_ID);
+                int currentHonSoLuong = InventoryService.gI().getParam(honBongTai, ITEM_PARAM_INDEX);
 
                 String npcSay = "|2|Mở chỉ số Bông tai Porata [+2]" + "\n\n";
                 npcSay += "|2|Tỉ lệ thành công: " + player.combineNew.ratioCombine + "%" + "\n";
@@ -89,48 +89,84 @@ public class NangChiSoBongTai {
     }
 
     public static void nangChiSoBongTai(Player player) {
-        try {
-            int currentHonSoLuong = InventoryService.gI().getParam(player, ITEM_PARAM_INDEX, HON_BONG_TAI_ID);
-            Item daXanhLam = InventoryService.gI().findItemBag(player, DA_XANH_LAM_ID);
-
-            if (currentHonSoLuong < REQUIRED_HON_BONG_TAI || daXanhLam == null) {
+        synchronized (player) {
+            if (player.combineNew.itemsCombine.size() != 3) {
+                Service.gI().sendThongBao(player,
+                        "Cần chọn đúng Bông tai cấp 2, Mảnh hồn bông tai và Đá xanh lam.");
+                return;
+            }
+            Item bongTai = null;
+            Item honBongTai = null;
+            Item daXanhLam = null;
+            for (Item item : player.combineNew.itemsCombine) {
+                if (item == null || !item.isNotNullItem()) {
+                    continue;
+                }
+                switch (item.template.id) {
+                    case BONG_TAI_ID -> bongTai = item;
+                    case HON_BONG_TAI_ID -> honBongTai = item;
+                    case DA_XANH_LAM_ID -> daXanhLam = item;
+                    default -> {
+                    }
+                }
+            }
+            if (bongTai == null || honBongTai == null || daXanhLam == null
+                    || InventoryService.gI().getIndexItemBag(player, bongTai) < 0
+                    || InventoryService.gI().getIndexItemBag(player, honBongTai) < 0
+                    || InventoryService.gI().getIndexItemBag(player, daXanhLam) < 0
+                    || InventoryService.gI().getParam(honBongTai, ITEM_PARAM_INDEX)
+                    < REQUIRED_HON_BONG_TAI || daXanhLam.quantity < 1) {
                 Service.gI().sendThongBao(player, "Không đủ vật phẩm để thực hiện.");
                 return;
             }
-            if (player.inventory.gem < player.combineNew.gemCombine) {
-                Service.gI().sendThongBao(player, "Bạn không đủ ngọc, còn thiếu " + (player.combineNew.gemCombine - player.inventory.gem) + " ngọc nữa!");
+            if (player.inventory.gem < GEM_NANG_BT) {
+                Service.gI().sendThongBao(player, "Bạn không đủ ngọc, còn thiếu "
+                        + (GEM_NANG_BT - player.inventory.gem) + " ngọc nữa!");
                 return;
             }
-            
-            player.inventory.gem -= player.combineNew.gemCombine;
-            
-            // Lấy item bông tai từ trong ô combine
-            Item bongTai = player.combineNew.itemsCombine.stream().filter(item -> item.template.id == BONG_TAI_ID).findFirst().orElse(null);
+            if (bongTai.quantity > 1 && InventoryService.gI().getCountEmptyBag(player) < 1) {
+                Service.gI().sendThongBao(player,
+                        "Bông tai cũ đang gộp thành stack, cần trống 1 ô hành trang để tách chiếc mở chỉ số.");
+                return;
+            }
 
-            if (Util.isTrue(player.combineNew.ratioCombine, 100)) {
+            boolean success = Util.isTrue(RATIO_NANG_CAP, 100);
+            Item upgradedEarring = bongTai;
+            if (success) {
+                upgradedEarring = InventoryService.gI().separateOneEarringInBag(player, bongTai);
+                if (upgradedEarring == null) {
+                    Service.gI().sendThongBao(player, "Không thể tách Bông tai cần mở chỉ số.");
+                    return;
+                }
+            }
+
+            player.inventory.gem -= GEM_NANG_BT;
+            if (success) {
                 byte optionId = UPGRADE_OPTIONS[Util.nextInt(0, UPGRADE_OPTIONS.length - 1)];
                 byte param = (byte) Util.nextInt(PARAM_MIN, PARAM_MAX);
-                
-                // Xóa các option cũ trên bông tai và thêm option mới
-                bongTai.itemOptions.clear();
-                bongTai.itemOptions.add(new Item.ItemOption(optionId, param));
-                bongTai.itemOptions.add(new Item.ItemOption(72, 2)); // Option cấp 2
-                
+                upgradedEarring.itemOptions.clear();
+                upgradedEarring.itemOptions.add(new Item.ItemOption(optionId, param));
+                upgradedEarring.itemOptions.add(new Item.ItemOption(72, 2));
+                upgradedEarring.info = upgradedEarring.getInfo();
+                upgradedEarring.content = upgradedEarring.getContent();
                 CombineService.gI().sendEffectSuccessCombine(player);
             } else {
                 CombineService.gI().sendEffectFailCombine(player);
             }
-            
-            // Trừ vật phẩm
-            InventoryService.gI().subParamItemsBag(player, HON_BONG_TAI_ID, ITEM_PARAM_INDEX, REQUIRED_HON_BONG_TAI);
+
+            InventoryService.gI().subParamItemBag(player, honBongTai,
+                    ITEM_PARAM_INDEX, REQUIRED_HON_BONG_TAI);
             InventoryService.gI().subQuantityItemsBag(player, daXanhLam, 1);
-            
+            if (InventoryService.gI().getIndexItemBag(player, honBongTai) < 0) {
+                player.combineNew.itemsCombine.remove(honBongTai);
+            }
+            if (InventoryService.gI().getIndexItemBag(player, daXanhLam) < 0) {
+                player.combineNew.itemsCombine.remove(daXanhLam);
+            }
+
             Service.gI().sendMoney(player);
             InventoryService.gI().sendItemBags(player);
             CombineService.gI().reOpenItemCombine(player);
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

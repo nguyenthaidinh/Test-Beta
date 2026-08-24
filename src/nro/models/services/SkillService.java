@@ -787,6 +787,7 @@ public class SkillService {
         } else if (player.setClothes.cadicM == 5) {
             dame += player.nPoint.hpMax * 50 / 100;
         }
+        dame = player.nPoint.applySpecialSkillDamageBonus(dame, Skill.TU_SAT);
         if (!player.isBoss && player.zone.mobs != null) {
             for (Mob mob : new ArrayList<>(player.zone.mobs)) {
                 if (mob != null && !mob.isDie() && Util.getDistance(player, mob) <= rangeBom) {

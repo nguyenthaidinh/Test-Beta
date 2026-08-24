@@ -127,4 +127,8 @@ INNER JOIN `item_shop` AS ish
 WHERE ish.`tab_id` = @tab_id
   AND ish.`temp_id` IN (880, 881, 882);
 
+UPDATE `item_template`
+SET `description` = 'Tặng cho Whis hoặc ăn vào để tăng 5% HP và 5% KI trong vòng 10 phút'
+WHERE `id` = 882;
+
 COMMIT;

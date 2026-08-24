@@ -68,6 +68,7 @@ import nro.models.map.service.NpcService;
 import nro.models.services.PetService;
 import nro.models.services.PlayerService;
 import nro.models.services.FriendAndEnemyService;
+import nro.models.services.GlobalSkyService;
 import nro.models.consts.ConstNpc;
 import nro.models.boss.Boss_Manager.BossManager;
 import nro.models.clan.Clan;
@@ -531,6 +532,8 @@ public class NpcFactory {
                                 TimeUtil.resetTestTime();
                                 Service.gI().sendThongBao(player, "Đã khôi phục giờ game về giờ thật: " + TimeUtil.getGameTimeText());
                             }
+                            case 7 ->
+                                GlobalSkyService.gI().toggle(player);
                         }
                     }
                     case ConstNpc.MENU_ADMIN_BOSS -> {

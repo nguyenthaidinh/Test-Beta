@@ -99,6 +99,7 @@ import nro.models.boss.pirate.PirateBlackBoss;
 import nro.models.boss.pirate.PirateCoolerBoss;
 import nro.models.boss.than_huy_diet.BeerusBoss;
 import nro.models.boss.than_huy_diet.WhisBoss;
+import nro.models.boss.ghost.PlanetGhostBoss;
 import nro.models.player.Player;
 import nro.models.network.Message;
 import nro.models.map.service.MapService;
@@ -188,6 +189,9 @@ public class BossManager implements Runnable {
         this.createBoss(BossID.BEERUS_BOSS);
         this.createBoss(BossID.COOLER_PIRATE);
         this.createBoss(BossID.PIRATE_BLACK, 2);
+        this.createBoss(BossID.GHOST_SVK, 20);
+        this.createBoss(BossID.GHOST_CAY_CON, 20);
+        this.createBoss(BossID.GHOST_NGAO_CON, 20);
 
     }
 
@@ -408,6 +412,8 @@ public class BossManager implements Runnable {
                     new PirateCoolerBoss();
                 case BossID.PIRATE_BLACK ->
                     new PirateBlackBoss();
+                case BossID.GHOST_SVK, BossID.GHOST_CAY_CON, BossID.GHOST_NGAO_CON ->
+                    new PlanetGhostBoss(bossID);
                 default ->
                     null;
             };
@@ -477,6 +483,11 @@ public class BossManager implements Runnable {
 
     private boolean canShowInAdminBossList(Boss boss) {
         if (boss == null || boss.data == null || boss.data.length == 0 || boss.data[0].getMapJoin().length == 0) {
+            return false;
+        }
+        // 60 boss hồn ma là quần thể tự động. Đưa toàn bộ vào menu sẽ làm
+        // số lượng vượt giới hạn byte của packet và có thể khiến client đọc âm.
+        if (boss instanceof PlanetGhostBoss) {
             return false;
         }
         int mapJoin = boss.data[0].getMapJoin()[0];

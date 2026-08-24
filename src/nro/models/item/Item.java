@@ -60,7 +60,8 @@ public class Item {
             }
             if (itemOption.optionTemplate != null
                     && (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)
-                    || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id))) {
+                    || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)
+                    && !isHellWolfFeatureOption(itemOption.optionTemplate.id))) {
                 continue;
             }
             strInfo += itemOption.getOptionString();
@@ -104,12 +105,19 @@ public class Item {
                 }
                 continue;
             }
-            if (ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)) {
+            if (ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)
+                    && !isHellWolfFeatureOption(itemOption.optionTemplate.id)) {
                 continue;
             }
             clientOptions.add(itemOption);
         }
         return clientOptions;
+    }
+
+    private boolean isHellWolfFeatureOption(int optionId) {
+        return this.template != null
+                && (this.template.id == ConstItem.SOI_DIA_NGUC || this.template.id == ConstItem.HON_MA)
+                && optionId >= 251 && optionId <= 254;
     }
 
     private String getDoThanThanhInfo() {

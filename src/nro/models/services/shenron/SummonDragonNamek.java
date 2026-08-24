@@ -14,6 +14,7 @@ import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
 import nro.models.map.service.NpcService;
 import nro.models.services.Service;
+import nro.models.services.GlobalSkyService;
 import nro.models.utils.Util;
 
 /**
@@ -120,6 +121,9 @@ public class SummonDragonNamek {
                 isShenronAppear = true;
             }
             Service.gI().sendMessAllPlayer(msg);
+            if (!appear) {
+                GlobalSkyService.gI().restoreAfterDragonLeaves();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -240,32 +244,6 @@ public class SummonDragonNamek {
                             InventoryService.gI().sendItemBags(playerSummonShenron);
                         }
                         break;
-                    case 2:
-                        if (playerSummonShenron.clan != null) {
-                            playerSummonShenron.clan.members.forEach(m -> {
-                                if (Client.gI().getPlayer(m.id) != null) {
-                                    Player p = Client.gI().getPlayer(m.id);
-                                    Item it = ItemService.gI().createNewItem((short) 2053);
-                                    it.quantity = 99;
-                                    InventoryService.gI().addItemBag(p, it);
-                                    InventoryService.gI().sendItemBags(p);
-                                } else {
-                                    Player p = MrBlue.loadById(m.id);
-                                    if (p != null) {
-                                        Item it = ItemService.gI().createNewItem((short) 2053);
-                                        it.quantity = 99;
-                                        InventoryService.gI().addItemBag(p, it);
-                                        PlayerDAO.updatePlayer(p);
-                                    }
-                                }
-                            });
-                        } else {
-                            Item it = ItemService.gI().createNewItem((short) 2053);
-                            it.quantity = 99;
-                            InventoryService.gI().addItemBag(playerSummonShenron, it);
-                            InventoryService.gI().sendItemBags(playerSummonShenron);
-                        }
-                        break;
                     default:
                         break;
                 }
@@ -283,15 +261,16 @@ public class SummonDragonNamek {
         String wish = null;
         switch (menu) {
             case ConstNpc.SHOW_SHENRON_NAMEK_CONFIRM:
+                if (select < 0 || select > 1) {
+                    Service.gI().sendThongBao(pl, "Lựa chọn không hợp lệ.");
+                    return;
+                }
                 switch (select) {
                     case 0:
                         wish = "1-20 viên ngọc rồng 3 sao";
                         break;
                     case 1:
                         wish = "pet hổ sẽ béo";
-                        break;
-                    case 2:
-                        wish = "x99 bột mỳ";
                         break;
                 }
                 break;
@@ -300,7 +279,9 @@ public class SummonDragonNamek {
     }
 
     public void sendBlackGokuhesNamec(Player pl) {
-        NpcService.gI().createMenuRongThieng(pl, ConstNpc.SHOW_SHENRON_NAMEK_CONFIRM, "Ta sẽ ban cho cả bang hội ngươi 1 điều ước, ngươi có 5 phút, hãy suy nghĩ thật kỹ trước khi quyết định", "1-20 viên ngọc rồng 3 sao", "pet hổ sẽ béo", "x99 bột mỳ");
+        NpcService.gI().createMenuRongThieng(pl, ConstNpc.SHOW_SHENRON_NAMEK_CONFIRM,
+                "Ta sẽ ban cho cả bang hội ngươi 1 điều ước, ngươi có 5 phút, hãy suy nghĩ thật kỹ trước khi quyết định",
+                "1-20 viên ngọc rồng 3 sao", "pet hổ sẽ béo");
     }
 
     public void shenronLeave(Player pl, byte type) {

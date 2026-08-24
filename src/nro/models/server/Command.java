@@ -28,6 +28,7 @@ import nro.models.Bot.BotManager;
 import nro.models.consts.ConstPlayer;
 import nro.models.data.LocalManager;
 import nro.models.services.TaskService;
+import nro.models.services.GlobalSkyService;
 
 /**
  *
@@ -61,6 +62,8 @@ public class Command {
         adminCommands.put("d", player -> Service.gI().setPos(player, player.location.x, player.location.y + 10));
         adminCommands.put("resetdiemboss", this::resetBossHunterPoint);
         adminCommands.put("cleardiemboss", this::resetBossHunterPoint);
+        adminCommands.put("troitoi", player -> GlobalSkyService.gI().setDark(player, true));
+        adminCommands.put("troisang", player -> GlobalSkyService.gI().setDark(player, false));
         adminCommands.put("reloadgc", player -> {
             int count = GiftCodeManager.gI().reloadGiftCodes();
             if (count >= 0) {
@@ -69,13 +72,7 @@ public class Command {
                 Service.gI().sendThongBao(player, "Lỗi reload giftcode!");
             }
         });
-        adminCommands.put("a", player -> NpcService.gI().createMenuConMeo(player, ConstNpc.MENU_ADMIN, -1,
-                "|0|Time start: " + ServerManager.timeStart
-                + "\nClients: " + Client.gI().getPlayers().size()
-                + "\n Sessions: " + SessionManager.gI().getNumSession()
-                + "\nThreads: " + Thread.activeCount()
-                + " luồng" + "\n" + SystemMetrics.ToString(),
-                "Ngọc rồng", "Đệ tử", "Bảo trì", "Tìm kiếm\nngười chơi", "Boss", "Đóng"));
+        adminCommands.put("a", this::showAdminMenu);
     }
 
     private void resetBossHunterPoint(Player player) {
@@ -104,7 +101,8 @@ public class Command {
                 + "\nThreads: " + Thread.activeCount()
                 + " luồng" + "\n" + SystemMetrics.ToString(),
                 "Ngọc rồng", "Đệ tử", "Bảo trì", "Tìm kiếm\nngười chơi", "Boss",
-                "Cài đặt\nthời gian", "Khôi phục\ngiờ thật", "Đóng");
+                "Cài đặt\nthời gian", "Khôi phục\ngiờ thật",
+                GlobalSkyService.gI().isDark() ? "Bật sáng\nbầu trời" : "Làm tối\nbầu trời", "Đóng");
     }
 
     private void initParameterizedCommands() {

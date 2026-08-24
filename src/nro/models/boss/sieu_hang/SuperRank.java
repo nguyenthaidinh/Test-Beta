@@ -256,11 +256,15 @@ public abstract class SuperRank extends Boss {
                         }
                         break;
                     case Skill.QUA_CAU_KENH_KHI:
-                    case Skill.MAKANKOSAPPO:
                     case Skill.DICH_CHUYEN_TUC_THOI:
                         if (bonusXuyenGiapSonCon > 0) {
                             tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon);
                         }
+                        break;
+                    case Skill.MAKANKOSAPPO:
+                        tlGiap = Math.min(86, Math.max(0, tlGiap));
+                        tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon);
+                        tlGiap = plAtt.applyFlourLazeArmorPenetration(tlGiap);
                         break;
                 }
             }

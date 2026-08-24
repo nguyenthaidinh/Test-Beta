@@ -89,11 +89,6 @@ public final class HalloweenRewards {
             return;
         }
 
-        drop(boss, ConstItem.BI_NGO, Util.nextInt(30, 60), killer.id, 0);
-
-        if (Util.isTrue(20, 100)) {
-            drop(boss, ConstItem.THIEP_HALLOWEEN, 1, killer.id, -30);
-        }
         if (Util.isTrue(10, 100)) {
             drop(boss, ConstItem.HOM_HALLOWEEN, 1, killer.id, 30);
         }

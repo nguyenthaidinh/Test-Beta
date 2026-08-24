@@ -207,4 +207,9 @@ public class BossID {
     public static final int CADIC_M = -924;
     public static final int BABY = -925;
     public static final int GAU_TUONG_CUOP = -926;
+
+    //========================HỒN MA BA HÀNH TINH========================
+    public static final int GHOST_SVK = -1001000;
+    public static final int GHOST_CAY_CON = -1001001;
+    public static final int GHOST_NGAO_CON = -1001002;
 }

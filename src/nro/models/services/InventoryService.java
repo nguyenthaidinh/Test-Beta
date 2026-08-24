@@ -630,6 +630,8 @@ public class InventoryService {
                 ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                 ItemService.gI().normalizeGokuNgayXuaOptions(item);
                 ItemService.gI().normalizeJackyChunCostumeOptions(item);
+                HellWolfPetService.gI().normalizePet(item);
+                HellWolfPetService.gI().normalizeSoul(item);
                 msg.writer().writeShort(item.template.id);
                 msg.writer().writeInt(item.quantity);
                 msg.writer().writeUTF(item.getInfo());
@@ -676,6 +678,8 @@ public class InventoryService {
                     ItemService.gI().normalizePumpkinCarriageMountOptions(item);
                     ItemService.gI().normalizeGokuNgayXuaOptions(item);
                     ItemService.gI().normalizeJackyChunCostumeOptions(item);
+                    HellWolfPetService.gI().normalizePet(item);
+                    HellWolfPetService.gI().normalizeSoul(item);
                     msg.writer().writeShort(item.template.id);
                     msg.writer().writeInt(item.quantity);
                     msg.writer().writeUTF(item.getInfo());
@@ -722,6 +726,8 @@ public class InventoryService {
                     ItemService.gI().normalizePumpkinCarriageMountOptions(it);
                     ItemService.gI().normalizeGokuNgayXuaOptions(it);
                     ItemService.gI().normalizeJackyChunCostumeOptions(it);
+                    HellWolfPetService.gI().normalizePet(it);
+                    HellWolfPetService.gI().normalizeSoul(it);
                     msg.writer().writeInt(it.quantity);
                     msg.writer().writeUTF(it.getInfo());
                     msg.writer().writeUTF(it.getContent());
@@ -890,10 +896,18 @@ public class InventoryService {
     }
 
     public boolean addItemList(List<Item> items, Item itemAdd) {
+        HellWolfPetService.gI().normalizePet(itemAdd);
+        HellWolfPetService.gI().normalizeSoul(itemAdd);
         if (itemAdd.itemOptions.isEmpty()) {
             itemAdd.itemOptions.add(new Item.ItemOption(73, 0));
         }
         ItemService.gI().normalizePumpkinCarriageMountOptions(itemAdd);
+
+        // Mỗi Bông tai Porata là một vật phẩm độc lập để người chơi có thể sở hữu
+        // nhiều chiếc với cấp và bộ chỉ số khác nhau. Không cộng dồn chúng thành stack.
+        if (isIndividualEarring(itemAdd.template.id)) {
+            return addIndividualEarrings(items, itemAdd);
+        }
 
         int[] idParam = isItemIncrementalOption(itemAdd);
         if (idParam[0] != -1) {
@@ -909,7 +923,9 @@ public class InventoryService {
                 }
             }
         }
-        boolean isStackable = itemAdd.template.isUpToUp || isForcedStackableItem(itemAdd.template.id);
+        boolean isStackable = itemAdd.template.isUpToUp
+                || itemAdd.template.id == ConstItem.HON_MA
+                || isForcedStackableItem(itemAdd.template.id);
         if (isStackable) {
             boolean isForcedStackable = isForcedStackableItem(itemAdd.template.id);
             for (Item it : items) {
@@ -960,6 +976,81 @@ public class InventoryService {
         return false;
     }
 
+    private boolean addIndividualEarrings(List<Item> items, Item itemAdd) {
+        int quantity = Math.max(0, itemAdd.quantity);
+        if (quantity == 0) {
+            return true;
+        }
+        int emptySlots = 0;
+        for (Item item : items) {
+            if (!item.isNotNullItem()) {
+                emptySlots++;
+            }
+        }
+        if (emptySlots < quantity) {
+            return false;
+        }
+        int created = 0;
+        long nextCreateTime = Math.max(nextUniqueCreateTime(items), itemAdd.createTime + 1);
+        for (int i = 0; i < items.size() && quantity > 0; i++) {
+            if (!items.get(i).isNotNullItem()) {
+                Item singleEarring = ItemService.gI().copyItem(itemAdd);
+                singleEarring.quantity = 1;
+                if (created > 0) {
+                    singleEarring.createTime = nextCreateTime++;
+                }
+                items.set(i, singleEarring);
+                quantity--;
+                created++;
+            }
+        }
+        itemAdd.quantity = 0;
+        return true;
+    }
+
+    /**
+     * Tách đúng một bông tai khỏi stack dữ liệu cũ trước khi đổi cấp/chỉ số.
+     * Dữ liệu mới không còn tạo stack bông tai, nhưng hàm này giữ tương thích với
+     * những nhân vật đã có stack từ trước khi cập nhật.
+     */
+    public Item separateOneEarringInBag(Player player, Item earring) {
+        if (player == null || earring == null || !earring.isNotNullItem()
+                || !isIndividualEarring(earring.template.id)
+                || getIndexItemBag(player, earring) < 0 || earring.quantity < 1) {
+            return null;
+        }
+        if (earring.quantity == 1) {
+            return earring;
+        }
+        for (int i = 0; i < player.inventory.itemsBag.size(); i++) {
+            if (!player.inventory.itemsBag.get(i).isNotNullItem()) {
+                Item singleEarring = ItemService.gI().copyItem(earring);
+                singleEarring.quantity = 1;
+                singleEarring.createTime = nextUniqueCreateTime(player.inventory.itemsBag);
+                earring.quantity--;
+                player.inventory.itemsBag.set(i, singleEarring);
+                return singleEarring;
+            }
+        }
+        return null;
+    }
+
+    private long nextUniqueCreateTime(List<Item> items) {
+        long next = System.currentTimeMillis();
+        for (Item item : items) {
+            if (item != null && item.isNotNullItem() && item.createTime >= next) {
+                next = item.createTime + 1;
+            }
+        }
+        return next;
+    }
+
+    private boolean isIndividualEarring(int itemId) {
+        return itemId == ConstItem.BONG_TAI_PORATA
+                || itemId == ConstItem.BONG_TAI_PORATA_CAP_2
+                || itemId == ConstItem.BONG_TAI_PORATA_CAP_3;
+    }
+
     private void compactForcedStackableItems(List<Item> items) {
         compactItemStacks(items, ConstItem.DUOI_KHI_1045);
         compactItemStacks(items, ConstItem.BI_NGO);
@@ -968,6 +1059,7 @@ public class InventoryService {
         compactItemStacks(items, ConstItem.KEO_NAO_NGUOI);
         compactItemStacks(items, ConstItem.KEO_BI_NGO);
         compactItemStacks(items, ConstItem.HOP_KEO_MA_QUY);
+        compactItemStacks(items, ConstItem.THIT_TUOI_NANG_CAP_SOI);
     }
 
     private void compactItemStacks(List<Item> items, int itemId) {
@@ -1007,7 +1099,8 @@ public class InventoryService {
         return itemId == ConstItem.DUOI_KHI_1045 || itemId == ConstItem.BI_NGO
                 || itemId == ConstItem.THIEP_HALLOWEEN
                 || itemId == ConstItem.KEO_BAN_TAY || itemId == ConstItem.KEO_NAO_NGUOI
-                || itemId == ConstItem.KEO_BI_NGO || itemId == ConstItem.HOP_KEO_MA_QUY;
+                || itemId == ConstItem.KEO_BI_NGO || itemId == ConstItem.HOP_KEO_MA_QUY
+                || itemId == ConstItem.THIT_TUOI_NANG_CAP_SOI;
     }
 
     private void normalizeForcedStackableItem(Item item) {
@@ -1171,6 +1264,41 @@ public class InventoryService {
             }
         }
         return 0;
+    }
+
+    public int getParam(Item item, int idOption) {
+        if (item == null || item.itemOptions == null || !item.isNotNullItem()) {
+            return 0;
+        }
+        for (ItemOption option : item.itemOptions) {
+            if (option != null && option.optionTemplate != null
+                    && option.optionTemplate.id == idOption) {
+                return Math.max(0, option.param);
+            }
+        }
+        return 0;
+    }
+
+    /** Trừ param trên đúng stack đã được người chơi chọn trong ô kết hợp. */
+    public boolean subParamItemBag(Player player, Item item, int idOption, int amount) {
+        if (player == null || item == null || amount <= 0
+                || getIndexItemBag(player, item) < 0 || item.itemOptions == null) {
+            return false;
+        }
+        for (ItemOption option : item.itemOptions) {
+            if (option != null && option.optionTemplate != null
+                    && option.optionTemplate.id == idOption) {
+                if (option.param < amount) {
+                    return false;
+                }
+                option.param -= amount;
+                if (option.param <= 0) {
+                    removeItem(player.inventory.itemsBag, item);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public void subParamItemsBag(Player player, int itemID, int idoption, int param) {

@@ -4,6 +4,7 @@ import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
 import nro.models.map.phoban.BanDoKhoBau;
 import nro.models.managers.TopBossHunter;
+import nro.models.managers.TopGhostHunter;
 import nro.models.services_dungeon.TreasureUnderSeaService;
 import nro.models.npc.Npc;
 import static nro.models.npc.NpcFactory.PLAYERID_OBJECT;
@@ -97,12 +98,17 @@ public class QuyLaoKame extends Npc {
                 menu.add("Nói\nchuyện");
                 menu.add("Đổi quà\nSự kiện");
                 menu.add("BXH\nSăn Boss");
+                menu.add("BXH\nSăn Hồn Ma");
                 menu.add("Nhận quà\nKOL");
                 menu.add("Nhận quà\nKOL VIP");
                 if (player.isAdmin()) {
                     menu.add(TopBossHunter.getInstance().isAdminDetailsVisible(player.id)
                             ? "Ẩn tên + điểm\nBXH Săn Boss"
                             : "Bật tên + điểm\nBXH Săn Boss");
+                    menu.add(TopGhostHunter.getInstance().isAdminDetailsVisible(player.id)
+                            ? "Ẩn tên + điểm\nBXH Hồn Ma"
+                            : "Bật tên + điểm\nBXH Hồn Ma");
+                    menu.add("Xóa điểm\nBXH Hồn Ma");
                 }
                 if (ruacon != null && ruacon.quantity >= 1) {
                     menu.add("Giao\nRùa con");
@@ -156,6 +162,9 @@ public class QuyLaoKame extends Npc {
             case ConstNpc.KOL_VIP_REWARD_MENU:
                 handleKOLQuestRewardConfirm(player, select, true);
                 break;
+            case ConstNpc.MENU_CLEAR_GHOST_HUNT_TOP:
+                handleClearGhostHunterConfirm(player, select);
+                break;
         }
     }
 
@@ -171,19 +180,32 @@ public class QuyLaoKame extends Npc {
                 Service.gI().showTopBossHunter(player);
                 break;
             case 3:
-                handleKOLQuest(player, false);
+                Service.gI().showTopGhostHunter(player);
                 break;
             case 4:
-                handleKOLQuest(player, true);
+                handleKOLQuest(player, false);
                 break;
             case 5:
+                handleKOLQuest(player, true);
+                break;
+            case 6:
                 if (player.isAdmin()) {
                     toggleBossHunterLeaderboardVisibility(player);
                 } else {
                     handleTradeRuacon(player);
                 }
                 break;
-            case 6:
+            case 7:
+                if (player.isAdmin()) {
+                    toggleGhostHunterLeaderboardVisibility(player);
+                }
+                break;
+            case 8:
+                if (player.isAdmin()) {
+                    confirmClearGhostHunterLeaderboard(player);
+                }
+                break;
+            case 9:
                 if (player.isAdmin()) {
                     handleTradeRuacon(player);
                 }
@@ -199,6 +221,36 @@ public class QuyLaoKame extends Npc {
         Service.gI().sendThongBao(player, visible
                 ? "Đã bật tên và điểm BXH Săn Boss cho tài khoản admin này."
                 : "Đã trở về chế độ xem ẩn của BXH Săn Boss.");
+    }
+
+    private void toggleGhostHunterLeaderboardVisibility(Player player) {
+        if (!player.isAdmin()) {
+            return;
+        }
+        boolean visible = TopGhostHunter.getInstance().toggleAdminDetailsVisible(player.id);
+        Service.gI().sendThongBao(player, visible
+                ? "Đã bật tên và điểm BXH Săn Hồn Ma cho tài khoản admin này."
+                : "Đã trở về chế độ xem ẩn của BXH Săn Hồn Ma.");
+    }
+
+    private void confirmClearGhostHunterLeaderboard(Player player) {
+        this.createOtherMenu(player, ConstNpc.MENU_CLEAR_GHOST_HUNT_TOP,
+                "Xóa toàn bộ điểm BXH Săn Hồn Ma?\nThao tác này không thể hoàn tác.",
+                "Xóa toàn bộ", "Hủy");
+    }
+
+    private void handleClearGhostHunterConfirm(Player player, int select) {
+        if (!player.isAdmin() || select != 0) {
+            return;
+        }
+        try {
+            int rows = TopGhostHunter.getInstance().clearAll();
+            Service.gI().sendThongBao(player,
+                    "Đã xóa toàn bộ điểm BXH Săn Hồn Ma: " + rows + " người chơi.");
+        } catch (Exception e) {
+            Logger.logException(QuyLaoKame.class, e);
+            Service.gI().sendThongBao(player, "Lỗi xóa điểm BXH Săn Hồn Ma.");
+        }
     }
 
     private void handleTalk(Player player) {
@@ -580,9 +632,6 @@ public class QuyLaoKame extends Npc {
                 options.add(new Item.ItemOption(93, 90));
                 break;
             case 1654:
-                options.add(new Item.ItemOption(50, 16));
-                options.add(new Item.ItemOption(77, 15));
-                options.add(new Item.ItemOption(103, 15));
                 options.add(new Item.ItemOption(106, 0));
                 options.add(new Item.ItemOption(30, 1));
                 options.add(new Item.ItemOption(93, 30));

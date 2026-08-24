@@ -651,6 +651,12 @@ public class PlayerDAO {
                         - (System.currentTimeMillis() - player.itemTime.lastTimeUseKeoBiNgo)) : 0));
                 dataArray.add((player.itemTime.isUseMayDoLinhHon ? Math.max(0, player.itemTime.timeMayDoLinhHon
                         - (System.currentTimeMillis() - player.itemTime.lastTimeUseMayDoLinhHon)) : 0));
+                dataArray.add((player.itemTime.isUseFlourLazeArmorPenetration
+                        ? Math.max(0, ItemTime.TIME_FLOUR_LAZE_ARMOR_PENETRATION
+                                - (System.currentTimeMillis()
+                                - player.itemTime.lastTimeUseFlourLazeArmorPenetration)) : 0));
+                dataArray.add(Math.max(0, player.dailyDendeFlourBought));
+                dataArray.add(player.lastDendeFlourPurchaseTime);
                 String itemTime = dataArray.toJSONString();
                 dataArray.clear();
 
@@ -746,6 +752,7 @@ public class PlayerDAO {
                     int timeLeftFusion = (int) (Fusion.TIME_FUSION - (System.currentTimeMillis() - player.fusion.lastTimeFusion));
                     dataArray.add(timeLeftFusion < 0 ? 0 : timeLeftFusion);
                     dataArray.add(player.pet.status);
+                    dataArray.add(player.fusion.selectedPorataCreateTime);
                     petInfo = dataArray.toJSONString();
                     dataArray.clear();
 

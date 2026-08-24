@@ -15,6 +15,7 @@ import nro.models.utils.Util;
 import nro.models.network.Message;
 import nro.models.services.ItemService;
 import nro.models.services.PlayerService;
+import nro.models.services.GlobalSkyService;
 import nro.models.services.InventoryService;
 import nro.models.utils.Logger;
 import java.util.List;
@@ -232,6 +233,9 @@ public class SummonDragon {
                 pl.idMark.setShenronType(-1);
             }
             Service.gI().sendMessAllPlayer(msg);
+            if (!appear) {
+                GlobalSkyService.gI().restoreAfterDragonLeaves();
+            }
         } catch (Exception e) {
         }
     }

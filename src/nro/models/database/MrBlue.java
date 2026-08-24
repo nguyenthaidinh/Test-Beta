@@ -29,6 +29,7 @@ import nro.models.player_system.AntiLogin;
 import nro.models.services.ClanService;
 import nro.models.services.IntrinsicService;
 import nro.models.services.ItemService;
+import nro.models.services.HellWolfPetService;
 import nro.models.map.service.MapService;
 import nro.models.services.Service;
 import nro.models.services.TaskService;
@@ -580,6 +581,7 @@ public class MrBlue {
             long timeKeoNaoNguoi = 0;
             long timeKeoBiNgo = 0;
             long timeMayDoLinhHon = 0;
+            long timeFlourLazeArmorPenetration = 0;
             int timeBoHuyet = Integer.parseInt(String.valueOf(dataArray.get(0)));
             int timeBoHuyet2 = Integer.parseInt(String.valueOf(dataArray.get(1)));
             int timeBoKhi = Integer.parseInt(String.valueOf(dataArray.get(2)));
@@ -664,6 +666,19 @@ public class MrBlue {
             if (dataArray.size() > 34) {
                 timeMayDoLinhHon = Long.parseLong(String.valueOf(dataArray.get(34)));
             }
+            if (dataArray.size() > 35) {
+                timeFlourLazeArmorPenetration = Long.parseLong(String.valueOf(dataArray.get(35)));
+            }
+            if (dataArray.size() > 36) {
+                player.dailyDendeFlourBought = Math.max(0,
+                        Integer.parseInt(String.valueOf(dataArray.get(36))));
+            }
+            if (dataArray.size() > 37) {
+                player.lastDendeFlourPurchaseTime = Long.parseLong(String.valueOf(dataArray.get(37)));
+            }
+            if (Util.isAfterMidnight(player.lastDendeFlourPurchaseTime)) {
+                player.dailyDendeFlourBought = 0;
+            }
 
             player.itemTime.lastTimeBoHuyet = System.currentTimeMillis() - (ItemTime.TIME_ITEM - timeBoHuyet);
             player.itemTime.lastTimeBoKhi = System.currentTimeMillis() - (ItemTime.TIME_ITEM - timeBoKhi);
@@ -700,6 +715,9 @@ public class MrBlue {
                     - (ItemTime.TIME_KEO_BI_NGO - timeKeoBiNgo);
             player.itemTime.lastTimeUseMayDoLinhHon = System.currentTimeMillis();
             player.itemTime.timeMayDoLinhHon = timeMayDoLinhHon;
+            player.itemTime.lastTimeUseFlourLazeArmorPenetration = System.currentTimeMillis()
+                    - (ItemTime.TIME_FLOUR_LAZE_ARMOR_PENETRATION
+                    - timeFlourLazeArmorPenetration);
 
             player.itemTime.iconMeal = iconMeal;
             player.itemTime.isEatMeal = timeMeal != 0;
@@ -735,6 +753,7 @@ public class MrBlue {
             player.itemTime.isUseKeoNaoNguoi = timeKeoNaoNguoi > 0;
             player.itemTime.isUseKeoBiNgo = timeKeoBiNgo > 0;
             player.itemTime.isUseMayDoLinhHon = timeMayDoLinhHon > 0;
+            player.itemTime.isUseFlourLazeArmorPenetration = timeFlourLazeArmorPenetration > 0;
             dataArray.clear();
 
             //data nhiệm vụ
@@ -856,6 +875,10 @@ public class MrBlue {
                 player.fusion.lastTimeFusion = System.currentTimeMillis()
                         - (Fusion.TIME_FUSION - Integer.parseInt(String.valueOf(dataArray.get(4))));
                 pet.status = Byte.parseByte(String.valueOf(dataArray.get(5)));
+                if (dataArray.size() > 6) {
+                    player.fusion.selectedPorataCreateTime
+                            = Long.parseLong(String.valueOf(dataArray.get(6)));
+                }
 
                 // data chỉ số
                 dataArray = (JSONArray) JSONValue.parse(String.valueOf(petData.get(1)));
@@ -1400,7 +1423,12 @@ public class MrBlue {
     }
 
     private static void loadItemOptions(Item item, JSONArray options) {
-        if (item == null || options == null || options.isEmpty()) {
+        if (item == null) {
+            return;
+        }
+        if (options == null || options.isEmpty()) {
+            HellWolfPetService.gI().normalizePet(item);
+            HellWolfPetService.gI().normalizeSoul(item);
             return;
         }
         item.itemOptions.clear();
@@ -1408,7 +1436,8 @@ public class MrBlue {
             JSONArray opt = (JSONArray) JSONValue.parse(String.valueOf(option));
             int optionId = Integer.parseInt(String.valueOf(opt.get(0)));
             int optionParam = Integer.parseInt(String.valueOf(opt.get(1)));
-            int[] migratedDoThanThanhOption = ItemService.migrateDoThanThanhDisplayOption(optionId, optionParam);
+            int[] migratedDoThanThanhOption = ItemService.migrateDoThanThanhDisplayOption(
+                    item.template.id, optionId, optionParam);
             optionId = migratedDoThanThanhOption[0];
             optionParam = migratedDoThanThanhOption[1];
             if (ItemService.gI().getItemOptionTemplate(optionId) == null) {
@@ -1423,6 +1452,8 @@ public class MrBlue {
         ItemService.gI().normalizeAngelDemonWingsOptions(item);
         ItemService.gI().normalizeBrolyRedCostumeOptions(item);
         ItemService.gI().normalizeBrolyCostumeOptions(item);
+        HellWolfPetService.gI().normalizePet(item);
+        HellWolfPetService.gI().normalizeSoul(item);
     }
 
     private static void initJackyChunCostumeWearTime(Player player) {

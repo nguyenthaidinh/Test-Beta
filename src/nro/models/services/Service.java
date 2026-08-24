@@ -27,9 +27,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import nro.models.Bot.BotAttackplayer;
 import nro.models.database.PlayerDAO;
+import nro.models.database.GhostHuntLeaderboardDAO;
 import nro.models.managers.MyClanTopBanDoKhoBau;
 import nro.models.managers.TopBanDoKhoBau;
 import nro.models.managers.TopBossHunter;
+import nro.models.managers.TopGhostHunter;
 import nro.models.managers.TopConDuongRanDoc;
 import nro.models.managers.TopKhiGasHuyDiet;
 import nro.models.map.Zone;
@@ -581,6 +583,54 @@ public class Service {
                 msg.writer().writeUTF(isCurrentPlayer
                         ? "Hạng của bạn: Top " + (i + 1)
                         + "\nĐiểm của bạn: " + Util.formatNumber(player.event.getEventPoint())
+                        : "");
+            }
+            player.sendMessage(msg);
+            msg.cleanup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showTopGhostHunter(Player player) {
+        TopGhostHunter topGhostHunter = TopGhostHunter.getInstance();
+        List<TopGhostHunter.Entry> list = topGhostHunter.loadTop();
+        GhostHuntLeaderboardDAO.Standing standing = topGhostHunter.getStanding(player.id);
+        if (list.isEmpty()) {
+            NpcService.gI().createTutorial(player, -1,
+                    "Chưa có dữ liệu BXH Săn Hồn Ma.\nĐiểm của bạn: "
+                    + Util.formatNumber(standing.point()));
+            return;
+        }
+
+        boolean canViewAllDetails = player.isAdmin()
+                && topGhostHunter.isAdminDetailsVisible(player.id);
+        String playerRankText = standing.rank() > 0 ? "Top " + standing.rank() : "Chưa có hạng";
+        Message msg = new Message(-96);
+        try {
+            msg.writer().writeByte(0);
+            msg.writer().writeUTF("BXH Săn Hồn Ma\nHạng của bạn: " + playerRankText
+                    + "\nĐiểm của bạn: " + Util.formatNumber(standing.point()));
+            msg.writer().writeByte(list.size());
+            for (int i = 0; i < list.size(); i++) {
+                TopGhostHunter.Entry entry = list.get(i);
+                boolean isCurrentPlayer = entry.playerId() == player.id;
+                boolean showDetails = canViewAllDetails || isCurrentPlayer;
+                msg.writer().writeInt(i + 1);
+                msg.writer().writeInt(showDetails ? (int) entry.playerId() : 0);
+                msg.writer().writeShort(showDetails ? entry.head() : player.getHead());
+                if (player.getSession().version > 214) {
+                    msg.writer().writeShort(-1);
+                }
+                msg.writer().writeShort(showDetails ? entry.body() : player.getBody());
+                msg.writer().writeShort(showDetails ? entry.leg() : player.getLeg());
+                msg.writer().writeUTF(showDetails ? entry.name() : "player");
+                msg.writer().writeUTF(showDetails
+                        ? "Điểm săn Hồn Ma: " + Util.formatNumber(entry.point())
+                        : "Điểm săn Hồn Ma: Ẩn");
+                msg.writer().writeUTF(isCurrentPlayer
+                        ? "Hạng của bạn: Top " + (i + 1)
+                        + "\nĐiểm của bạn: " + Util.formatNumber(standing.point())
                         : "");
             }
             player.sendMessage(msg);

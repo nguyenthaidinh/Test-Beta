@@ -8,7 +8,6 @@ import nro.models.consts.ConstMap;
 import nro.models.consts.ConstItem;
 import nro.models.consts.ConstMob;
 import nro.models.consts.ConstTask;
-import nro.models.event.EventManager;
 import nro.models.item.Item;
 import nro.models.map.ItemMap;
 import java.util.List;
@@ -616,7 +615,6 @@ public class Mob {
         }
         int mapid = player.zone.map.mapId;
         Player rewardOwner = getRewardOwner(player);
-        addHalloweenMobReward(rewardOwner, list, x, yEnd, mapid);
         addPirateIslandChestMobReward(rewardOwner, list, x, yEnd, mapid);
         //========================Capsul Kì Bí========================
         if (player.itemTime.isUseMayDo
@@ -649,7 +647,7 @@ public class Mob {
                 ItemMap it = new ItemMap(zone, 933, 1, x, yEnd, player.id);
                 it.options.add(new Item.ItemOption(31, 1));
                 list.add(it);
-            } else if (Util.isTrue(dropRate2, 100) && player.itemEvent.canDropManhVo(50_000)) {
+            } else if (Util.isTrue(dropRate2, 100)) {
                 ItemMap it = new ItemMap(zone, 934, 1, x, yEnd, player.id);
                 it.options.add(new Item.ItemOption(31, 1));
                 list.add(it);
@@ -1106,33 +1104,6 @@ public class Mob {
         return mapid == ConstMap.DAO_HAI_TAC_1
                 || mapid == ConstMap.DAO_HAI_TAC_2
                 || mapid == ConstMap.DAO_HAI_TAC_3;
-    }
-
-    private void addHalloweenMobReward(Player player, List<ItemMap> list, int x, int yEnd, int mapid) {
-        if (player == null) {
-            return;
-        }
-        boolean isHalloweenDropMap = MapService.gI().AllMap(mapid) || MapService.gI().isMapEventHalloween(mapid);
-        if (!EventManager.HALLOWEEN || MapService.gI().isMapPhoBan(mapid) || !isHalloweenDropMap) {
-            return;
-        }
-
-        int pumpkinDropRate = 5;
-        int pumpkinQuantityMin = 1;
-        int pumpkinQuantityMax = 2;
-
-        if (player.effectSkill != null && player.effectSkill.isHalloween) {
-            pumpkinDropRate = 8;
-            pumpkinQuantityMin = 2;
-            pumpkinQuantityMax = 4;
-        }
-
-        if (Util.isTrue(pumpkinDropRate, 100)) {
-            list.add(new ItemMap(zone, ConstItem.BI_NGO, Util.nextInt(pumpkinQuantityMin, pumpkinQuantityMax), x, yEnd, player.id));
-        }
-        if (Util.isTrue(1, 1000)) {
-            list.add(new ItemMap(zone, ConstItem.THIEP_HALLOWEEN, 1, x + 12, yEnd, player.id));
-        }
     }
 
     private Player getRewardOwner(Player killer) {

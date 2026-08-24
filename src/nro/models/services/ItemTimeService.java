@@ -26,6 +26,7 @@ public class ItemTimeService {
     private static final int ICON_KEO_NAO_NGUOI = 11737;
     private static final int ICON_KEO_BI_NGO = 11749;
     private static final int ICON_MAY_DO_LINH_HON = 11493;
+    private static final int ICON_FLOUR = 7069;
 
     private static ItemTimeService i;
 
@@ -91,6 +92,12 @@ public class ItemTimeService {
         if (player.itemTime.isUseKeoBiNgo) {
             sendItemTime(player, ICON_KEO_BI_NGO,
                     (int) ((TIME_KEO_BI_NGO - (System.currentTimeMillis() - player.itemTime.lastTimeUseKeoBiNgo)) / 1000));
+        }
+        if (player.itemTime.isUseFlourLazeArmorPenetration) {
+            sendItemTime(player, ICON_FLOUR,
+                    (int) ((TIME_FLOUR_LAZE_ARMOR_PENETRATION
+                            - (System.currentTimeMillis()
+                            - player.itemTime.lastTimeUseFlourLazeArmorPenetration)) / 1000));
         }
         if (player.itemTime.isUseMayDoLinhHon) {
             long remaining = player.itemTime.timeMayDoLinhHon

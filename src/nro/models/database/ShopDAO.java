@@ -117,7 +117,8 @@ public class ShopDAO {
             while (rs.next()) {
                 int optionId = rs.getInt("option_id");
                 int optionParam = rs.getInt("param");
-                int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(optionId, optionParam);
+                int[] migratedOption = ItemService.migrateDoThanThanhDisplayOption(
+                        itemShop.temp.id, optionId, optionParam);
                 itemShop.options.add(new Item.ItemOption(migratedOption[0], migratedOption[1]));
             }
             try {

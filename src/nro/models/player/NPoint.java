@@ -11,6 +11,7 @@ import nro.models.skill.Skill;
 import nro.models.server.Manager;
 import nro.models.services.EffectSkillService;
 import nro.models.services.ItemService;
+import nro.models.services.HellWolfPetService;
 import nro.models.map.service.MapService;
 import nro.models.services.PlayerService;
 import nro.models.services.Service;
@@ -40,6 +41,7 @@ public class NPoint {
     private static final long BASE_CRIT_UPGRADE_TIEM_NANG = 12_500L;
     private static final long HIGH_CRIT_UPGRADE_TIEM_NANG_DIVISOR = 30L;
     private static final int HIGH_CRIT_UPGRADE_FROM = 12;
+    private static final int FRIED_SHRIMP_ICON_ID = 8062;
 
     @Setter
     private Player player;
@@ -73,6 +75,10 @@ public class NPoint {
     public long tiemNang;
 
     public long hp, hpMax, hpg;
+
+    // Chỉ bật cho thực thể có HP vượt giới hạn int của giao thức client.
+    // Mặc định false nên không thay đổi cách hiển thị của người chơi/boss cũ.
+    private boolean scaleClientHpToIntRange;
     public int mp, mpMax, mpg;
     public long dame;
     public int dameg;
@@ -167,6 +173,10 @@ public class NPoint {
     public short tlxgcc;
 
     public short tlxgc;
+
+    public int tlDameTuSat;
+    public int tlDameLaze;
+    public int tlDameQCKK;
 
     public short tlchinhxac;
 
@@ -429,30 +439,26 @@ public class NPoint {
 
         // Bông tai cấp 2
         if (this.player.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA2) {
-            this.player.inventory.itemsBag.stream()
-                    .filter(it -> it.isNotNullItem() && it.template.id == 921)
-                    .findFirst()
-                    .ifPresent(btc2 -> {
-                        for (ItemOption io : btc2.itemOptions) {
-                            addOption(io);
-                            if (io.optionTemplate.id == 72) {
-                                this.levelBT = io.param;
-                            }
-                        }
-                    });
+            Item btc2 = this.player.fusion.getSelectedPorata(921);
+            if (btc2 != null) {
+                for (ItemOption io : btc2.itemOptions) {
+                    addOption(io);
+                    if (io.optionTemplate.id == 72) {
+                        this.levelBT = io.param;
+                    }
+                }
+            }
         }
         if (this.player.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA3) {
-            this.player.inventory.itemsBag.stream()
-                    .filter(it -> it.isNotNullItem() && it.template.id == 1819)
-                    .findFirst()
-                    .ifPresent(btc3 -> {
-                        for (ItemOption io : btc3.itemOptions) {
-                            addOption(io);
-                            if (io.optionTemplate.id == 72) {
-                                this.levelBT = io.param;
-                            }
-                        }
-                    });
+            Item btc3 = this.player.fusion.getSelectedPorata(1819);
+            if (btc3 != null) {
+                for (ItemOption io : btc3.itemOptions) {
+                    addOption(io);
+                    if (io.optionTemplate.id == 72) {
+                        this.levelBT = io.param;
+                    }
+                }
+            }
         }
 
         this.player.setClothes.worldcup = 0;
@@ -478,6 +484,7 @@ public class NPoint {
                 ItemService.gI().normalizeAngelDemonWingsOptions(item);
                 ItemService.gI().normalizeBrolyRedCostumeOptions(item);
                 ItemService.gI().normalizeBrolyCostumeOptions(item);
+                HellWolfPetService.gI().normalizePet(item);
                 if (item.template.id == 1781 && isFusionActive()) {
                     for (ItemOption io : item.itemOptions) {
                         if (io.optionTemplate.id == 204) {
@@ -628,6 +635,19 @@ public class NPoint {
                 break;
             case 99: //Xuyen giap can chien
                 this.tlxgcc += io.param;
+                break;
+            case HellWolfPetService.OPTION_ARMOR_PENETRATION:
+                this.tlxgc += io.param;
+                this.tlxgcc += io.param;
+                break;
+            case HellWolfPetService.OPTION_SELF_DESTRUCT_DAMAGE:
+                this.tlDameTuSat += io.param;
+                break;
+            case HellWolfPetService.OPTION_LAZE_DAMAGE:
+                this.tlDameLaze += io.param;
+                break;
+            case HellWolfPetService.OPTION_QCKK_DAMAGE:
+                this.tlDameQCKK += io.param;
                 break;
             case 100: //+#% vàng từ quái
                 this.tlGold += io.param;
@@ -997,7 +1017,8 @@ public class NPoint {
         }
 
         // Xử lý thức ăn 2
-        if (this.player.itemTime != null && this.player.itemTime.isEatMeal2 && this.player.itemTime.iconMeal2 == 8062) {
+        if (this.player.itemTime != null && this.player.itemTime.isEatMeal2
+                && this.player.itemTime.iconMeal2 == FRIED_SHRIMP_ICON_ID) {
             hpMax += (hpMax * 5 / 100L);
         }
 
@@ -1157,6 +1178,12 @@ public class NPoint {
             mpMax *= this.player.effectSkin.xHPKI;
         }
 
+        // Tôm tẩm bột chiên xù: tăng 5% KI cùng với 5% HP trong 10 phút.
+        if (this.player.itemTime != null && this.player.itemTime.isEatMeal2
+                && this.player.itemTime.iconMeal2 == FRIED_SHRIMP_ICON_ID) {
+            mpMax += (mpMax * 5 / 100L);
+        }
+
         // Xử lý gogeta
         if (this.isGogeta) {
             mpMax += (mpMax * 10 / 100L);
@@ -1254,11 +1281,26 @@ public class NPoint {
     }
 
     public int getClientHp() {
+        if (scaleClientHpToIntRange && this.hpMax > Integer.MAX_VALUE) {
+            long currentHp = Math.max(0, Math.min(this.hp, this.hpMax));
+            if (currentHp == 0) {
+                return 0;
+            }
+            long scaledHp = Math.round((double) currentHp * Integer.MAX_VALUE / this.hpMax);
+            return (int) Math.max(1, Math.min(scaledHp, Integer.MAX_VALUE));
+        }
         return toClientStat(this.hp);
     }
 
     public int getClientHpMax() {
+        if (scaleClientHpToIntRange && this.hpMax > Integer.MAX_VALUE) {
+            return Integer.MAX_VALUE;
+        }
         return toClientStat(this.hpMax);
+    }
+
+    public void setScaleClientHpToIntRange(boolean scaleClientHpToIntRange) {
+        this.scaleClientHpToIntRange = scaleClientHpToIntRange;
     }
 
     public int getClientHpg() {
@@ -1549,6 +1591,9 @@ public class NPoint {
         this.tlGiap = 0;
         this.tlxgcc = 0;
         this.tlxgc = 0;
+        this.tlDameTuSat = 0;
+        this.tlDameLaze = 0;
+        this.tlDameQCKK = 0;
         this.tlchinhxac = 0;
         this.tlTNSMPet = 0;
         this.xChuong = 0;
@@ -1620,6 +1665,21 @@ public class NPoint {
         } else {
             isCrit = Util.isTrue(this.crit, ConstRatio.PER100);
         }
+    }
+
+    public long applySpecialSkillDamageBonus(long damage, int skillTemplateId) {
+        int percent = switch (skillTemplateId) {
+            case Skill.TU_SAT -> this.tlDameTuSat;
+            case Skill.MAKANKOSAPPO -> this.tlDameLaze;
+            case Skill.QUA_CAU_KENH_KHI -> this.tlDameQCKK;
+            default -> 0;
+        };
+        long baseDamage = Math.max(0, Math.min(damage, MAX_PLAYER_DAME));
+        if (percent <= 0 || baseDamage >= MAX_PLAYER_DAME) {
+            return baseDamage;
+        }
+        long bonus = baseDamage * Math.min(percent, 100) / 100L;
+        return Math.min(MAX_PLAYER_DAME, baseDamage + bonus);
     }
 
     public long getDameAttack(boolean isAttackMob) {
@@ -1724,7 +1784,9 @@ public class NPoint {
                 break;
             case Skill.MAKANKOSAPPO:
                 percentDameSkill = skillSelect.damage;
-                return Math.min(MAX_PLAYER_DAME, (long) this.mpMax * percentDameSkill / 100);
+                return applySpecialSkillDamageBonus(
+                        Math.min(MAX_PLAYER_DAME, (long) this.mpMax * percentDameSkill / 100),
+                        Skill.MAKANKOSAPPO);
             case Skill.QUA_CAU_KENH_KHI:
                 long hpmob = 0;
                 long hppl = 0;
@@ -1749,7 +1811,8 @@ public class NPoint {
                 }
 
                 dameqckk = dameqckk + (Util.nextInt(-5, 5) * dameqckk / 100);
-                return Math.min(dameqckk, MAX_PLAYER_DAME);
+                return applySpecialSkillDamageBonus(Math.min(dameqckk, MAX_PLAYER_DAME),
+                        Skill.QUA_CAU_KENH_KHI);
             case Skill.DE_TRUNG:
                 if (player.setClothes.pikkoroDaimao == 5) {
                     dameAttack *= 4;

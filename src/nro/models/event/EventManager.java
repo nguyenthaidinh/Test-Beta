@@ -19,7 +19,7 @@ public class EventManager {
 
     public static boolean CHRISTMAS = true;
 
-    public static boolean HALLOWEEN = true;
+    public static boolean HALLOWEEN = false;
 
     public static boolean HUNG_VUONG = true;
 

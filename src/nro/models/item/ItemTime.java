@@ -39,6 +39,8 @@ public class ItemTime {
     public static final int TIME_NCD = 1800000;
     public static final int TIME_KEO_NAO_NGUOI = 600000;
     public static final int TIME_KEO_BI_NGO = 300000;
+    public static final int TIME_FLOUR_LAZE_ARMOR_PENETRATION = 600_000;
+    public static final int FLOUR_LAZE_ARMOR_PENETRATION_PERCENT = 80;
     public static final long TIME_MAY_DO_LINH_HON = 30 * 60 * 1000L;
 
     private Player player;
@@ -113,6 +115,9 @@ public class ItemTime {
 
     public boolean isUseKeoBiNgo;
     public long lastTimeUseKeoBiNgo;
+
+    public boolean isUseFlourLazeArmorPenetration;
+    public long lastTimeUseFlourLazeArmorPenetration;
 
     public boolean isUseMayDoLinhHon;
     public long lastTimeUseMayDoLinhHon;
@@ -238,6 +243,13 @@ public class ItemTime {
         if (isUseKeoBiNgo) {
             if (Util.canDoWithTime(lastTimeUseKeoBiNgo, TIME_KEO_BI_NGO)) {
                 isUseKeoBiNgo = false;
+            }
+        }
+        if (isUseFlourLazeArmorPenetration) {
+            if (Util.canDoWithTime(lastTimeUseFlourLazeArmorPenetration,
+                    TIME_FLOUR_LAZE_ARMOR_PENETRATION)) {
+                isUseFlourLazeArmorPenetration = false;
+                Service.gI().sendThongBao(player, "Hiệu ứng xuyên giáp Laze của Bột mì đã hết");
             }
         }
         if (isUseMayDoLinhHon) {

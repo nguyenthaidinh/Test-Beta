@@ -30,6 +30,7 @@ import nro.models.services_dungeon.AncientCastleService;
 import nro.models.server.Manager;
 import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
+import nro.models.services.GlobalSkyService;
 import nro.models.services_dungeon.NgocRongNamecService;
 
 public class ChangeMapService {
@@ -604,6 +605,7 @@ public class ChangeMapService {
             Service.gI().sendThongBao(player, player.textThongBaoThua);
             player.textThongBaoThua = null;
         }
+        GlobalSkyService.gI().syncPlayer(player);
         if (player.isPl() && player.effectSkill != null && player.effectSkill.isBodyChangeTechnique) {
             EffectSkillService.gI().removeBodyChangeTechnique(player);
         }

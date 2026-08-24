@@ -196,8 +196,11 @@ public class ConstNpc {
     public static final int MENU_NANG_CAP_CHAN_MENH = 508;
     public static final int MENU_NANG_CAP_DAC_CAU = 509;
     public static final int MENU_SACH_TUYET_KY = 510;
-    public static final int MENU_BT3_OPTIONS   = 560; // sub-menu chức năng BT3
-    public static final int MENU_BT3_DOI_MANH  = 561; // confirm đổi mảnh BT2 → BT3
+    public static final int MENU_BONG_TAI_OPTIONS = 560;
+    public static final int MENU_BT3_DOI_MANH = 561; // confirm đổi mảnh BT2 → BT3
+    public static final int MENU_HON_MA = 562;
+    public static final int MENU_BT2_ACTIONS = 563;
+    public static final int MENU_BT3_ACTIONS = 564;
     //index menu whis
     public static final int MENU_DAP_DO = 508;
 
@@ -241,6 +244,7 @@ public class ConstNpc {
     public static final int MENU_HUY_DIET_CAPSULE = 541;
     public static final int MENU_CAPSULE_VANG_KICH_HOAT = 542;
     public static final int MENU_GOLD_BAR_SPEND_TOP = 543;
+    public static final int MENU_CLEAR_GHOST_HUNT_TOP = 544;
     public static final int MENU_OPTION_USE_ITEM726 = 726;
     public static final int MENU_SIEU_THAN_THUY = 2006;
     public static final int MENU_XUONG_TANG_DUOI = 2007;

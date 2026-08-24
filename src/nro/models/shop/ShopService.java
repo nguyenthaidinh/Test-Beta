@@ -48,8 +48,10 @@ public class ShopService {
     private static final byte NORMAL_SHOP = 0;
     private static final byte SPEC_SHOP = 3;
     private static final byte KINANG_SHOP = 1;
+    private static final String SHOP_DENDE = "DENDE";
     private static final String SHOP_CHI_CHI = "SHOP_CHI_CHI";
     private static final String HALLOWEEN_EVENT_SHOP = "HALLOWEEN_EVENT_SHOP";
+    private static final int TAB_DENDE_SPECIAL_ID = 6;
     private static final int TAB_CHI_CHI_EVENT_ID = 58;
     private static final short GOLD_BAR_ITEM_ID = (short) ConstItem.THOI_VANG;
     private static final int GOLD_BAR_ICON_ID = 4028;
@@ -59,6 +61,20 @@ public class ShopService {
     private static final int CHI_CHI_GEM_PACKAGE_SHOP_ID = -1_000_077;
     private static final int CHI_CHI_GEM_PACKAGE_AMOUNT = 1_000_000;
     private static final int CHI_CHI_GEM_PACKAGE_GOLD_BAR_COST = 15_000;
+    private static final int CHI_CHI_EARRING_SOUL_SHOP_ID = -ConstItem.MANH_HON_BONG_TAI;
+    private static final short EARRING_SOUL_ITEM_ID = (short) ConstItem.MANH_HON_BONG_TAI;
+    private static final int EARRING_SOUL_GOLD_BAR_COST = 2;
+    private static final int CHI_CHI_BLUE_STONE_SHOP_ID = -ConstItem.DA_XANH_LAM;
+    private static final short BLUE_STONE_ITEM_ID = (short) ConstItem.DA_XANH_LAM;
+    private static final int BLUE_STONE_GOLD_BAR_COST = 100;
+    private static final int CHI_CHI_LEGENDARY_MAP_SHOP_ID = -ConstItem.BAN_DO_TRUYEN_THUYET;
+    private static final short LEGENDARY_MAP_ITEM_ID = (short) ConstItem.BAN_DO_TRUYEN_THUYET;
+    private static final int LEGENDARY_MAP_GOLD_BAR_COST = 1_000;
+    private static final int DENDE_FLOUR_SHOP_ID = -ConstItem.BOT_MI;
+    private static final short FLOUR_ITEM_ID = (short) ConstItem.BOT_MI;
+    private static final int FLOUR_GOLD_BAR_COST = 500;
+    private static final int DENDE_FLOUR_DAILY_LIMIT = 20;
+    private static final int FRAGMENT_QUANTITY_OPTION_ID = 31;
     private static final short SOUL_DETECTOR_ITEM_ID = (short) ConstItem.MAY_DO_LINH_HON;
     private static final int SOUL_DETECTOR_GOLD_BAR_COST = 100;
     private static final short DEVIL_CANDY_BOX_ITEM_ID = (short) ConstItem.HOP_KEO_MA_QUY;
@@ -100,11 +116,17 @@ public class ShopService {
         }
         try {
             Shop shop = this.getShop(tagName);
-            if (SHOP_CHI_CHI.equals(tagName)) {
+            if (SHOP_DENDE.equals(tagName)) {
+                ensureFlourInDendeShop(shop);
+                configureDendeSpecialShop(shop);
+            } else if (SHOP_CHI_CHI.equals(tagName)) {
                 ensureTrumTop1InChiChiShop(shop);
                 ensureSsj4CostumesInChiChiShop(shop);
                 ensureJackyChunCostumeInChiChiShop(shop);
                 ensureFeaturedEventItemsInChiChiShop(shop);
+                ensureEarringSoulInChiChiShop(shop);
+                ensureBlueStoneInChiChiShop(shop);
+                ensureLegendaryMapInChiChiShop(shop);
                 hideGoldBarInChiChiShop(shop);
                 ensureGemPackageInChiChiShop(shop);
                 configureChiChiSpecialShop(shop);
@@ -158,6 +180,94 @@ public class ShopService {
             return this.resolveShopBua(player, new Shop(shop));
         }
         return allGender ? new Shop(shop) : new Shop(shop, player);
+    }
+
+    private void ensureFlourInDendeShop(Shop shop) {
+        if (shop == null || shop.tabShops == null || shop.tabShops.isEmpty()) {
+            return;
+        }
+        TabShop specialTab = null;
+        ItemShop flour = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_DENDE_SPECIAL_ID) {
+                specialTab = tabShop;
+            }
+            for (int i = tabShop.itemShops.size() - 1; i >= 0; i--) {
+                ItemShop itemShop = tabShop.itemShops.get(i);
+                if (itemShop != null && itemShop.temp != null
+                        && itemShop.temp.id == FLOUR_ITEM_ID) {
+                    if (flour == null) {
+                        flour = itemShop;
+                    }
+                    tabShop.itemShops.remove(i);
+                }
+            }
+        }
+        if (specialTab == null) {
+            specialTab = shop.tabShops.get(shop.tabShops.size() - 1);
+        }
+        if (flour == null) {
+            flour = new ItemShop();
+        }
+        flour.id = DENDE_FLOUR_SHOP_ID;
+        flour.tabShop = specialTab;
+        flour.temp = ItemService.gI().getTemplate(FLOUR_ITEM_ID);
+        if (flour.temp == null) {
+            return;
+        }
+        ItemService.gI().normalizeFlourTemplate(flour.temp);
+        flour.isNew = true;
+        flour.typeSell = COST_GEM;
+        flour.cost = FLOUR_GOLD_BAR_COST;
+        flour.iconSpec = GOLD_BAR_ICON_ID;
+        flour.options.clear();
+        specialTab.itemShops.add(0, flour);
+    }
+
+    private void configureDendeSpecialShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        shop.typeShop = SPEC_SHOP;
+        for (TabShop tabShop : shop.tabShops) {
+            for (ItemShop itemShop : tabShop.itemShops) {
+                if (itemShop == null || itemShop.temp == null
+                        || itemShop.id == DENDE_FLOUR_SHOP_ID) {
+                    continue;
+                }
+                short currencyItemId;
+                switch (itemShop.typeSell) {
+                    case COST_GOLD:
+                        currencyItemId = GOLD_CURRENCY_ITEM_ID;
+                        break;
+                    case COST_GEM:
+                        currencyItemId = GEM_CURRENCY_ITEM_ID;
+                        break;
+                    case COST_RUBY:
+                        currencyItemId = RUBY_CURRENCY_ITEM_ID;
+                        break;
+                    default:
+                        continue;
+                }
+                if (ItemService.gI().getTemplate(currencyItemId) != null) {
+                    itemShop.iconSpec = ItemService.gI().getTemplate(currencyItemId).iconID;
+                }
+            }
+        }
+    }
+
+    private boolean isDendeFlourPurchase(Shop shop, ItemShop itemShop) {
+        return shop != null
+                && SHOP_DENDE.equals(shop.tagName)
+                && itemShop != null
+                && itemShop.temp != null
+                && itemShop.temp.id == FLOUR_ITEM_ID;
+    }
+
+    private void resetDendeFlourPurchaseCount(Player player) {
+        if (Util.isAfterMidnight(player.lastDendeFlourPurchaseTime)) {
+            player.dailyDendeFlourBought = 0;
+        }
     }
 
     private void ensureTrumTop1InChiChiShop(Shop shop) {
@@ -454,7 +564,10 @@ public class ShopService {
         for (TabShop tabShop : shop.tabShops) {
             for (ItemShop itemShop : tabShop.itemShops) {
                 if (itemShop == null || itemShop.temp == null
-                        || itemShop.id == CHI_CHI_GEM_PACKAGE_SHOP_ID) {
+                        || itemShop.id == CHI_CHI_GEM_PACKAGE_SHOP_ID
+                        || itemShop.id == CHI_CHI_EARRING_SOUL_SHOP_ID
+                        || itemShop.id == CHI_CHI_BLUE_STONE_SHOP_ID
+                        || itemShop.temp.id == LEGENDARY_MAP_ITEM_ID) {
                     continue;
                 }
                 short currencyItemId;
@@ -476,6 +589,172 @@ public class ShopService {
                 }
             }
         }
+    }
+
+    private void ensureEarringSoulInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null && !shop.tabShops.isEmpty()) {
+            eventTab = shop.tabShops.get(0);
+        }
+        if (eventTab == null) {
+            return;
+        }
+
+        ItemShop earringSoul = null;
+        for (ItemShop itemShop : eventTab.itemShops) {
+            if (itemShop.temp != null && itemShop.temp.id == EARRING_SOUL_ITEM_ID) {
+                earringSoul = itemShop;
+                break;
+            }
+        }
+        boolean isNewShopItem = earringSoul == null;
+        if (earringSoul == null) {
+            earringSoul = new ItemShop();
+            earringSoul.id = CHI_CHI_EARRING_SOUL_SHOP_ID;
+        }
+        if (!configureEarringSoulShopItem(earringSoul, eventTab)) {
+            return;
+        }
+        if (isNewShopItem) {
+            eventTab.itemShops.add(0, earringSoul);
+        }
+    }
+
+    private boolean configureEarringSoulShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.id = CHI_CHI_EARRING_SOUL_SHOP_ID;
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(EARRING_SOUL_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = EARRING_SOUL_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
+        itemShop.options.clear();
+        itemShop.options.add(new ItemOption(FRAGMENT_QUANTITY_OPTION_ID, 1));
+        return true;
+    }
+
+    private void ensureBlueStoneInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null && !shop.tabShops.isEmpty()) {
+            eventTab = shop.tabShops.get(0);
+        }
+        if (eventTab == null) {
+            return;
+        }
+
+        ItemShop blueStone = null;
+        for (ItemShop itemShop : eventTab.itemShops) {
+            if (itemShop.temp != null && itemShop.temp.id == BLUE_STONE_ITEM_ID) {
+                blueStone = itemShop;
+                break;
+            }
+        }
+        boolean isNewShopItem = blueStone == null;
+        if (blueStone == null) {
+            blueStone = new ItemShop();
+            blueStone.id = CHI_CHI_BLUE_STONE_SHOP_ID;
+        }
+        if (!configureBlueStoneShopItem(blueStone, eventTab)) {
+            return;
+        }
+        if (isNewShopItem) {
+            eventTab.itemShops.add(Math.min(1, eventTab.itemShops.size()), blueStone);
+        }
+    }
+
+    private boolean configureBlueStoneShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.id = CHI_CHI_BLUE_STONE_SHOP_ID;
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(BLUE_STONE_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = BLUE_STONE_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
+        itemShop.options.clear();
+        itemShop.options.add(new ItemOption(FRAGMENT_QUANTITY_OPTION_ID, 1));
+        return true;
+    }
+
+    private void ensureLegendaryMapInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null && !shop.tabShops.isEmpty()) {
+            eventTab = shop.tabShops.get(0);
+        }
+        if (eventTab == null) {
+            return;
+        }
+
+        ItemShop legendaryMap = null;
+        for (TabShop tabShop : shop.tabShops) {
+            for (ItemShop itemShop : tabShop.itemShops) {
+                if (itemShop.temp != null && itemShop.temp.id == LEGENDARY_MAP_ITEM_ID) {
+                    legendaryMap = itemShop;
+                    eventTab = tabShop;
+                    break;
+                }
+            }
+            if (legendaryMap != null) {
+                break;
+            }
+        }
+        boolean isNewShopItem = legendaryMap == null;
+        if (legendaryMap == null) {
+            legendaryMap = new ItemShop();
+            legendaryMap.id = CHI_CHI_LEGENDARY_MAP_SHOP_ID;
+        }
+        if (!configureLegendaryMapShopItem(legendaryMap, eventTab)) {
+            return;
+        }
+        if (isNewShopItem) {
+            eventTab.itemShops.add(legendaryMap);
+        }
+    }
+
+    private boolean configureLegendaryMapShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(LEGENDARY_MAP_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = LEGENDARY_MAP_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
+        itemShop.options.clear();
+        return true;
     }
 
     private void ensureSoulDetectorInHalloweenEventShop(Shop shop) {
@@ -1409,6 +1688,28 @@ public class ShopService {
             return;
         }
 
+        boolean dendeFlourPurchase = isDendeFlourPurchase(shop, is);
+        if (dendeFlourPurchase) {
+            resetDendeFlourPurchaseCount(player);
+            if (player.dailyDendeFlourBought >= DENDE_FLOUR_DAILY_LIMIT) {
+                Service.gI().sendThongBao(player,
+                        "Bạn đã mua đủ 20 Bột mì hôm nay, vui lòng quay lại ngày mai!");
+                return;
+            }
+        }
+
+        // Kiểm tra giới hạn mảnh trước khi trừ tiền.
+        if (is.temp.id == 933 || is.temp.id == 935) {
+            if (Util.isAfterMidnight(player.lastTimeFragmentBought)) {
+                player.dailyFragmentBought = 0;
+            }
+            if (player.dailyFragmentBought >= 100) {
+                Service.gI().sendThongBao(player,
+                        "Bạn đã mua đủ 100 mảnh hôm nay, vui lòng quay lại ngày mai!");
+                return;
+            }
+        }
+
         // Shop thường
         boolean paidWithGoldBar = shop.typeShop == ShopService.SPEC_SHOP && isGoldBarCost(is);
 
@@ -1430,18 +1731,18 @@ public class ShopService {
             item = ItemService.gI().createNewItem((short) 521);
             item.itemOptions.addAll(is.options);
         }
-        // Mảnh vỡ/Hồn bông tai: giới hạn 100 mảnh/ngày + cần option 31 để tích lũy đúng
-        if (item.template.id == 933 || item.template.id == 934 || item.template.id == 935) {
-            // Reset counter nếu qua ngày mới
-            if (Util.isAfterMidnight(player.lastTimeFragmentBought)) {
-                player.dailyFragmentBought = 0;
-            }
-            if (player.dailyFragmentBought >= 100) {
-                Service.gI().sendThongBao(player, "Bạn đã mua đủ 100 mảnh hôm nay, vui lòng quay lại ngày mai!");
-                return;
-            }
+        // Mảnh vỡ/Đá xanh lam vẫn giới hạn 100 mảnh/ngày.
+        // Mảnh hồn bông tai được bán không giới hạn.
+        if (item.template.id == 933 || item.template.id == 935) {
             player.dailyFragmentBought++;
             player.lastTimeFragmentBought = System.currentTimeMillis();
+        }
+        if (dendeFlourPurchase) {
+            player.dailyDendeFlourBought++;
+            player.lastDendeFlourPurchaseTime = System.currentTimeMillis();
+        }
+        // Các mảnh bông tai cần option 31 để tích lũy đúng vào cùng một vật phẩm.
+        if (item.template.id == 933 || item.template.id == 934 || item.template.id == 935) {
             boolean hasOpt31 = item.itemOptions.stream()
                     .anyMatch(io -> io.optionTemplate.id == 31);
             if (!hasOpt31) {

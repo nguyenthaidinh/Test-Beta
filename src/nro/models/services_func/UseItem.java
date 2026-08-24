@@ -890,6 +890,7 @@ public class UseItem {
                             case ConstItem.MAY_DO_LINH_HON:
                             case ConstItem.KEO_NAO_NGUOI:
                             case ConstItem.KEO_BI_NGO:
+                            case ConstItem.BOT_MI:
                             case 381: //cuồng nộ
                             case 382: //bổ huyết
                             case 383: //bổ khí
@@ -931,13 +932,13 @@ public class UseItem {
                                 useTDLT(pl, item);
                                 break;
                             case 454: //bông tai
-                                UseItem.gI().usePorata(pl);
+                                UseItem.gI().usePorata(pl, item);
                                 break;
                             case 921: //bông tai
-                                UseItem.gI().usePorata2(pl);
+                                UseItem.gI().usePorata2(pl, item);
                                 break;
                                 case 1819: //bông tai
-                                UseItem.gI().usePorata3(pl);
+                                UseItem.gI().usePorata3(pl, item);
                                 break;
                             case 193: //gói 10 viên capsule
                                 openCapsuleUI(pl);
@@ -2112,6 +2113,15 @@ public class UseItem {
                 ItemTimeService.gI().removeItemTime(pl, pl.itemTime.iconMeal2);
                 pl.itemTime.iconMeal2 = item.template.iconID;
                 break;
+            case ConstItem.BOT_MI:
+                pl.itemTime.lastTimeUseFlourLazeArmorPenetration = System.currentTimeMillis();
+                pl.itemTime.isUseFlourLazeArmorPenetration = true;
+                Service.gI().sendThongBao(pl,
+                        "Bột mì: Laze Namếc bỏ qua 80% lượng giáp người chơi và Boss trong 10 phút");
+                ChatGlobalService.gI().ThongBaoRoiDo(pl,
+                        "Người chơi " + pl.name
+                        + " vừa sử dụng Bột mì để rơi vào trạng thái thiếu tỉnh táo, các cư dân hãy cẩn thận.");
+                break;
 
             case 1532: //máy dò đồ
                 pl.itemTime.lastTimeUseKhoBauX2 = System.currentTimeMillis();
@@ -2218,22 +2228,24 @@ public class UseItem {
         }
     }
 
-    private void usePorata2(Player pl) {
+    private void usePorata2(Player pl, Item item) {
         if (pl.pet == null || pl.fusion.typeFusion == 4) {
             Service.gI().sendThongBao(pl, "Không thể thực hiện");
         } else {
             if (pl.fusion.typeFusion == ConstPlayer.NON_FUSION) {
+                pl.fusion.selectPorata(item);
                 pl.pet.fusion2(true);
             } else {
                 pl.pet.unFusion();
             }
         }
     }
-    private void usePorata3(Player pl) {
+    private void usePorata3(Player pl, Item item) {
         if (pl.pet == null || pl.fusion.typeFusion == 4) {
             Service.gI().sendThongBao(pl, "Không thể thực hiện");
         } else {
             if (pl.fusion.typeFusion == ConstPlayer.NON_FUSION) {
+                pl.fusion.selectPorata(item);
                 pl.pet.fusion3(true);
             } else {
                 pl.pet.unFusion();
@@ -2241,11 +2253,12 @@ public class UseItem {
         }
     }
 
-    private void usePorata(Player pl) {
+    private void usePorata(Player pl, Item item) {
         if (pl.pet == null || pl.fusion.typeFusion == 4) {
             Service.gI().sendThongBao(pl, "Không thể thực hiện");
         } else {
             if (pl.fusion.typeFusion == ConstPlayer.NON_FUSION) {
+                pl.fusion.selectPorata(item);
                 pl.pet.fusion(true);
             } else {
                 pl.pet.unFusion();

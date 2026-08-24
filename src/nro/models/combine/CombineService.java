@@ -63,6 +63,8 @@ public class CombineService {
     public static final int NANG_CHI_SO_BONG_TAI3 = 457;
     public static final int HIEN_TE_THAN_LINH = 998;
     public static final int BAN_DO_THAN_LINH_LIO = 999;
+    public static final int EP_OPTION_SOI_DIA_NGUC = 1000;
+    public static final int NANG_CAP_SOI_DIA_NGUC = 1001;
     private static CombineService instance;
     
     public final Npc baHatMit;
@@ -122,6 +124,12 @@ public class CombineService {
                 break;
             case BAN_DO_THAN_LINH_LIO:
                 showInfoBanDoThanLinh(player);
+                break;
+            case EP_OPTION_SOI_DIA_NGUC:
+                EpOptionSoiDiaNguc.showInfoCombine(player);
+                break;
+            case NANG_CAP_SOI_DIA_NGUC:
+                NangCapSoiDiaNguc.showInfoCombine(player);
                 break;
             case NHAP_NGOC_RONG:
                 NhapNgocRong.showInfoCombine(player);
@@ -216,6 +224,12 @@ public class CombineService {
                 break;
             case BAN_DO_THAN_LINH_LIO:
                 thucHienBanDoThanLinh(player);
+                break;
+            case EP_OPTION_SOI_DIA_NGUC:
+                EpOptionSoiDiaNguc.epOption(player);
+                break;
+            case NANG_CAP_SOI_DIA_NGUC:
+                NangCapSoiDiaNguc.upgrade(player);
                 break;
             case NHAP_NGOC_RONG:
                 NhapNgocRong.nhapNgocRong(player);
@@ -652,6 +666,10 @@ public class CombineService {
                 return "Ta sẽ phù phép\nhiến tế trang bị Thần Linh\nthành trang bị Kích Hoạt";
             case BAN_DO_THAN_LINH_LIO:
                 return "Đặt đồ Thần Linh\nvào đây để bán\nNhận " + LioShopManager.PRICE_BUY_IN + " thỏi vàng";
+            case EP_OPTION_SOI_DIA_NGUC:
+                return "Ta sẽ giúp ngươi\nép Hồn ma vào\nSói Địa Ngục";
+            case NANG_CAP_SOI_DIA_NGUC:
+                return "Ta sẽ giúp ngươi\ndùng Thịt tươi nâng cấp\nSói Địa Ngục";
             case NHAP_NGOC_RONG:
                 return "Ta sẽ phù phép\ncho 7 viên Ngọc Rồng\nthành 1 viên Ngọc Rồng cấp cao";
             case NANG_CAP_VAT_PHAM:
@@ -718,6 +736,10 @@ public class CombineService {
                 return "Vào hành trang\nChọn 1 trang bị Thần Linh\n(Áo, Quần, Găng, Giày hoặc Nhẫn)\nSau đó chọn 'Hiến tế'";
             case BAN_DO_THAN_LINH_LIO:
                 return "Vào hành trang\nChọn 1 trang bị Thần Linh\n(Áo, Quần, Găng, Giày hoặc Nhẫn)\nSau đó chọn 'Bán'";
+            case EP_OPTION_SOI_DIA_NGUC:
+                return "Vào hành trang\nChọn 1 Sói Địa Ngục\nChọn 1 loại Hồn ma\nSau đó chọn 'Ép option'";
+            case NANG_CAP_SOI_DIA_NGUC:
+                return "Vào hành trang\nChọn 1 Sói Địa Ngục\nChọn Thịt tươi\nSau đó chọn 'Nâng cấp'";
             case CHUYEN_HOA_TRANG_BI_NGOC:
             case CHUYEN_HOA_TRANG_BI_VANG:
                 return "Vào hành trang\nChọn trang bị gốc\n(Áo,quần,găng,giày hoặc rada)\ntừ cấp[+4] trở lên\nChọn tiếp trang bị mới\nchưa nâng cấp cần nhập thể\nsau đó chọn 'Nâng cấp'";
@@ -742,17 +764,17 @@ public class CombineService {
                         + "Ch\u1ecdn 10 \u0110\u00e1 ng\u0169 s\u1eafc\n"
                         + "Sau \u0111\u00f3 ch\u1ecdn 'Ch\u1ebf t\u1ea1o'";
             case NANG_CAP_BONG_TAI:
-                return "Vào hành trang\nChọn bông tai Porata\nChọn mảnh bông tai để nâng cấp, Số lượng 9999 cái"
+                return "Vào hành trang\nChọn 1 Bông tai Porata cấp 1\nChọn Mảnh vỡ bông tai có ít nhất 1.000 mảnh"
                         + "\nSau đó chọn 'Nâng cấp'";
             case NANG_CHI_SO_BONG_TAI:
-                return "Vào hành trang\nChọn bông tai Porata\nChọn mảnh hồn porata số lượng 99"
-                        + "\ncái và đá xanh lam để nâng cấp.\nSau đó chọn 'Nâng cấp chỉ số'";
+                return "Vào hành trang\nChọn 1 Bông tai Porata cấp 2\nChọn Mảnh hồn bông tai có ít nhất 200 mảnh"
+                        + "\nvà 1 Đá xanh lam.\nSau đó chọn 'Nâng cấp chỉ số'";
             case NANG_CAP_BONG_TAI3:
-                return "Vào hành trang\nChọn bông tai Porata cấp 2\nChọn mảnh bông tai để nâng cấp, Số lượng 19999 cái"
+                return "Vào hành trang\nChọn 1 Bông tai Porata cấp 2\nChọn Mảnh vỡ bông tai cấp 3 có ít nhất 1.000 mảnh"
                         + "\nSau đó chọn 'Nâng cấp'";
             case NANG_CHI_SO_BONG_TAI3:
-                return "Vào hành trang\nChọn bông tai Porata Cấp 3\nChọn mảnh hồn porata số lượng 199"
-                        + "\ncái và đá xanh lam để nâng cấp.\nSau đó chọn 'Nâng cấp chỉ số'";    
+                return "Vào hành trang\nChọn 1 Bông tai Porata cấp 3\nChọn Mảnh hồn bông tai có ít nhất 99 mảnh"
+                        + "\nvà 1 Đá xanh lam.\nSau đó chọn 'Nâng cấp chỉ số'";
             case NANG_CAP_SAO_PHA_LE:
                 return "Vào hành trang\nChọn đá Hematite\nChọn loại sao pha lê (cấp 1)\nSau đó chọn 'Nâng cấp'";
             case DANH_BONG_SAO_PHA_LE:

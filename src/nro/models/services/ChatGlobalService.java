@@ -50,7 +50,7 @@ public class ChatGlobalService implements Runnable {
     }
 
     public void ThongBaoRoiDo(Player player, String text) {
-        waitingChat.add(new ChatGlobal(player, text.length() > 100 ? text.substring(0, 100) : text));
+        waitingChat.add(new ChatGlobal(player, text.length() > 200 ? text.substring(0, 200) : text));
     }
 
     public void ThongBaoDapDo(Player player, String text) {

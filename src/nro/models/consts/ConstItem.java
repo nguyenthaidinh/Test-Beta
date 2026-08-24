@@ -933,6 +933,7 @@ public class ConstItem {
     public static final int BUP_BE = 919;
     public static final int GAY_NHU_Y = 920;
     public static final int BONG_TAI_PORATA_CAP_2 = 921;
+    public static final int BONG_TAI_PORATA_CAP_3 = 1819;
     public static final int CAI_TRANG_GOKU_NOEL = 922;
     public static final int CAI_TRANG_PICO_NOEL = 923;
     public static final int CAI_TRANG_RADIC_NOEL = 924;
@@ -1233,7 +1234,10 @@ public class ConstItem {
     public static final int VOT_BAT_BO = 1251;
     public static final int VE_SAU_XEN = 1252;
     public static final int VE_SAU_XEN_TIEN_HOA = 1253;
+    public static final int HON_MA = 1258;
     public static final int MAY_DO_LINH_HON = 1264;
+    public static final int THIT_TUOI_NANG_CAP_SOI = 1549;
+    public static final int SOI_DIA_NGUC = 1654;
     public static final int XE_BI_NGO = 1346;
     public static final int PET_MEO_PHU_THUY = 1347;
     public static final int KEO_NAO_NGUOI = 1350;

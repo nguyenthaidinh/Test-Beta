@@ -21,6 +21,8 @@ import nro.models.task.BadgesTaskService;
 
 public class XenBoHung extends Boss {
 
+    private static final int ADDITIONAL_DAMAGE_REDUCTION_PERCENT = 50;
+
     private long lastTimeHapThu;
     private int timeHapThu;
 
@@ -96,6 +98,9 @@ public class XenBoHung extends Boss {
                 this.chat("Xí hụt");
                 return 0;
             }
+            damage -= damage * getEffectiveDamageReductionPercent(
+                    plAtt, ADDITIONAL_DAMAGE_REDUCTION_PERCENT) / 100;
+            // Giữ nguyên lớp giảm sát thương 50% cũ của Sên võ đài.
             damage = this.nPoint.subDameInjureWithDeff(damage / 2);
             if (!piercing && effectSkill.isShielding) {
                 if (damage > nPoint.hpMax) {

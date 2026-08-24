@@ -2,7 +2,6 @@ package nro.models.shop;
 
 import nro.models.player.Player;
 import java.util.ArrayList;
-import nro.models.services.InventoryService;
 
 /**
  *
@@ -22,8 +21,6 @@ public class TabShopUron extends TabShop {
 
         int dauCanBuyId = idDauCanBuy(player);
 
-        boolean hasBongTai = InventoryService.gI().findItemBongTai(player);
-
         for (ItemShop itemShop : tabShop.itemShops) {
             if (itemShop.temp.gender == player.gender || itemShop.temp.gender == 3) {
                 boolean isInListDauThan = false;
@@ -34,10 +31,6 @@ public class TabShopUron extends TabShop {
                     }
                 }
                 if (player.haveTennisSpaceShip && itemShop.temp.id == 453) {
-                    continue;
-                }
-
-                if (hasBongTai && itemShop.temp.id == 454) {
                     continue;
                 }
 

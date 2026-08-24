@@ -43,6 +43,10 @@ public class ItemService {
     private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
     private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 50, 77, 96, 103, 106, 108, 117, 204};
     private static final short COSTUME_JACKY_CHUN_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
+    private static final short FRIED_SHRIMP_ID = (short) ConstItem.TOM_TAM_BOT_CHIEN_XU;
+    private static final String FRIED_SHRIMP_DESCRIPTION = "T\u1eb7ng cho Whis ho\u1eb7c \u0103n v\u00e0o \u0111\u1ec3 t\u0103ng 5% HP v\u00e0 5% KI trong v\u00f2ng 10 ph\u00fat";
+    private static final short FLOUR_ID = (short) ConstItem.BOT_MI;
+    private static final String FLOUR_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 Laze Nam\u1ebfc b\u1ecf qua 80% l\u01b0\u1ee3ng gi\u00e1p c\u1ee7a ng\u01b0\u1eddi ch\u01a1i v\u00e0 Boss trong 10 ph\u00fat";
     public static final int DO_THAN_THANH_SET_OPTION = 233;
     public static final int DO_THAN_THANH_PARAM_SVK_CON = 101;
     public static final int DO_THAN_THANH_PARAM_SON_CON = 102;
@@ -150,6 +154,7 @@ public class ItemService {
     public Item createItemFromItemShop(ItemShop itemShop) {
         Item item = new Item();
         item.template = itemShop.temp;
+        HellWolfPetService.gI().normalizeTemplate(item.template);
         item.quantity = 1;
         normalizePumpkinCandyTemplate(item.template);
         item.content = item.getContent();
@@ -166,6 +171,8 @@ public class ItemService {
         normalizeBrolyRedCostumeOptions(item);
         normalizeBrolyCostumeOptions(item);
         normalizePumpkinCarriageMountOptions(item);
+        HellWolfPetService.gI().normalizePet(item);
+        HellWolfPetService.gI().normalizeSoul(item);
         item.content = item.getContent();
         item.info = item.getInfo();
         return item;
@@ -190,6 +197,8 @@ public class ItemService {
         normalizeBrolyRedCostumeOptions(it);
         normalizeBrolyCostumeOptions(it);
         normalizePumpkinCarriageMountOptions(it);
+        HellWolfPetService.gI().normalizePet(it);
+        HellWolfPetService.gI().normalizeSoul(it);
         return it;
     }
 
@@ -203,6 +212,8 @@ public class ItemService {
         normalizeTrainArmorTemplate(item.template);
         normalizeFusionGokuTemplate(item.template);
         normalizeGokuNgayXuaTemplate(item.template);
+        normalizeFriedShrimpTemplate(item.template);
+        normalizeFlourTemplate(item.template);
         normalizePumpkinCandyTemplate(item.template);
         item.quantity = quantity;
         item.createTime = System.currentTimeMillis();
@@ -338,6 +349,20 @@ public class ItemService {
             return;
         }
         template.description = COSTUME_JACKY_CHUN_DESCRIPTION;
+    }
+
+    public void normalizeFriedShrimpTemplate(Template.ItemTemplate template) {
+        if (template == null || template.id != FRIED_SHRIMP_ID) {
+            return;
+        }
+        template.description = FRIED_SHRIMP_DESCRIPTION;
+    }
+
+    public void normalizeFlourTemplate(Template.ItemTemplate template) {
+        if (template == null || template.id != FLOUR_ID) {
+            return;
+        }
+        template.description = FLOUR_DESCRIPTION;
     }
 
     public void normalizeAngelDemonWingsOptions(Item item) {
@@ -1123,6 +1148,15 @@ public class ItemService {
         return new int[]{optionId, optionParam};
     }
 
+    public static int[] migrateDoThanThanhDisplayOption(int itemId, int optionId, int optionParam) {
+        if ((itemId == ConstItem.SOI_DIA_NGUC || itemId == ConstItem.HON_MA)
+                && optionId >= HellWolfPetService.OPTION_ARMOR_PENETRATION
+                && optionId <= HellWolfPetService.OPTION_QCKK_DAMAGE) {
+            return new int[]{optionId, optionParam};
+        }
+        return migrateDoThanThanhDisplayOption(optionId, optionParam);
+    }
+
     public int randomSKHId(byte gender) {
         if (gender == 3) {
             gender = 2;
@@ -1157,7 +1191,9 @@ public class ItemService {
     }
 
     public Template.ItemTemplate getTemplate(int id) {
-        return Manager.ITEM_TEMPLATES.get(id);
+        Template.ItemTemplate template = Manager.ITEM_TEMPLATES.get(id);
+        HellWolfPetService.gI().normalizeTemplate(template);
+        return template;
     }
 
     public int getPercentTrainArmor(Item item) {

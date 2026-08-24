@@ -12,6 +12,7 @@ import nro.models.services.SubMenuService;
 import nro.models.services.Service;
 import nro.models.services.FlagBagService;
 import nro.models.services.ItemTimeService;
+import nro.models.services.GlobalSkyService;
 import nro.models.services.SkillService;
 import nro.models.map.service.NpcService;
 import nro.models.services.TaskService;
@@ -834,6 +835,7 @@ public class Controller implements IMessageHandler {
                                 Service.gI().sendChibi(player);
                             }
                             player.zone.mapInfo(player);
+                            GlobalSkyService.gI().syncPlayer(player);
                             if (player.getSession().version >= 220) {
                                 for (Skill skill : player.playerSkill.skills) {
                                     if (skill.currLevel <= 0 || skill.template.type != 4) {
