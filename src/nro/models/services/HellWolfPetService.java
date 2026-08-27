@@ -42,6 +42,13 @@ public final class HellWolfPetService {
         OPTION_QCKK_DAMAGE
     };
 
+    private static final int[][] INITIAL_PET_OPTIONS = {
+        {OPTION_DEFAULT, 0},
+        {OPTION_LEVEL, MIN_LEVEL},
+        {106, 0}, // Không ảnh hưởng bởi cái lạnh.
+        {30, 1} // Không thể giao dịch.
+    };
+
     private static final HellWolfPetService INSTANCE = new HellWolfPetService();
 
     private HellWolfPetService() {
@@ -49,6 +56,19 @@ public final class HellWolfPetService {
 
     public static HellWolfPetService gI() {
         return INSTANCE;
+    }
+
+    /**
+     * Bộ option khởi tạo cho Sói Địa Ngục mới. Pet bắt đầu ở cấp 1, giữ công
+     * dụng chống lạnh và không giao dịch; không có sẵn chỉ số ép và không có
+     * hạn sử dụng.
+     */
+    public List<ItemOption> createInitialPetOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        for (int[] option : INITIAL_PET_OPTIONS) {
+            options.add(new ItemOption(option[0], option[1]));
+        }
+        return options;
     }
 
     public void normalizeTemplate(Template.ItemTemplate template) {
@@ -75,6 +95,7 @@ public final class HellWolfPetService {
 
         List<ItemOption> preservedOptions = new ArrayList<>();
         Map<Integer, Integer> controlledValues = new LinkedHashMap<>();
+        boolean hasNonTradeOption = false;
         for (ItemOption option : pet.itemOptions) {
             if (option == null || option.optionTemplate == null) {
                 continue;
@@ -89,9 +110,13 @@ public final class HellWolfPetService {
                 }
                 continue;
             }
+            hasNonTradeOption |= optionId == 30;
             preservedOptions.add(option);
         }
 
+        if (!hasNonTradeOption) {
+            preservedOptions.add(new ItemOption(30, 1));
+        }
         preservedOptions.add(new ItemOption(OPTION_LEVEL, level));
         for (int optionId : SOUL_OPTION_IDS) {
             int cap = getCap(level, optionId);

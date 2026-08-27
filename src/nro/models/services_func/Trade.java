@@ -1,5 +1,6 @@
 package nro.models.services_func;
 
+import nro.models.consts.ConstItem;
 import nro.models.database.HistoryTransactionDAO;
 import nro.models.item.Item;
 import nro.models.player.Inventory;
@@ -218,8 +219,14 @@ public class Trade {
     }
 
     private boolean isItemCannotTran(Item item) {
+        if (item == null || !item.isNotNullItem()) {
+            return true;
+        }
+        if (item.template.id == ConstItem.SOI_DIA_NGUC) {
+            return true;
+        }
         for (Item.ItemOption io : item.itemOptions) {
-            if (io.optionTemplate.id == 30) {
+            if (io != null && io.optionTemplate != null && io.optionTemplate.id == 30) {
                 return true;
             }
         }

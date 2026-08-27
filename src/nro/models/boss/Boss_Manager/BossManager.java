@@ -100,6 +100,7 @@ import nro.models.boss.pirate.PirateCoolerBoss;
 import nro.models.boss.than_huy_diet.BeerusBoss;
 import nro.models.boss.than_huy_diet.WhisBoss;
 import nro.models.boss.ghost.PlanetGhostBoss;
+import nro.models.boss.ghost.RoyalGhostBoss;
 import nro.models.player.Player;
 import nro.models.network.Message;
 import nro.models.map.service.MapService;
@@ -119,6 +120,7 @@ import nro.models.map.service.NpcService;
 import nro.models.mob_bigboss.GauTuongCuop;
 import nro.models.server.Maintenance;
 import nro.models.server.ServerManager;
+import nro.models.services.GlobalSkyService;
 import nro.models.services.Service;
 import nro.models.utils.Functions;
 import nro.models.utils.Logger;
@@ -192,6 +194,11 @@ public class BossManager implements Runnable {
         this.createBoss(BossID.GHOST_SVK, 20);
         this.createBoss(BossID.GHOST_CAY_CON, 20);
         this.createBoss(BossID.GHOST_NGAO_CON, 20);
+        this.createBoss(BossID.GHOST_KING_CAY);
+        this.createBoss(BossID.GHOST_KING_NGAO);
+        this.createBoss(BossID.GHOST_KING_ALO_VU_A);
+        this.createBoss(BossID.GHOST_KING_SVK);
+        this.createBoss(BossID.GHOST_KING_NEZUKO);
 
     }
 
@@ -414,6 +421,10 @@ public class BossManager implements Runnable {
                     new PirateBlackBoss();
                 case BossID.GHOST_SVK, BossID.GHOST_CAY_CON, BossID.GHOST_NGAO_CON ->
                     new PlanetGhostBoss(bossID);
+                case BossID.GHOST_KING_CAY, BossID.GHOST_KING_NGAO,
+                        BossID.GHOST_KING_ALO_VU_A, BossID.GHOST_KING_SVK,
+                        BossID.GHOST_KING_NEZUKO ->
+                    new RoyalGhostBoss(bossID);
                 default ->
                     null;
             };
@@ -473,21 +484,26 @@ public class BossManager implements Runnable {
 
     private List<Boss> getAdminBossSelections() {
         List<Boss> selections = new ArrayList<>();
+        Map<Integer, PlanetGhostBoss> ghostSelections = new LinkedHashMap<>();
         for (Boss boss : new ArrayList<>(this.bosses)) {
+            if (boss instanceof PlanetGhostBoss ghostBoss) {
+                PlanetGhostBoss currentSelection = ghostSelections.get(ghostBoss.getGhostType());
+                if (currentSelection == null
+                        || (currentSelection.zone == null && ghostBoss.zone != null && !ghostBoss.isDie())) {
+                    ghostSelections.put(ghostBoss.getGhostType(), ghostBoss);
+                }
+                continue;
+            }
             if (canShowInAdminBossList(boss)) {
                 selections.add(boss);
             }
         }
+        selections.addAll(ghostSelections.values());
         return selections;
     }
 
     private boolean canShowInAdminBossList(Boss boss) {
         if (boss == null || boss.data == null || boss.data.length == 0 || boss.data[0].getMapJoin().length == 0) {
-            return false;
-        }
-        // 60 boss hồn ma là quần thể tự động. Đưa toàn bộ vào menu sẽ làm
-        // số lượng vượt giới hạn byte của packet và có thể khiến client đọc âm.
-        if (boss instanceof PlanetGhostBoss) {
             return false;
         }
         int mapJoin = boss.data[0].getMapJoin()[0];
@@ -500,6 +516,20 @@ public class BossManager implements Runnable {
     }
 
     private String getBossStatusText(Boss boss) {
+        if (boss instanceof PlanetGhostBoss ghostBoss) {
+            int total = 0;
+            int active = 0;
+            for (Boss candidate : new ArrayList<>(this.bosses)) {
+                if (candidate instanceof PlanetGhostBoss ghostCandidate
+                        && ghostCandidate.getGhostType() == ghostBoss.getGhostType()) {
+                    total++;
+                    if (ghostCandidate.zone != null && !ghostCandidate.isDie()) {
+                        active++;
+                    }
+                }
+            }
+            return active + "/" + total + " đang xuất hiện - theo đợt phút 00 và 30";
+        }
         if (boss.zone != null && !boss.isDie()) {
             return "Đang xuất hiện - " + boss.bossStatus;
         }
@@ -507,6 +537,16 @@ public class BossManager implements Runnable {
     }
 
     private String getBossLocationText(Boss boss) {
+        if (boss instanceof PlanetGhostBoss ghostBoss) {
+            Boss activeBoss = findActiveGhostBoss(ghostBoss.getGhostType());
+            if (activeBoss != null) {
+                return activeBoss.zone.map.mapName + " (" + activeBoss.zone.map.mapId
+                        + ") khu " + activeBoss.zone.zoneId + " - nhóm 20 con rải ngẫu nhiên";
+            }
+            return GlobalSkyService.gI().isDark()
+                    ? "Nhóm 20 con đang chờ đợt kế tiếp vào phút 00 hoặc 30"
+                    : "Nhóm 20 con chưa xuất hiện - cần bật trời tối";
+        }
         if (boss.zone == null) {
             return "Chưa có map/khu";
         }
@@ -545,13 +585,28 @@ public class BossManager implements Runnable {
         }
         switch (select) {
             case 0 -> {
-                if (boss.zone == null) {
+                Boss travelTarget = boss instanceof PlanetGhostBoss ghostBoss
+                        ? findActiveGhostBoss(ghostBoss.getGhostType()) : boss;
+                if (travelTarget == null || travelTarget.zone == null) {
                     Service.gI().sendThongBao(player, "Boss chưa xuất hiện, hãy hồi sinh trước.");
                     return;
                 }
-                ChangeMapService.gI().changeMapYardrat(player, boss.zone, boss.location.x, boss.location.y);
+                ChangeMapService.gI().changeMapYardrat(player, travelTarget.zone,
+                        travelTarget.location.x, travelTarget.location.y);
             }
             case 1 -> {
+                if (boss instanceof PlanetGhostBoss ghostBoss) {
+                    if (!GlobalSkyService.gI().isDark()) {
+                        Service.gI().sendThongBao(player,
+                                "Cần bật trời tối trước khi hồi sinh Boss Hồn ma.");
+                        return;
+                    }
+                    int respawned = forceRespawnGhostGroup(ghostBoss.getGhostType());
+                    Service.gI().sendThongBao(player, "Đã hồi sinh " + respawned
+                            + " Boss " + ghostBoss.data[0].getName() + ".");
+                    showListBoss(player);
+                    return;
+                }
                 Boss respawnTarget = boss.getRespawnTarget();
                 respawnTarget.forceRespawnNow();
                 Service.gI().sendThongBao(player, "Đã hồi sinh " + respawnTarget.data[0].getName() + ".");
@@ -560,6 +615,29 @@ public class BossManager implements Runnable {
             case 2 -> showListBoss(player);
             default -> ADMIN_BOSS_SELECTIONS.remove(player.id);
         }
+    }
+
+    private Boss findActiveGhostBoss(int ghostType) {
+        for (Boss candidate : new ArrayList<>(this.bosses)) {
+            if (candidate instanceof PlanetGhostBoss ghostBoss
+                    && ghostBoss.getGhostType() == ghostType
+                    && ghostBoss.zone != null && !ghostBoss.isDie()) {
+                return ghostBoss;
+            }
+        }
+        return null;
+    }
+
+    private int forceRespawnGhostGroup(int ghostType) {
+        int count = 0;
+        for (Boss candidate : new ArrayList<>(this.bosses)) {
+            if (candidate instanceof PlanetGhostBoss ghostBoss
+                    && ghostBoss.getGhostType() == ghostType) {
+                ghostBoss.forceRespawnNow();
+                count++;
+            }
+        }
+        return count;
     }
 
     private Boss getAdminBossSelection(Player player, int selection) {

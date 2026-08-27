@@ -4,6 +4,8 @@ import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import nro.models.player.Player;
 import nro.models.network.Message;
 import nro.models.npc.Npc;
@@ -91,13 +93,28 @@ public class CombineService {
      * @param index
      */
     public void showInfoCombine(Player player, int[] index) {
-        if (player.combineNew == null) {
+        if (player == null || player.combineNew == null || player.inventory == null
+                || player.inventory.itemsBag == null || index == null) {
             return;
         }
         player.combineNew.clearItemCombine();
+        Set<Integer> selectedIndexes = new HashSet<>();
         if (index.length > 0) {
             for (int i = 0; i < index.length; i++) {
-                player.combineNew.itemsCombine.add(player.inventory.itemsBag.get(index[i]));
+                int bagIndex = index[i];
+                if (bagIndex < 0 || bagIndex >= player.inventory.itemsBag.size()
+                        || !selectedIndexes.add(bagIndex)) {
+                    player.combineNew.clearItemCombine();
+                    Service.gI().sendThongBao(player, "Danh sách vật phẩm nâng cấp không hợp lệ.");
+                    return;
+                }
+                Item selectedItem = player.inventory.itemsBag.get(bagIndex);
+                if (selectedItem == null || !selectedItem.isNotNullItem()) {
+                    player.combineNew.clearItemCombine();
+                    Service.gI().sendThongBao(player, "Vật phẩm nâng cấp không còn trong hành trang.");
+                    return;
+                }
+                player.combineNew.itemsCombine.add(selectedItem);
             }
         }
         switch (player.combineNew.typeCombine) {
@@ -739,7 +756,9 @@ public class CombineService {
             case EP_OPTION_SOI_DIA_NGUC:
                 return "Vào hành trang\nChọn 1 Sói Địa Ngục\nChọn 1 loại Hồn ma\nSau đó chọn 'Ép option'";
             case NANG_CAP_SOI_DIA_NGUC:
-                return "Vào hành trang\nChọn 1 Sói Địa Ngục\nChọn Thịt tươi\nSau đó chọn 'Nâng cấp'";
+                return "Chọn 1 Sói Địa Ngục và Thịt tươi\n"
+                        + NangCapSoiDiaNguc.getUpgradeGuide()
+                        + "\nSau đó chọn 'Nâng cấp'";
             case CHUYEN_HOA_TRANG_BI_NGOC:
             case CHUYEN_HOA_TRANG_BI_VANG:
                 return "Vào hành trang\nChọn trang bị gốc\n(Áo,quần,găng,giày hoặc rada)\ntừ cấp[+4] trở lên\nChọn tiếp trang bị mới\nchưa nâng cấp cần nhập thể\nsau đó chọn 'Nâng cấp'";

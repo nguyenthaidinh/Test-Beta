@@ -45,6 +45,7 @@ public final class NangCapSoiDiaNguc {
                 + "Phí nâng cấp: " + Util.numberToMoney(GEM_COST) + " ngọc\n"
                 + "Hiện có trong ô nâng cấp: " + Util.numberToMoney(meat.quantity) + " Thịt tươi\n"
                 + "Tỉ lệ thành công: " + SUCCESS_RATE + "%\n"
+                + "Chỉ số mở ở cấp " + targetLevel + ":\n" + getLevelBenefits(targetLevel) + "\n"
                 + "Thành công hoặc thất bại đều tiêu hao Thịt tươi và ngọc.";
         if (meat.quantity < requiredMeat) {
             showCloseMenu(player, npcSay + "\nCòn thiếu "
@@ -129,6 +130,27 @@ public final class NangCapSoiDiaNguc {
             case 5 -> 3_000;
             case 6 -> 5_000;
             default -> 0;
+        };
+    }
+
+    public static String getUpgradeGuide() {
+        return "Cấp 2: 100 Thịt tươi\n"
+                + "Cấp 3: 300 Thịt tươi\n"
+                + "Cấp 4: 1.000 Thịt tươi\n"
+                + "Cấp 5: 3.000 Thịt tươi\n"
+                + "Cấp 6: 5.000 Thịt tươi\n"
+                + "Mỗi lượt: 5.000 ngọc, thành công 50%";
+    }
+
+    public static String getLevelBenefits(int level) {
+        return switch (level) {
+            case 1 -> "HP, KI, Sức đánh tối đa 70%";
+            case 2 -> "HP, KI, Sức đánh tối đa 100%";
+            case 3 -> "HP, KI, Sức đánh 100%; Giáp và ST chí mạng 10%";
+            case 4 -> "HP, KI, Sức đánh 100%; Giáp và ST chí mạng 25%";
+            case 5 -> "Như cấp 4; Xuyên giáp, Tự sát, Laze và QCKK 20%";
+            case 6 -> "HP, KI, Sức đánh 100%; các chỉ số còn lại tối đa 30%";
+            default -> "Không xác định";
         };
     }
 

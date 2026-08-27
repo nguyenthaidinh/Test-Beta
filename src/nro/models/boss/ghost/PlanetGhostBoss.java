@@ -31,6 +31,7 @@ public class PlanetGhostBoss extends Boss {
     private static final long MAX_HP = 5_000_000_000L;
     private static final int DAMAGE = 300_000;
     private static final int RESPAWN_SECONDS = 30 * 60;
+    private static final long RESPAWN_WAVE_MILLIS = RESPAWN_SECONDS * 1_000L;
     private static final int THAN_LINH_DROP_RATE = 50;
     private static final int DRAGON_BALL_DROP_RATE = 70;
     private static final int FRESH_MEAT_MIN_QUANTITY = 1;
@@ -67,6 +68,10 @@ public class PlanetGhostBoss extends Boss {
     public PlanetGhostBoss(int ghostType) throws Exception {
         super(NEXT_INSTANCE_ID.getAndDecrement(), true, false, createData(ghostType));
         this.ghostType = ghostType;
+    }
+
+    public int getGhostType() {
+        return ghostType;
     }
 
     private static BossData createData(int ghostType) {
@@ -129,12 +134,23 @@ public class PlanetGhostBoss extends Boss {
         super.update();
     }
 
+    /**
+     * Hồn ma xuất hiện theo đợt chung vào phút 00 và 30 thay vì mỗi con tự đếm
+     * 30 phút kể từ lúc chết. Đợt đầu sau khi admin bật trời tối vẫn xuất hiện ngay
+     * vì lastTimeRest được đặt về 0 khi sự kiện đang tắt.
+     */
     @Override
     public void rest() {
-        if (Util.canDoWithTime(lastTimeRest, secondsRest * 1000)
-                && GhostBossSpawnLimiter.gI().tryReserveSpawn(ghostType)) {
+        if (this.lastTimeRest <= 0 || System.currentTimeMillis() >= nextRespawnWave(this.lastTimeRest)) {
             this.changeStatus(BossStatus.RESPAWN);
         }
+    }
+
+    static long nextRespawnWave(long restTimeMillis) {
+        if (restTimeMillis <= 0) {
+            return 0;
+        }
+        return (Math.floorDiv(restTimeMillis, RESPAWN_WAVE_MILLIS) + 1L) * RESPAWN_WAVE_MILLIS;
     }
 
     private void hideUntilAdminDarkensSky() {
@@ -184,7 +200,7 @@ public class PlanetGhostBoss extends Boss {
                 ConstItem.THIT_TUOI_NANG_CAP_SOI, freshMeatQuantity,
                 x + Util.nextInt(-30, 30), y, plKill.id));
 
-        // Mỗi khung 7 phút 12 giây được rơi tối đa 1 Hồn ma, đủ 200 khung trong ngày.
+        // Chia 500 lượt rơi Hồn ma thành các khung đều trong 24 giờ (khoảng 2 phút 53 giây/khung).
         if (GhostSoulDropLimiter.gI().tryReserveDrop()) {
             ItemMap soul = new ItemMap(this.zone, ConstItem.HON_MA, 1,
                     x + Util.nextInt(-30, 30), y, plKill.id);

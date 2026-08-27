@@ -423,9 +423,14 @@ public class Controller implements IMessageHandler {
                     if (player != null) {
                         try {
                             _msg.reader().readByte();
-                            int[] indexItem = new int[_msg.reader().readByte()];
+                            int selectedCount = Byte.toUnsignedInt(_msg.reader().readByte());
+                            if (player.inventory == null || player.inventory.itemsBag == null
+                                    || selectedCount > player.inventory.itemsBag.size()) {
+                                break;
+                            }
+                            int[] indexItem = new int[selectedCount];
                             for (int i = 0; i < indexItem.length; i++) {
-                                indexItem[i] = _msg.reader().readByte();
+                                indexItem[i] = Byte.toUnsignedInt(_msg.reader().readByte());
                             }
                             CombineService.gI().showInfoCombine(player, indexItem);
                         } catch (IOException e) {

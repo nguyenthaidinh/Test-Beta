@@ -1,5 +1,5 @@
 -- Shop sự kiện Halloween tại NPC ChiChi.
--- Giá dùng Thỏi vàng: Thiệp Halloween 10 TV, Bí ngô 5 TV, Capsule Halloween 100 TV, Hộp Kẹo Ma Quỷ 200 TV, Đá ngũ sắc 1000 TV, Bản đồ truyền thuyết 500 TV.
+-- Giá dùng Thỏi vàng: Thiệp Halloween 10 TV, Bí ngô 5 TV, Capsule Halloween 100 TV, Hộp Kẹo Ma Quỷ 200 TV, Đá ngũ sắc 1000 TV, Bản đồ truyền thuyết 1000 TV.
 -- `icon_spec` 4028 là icon_id của item 457 - Thỏi vàng.
 
 -- May do linh hon: 100 Thoi vang.
@@ -157,7 +157,7 @@ SET @item_shop_id := (
 );
 SET @item_shop_id := COALESCE(@item_shop_id, (SELECT COALESCE(MAX(`id`), 0) + 1 FROM `item_shop`));
 INSERT INTO `item_shop` (`id`, `tab_id`, `temp_id`, `is_new`, `is_sell`, `type_sell`, `cost`, `icon_spec`, `create_time`)
-SELECT @item_shop_id, @tab_id, 1565, 1, 1, 1, 500, 4028, NOW()
+SELECT @item_shop_id, @tab_id, 1565, 1, 1, 1, 1000, 4028, NOW()
 WHERE NOT EXISTS (
     SELECT 1
     FROM `item_shop`
@@ -192,7 +192,7 @@ SET `is_new` = 1,
         WHEN 1264 THEN 100
         WHEN 1356 THEN 200
         WHEN 674 THEN 1000
-        WHEN 1565 THEN 500
+        WHEN 1565 THEN 1000
         WHEN 818 THEN 100
         ELSE `cost`
     END,

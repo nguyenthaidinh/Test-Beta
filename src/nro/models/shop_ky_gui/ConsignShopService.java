@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import nro.models.consts.ConstItem;
 import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
@@ -388,8 +389,14 @@ public class ConsignShopService {
     public void KiGui(Player pl, int id, int money, byte moneyType, int quantity) {
         try {
             Item it = ItemService.gI().copyItem(pl.inventory.itemsBag.get(id));
+            if (it.template.id == ConstItem.SOI_DIA_NGUC) {
+                Service.gI().sendThongBao(pl, "Sói Địa Ngục không thể kí gửi");
+                openShopKyGui(pl);
+                return;
+            }
             for (Item.ItemOption daubuoi : it.itemOptions) {
-                if (daubuoi.optionTemplate.id == 30) {
+                if (daubuoi != null && daubuoi.optionTemplate != null
+                        && daubuoi.optionTemplate.id == 30) {
                     Service.gI().sendThongBao(pl, "Vật phẩm không thể kí gửi");
                     openShopKyGui(pl);
                     return;

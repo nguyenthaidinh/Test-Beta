@@ -70,6 +70,9 @@ public class ShopService {
     private static final int CHI_CHI_LEGENDARY_MAP_SHOP_ID = -ConstItem.BAN_DO_TRUYEN_THUYET;
     private static final short LEGENDARY_MAP_ITEM_ID = (short) ConstItem.BAN_DO_TRUYEN_THUYET;
     private static final int LEGENDARY_MAP_GOLD_BAR_COST = 1_000;
+    private static final int CHI_CHI_FRESH_MEAT_SHOP_ID = -ConstItem.THIT_TUOI_NANG_CAP_SOI;
+    private static final short FRESH_MEAT_ITEM_ID = (short) ConstItem.THIT_TUOI_NANG_CAP_SOI;
+    private static final int FRESH_MEAT_GEM_COST = 200;
     private static final int DENDE_FLOUR_SHOP_ID = -ConstItem.BOT_MI;
     private static final short FLOUR_ITEM_ID = (short) ConstItem.BOT_MI;
     private static final int FLOUR_GOLD_BAR_COST = 500;
@@ -127,10 +130,12 @@ public class ShopService {
                 ensureEarringSoulInChiChiShop(shop);
                 ensureBlueStoneInChiChiShop(shop);
                 ensureLegendaryMapInChiChiShop(shop);
+                ensureFreshMeatInChiChiShop(shop);
                 hideGoldBarInChiChiShop(shop);
                 ensureGemPackageInChiChiShop(shop);
                 configureChiChiSpecialShop(shop);
             } else if (HALLOWEEN_EVENT_SHOP.equals(tagName)) {
+                ensureLegendaryMapInHalloweenEventShop(shop);
                 ensureSoulDetectorInHalloweenEventShop(shop);
                 ensureDevilCandyBoxInHalloweenEventShop(shop);
                 ensureHuyDietCapsuleInHalloweenEventShop(shop);
@@ -753,6 +758,88 @@ public class ShopService {
         itemShop.typeSell = COST_GEM;
         itemShop.cost = LEGENDARY_MAP_GOLD_BAR_COST;
         itemShop.iconSpec = GOLD_BAR_ICON_ID;
+        itemShop.options.clear();
+        return true;
+    }
+
+    /** Đồng bộ Bản đồ truyền thuyết trong Shop sự kiện Chichi về 1.000 Thỏi vàng. */
+    private void ensureLegendaryMapInHalloweenEventShop(Shop shop) {
+        if (shop == null || shop.tabShops == null || shop.tabShops.isEmpty()) {
+            return;
+        }
+        shop.typeShop = SPEC_SHOP;
+        TabShop eventTab = shop.tabShops.get(0);
+        ItemShop legendaryMap = null;
+        for (ItemShop itemShop : eventTab.itemShops) {
+            if (itemShop != null && itemShop.temp != null
+                    && itemShop.temp.id == LEGENDARY_MAP_ITEM_ID) {
+                legendaryMap = itemShop;
+                break;
+            }
+        }
+        boolean isNewShopItem = legendaryMap == null;
+        if (legendaryMap == null) {
+            legendaryMap = new ItemShop();
+            legendaryMap.id = CHI_CHI_LEGENDARY_MAP_SHOP_ID;
+        }
+        if (!configureLegendaryMapShopItem(legendaryMap, eventTab)) {
+            return;
+        }
+        if (isNewShopItem) {
+            eventTab.itemShops.add(legendaryMap);
+        }
+    }
+
+    /** Bán đúng 1 Thịt tươi mỗi lượt với giá 200 Ngọc tại tab sự kiện Chichi. */
+    private void ensureFreshMeatInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null || shop.tabShops.isEmpty()) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null) {
+            eventTab = shop.tabShops.get(0);
+        }
+
+        ItemShop freshMeat = null;
+        for (TabShop tabShop : shop.tabShops) {
+            for (int i = tabShop.itemShops.size() - 1; i >= 0; i--) {
+                ItemShop itemShop = tabShop.itemShops.get(i);
+                if (itemShop != null && itemShop.temp != null
+                        && itemShop.temp.id == FRESH_MEAT_ITEM_ID) {
+                    if (freshMeat == null) {
+                        freshMeat = itemShop;
+                    }
+                    tabShop.itemShops.remove(i);
+                }
+            }
+        }
+        if (freshMeat == null) {
+            freshMeat = new ItemShop();
+        }
+        if (!configureFreshMeatShopItem(freshMeat, eventTab)) {
+            return;
+        }
+        eventTab.itemShops.add(Math.min(2, eventTab.itemShops.size()), freshMeat);
+    }
+
+    private boolean configureFreshMeatShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.id = CHI_CHI_FRESH_MEAT_SHOP_ID;
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(FRESH_MEAT_ITEM_ID);
+        var gemTemplate = ItemService.gI().getTemplate(GEM_CURRENCY_ITEM_ID);
+        if (itemShop.temp == null || gemTemplate == null) {
+            return false;
+        }
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = FRESH_MEAT_GEM_COST;
+        itemShop.iconSpec = gemTemplate.iconID;
         itemShop.options.clear();
         return true;
     }

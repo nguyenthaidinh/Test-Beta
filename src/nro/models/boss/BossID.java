@@ -212,4 +212,11 @@ public class BossID {
     public static final int GHOST_SVK = -1001000;
     public static final int GHOST_CAY_CON = -1001001;
     public static final int GHOST_NGAO_CON = -1001002;
+
+    //========================BOSS VƯƠNG SỰ KIỆN HỒN MA========================
+    public static final int GHOST_KING_CAY = -1001010;
+    public static final int GHOST_KING_NGAO = -1001011;
+    public static final int GHOST_KING_ALO_VU_A = -1001012;
+    public static final int GHOST_KING_SVK = -1001013;
+    public static final int GHOST_KING_NEZUKO = -1001014;
 }

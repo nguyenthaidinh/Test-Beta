@@ -1,6 +1,7 @@
 package nro.models.services;
 
 import nro.models.mob.Mob;
+import nro.models.interfaces.ControlEffectImmune;
 import nro.models.player.Player;
 import nro.models.skill.Skill;
 import nro.models.network.Message;
@@ -59,6 +60,11 @@ public class EffectSkillService {
     }
 
     public void sendEffectPlayer(Player plUseSkill, Player plTarget, byte toggle, byte effect) {
+        if (toggle == TURN_ON_EFFECT && plTarget instanceof ControlEffectImmune
+                && (effect == HOLD_EFFECT || effect == BLIND_EFFECT
+                || effect == SLEEP_EFFECT || effect == STONE_EFFECT)) {
+            return;
+        }
         Message msg;
         try {
             msg = new Message(-124);
@@ -116,6 +122,9 @@ public class EffectSkillService {
     }
 
     public void setAnTroi(Player player, Player plTroi, long lastTimeAnTroi, int timeAnTroi) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         player.effectSkill.anTroi = true;
         player.effectSkill.plTroi = plTroi;
     }
@@ -127,6 +136,9 @@ public class EffectSkillService {
     }
 
     public void setThoiMien(Player player, long lastTimeThoiMien, int timeThoiMien) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         player.effectSkill.isThoiMien = true;
         player.effectSkill.lastTimeThoiMien = lastTimeThoiMien;
         player.effectSkill.timeThoiMien = timeThoiMien;
@@ -138,6 +150,9 @@ public class EffectSkillService {
     }
 
     public void startStun(Player player, long lastTimeStartBlind, int timeBlind) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         player.effectSkill.lastTimeStartStun = lastTimeStartBlind;
         player.effectSkill.timeStun = timeBlind;
         player.effectSkill.isStun = true;
@@ -150,6 +165,9 @@ public class EffectSkillService {
     }
 
     public void setSocola(Player player, long lastTimeSocola, int timeSocola) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         player.effectSkill.lastTimeSocola = lastTimeSocola;
         player.effectSkill.timeSocola = timeSocola;
         player.effectSkill.isSocola = true;
@@ -177,6 +195,9 @@ public class EffectSkillService {
     }
 
     public void setBlindDCTT(Player player, long lastTimeDCTT, int timeBlindDCTT) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         player.effectSkill.isBlindDCTT = true;
         player.effectSkill.lastTimeBlindDCTT = lastTimeDCTT;
         player.effectSkill.timeBlindDCTT = timeBlindDCTT;
@@ -271,7 +292,7 @@ public class EffectSkillService {
     }
 
     public void setIsBinh(Player plAtt, Player player, int time) {
-        if (player.effectSkill != null) {
+        if (player != null && !(player instanceof ControlEffectImmune) && player.effectSkill != null) {
             int typeBinh = plAtt.newSkill.typeItem;
             player.effectSkill.isBinh = true;
             player.effectSkill.typeBinh = typeBinh;
@@ -291,7 +312,7 @@ public class EffectSkillService {
     }
 
     public void setIsHalloween(Player player, int outFit, int time) {
-        if (player.effectSkill != null) {
+        if (player != null && !(player instanceof ControlEffectImmune) && player.effectSkill != null) {
             player.effectSkill.isHalloween = true;
             player.effectSkill.idOutfitHalloween = outFit != -1 ? outFit : Util.nextInt(5);
             player.effectSkill.timeHalloween = time;
@@ -321,7 +342,8 @@ public class EffectSkillService {
             player.effectSkill.isUseMafuba = false;
             for (Player playerMap : player.newSkill.playersTaget) {
                 try {
-                    if (player.location != null && playerMap.location != null) {
+                    if (player.location != null && playerMap.location != null
+                            && !(playerMap instanceof ControlEffectImmune)) {
                         EffectSkillService.gI().setIsBinh(player, playerMap, 11000 * (player.newSkill.typeItem == 0 ? 1 : 2));
                         int x = player.location.x + ((player.newSkill.dir == -1) ? (-75) : 75);
                         int y = player.location.y;
@@ -340,6 +362,9 @@ public class EffectSkillService {
     }
 
     public void setIsStone(Player player, int time) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         if (MapService.gI().isMapMaBu(player.zone.map.mapId)) {
             player.nPoint.hp /= 2;
             PlayerService.gI().sendInfoHp(player);
@@ -360,6 +385,9 @@ public class EffectSkillService {
     }
 
     public void setIsLamCham(Player player, int time) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         player.nPoint.speed = 1;
         Service.gI().point(player);
         Service.gI().sendSpeedPlayer(player, -1);
@@ -377,6 +405,9 @@ public class EffectSkillService {
     }
 
     public void setIsTanHinh(Player player, int time) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         Service.gI().setPos2(player, player.location.x, 10000);
         player.effectSkill.isTanHinh = true;
         player.effectSkill.timeTanHinh = time;
@@ -400,6 +431,9 @@ public class EffectSkillService {
     }
 
     public void setMabuHold(Player player, MaBuHold MabuHold) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         short x = (short) MabuHold.x;
         short y = (short) MabuHold.y;
         player.maBuHold = MabuHold;
@@ -442,6 +476,9 @@ public class EffectSkillService {
     }
 
     public void setChibi(Player player, int time) {
+        if (player == null || player instanceof ControlEffectImmune) {
+            return;
+        }
         player.effectSkill.isChibi = true;
         player.effectSkill.timeChibi = time;
         player.typeChibi = Util.nextInt(0, 3);

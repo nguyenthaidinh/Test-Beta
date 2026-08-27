@@ -8,6 +8,7 @@ import nro.models.boss.yardrat.Yardart;
 import nro.models.consts.ConstAchievement;
 import nro.models.consts.ConstItem;
 import nro.models.intrinsic.Intrinsic;
+import nro.models.interfaces.ControlEffectImmune;
 import nro.models.item.Item;
 import nro.models.mob.Mob;
 import nro.models.mob.MobMe;
@@ -515,7 +516,7 @@ public class SkillService {
             case Skill.SOCOLA:
                 EffectSkillService.gI().sendEffectUseSkill(player, Skill.SOCOLA);
                 int timeSocola = SkillUtil.getTimeSocola();
-                if (plTarget != null) {
+                if (plTarget != null && !(plTarget instanceof ControlEffectImmune)) {
                     EffectSkillService.gI().setSocola(plTarget, System.currentTimeMillis(), timeSocola);
                     Service.gI().Send_Caitrang(plTarget);
                     ItemTimeService.gI().sendItemTime(plTarget, 4133, timeSocola / 1000);
@@ -533,8 +534,11 @@ public class SkillService {
                     }
                     Service.gI().setPos(player, plTarget.location.x, plTarget.location.y);
                     playerAttackPlayer(player, plTarget, miss);
-                    EffectSkillService.gI().setBlindDCTT(plTarget, System.currentTimeMillis(), timeChoangDCTT);
-                    EffectSkillService.gI().sendEffectPlayer(player, plTarget, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.BLIND_EFFECT);
+                    if (!(plTarget instanceof ControlEffectImmune)) {
+                        EffectSkillService.gI().setBlindDCTT(plTarget, System.currentTimeMillis(), timeChoangDCTT);
+                        EffectSkillService.gI().sendEffectPlayer(player, plTarget,
+                                EffectSkillService.TURN_ON_EFFECT, EffectSkillService.BLIND_EFFECT);
+                    }
                     PlayerService.gI().sendInfoHpMpMoney(plTarget);
                     ItemTimeService.gI().sendItemTime(plTarget, 3779, timeChoangDCTT / 1000);
                 }
@@ -550,7 +554,7 @@ public class SkillService {
             case Skill.THOI_MIEN:
                 EffectSkillService.gI().sendEffectUseSkill(player, Skill.THOI_MIEN);
                 int timeSleep = SkillUtil.getTimeThoiMien(player.playerSkill.skillSelect.point);
-                if (plTarget != null) {
+                if (plTarget != null && !(plTarget instanceof ControlEffectImmune)) {
                     EffectSkillService.gI().setThoiMien(plTarget, System.currentTimeMillis(), timeSleep);
                     EffectSkillService.gI().sendEffectPlayer(player, plTarget, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.SLEEP_EFFECT);
                     ItemTimeService.gI().sendItemTime(plTarget, 3782, timeSleep / 1000);
@@ -571,7 +575,9 @@ public class SkillService {
                     timeHold = 5000;
                 }
                 EffectSkillService.gI().setUseTroi(player, System.currentTimeMillis(), timeHold);
-                if (plTarget != null && (!plTarget.playerSkill.prepareQCKK && !plTarget.playerSkill.prepareLaze && !plTarget.playerSkill.prepareTuSat)) {
+                if (plTarget != null && !(plTarget instanceof ControlEffectImmune)
+                        && (!plTarget.playerSkill.prepareQCKK && !plTarget.playerSkill.prepareLaze
+                        && !plTarget.playerSkill.prepareTuSat)) {
                     player.effectSkill.plAnTroi = plTarget;
                     EffectSkillService.gI().sendEffectPlayer(player, plTarget, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.HOLD_EFFECT);
                     EffectSkillService.gI().setAnTroi(plTarget, player, System.currentTimeMillis(), timeHold);
@@ -632,7 +638,8 @@ public class SkillService {
                         playersMap = player.zone.getHumanoids();
                     }
                     for (Player pl : playersMap) {
-                        if (pl != null && !player.equals(pl) && pl.nPoint != null && !pl.nPoint.khangTDHS) {
+                        if (pl != null && !player.equals(pl) && pl.nPoint != null
+                                && !pl.nPoint.khangTDHS && !(pl instanceof ControlEffectImmune)) {
                             if (Util.getDistance(player, pl) <= SkillUtil.getRangeStun(player.playerSkill.skillSelect.point)
                                     && canAttackPlayer(player, pl)) {
                                 if (player.isPet && ((Pet) player).master.equals(pl)) {

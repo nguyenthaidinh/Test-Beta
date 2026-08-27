@@ -437,7 +437,8 @@ public class Item {
             }
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
                     && io.optionTemplate.id != 107 && io.optionTemplate.id != 218
-                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
+                    && (!ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)
+                    || isHellWolfFeatureOption(io.optionTemplate.id))) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -476,7 +477,8 @@ public class Item {
             }
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
                     && io.optionTemplate.id != 107
-                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
+                    && (!ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)
+                    || isHellWolfFeatureOption(io.optionTemplate.id))) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -500,7 +502,8 @@ public class Item {
             }
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
                     && io.optionTemplate.id != 107 && io.optionTemplate.id != 218
-                    && !ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)) {
+                    && (!ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)
+                    || isHellWolfFeatureOption(io.optionTemplate.id))) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -661,7 +664,8 @@ public class Item {
             }
             if (itemOption.optionTemplate != null
                     && (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)
-                    || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id))) {
+                    || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)
+                    && !isHellWolfFeatureOption(itemOption.optionTemplate.id))) {
                 continue;
             }
             strInfo += itemOption.getOptionString() + "\n";
