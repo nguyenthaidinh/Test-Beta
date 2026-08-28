@@ -12,6 +12,8 @@ import nro.models.utils.Util;
 /** Ép đúng một Hồn ma vào pet Sói Địa Ngục. */
 public final class EpOptionSoiDiaNguc {
 
+    private static final long GOLD_COST = 5_000_000_000L;
+    private static final int GEM_COST = 5_000;
     private static final int SUCCESS_RATE = 80;
 
     private EpOptionSoiDiaNguc() {
@@ -51,17 +53,31 @@ public final class EpOptionSoiDiaNguc {
         }
 
         int added = Math.min(wolfService.getSoulIncrement(optionId), cap - current);
+        // goldCombine là int nên không thể chứa mức phí 5 tỷ. Phí vàng được
+        // kiểm tra và trừ trực tiếp bằng GOLD_COST (long) trong epOption().
         player.combineNew.goldCombine = 0;
-        player.combineNew.gemCombine = 0;
+        player.combineNew.gemCombine = GEM_COST;
         player.combineNew.ratioCombine = SUCCESS_RATE;
         String npcSay = "Sói Địa Ngục cấp " + level + "\n"
                 + optionName + ": " + current + "% → " + (current + added) + "%\n"
                 + "Giới hạn hiện tại: " + cap + "%\n"
                 + "Tỉ lệ thành công: " + SUCCESS_RATE + "%\n"
-                + "Không tốn vàng, không tốn ngọc.\n"
-                + "Thành công hoặc thất bại đều tiêu hao 1 Hồn ma.";
+                + "Phí: " + Util.numberToMoney(GOLD_COST) + " vàng và "
+                + Util.numberToMoney(GEM_COST) + " ngọc.\n"
+                + "Thành công hoặc thất bại đều tiêu hao phí và 1 Hồn ma.";
+        if (player.inventory.gold < GOLD_COST) {
+            showCloseMenu(player, npcSay + "\nCòn thiếu "
+                    + Util.numberToMoney(GOLD_COST - player.inventory.gold) + " vàng.");
+            return;
+        }
+        if (player.inventory.gem < GEM_COST) {
+            showCloseMenu(player, npcSay + "\nCòn thiếu "
+                    + Util.numberToMoney(GEM_COST - player.inventory.gem) + " ngọc.");
+            return;
+        }
         CombineService.gI().baHatMit.createOtherMenu(player, ConstNpc.MENU_START_COMBINE,
-                npcSay, "Ép option\nMiễn phí", "Từ chối");
+                npcSay, "Ép option\n" + Util.numberToMoney(GOLD_COST) + " vàng\n"
+                        + Util.numberToMoney(GEM_COST) + " ngọc", "Từ chối");
     }
 
     public static void epOption(Player player) {
@@ -91,6 +107,16 @@ public final class EpOptionSoiDiaNguc {
                 Service.gI().sendThongBao(player, "Chỉ số này chưa mở hoặc đã đạt giới hạn của cấp hiện tại.");
                 return;
             }
+            if (player.inventory.gold < GOLD_COST) {
+                Service.gI().sendThongBao(player, "Không đủ "
+                        + Util.numberToMoney(GOLD_COST) + " vàng để ép option Sói Địa Ngục.");
+                return;
+            }
+            if (player.inventory.gem < GEM_COST) {
+                Service.gI().sendThongBao(player, "Không đủ "
+                        + Util.numberToMoney(GEM_COST) + " ngọc để ép option Sói Địa Ngục.");
+                return;
+            }
             boolean success = Util.isTrue(SUCCESS_RATE, 100);
             int added = 0;
             if (success) {
@@ -101,6 +127,8 @@ public final class EpOptionSoiDiaNguc {
                 }
             }
 
+            player.inventory.subGold(GOLD_COST);
+            player.inventory.subGem(GEM_COST);
             InventoryService.gI().subQuantityItemsBag(player, soul, 1);
             if (InventoryService.gI().getIndexItemBag(player, soul) < 0) {
                 player.combineNew.itemsCombine.remove(soul);
@@ -108,12 +136,17 @@ public final class EpOptionSoiDiaNguc {
             if (success) {
                 CombineService.gI().sendEffectSuccessCombine(player);
                 Service.gI().sendThongBao(player, "Ép thành công: "
-                        + wolfService.getOptionName(optionId) + " +" + added + "%.");
+                        + wolfService.getOptionName(optionId) + " +" + added + "%. Đã tiêu hao "
+                        + Util.numberToMoney(GOLD_COST) + " vàng, "
+                        + Util.numberToMoney(GEM_COST) + " ngọc và 1 Hồn ma.");
             } else {
                 CombineService.gI().sendEffectFailCombine(player);
-                Service.gI().sendThongBao(player, "Ép thất bại, đã tiêu hao 1 Hồn ma.");
+                Service.gI().sendThongBao(player, "Ép thất bại, đã tiêu hao "
+                        + Util.numberToMoney(GOLD_COST) + " vàng, "
+                        + Util.numberToMoney(GEM_COST) + " ngọc và 1 Hồn ma.");
             }
             InventoryService.gI().sendItemBags(player);
+            Service.gI().sendMoney(player);
             CombineService.gI().reOpenItemCombine(player);
         }
     }

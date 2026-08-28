@@ -28,8 +28,10 @@ import nro.models.utils.Util;
  */
 public class PlanetGhostBoss extends Boss {
 
-    private static final long MAX_HP = 5_000_000_000L;
+    private static final long MAX_HP = 10_000_000_000L;
     private static final int DAMAGE = 300_000;
+    private static final int DAMAGE_REDUCTION_PERCENT = 50;
+    private static final long REPEAT_CHAT_DELAY_MS = 2_000L;
     private static final int RESPAWN_SECONDS = 30 * 60;
     private static final long RESPAWN_WAVE_MILLIS = RESPAWN_SECONDS * 1_000L;
     private static final int THAN_LINH_DROP_RATE = 50;
@@ -46,8 +48,17 @@ public class PlanetGhostBoss extends Boss {
         ConstItem.NGOC_RONG_7_SAO
     };
     private static final AtomicInteger NEXT_INSTANCE_ID = new AtomicInteger(-1_100_000);
+    private static final String[] REPEAT_CHATS = {
+        "Chặn bố mày đi",
+        "Gâu Gâu",
+        "Ẳng ẳng",
+        "Tao là đàn em của Cầy Thực Vật",
+        "Chặn tao đi ranh con"
+    };
 
     private final int ghostType;
+    private int repeatChatIndex;
+    private long nextRepeatChatTime;
 
     // Chỉ lấy map thường thuộc hành tinh gốc, không lấy nhà riêng/phó bản/sự kiện.
     private static final int[] EARTH_MAPS = {
@@ -77,11 +88,11 @@ public class PlanetGhostBoss extends Boss {
     private static BossData createData(int ghostType) {
         return switch (ghostType) {
             case BossID.GHOST_SVK -> createData(
-                    "svk", ConstPlayer.TRAI_DAT, (short) 47, EARTH_MAPS, Skill.KAMEJOKO);
+                    "Svk Con", ConstPlayer.TRAI_DAT, (short) 47, EARTH_MAPS, Skill.KAMEJOKO);
             case BossID.GHOST_CAY_CON -> createData(
-                    "cầy con", ConstPlayer.XAYDA, (short) 48, XAYDA_MAPS, Skill.GALICK);
+                    "Cầy Con", ConstPlayer.XAYDA, (short) 48, XAYDA_MAPS, Skill.GALICK);
             case BossID.GHOST_NGAO_CON -> createData(
-                    "ngao con", ConstPlayer.NAMEC, (short) 49, NAMEC_MAPS, Skill.MASENKO);
+                    "Ngao Con", ConstPlayer.NAMEC, (short) 49, NAMEC_MAPS, Skill.MASENKO);
             default -> throw new IllegalArgumentException("Loại boss hồn ma không hợp lệ: " + ghostType);
         };
     }
@@ -110,17 +121,20 @@ public class PlanetGhostBoss extends Boss {
     public void initBase() {
         super.initBase();
 
-        // BossData dùng int[] nên không chứa được 5 tỷ. Gán lại bằng long sau
+        // BossData dùng int[] nên không chứa được 10 tỷ. Gán lại bằng long sau
         // khi calPoint() hoàn tất để giữ đúng HP phía server.
         this.nPoint.hpg = MAX_HP;
         this.nPoint.hpMax = MAX_HP;
         this.nPoint.hp = MAX_HP;
         this.nPoint.setScaleClientHpToIntRange(true);
 
-        // Không giáp, không né và không có chỉ số phòng thủ ẩn.
+        // Lớp giáp phần trăm được xử lý trong injured(); không cộng phòng thủ
+        // phẳng, né hoặc chỉ số ẩn để tránh làm sai mức giảm 50% yêu cầu.
         this.nPoint.defg = 0;
         this.nPoint.def = 0;
         this.nPoint.tlNeDon = 0;
+        this.repeatChatIndex = 0;
+        this.nextRepeatChatTime = 0;
     }
 
     @Override
@@ -132,6 +146,34 @@ public class PlanetGhostBoss extends Boss {
             return;
         }
         super.update();
+        updateRepeatChat();
+    }
+
+    @Override
+    public synchronized int injured(Player attacker, long damage,
+            boolean piercing, boolean isMobAttack) {
+        if (this.isDie() || damage <= 0) {
+            return 0;
+        }
+        int reduction = getEffectiveDamageReductionPercent(
+                attacker, DAMAGE_REDUCTION_PERCENT);
+        long reducedDamage = Math.max(1L,
+                damage * (100L - reduction) / 100L);
+        return super.injured(attacker, reducedDamage, piercing, isMobAttack);
+    }
+
+    private void updateRepeatChat() {
+        if (this.zone == null || this.isDie()
+                || this.bossStatus != BossStatus.ACTIVE) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now < this.nextRepeatChatTime) {
+            return;
+        }
+        this.chat(REPEAT_CHATS[this.repeatChatIndex]);
+        this.repeatChatIndex = (this.repeatChatIndex + 1) % REPEAT_CHATS.length;
+        this.nextRepeatChatTime = now + REPEAT_CHAT_DELAY_MS;
     }
 
     /**
@@ -166,6 +208,8 @@ public class PlanetGhostBoss extends Boss {
         this.prepareBom = false;
         this.currentLevel = -1;
         this.lastTimeRest = 0;
+        this.repeatChatIndex = 0;
+        this.nextRepeatChatTime = 0;
         this.changeStatus(BossStatus.REST);
     }
 
