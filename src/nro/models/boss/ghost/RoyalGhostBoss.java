@@ -1,5 +1,7 @@
 package nro.models.boss.ghost;
 
+import java.util.ArrayList;
+import java.util.List;
 import nro.models.boss.Boss;
 import nro.models.boss.BossData;
 import nro.models.boss.BossID;
@@ -8,7 +10,9 @@ import nro.models.consts.ConstItem;
 import nro.models.consts.ConstPlayer;
 import nro.models.interfaces.ControlEffectImmune;
 import nro.models.map.ItemMap;
+import nro.models.map.Zone;
 import nro.models.map.service.ChangeMapService;
+import nro.models.network.Message;
 import nro.models.player.Pet;
 import nro.models.player.Player;
 import nro.models.services.EffectSkillService;
@@ -18,6 +22,7 @@ import nro.models.services.ItemService;
 import nro.models.services.Service;
 import nro.models.services.SkillService;
 import nro.models.skill.Skill;
+import nro.models.utils.Logger;
 import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
 
@@ -40,6 +45,27 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     private static final long SECOND_PHASE_HP = 800_000_000L;
     private static final long FIRST_RECOVERY_TARGET_HP = MAX_HP;
     private static final long SECOND_RECOVERY_TARGET_HP = 7_000_000_000L;
+    private static final long CAY_TRANSFORMATION_HP = 500_000_000L;
+    private static final long CAY_TRANSFORMED_MAX_HP = 20_000_000_000L;
+    private static final long CAY_TRANSFORMATION_CHAT_DELAY_MS = 2_000L;
+    private static final long SVK_ESCAPE_DELAY_MS = 2_000L;
+    private static final long SVK_REPEAT_CHAT_DELAY_MS = 2_000L;
+    private static final long NGAO_INTRO_DELAY_MS = 2_000L;
+    private static final long NGAO_MASS_KILL_INTERVAL_MS = 1_000L;
+    private static final int NGAO_MASS_KILL_WAVES = 5;
+    private static final int NGAO_QCKK_CHARGE_MS = 4_000;
+    private static final String[] SVK_REPEAT_CHATS = {
+        "Am bách am bách",
+        "Tao cay thằng Sơn lắm rồi",
+        "Cà phê không?",
+        "Đi cà phê không?"
+    };
+    private static final String[] NGAO_RAMPAGE_CHATS = {
+        "Đang ngủ",
+        "Dậy rồi",
+        "Dậy từ lâu rồi",
+        "Im im im tao thích im đấy"
+    };
     private static final int RESPAWN_SECONDS = 2 * 60 * 60;
     private static final long RESPAWN_WAVE_MILLIS = RESPAWN_SECONDS * 1_000L;
 
@@ -71,6 +97,21 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     private boolean firstRecoveryUsed;
     private boolean secondRecoveryUsed;
     private long recoveryTargetHp;
+    private boolean cayTransformationUsed;
+    private boolean cayTransformationInProgress;
+    private int cayTransformationStage;
+    private long cayTransformationNextActionTime;
+    private boolean svkEscapeUsed;
+    private boolean svkEscapeInProgress;
+    private boolean svkRepeatChatActive;
+    private int svkRepeatChatIndex;
+    private long svkNextActionTime;
+    private boolean ngaoRampageUsed;
+    private boolean ngaoRampageInProgress;
+    private int ngaoRampageStage;
+    private int ngaoMassKillCount;
+    private int ngaoRampageChatIndex;
+    private long ngaoNextActionTime;
 
     public RoyalGhostBoss(int royalType) throws Exception {
         super(royalType, true, false, createData(royalType));
@@ -85,10 +126,11 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         return switch (royalType) {
             // Item 1087 - Tanjiro
             case BossID.GHOST_KING_CAY -> createData(
-                    "Cầy Vương", ConstPlayer.XAYDA, 1119, 1120, 1121, Skill.GALICK);
+                    "Cầy Vương", ConstPlayer.XAYDA, 1119, 1120, 1121, Skill.GALICK, true);
             // Item 1088 - Inosuke Hashibira
             case BossID.GHOST_KING_NGAO -> createData(
-                    "Ngao Vương", ConstPlayer.NAMEC, 1122, 1123, 1124, Skill.MASENKO);
+                    "Ngao Vương", ConstPlayer.NAMEC, 1122, 1123, 1124,
+                    Skill.MASENKO, false, true);
             // Item 1089 - Inosuke
             case BossID.GHOST_KING_ALO_VU_A -> createData(
                     "Alo Vũ à", ConstPlayer.TRAI_DAT, 1131, 1132, 1133, Skill.KAMEJOKO);
@@ -104,6 +146,39 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
 
     private static BossData createData(String name, byte gender, int head, int body,
             int leg, int skillId) {
+        return createData(name, gender, head, body, leg, skillId, false, false);
+    }
+
+    private static BossData createData(String name, byte gender, int head, int body,
+            int leg, int skillId, boolean hasMonkeyTransformation) {
+        return createData(name, gender, head, body, leg, skillId,
+                hasMonkeyTransformation, false);
+    }
+
+    private static BossData createData(String name, byte gender, int head, int body,
+            int leg, int skillId, boolean hasMonkeyTransformation, boolean hasQckk) {
+        int[][] skills = hasMonkeyTransformation
+                ? new int[][]{
+                    {skillId, 7, 1_000},
+                    {Skill.KHIEN_NANG_LUONG, 7, 1_000_000},
+                    {Skill.TAI_TAO_NANG_LUONG, 7, 1_000_000},
+                    {Skill.THAI_DUONG_HA_SAN, 7, 1_000_000},
+                    {Skill.BIEN_KHI, 7, 1_000_000}
+                }
+                : hasQckk
+                ? new int[][]{
+                    {skillId, 7, 1_000},
+                    {Skill.KHIEN_NANG_LUONG, 7, 1_000_000},
+                    {Skill.TAI_TAO_NANG_LUONG, 7, 1_000_000},
+                    {Skill.THAI_DUONG_HA_SAN, 7, 1_000_000},
+                    {Skill.QUA_CAU_KENH_KHI, 7, 1_000_000}
+                }
+                : new int[][]{
+                    {skillId, 7, 1_000},
+                    {Skill.KHIEN_NANG_LUONG, 7, 1_000_000},
+                    {Skill.TAI_TAO_NANG_LUONG, 7, 1_000_000},
+                    {Skill.THAI_DUONG_HA_SAN, 7, 1_000_000}
+                };
         return new BossData(
                 name,
                 gender,
@@ -111,12 +186,7 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
                 DAMAGE,
                 new int[]{1}, // HP thật được gán bằng long trong initBase().
                 THREE_PLANET_MAPS,
-                new int[][]{
-                    {skillId, 7, 1_000},
-                    {Skill.KHIEN_NANG_LUONG, 7, 1_000_000},
-                    {Skill.TAI_TAO_NANG_LUONG, 7, 1_000_000},
-                    {Skill.THAI_DUONG_HA_SAN, 7, 1_000_000}
-                },
+                skills,
                 new String[]{},
                 new String[]{},
                 new String[]{},
@@ -126,6 +196,12 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
 
     @Override
     public void initBase() {
+        if (this.effectSkill != null) {
+            this.effectSkill.isMonkey = false;
+            this.effectSkill.levelMonkey = 0;
+            this.effectSkill.lastTimeUpMonkey = 0;
+            this.effectSkill.timeMonkey = 0;
+        }
         super.initBase();
         this.nPoint.hpg = MAX_HP;
         this.nPoint.hpMax = MAX_HP;
@@ -137,6 +213,22 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         this.firstRecoveryUsed = false;
         this.secondRecoveryUsed = false;
         this.recoveryTargetHp = 0;
+        this.cayTransformationUsed = false;
+        this.cayTransformationInProgress = false;
+        this.cayTransformationStage = 0;
+        this.cayTransformationNextActionTime = 0;
+        this.svkEscapeUsed = false;
+        this.svkEscapeInProgress = false;
+        this.svkRepeatChatActive = false;
+        this.svkRepeatChatIndex = 0;
+        this.svkNextActionTime = 0;
+        this.ngaoRampageUsed = false;
+        this.ngaoRampageInProgress = false;
+        this.ngaoRampageStage = 0;
+        this.ngaoMassKillCount = 0;
+        this.ngaoRampageChatIndex = 0;
+        this.ngaoNextActionTime = 0;
+        this.playerSkill.prepareQCKK = false;
         this.effectSkill.isCharging = false;
         this.effectSkill.countCharging = 0;
         this.effectSkill.isShielding = false;
@@ -150,13 +242,21 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
             hideUntilAdminDarkensSky();
             return;
         }
+        // Pha khỉ của Cầy Vương kéo dài tới khi chết, không dùng thời hạn 120 giây của skill thường.
+        if (isCayKing() && this.cayTransformationUsed
+                && this.effectSkill != null && this.effectSkill.isMonkey) {
+            this.effectSkill.lastTimeUpMonkey = System.currentTimeMillis();
+        }
         super.update();
         updateRecoveryState();
+        updateCayTransformationState();
+        updateSvkSpecialState();
+        updateNgaoRampageState();
     }
 
     @Override
     public void active() {
-        if (this.recoveryTargetHp > 0) {
+        if (this.recoveryTargetHp > 0 || isSpecialTransitionInProgress()) {
             return;
         }
         super.active();
@@ -206,10 +306,15 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
             return 0;
         }
 
+        // SVK Vương né hoàn toàn ba loại chưởng thường: Kamejoko, Masenko và Antomic.
+        if (isSvkKing() && isNormalEnergyBlast(attacker)) {
+            return 0;
+        }
+
         // Hai lần hồi phục là các chuyển pha bắt buộc. Trong lúc đang tái tạo,
         // boss không nhận thêm sát thương để đòn xuyên khiên hoặc đòn kế tiếp
         // không thể giết boss trước khi hồi đủ HP của giai đoạn.
-        if (this.recoveryTargetHp > 0) {
+        if (this.recoveryTargetHp > 0 || isSpecialTransitionInProgress()) {
             return 0;
         }
 
@@ -307,6 +412,30 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         this.firstRecoveryUsed = false;
         this.secondRecoveryUsed = false;
         this.recoveryTargetHp = 0;
+        this.cayTransformationUsed = false;
+        this.cayTransformationInProgress = false;
+        this.cayTransformationStage = 0;
+        this.cayTransformationNextActionTime = 0;
+        this.svkEscapeUsed = false;
+        this.svkEscapeInProgress = false;
+        this.svkRepeatChatActive = false;
+        this.svkRepeatChatIndex = 0;
+        this.svkNextActionTime = 0;
+        this.ngaoRampageUsed = false;
+        this.ngaoRampageInProgress = false;
+        this.ngaoRampageStage = 0;
+        this.ngaoMassKillCount = 0;
+        this.ngaoRampageChatIndex = 0;
+        this.ngaoNextActionTime = 0;
+        if (this.playerSkill != null) {
+            this.playerSkill.prepareQCKK = false;
+        }
+        if (this.effectSkill != null) {
+            this.effectSkill.isMonkey = false;
+            this.effectSkill.levelMonkey = 0;
+            this.effectSkill.lastTimeUpMonkey = 0;
+            this.effectSkill.timeMonkey = 0;
+        }
         this.changeStatus(BossStatus.REST);
     }
 
@@ -324,7 +453,7 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     }
 
     private long getPendingPhaseThreshold() {
-        if (this.recoveryTargetHp > 0) {
+        if (this.recoveryTargetHp > 0 || isSpecialTransitionInProgress()) {
             return 0;
         }
         if (!this.firstRecoveryUsed) {
@@ -333,11 +462,14 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         if (!this.secondRecoveryUsed) {
             return SECOND_PHASE_HP;
         }
+        if (isCayKing() && !this.cayTransformationUsed) {
+            return CAY_TRANSFORMATION_HP;
+        }
         return 0;
     }
 
     private void triggerPendingPhase() {
-        if (this.recoveryTargetHp > 0) {
+        if (this.recoveryTargetHp > 0 || isSpecialTransitionInProgress()) {
             return;
         }
         if (!this.firstRecoveryUsed && this.nPoint.hp <= FIRST_PHASE_HP) {
@@ -353,6 +485,340 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
             this.chat("Thái Dương Hạ San! Tái tạo năng lượng!");
             useSolarFlare();
             startEnergyRecovery(SECOND_RECOVERY_TARGET_HP);
+            return;
+        }
+        if (isCayKing() && this.firstRecoveryUsed && this.secondRecoveryUsed
+                && !this.cayTransformationUsed && this.nPoint.hp <= CAY_TRANSFORMATION_HP) {
+            startCayTransformation();
+        }
+    }
+
+    private boolean isCayKing() {
+        return this.royalType == BossID.GHOST_KING_CAY;
+    }
+
+    private boolean isSvkKing() {
+        return this.royalType == BossID.GHOST_KING_SVK;
+    }
+
+    private boolean isNgaoKing() {
+        return this.royalType == BossID.GHOST_KING_NGAO;
+    }
+
+    private boolean isSpecialTransitionInProgress() {
+        return this.cayTransformationInProgress || this.svkEscapeInProgress
+                || this.ngaoRampageInProgress;
+    }
+
+    private boolean isNormalEnergyBlast(Player attacker) {
+        return attacker != null
+                && attacker.playerSkill != null
+                && attacker.playerSkill.skillSelect != null
+                && attacker.playerSkill.skillSelect.template != null
+                && SkillUtil.isUseSkillChuong(attacker);
+    }
+
+    private void startCayTransformation() {
+        this.cayTransformationUsed = true;
+        this.cayTransformationInProgress = true;
+        this.cayTransformationStage = 0;
+        this.cayTransformationNextActionTime
+                = System.currentTimeMillis() + CAY_TRANSFORMATION_CHAT_DELAY_MS;
+        this.chat("Được ấy, gâu gâu.");
+    }
+
+    private void updateCayTransformationState() {
+        if (!this.cayTransformationInProgress
+                || System.currentTimeMillis() < this.cayTransformationNextActionTime) {
+            return;
+        }
+        switch (this.cayTransformationStage) {
+            case 0 -> {
+                transformCayKingToMonkey();
+                this.chat("Xương rồng đơm lá đơm hoa");
+                this.cayTransformationStage = 1;
+                this.cayTransformationNextActionTime
+                        = System.currentTimeMillis() + CAY_TRANSFORMATION_CHAT_DELAY_MS;
+            }
+            case 1 -> {
+                this.chat("Nước đong đầy trên cao nguyên đá");
+                this.cayTransformationStage = 2;
+                this.cayTransformationNextActionTime
+                        = System.currentTimeMillis() + CAY_TRANSFORMATION_CHAT_DELAY_MS;
+            }
+            default -> {
+                this.chat("Là ngày Cầy Vương trở về nhà");
+                this.cayTransformationInProgress = false;
+                this.cayTransformationStage = 3;
+                this.cayTransformationNextActionTime = 0;
+            }
+        }
+    }
+
+    private void transformCayKingToMonkey() {
+        if (selectSkill(Skill.BIEN_KHI)) {
+            EffectSkillService.gI().startUseSkillMonkey(this);
+        } else {
+            this.effectSkill.isMonkey = true;
+            this.effectSkill.levelMonkey = 7;
+        }
+        // Đây là pha cuối của Cầy Vương nên giữ hình khỉ tới khi boss chết hoặc sự kiện tắt.
+        this.effectSkill.isMonkey = true;
+        this.effectSkill.levelMonkey = 7;
+        this.effectSkill.lastTimeUpMonkey = System.currentTimeMillis();
+        this.effectSkill.timeMonkey = Integer.MAX_VALUE;
+        this.nPoint.hpg = MAX_HP;
+        Service.gI().point(this);
+        this.nPoint.hpMax = CAY_TRANSFORMED_MAX_HP;
+        this.nPoint.hp = CAY_TRANSFORMED_MAX_HP;
+        this.nPoint.setScaleClientHpToIntRange(true);
+        Service.gI().Send_Caitrang(this);
+        Service.gI().Send_Info_NV(this);
+    }
+
+    private void startSvkEscape() {
+        this.svkEscapeUsed = true;
+        this.svkEscapeInProgress = true;
+        this.svkRepeatChatActive = false;
+        this.svkRepeatChatIndex = 0;
+        this.svkNextActionTime = System.currentTimeMillis() + SVK_ESCAPE_DELAY_MS;
+        this.chat("Có kỹ năng không?");
+    }
+
+    private void updateSvkSpecialState() {
+        if (!isSvkKing()) {
+            return;
+        }
+        if (this.isDie() || this.zone == null) {
+            this.svkEscapeInProgress = false;
+            this.svkRepeatChatActive = false;
+            this.svkNextActionTime = 0;
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (this.svkEscapeInProgress) {
+            if (now < this.svkNextActionTime) {
+                return;
+            }
+            relocateSvkAndHeal();
+            this.svkEscapeInProgress = false;
+            this.svkRepeatChatActive = true;
+            this.svkRepeatChatIndex = 0;
+            chatNextSvkRepeatLine();
+            this.svkNextActionTime = now + SVK_REPEAT_CHAT_DELAY_MS;
+            return;
+        }
+        if (this.svkRepeatChatActive && now >= this.svkNextActionTime) {
+            chatNextSvkRepeatLine();
+            this.svkNextActionTime = now + SVK_REPEAT_CHAT_DELAY_MS;
+        }
+    }
+
+    private void chatNextSvkRepeatLine() {
+        this.chat(SVK_REPEAT_CHATS[this.svkRepeatChatIndex]);
+        this.svkRepeatChatIndex = (this.svkRepeatChatIndex + 1) % SVK_REPEAT_CHATS.length;
+    }
+
+    private void relocateSvkAndHeal() {
+        Zone targetZone = getRandomDifferentZone();
+        // Hồi đầy trước khi nạp boss vào khu mới để người chơi tại khu đích
+        // nhìn thấy ngay đúng 10 tỷ HP, không thoáng thấy giá trị 7 tỷ của pha trước.
+        this.nPoint.hpg = MAX_HP;
+        this.nPoint.hpMax = MAX_HP;
+        this.nPoint.hp = MAX_HP;
+        this.nPoint.setScaleClientHpToIntRange(true);
+        if (targetZone != null) {
+            int x = targetZone.map.mapWidth > 200
+                    ? Util.nextInt(100, targetZone.map.mapWidth - 100) : 100;
+            int y = targetZone.map.yPhysicInTop(x, 100);
+            ChangeMapService.gI().changeMap(this, targetZone, x, y);
+        }
+        Service.gI().Send_Info_NV(this);
+    }
+
+    private Zone getRandomDifferentZone() {
+        if (this.zone == null || this.zone.map == null) {
+            return null;
+        }
+        List<Zone> zones = this.zone.map.zones;
+        if (zones == null || zones.size() <= 1) {
+            return null;
+        }
+        int start = Util.nextInt(0, zones.size() - 1);
+        for (int i = 0; i < zones.size(); i++) {
+            Zone candidate = zones.get((start + i) % zones.size());
+            if (candidate != null && !candidate.equals(this.zone)
+                    && candidate.isBossCanJoin(this)) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    private void startNgaoRampage() {
+        this.ngaoRampageUsed = true;
+        this.ngaoRampageInProgress = true;
+        this.ngaoRampageStage = 0;
+        this.ngaoMassKillCount = 0;
+        this.ngaoRampageChatIndex = 0;
+        this.ngaoNextActionTime = System.currentTimeMillis() + NGAO_INTRO_DELAY_MS;
+        this.chat("Cái gì đang học bài hả?");
+    }
+
+    private void updateNgaoRampageState() {
+        if (!isNgaoKing()) {
+            return;
+        }
+        if (this.isDie() || this.zone == null) {
+            this.ngaoRampageInProgress = false;
+            this.ngaoNextActionTime = 0;
+            if (this.playerSkill != null) {
+                this.playerSkill.prepareQCKK = false;
+            }
+            return;
+        }
+        if (!this.ngaoRampageInProgress
+                || System.currentTimeMillis() < this.ngaoNextActionTime) {
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        switch (this.ngaoRampageStage) {
+            case 0 -> executeNgaoMassKillWave(now);
+            case 1 -> prepareNgaoShieldAndQckk(now);
+            default -> finishNgaoQckkRampage();
+        }
+    }
+
+    private void executeNgaoMassKillWave(long now) {
+        killAllPlayersInCurrentZone();
+        if (this.ngaoRampageChatIndex < NGAO_RAMPAGE_CHATS.length) {
+            this.chat(NGAO_RAMPAGE_CHATS[this.ngaoRampageChatIndex++]);
+        }
+        this.ngaoMassKillCount++;
+        if (this.ngaoMassKillCount >= NGAO_MASS_KILL_WAVES) {
+            this.ngaoRampageStage = 1;
+        }
+        this.ngaoNextActionTime = now + NGAO_MASS_KILL_INTERVAL_MS;
+    }
+
+    private void prepareNgaoShieldAndQckk(long now) {
+        activateEnergyShield();
+        if (selectSkill(Skill.QUA_CAU_KENH_KHI)) {
+            this.playerSkill.prepareQCKK = true;
+            this.playerSkill.lastTimePrepareQCKK = now;
+            SkillService.gI().sendPlayerPrepareSkill(this, NGAO_QCKK_CHARGE_MS);
+        }
+        this.ngaoRampageStage = 2;
+        this.ngaoNextActionTime = now + NGAO_QCKK_CHARGE_MS;
+    }
+
+    private void finishNgaoQckkRampage() {
+        try {
+            Player target = getRandomAlivePlayerInCurrentZone();
+            if (selectSkill(Skill.QUA_CAU_KENH_KHI)) {
+                // Gọi lần hai của QCKK để phát đúng hoạt ảnh ném cầu. Sát thương
+                // toàn khu vẫn được chốt riêng bên dưới, không phụ thuộc phạm vi skill.
+                boolean standardAnimationSent = target != null
+                        && SkillService.gI().useSkill(this, target, null, -1, null);
+                if (!standardAnimationSent) {
+                    // Sau 5 đợt quét có thể không còn mục tiêu sống. Khi đó
+                    // useSkill gốc không phát gói ném cầu, nên dùng một nhân vật
+                    // vẫn còn trong khu làm đích hiển thị cho toàn bộ client.
+                    sendNgaoQckkFallbackAnimation(getRandomPlayerInCurrentZone());
+                }
+            }
+        } catch (Exception e) {
+            Logger.logException(RoyalGhostBoss.class, e,
+                    "Lỗi khi Ngao Vương ném QCKK");
+        } finally {
+            // Luôn thoát chuyển pha, kể cả dữ liệu skill/target phát sinh lỗi.
+            if (this.playerSkill != null) {
+                this.playerSkill.prepareQCKK = false;
+            }
+            this.ngaoRampageInProgress = false;
+            this.ngaoRampageStage = 3;
+            this.ngaoNextActionTime = 0;
+            killAllPlayersInCurrentZone();
+        }
+    }
+
+    private Player getRandomAlivePlayerInCurrentZone() {
+        if (this.zone == null) {
+            return null;
+        }
+        List<Player> alivePlayers = new ArrayList<>();
+        for (Player player : new ArrayList<>(this.zone.getPlayers())) {
+            if (player != null && player.zone == this.zone && !player.isDie()) {
+                alivePlayers.add(player);
+            }
+        }
+        return alivePlayers.isEmpty()
+                ? null : alivePlayers.get(Util.nextInt(0, alivePlayers.size() - 1));
+    }
+
+    private Player getRandomPlayerInCurrentZone() {
+        if (this.zone == null) {
+            return null;
+        }
+        List<Player> players = new ArrayList<>();
+        for (Player player : new ArrayList<>(this.zone.getPlayers())) {
+            if (player != null && player.zone == this.zone) {
+                players.add(player);
+            }
+        }
+        return players.isEmpty()
+                ? null : players.get(Util.nextInt(0, players.size() - 1));
+    }
+
+    private void sendNgaoQckkFallbackAnimation(Player target) {
+        if (target == null || this.playerSkill == null
+                || this.playerSkill.skillSelect == null) {
+            return;
+        }
+        Message message = null;
+        try {
+            message = new Message(-60);
+            message.writer().writeInt((int) this.id);
+            message.writer().writeByte(this.playerSkill.skillSelect.skillId);
+            message.writer().writeByte(1);
+            message.writer().writeInt((int) target.id);
+            message.writer().writeByte(1);
+            message.writer().writeByte(0);
+            message.writer().writeInt(target.nPoint == null ? 0 : target.nPoint.getClientHp());
+            message.writer().writeBoolean(true);
+            message.writer().writeBoolean(false);
+            Service.gI().sendMessAllPlayerInMap(this, message);
+        } catch (Exception e) {
+            Logger.logException(RoyalGhostBoss.class, e,
+                    "Lỗi khi gửi hoạt ảnh QCKK dự phòng của Ngao Vương");
+        } finally {
+            if (message != null) {
+                message.cleanup();
+            }
+        }
+    }
+
+    private void killAllPlayersInCurrentZone() {
+        if (this.zone == null) {
+            return;
+        }
+        Zone currentZone = this.zone;
+        for (Player target : new ArrayList<>(currentZone.getPlayers())) {
+            if (target != null && target.zone == currentZone && !target.isDie()) {
+                try {
+                    // Kiểm tra lại ngay trước khi xử lý vì người chơi có thread
+                    // đổi khu riêng; không giết nhầm sau khi họ đã sang khu khác.
+                    if (target.zone == currentZone && !target.isDie()) {
+                        target.setDie();
+                    }
+                } catch (Exception e) {
+                    // Một nhân vật lỗi trạng thái không được phép ngắt cả đợt
+                    // quét hoặc khiến Ngao Vương kẹt vĩnh viễn trong chuyển pha.
+                    Logger.logException(RoyalGhostBoss.class, e,
+                            "Lỗi khi Ngao Vương quét người chơi trong khu");
+                }
+            }
         }
     }
 
@@ -374,9 +840,7 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     private void startEnergyRecovery(long targetHp) {
         this.recoveryTargetHp = Math.min(targetHp, this.nPoint.hpMax);
         if (!selectSkill(Skill.TAI_TAO_NANG_LUONG)) {
-            this.nPoint.setHp(this.recoveryTargetHp);
-            this.recoveryTargetHp = 0;
-            Service.gI().Send_Info_NV(this);
+            completeEnergyRecovery();
             return;
         }
         this.effectSkill.countCharging = 0;
@@ -389,19 +853,39 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
             return;
         }
         if (this.nPoint.hp >= this.recoveryTargetHp) {
-            boolean completedFirstRecovery = this.recoveryTargetHp == FIRST_RECOVERY_TARGET_HP;
-            this.nPoint.setHp(this.recoveryTargetHp);
-            EffectSkillService.gI().stopCharge(this);
-            this.recoveryTargetHp = 0;
-            if (completedFirstRecovery && this.effectSkill.isShielding) {
-                EffectSkillService.gI().removeShield(this);
-            }
-            Service.gI().Send_Info_NV(this);
+            completeEnergyRecovery();
         } else if (!this.effectSkill.isCharging) {
             if (selectSkill(Skill.TAI_TAO_NANG_LUONG)) {
                 this.effectSkill.countCharging = 0;
                 EffectSkillService.gI().startCharge(this);
+            } else {
+                // Không để boss kẹt bất tử ở trạng thái chuyển pha nếu dữ liệu
+                // kỹ năng bị thiếu hoặc bị thay đổi khi máy chủ đang chạy.
+                completeEnergyRecovery();
             }
+        }
+    }
+
+    private void completeEnergyRecovery() {
+        if (this.recoveryTargetHp <= 0) {
+            return;
+        }
+        boolean completedFirstRecovery = this.recoveryTargetHp == FIRST_RECOVERY_TARGET_HP;
+        boolean completedSecondRecovery = this.recoveryTargetHp == SECOND_RECOVERY_TARGET_HP;
+        this.nPoint.setHp(this.recoveryTargetHp);
+        if (this.effectSkill != null && this.effectSkill.isCharging) {
+            EffectSkillService.gI().stopCharge(this);
+        }
+        this.recoveryTargetHp = 0;
+        if (completedFirstRecovery && this.effectSkill != null && this.effectSkill.isShielding) {
+            EffectSkillService.gI().removeShield(this);
+        }
+        Service.gI().Send_Info_NV(this);
+        if (completedSecondRecovery && isSvkKing() && !this.svkEscapeUsed) {
+            startSvkEscape();
+        }
+        if (completedSecondRecovery && isNgaoKing() && !this.ngaoRampageUsed) {
+            startNgaoRampage();
         }
     }
 
@@ -416,6 +900,9 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     }
 
     private void stopPhaseEffects() {
+        if (this.playerSkill != null) {
+            this.playerSkill.prepareQCKK = false;
+        }
         if (this.effectSkill == null) {
             return;
         }
