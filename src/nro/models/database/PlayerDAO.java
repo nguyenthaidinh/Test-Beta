@@ -657,6 +657,8 @@ public class PlayerDAO {
                                 - player.itemTime.lastTimeUseFlourLazeArmorPenetration)) : 0));
                 dataArray.add(Math.max(0, player.dailyDendeFlourBought));
                 dataArray.add(player.lastDendeFlourPurchaseTime);
+                dataArray.add(Math.max(0, player.dailyRoyalBossRadarBought));
+                dataArray.add(player.lastRoyalBossRadarPurchaseTime);
                 String itemTime = dataArray.toJSONString();
                 dataArray.clear();
 

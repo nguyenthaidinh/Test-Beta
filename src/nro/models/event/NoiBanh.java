@@ -14,6 +14,8 @@ import nro.models.services_dungeon.AncientCastleService;
 
 public class NoiBanh extends Npc {
 
+    private static final boolean EVENT_CLOSED = true;
+    private static final String EVENT_CLOSED_MESSAGE = "Sự kiện Trung Thu đã kết thúc.";
     private static final int DUOI_KHI_ID = 1045;
     private static final int COST_BTT1 = 50;   // 50 Đuôi Khỉ
     private static final int COST_BTT2 = 80;   // 80 Đuôi Khỉ
@@ -25,6 +27,10 @@ public class NoiBanh extends Npc {
 
     @Override
     public void openBaseMenu(Player player) {
+        if (EVENT_CLOSED) {
+            Service.gI().sendThongBaoOK(player, EVENT_CLOSED_MESSAGE);
+            return;
+        }
         Item duoiKhi = InventoryService.gI().findItemBag(player, DUOI_KHI_ID);
         int soLuong = (duoiKhi != null) ? duoiKhi.quantity : 0;
         createOtherMenu(player, 0,
@@ -41,6 +47,10 @@ public class NoiBanh extends Npc {
 
     @Override
     public void confirmMenu(Player pl, int select) {
+        if (EVENT_CLOSED) {
+            Service.gI().sendThongBaoOK(pl, EVENT_CLOSED_MESSAGE);
+            return;
+        }
         if (canOpenNpc(pl)) {
             switch (pl.idMark.getIndexMenu()) {
                 case 0 -> {

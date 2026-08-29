@@ -679,6 +679,16 @@ public class MrBlue {
             if (Util.isAfterMidnight(player.lastDendeFlourPurchaseTime)) {
                 player.dailyDendeFlourBought = 0;
             }
+            if (dataArray.size() > 38) {
+                player.dailyRoyalBossRadarBought = Math.max(0,
+                        Integer.parseInt(String.valueOf(dataArray.get(38))));
+            }
+            if (dataArray.size() > 39) {
+                player.lastRoyalBossRadarPurchaseTime = Long.parseLong(String.valueOf(dataArray.get(39)));
+            }
+            if (Util.isAfterMidnight(player.lastRoyalBossRadarPurchaseTime)) {
+                player.dailyRoyalBossRadarBought = 0;
+            }
 
             player.itemTime.lastTimeBoHuyet = System.currentTimeMillis() - (ItemTime.TIME_ITEM - timeBoHuyet);
             player.itemTime.lastTimeBoKhi = System.currentTimeMillis() - (ItemTime.TIME_ITEM - timeBoKhi);

@@ -366,6 +366,8 @@ public class Player implements Runnable {
     public long lastTimeFragmentBought;
     public int dailyDendeFlourBought;
     public long lastDendeFlourPurchaseTime;
+    public int dailyRoyalBossRadarBought;
+    public long lastRoyalBossRadarPurchaseTime;
 
     public Player() {
         LearnSkill = new LearnSkill();

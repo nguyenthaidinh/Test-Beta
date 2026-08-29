@@ -222,7 +222,8 @@ public class Trade {
         if (item == null || !item.isNotNullItem()) {
             return true;
         }
-        if (item.template.id == ConstItem.SOI_DIA_NGUC) {
+        if (item.template.id == ConstItem.SOI_DIA_NGUC
+                || item.template.id == ConstItem.RADA_DO_VUONG) {
             return true;
         }
         for (Item.ItemOption io : item.itemOptions) {

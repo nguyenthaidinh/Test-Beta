@@ -62,23 +62,30 @@ public class ChatGlobalService implements Runnable {
     }
 
     /**
-     * Chụp lại thông tin người gửi ngay khi hẹn giờ, sau đó mới đưa tin
-     * vào kênh thế giới. Nhờ vậy tin vẫn đúng người, đúng nội dung kể
-     * cả khi người chơi đã thoát game trong thời gian chờ.
+     * Chụp lại thông tin người gửi ngay khi hẹn giờ, sau đó phát theo
+     * số lần và khoảng cách đã chọn. Nhờ vậy tin vẫn đúng người,
+     * đúng nội dung kể cả khi người chơi đã thoát game trong thời gian chờ.
      */
-    public void ThongBaoRoiDoSau(Player player, String text, long delayMillis) {
+    public void ThongBaoRoiDoSau(Player player, String text, long delayMillis,
+            int repeatCount, long repeatIntervalMillis) {
         if (player == null || text == null) {
             return;
         }
         String message = text.length() > 200 ? text.substring(0, 200) : text;
-        ChatGlobal delayedChat = new ChatGlobal(player, message);
-        DELAYED_CHAT_EXECUTOR.schedule(
-                () -> {
-                    chatGlobal(delayedChat);
-                    delayedChat.dispose();
-                },
-                Math.max(0L, delayMillis),
-                TimeUnit.MILLISECONDS);
+        int totalMessages = Math.max(1, repeatCount);
+        long firstDelay = Math.max(0L, delayMillis);
+        long interval = Math.max(0L, repeatIntervalMillis);
+        for (int i = 0; i < totalMessages; i++) {
+            ChatGlobal delayedChat = new ChatGlobal(player, message);
+            long messageDelay = firstDelay + i * interval;
+            DELAYED_CHAT_EXECUTOR.schedule(
+                    () -> {
+                        chatGlobal(delayedChat);
+                        delayedChat.dispose();
+                    },
+                    messageDelay,
+                    TimeUnit.MILLISECONDS);
+        }
     }
 
     public void ThongBaoDapDo(Player player, String text) {

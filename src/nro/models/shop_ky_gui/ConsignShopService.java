@@ -38,7 +38,8 @@ public class ConsignShopService {
 
     private List<ConsignItem> getItemKyGui2(Player pl, byte tab, byte to, byte max) {
         List<ConsignItem> filtered = ConsignShopManager.gI().listItem.stream()
-                .filter(it -> it != null && it.tab == tab && !it.isBuy)
+                .filter(it -> it != null && it.itemId != ConstItem.RADA_DO_VUONG
+                        && it.tab == tab && !it.isBuy)
                 .sorted(Comparator.comparingInt((ConsignItem it) -> it.isUpTop).reversed())
                 .collect(Collectors.toList());
 
@@ -51,7 +52,8 @@ public class ConsignShopService {
 
     private List<ConsignItem> getItemKyGui(Player pl, byte tab, byte... max) {
         List<ConsignItem> filtered = ConsignShopManager.gI().listItem.stream()
-                .filter(it -> it != null && it.tab == tab && !it.isBuy && it.player_sell != pl.id)
+                .filter(it -> it != null && it.itemId != ConstItem.RADA_DO_VUONG
+                        && it.tab == tab && !it.isBuy && it.player_sell != pl.id)
                 .sorted(Comparator.comparingInt((ConsignItem it) -> it.isUpTop).reversed())
                 .collect(Collectors.toList());
 
@@ -76,7 +78,7 @@ public class ConsignShopService {
 
     private List<ConsignItem> getItemKyGui() {
         return ConsignShopManager.gI().listItem.stream()
-                .filter(it -> it != null && !it.isBuy)
+                .filter(it -> it != null && it.itemId != ConstItem.RADA_DO_VUONG && !it.isBuy)
                 .sorted(Comparator.comparingInt((ConsignItem it) -> it.isUpTop).reversed())
                 .collect(Collectors.toList());
     }
@@ -344,6 +346,9 @@ public class ConsignShopService {
 
     public boolean itemCanConsign(Item it) {
         if (it != null && it.template != null) {
+            if (it.template.id == ConstItem.RADA_DO_VUONG) {
+                return false;
+            }
             if (it.itemOptions.stream().anyMatch(op -> op.optionTemplate.id == 86)
                     || it.itemOptions.stream().anyMatch(op -> op.optionTemplate.id == 87)
                     || it.template.type == 14
@@ -389,6 +394,11 @@ public class ConsignShopService {
     public void KiGui(Player pl, int id, int money, byte moneyType, int quantity) {
         try {
             Item it = ItemService.gI().copyItem(pl.inventory.itemsBag.get(id));
+            if (it.template.id == ConstItem.RADA_DO_VUONG) {
+                Service.gI().sendThongBao(pl, "Radar Dò Vương không thể ký gửi");
+                openShopKyGui(pl);
+                return;
+            }
             if (it.template.id == ConstItem.SOI_DIA_NGUC) {
                 Service.gI().sendThongBao(pl, "Sói Địa Ngục không thể kí gửi");
                 openShopKyGui(pl);

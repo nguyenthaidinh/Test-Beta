@@ -50,6 +50,7 @@ public class ShopService {
     private static final byte KINANG_SHOP = 1;
     private static final String SHOP_DENDE = "DENDE";
     private static final String SHOP_CHI_CHI = "SHOP_CHI_CHI";
+    private static final String SHOP_SANTA = "SANTA";
     private static final String HALLOWEEN_EVENT_SHOP = "HALLOWEEN_EVENT_SHOP";
     private static final int TAB_DENDE_SPECIAL_ID = 6;
     private static final int TAB_CHI_CHI_EVENT_ID = 58;
@@ -70,6 +71,10 @@ public class ShopService {
     private static final int CHI_CHI_LEGENDARY_MAP_SHOP_ID = -ConstItem.BAN_DO_TRUYEN_THUYET;
     private static final short LEGENDARY_MAP_ITEM_ID = (short) ConstItem.BAN_DO_TRUYEN_THUYET;
     private static final int LEGENDARY_MAP_GOLD_BAR_COST = 1_000;
+    private static final int CHI_CHI_ROYAL_BOSS_RADAR_SHOP_ID = -ConstItem.RADA_DO_VUONG;
+    private static final short ROYAL_BOSS_RADAR_ITEM_ID = (short) ConstItem.RADA_DO_VUONG;
+    private static final int ROYAL_BOSS_RADAR_GOLD_BAR_COST = 30_000;
+    private static final int ROYAL_BOSS_RADAR_DAILY_LIMIT = 5;
     private static final int CHI_CHI_FRESH_MEAT_SHOP_ID = -ConstItem.THIT_TUOI_NANG_CAP_SOI;
     private static final short FRESH_MEAT_ITEM_ID = (short) ConstItem.THIT_TUOI_NANG_CAP_SOI;
     private static final int FRESH_MEAT_GEM_COST = 500;
@@ -119,7 +124,9 @@ public class ShopService {
         }
         try {
             Shop shop = this.getShop(tagName);
-            if (SHOP_DENDE.equals(tagName)) {
+            if (SHOP_SANTA.equals(tagName)) {
+                removeRoyalBossRadarFromSantaShop(shop);
+            } else if (SHOP_DENDE.equals(tagName)) {
                 ensureFlourInDendeShop(shop);
                 configureDendeSpecialShop(shop);
             } else if (SHOP_CHI_CHI.equals(tagName)) {
@@ -131,6 +138,7 @@ public class ShopService {
                 ensureBlueStoneInChiChiShop(shop);
                 ensureLegendaryMapInChiChiShop(shop);
                 ensureFreshMeatInChiChiShop(shop);
+                ensureRoyalBossRadarInChiChiShop(shop);
                 hideGoldBarInChiChiShop(shop);
                 ensureGemPackageInChiChiShop(shop);
                 configureChiChiSpecialShop(shop);
@@ -168,6 +176,21 @@ public class ShopService {
         } catch (Exception ex) {
             ex.printStackTrace();
             Service.gI().sendThongBao(player, ex.getMessage());
+        }
+    }
+
+    /** Chỉ gỡ Radar Dò Vương khỏi shop Santa, không ảnh hưởng shop khác. */
+    private void removeRoyalBossRadarFromSantaShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop == null || tabShop.itemShops == null) {
+                continue;
+            }
+            tabShop.itemShops.removeIf(itemShop -> itemShop != null
+                    && itemShop.temp != null
+                    && itemShop.temp.id == ConstItem.RADA_DO_VUONG);
         }
     }
 
@@ -572,6 +595,7 @@ public class ShopService {
                         || itemShop.id == CHI_CHI_GEM_PACKAGE_SHOP_ID
                         || itemShop.id == CHI_CHI_EARRING_SOUL_SHOP_ID
                         || itemShop.id == CHI_CHI_BLUE_STONE_SHOP_ID
+                        || itemShop.id == CHI_CHI_ROYAL_BOSS_RADAR_SHOP_ID
                         || itemShop.temp.id == LEGENDARY_MAP_ITEM_ID) {
                     continue;
                 }
@@ -841,6 +865,60 @@ public class ShopService {
         itemShop.cost = FRESH_MEAT_GEM_COST;
         itemShop.iconSpec = gemTemplate.iconID;
         itemShop.options.clear();
+        return true;
+    }
+
+    /** Bán Radar Dò Vương trong tab sự kiện Chichi với giá 30.000 Thỏi vàng. */
+    private void ensureRoyalBossRadarInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null || shop.tabShops.isEmpty()) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null) {
+            eventTab = shop.tabShops.get(0);
+        }
+
+        ItemShop royalBossRadar = null;
+        for (TabShop tabShop : shop.tabShops) {
+            for (int i = tabShop.itemShops.size() - 1; i >= 0; i--) {
+                ItemShop itemShop = tabShop.itemShops.get(i);
+                if (itemShop != null && itemShop.temp != null
+                        && itemShop.temp.id == ROYAL_BOSS_RADAR_ITEM_ID) {
+                    if (royalBossRadar == null) {
+                        royalBossRadar = itemShop;
+                    }
+                    tabShop.itemShops.remove(i);
+                }
+            }
+        }
+        if (royalBossRadar == null) {
+            royalBossRadar = new ItemShop();
+        }
+        if (!configureRoyalBossRadarShopItem(royalBossRadar, eventTab)) {
+            return;
+        }
+        eventTab.itemShops.add(Math.min(3, eventTab.itemShops.size()), royalBossRadar);
+    }
+
+    private boolean configureRoyalBossRadarShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.id = CHI_CHI_ROYAL_BOSS_RADAR_SHOP_ID;
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(ROYAL_BOSS_RADAR_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = ROYAL_BOSS_RADAR_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
+        itemShop.options.clear();
+        itemShop.options.add(new Item.ItemOption(30, 0));
         return true;
     }
 
@@ -1784,6 +1862,15 @@ public class ShopService {
                 return;
             }
         }
+        boolean royalBossRadarPurchase = isChiChiRoyalBossRadarPurchase(shop, is);
+        if (royalBossRadarPurchase) {
+            resetRoyalBossRadarPurchaseCount(player);
+            if (player.dailyRoyalBossRadarBought >= ROYAL_BOSS_RADAR_DAILY_LIMIT) {
+                Service.gI().sendThongBao(player,
+                        "Bạn đã mua đủ 5 Radar Dò Vương hôm nay, vui lòng quay lại ngày mai!");
+                return;
+            }
+        }
 
         // Kiểm tra giới hạn mảnh trước khi trừ tiền.
         if (is.temp.id == 933 || is.temp.id == 935) {
@@ -1827,6 +1914,10 @@ public class ShopService {
         if (dendeFlourPurchase) {
             player.dailyDendeFlourBought++;
             player.lastDendeFlourPurchaseTime = System.currentTimeMillis();
+        }
+        if (royalBossRadarPurchase) {
+            player.dailyRoyalBossRadarBought++;
+            player.lastRoyalBossRadarPurchaseTime = System.currentTimeMillis();
         }
         // Các mảnh bông tai cần option 31 để tích lũy đúng vào cùng một vật phẩm.
         if (item.template.id == 933 || item.template.id == 934 || item.template.id == 935) {
@@ -1951,6 +2042,18 @@ public class ShopService {
         return itSpec == GOLD_BAR_ITEM_ID;
     }
 
+    private boolean isChiChiRoyalBossRadarPurchase(Shop shop, ItemShop itemShop) {
+        return shop != null && SHOP_CHI_CHI.equals(shop.tagName)
+                && itemShop != null && itemShop.temp != null
+                && itemShop.temp.id == ROYAL_BOSS_RADAR_ITEM_ID;
+    }
+
+    private void resetRoyalBossRadarPurchaseCount(Player player) {
+        if (Util.isAfterMidnight(player.lastRoyalBossRadarPurchaseTime)) {
+            player.dailyRoyalBossRadarBought = 0;
+        }
+    }
+
     private boolean isChiChiGemPackage(Shop shop, ItemShop itemShop) {
         return shop != null
                 && SHOP_CHI_CHI.equals(shop.tagName)
@@ -2019,19 +2122,54 @@ public class ShopService {
                 }
                 break;
             default:
-                if (InventoryService.gI().findItemBag(pl, itSpec) == null || !InventoryService.gI().findItemBag(pl, itSpec).isNotNullItem()) {
+                long itemQuantity = countItemQuantityInBag(pl, itSpec);
+                if (itemQuantity <= 0) {
                     Service.gI().sendThongBao(pl, "Không tìm thấy " + itS.template.name);
                     isBuy = false;
-                } else if (InventoryService.gI().findItemBag(pl, itSpec).quantity < buySpec) {
+                } else if (itemQuantity < buySpec) {
                     Service.gI().sendThongBao(pl, "Bạn không có đủ " + buySpec + " " + itS.template.name);
                     isBuy = false;
                 } else {
-                    InventoryService.gI().subQuantityItemsBag(pl, InventoryService.gI().findItemBag(pl, itSpec), buySpec);
-                    isBuy = true;
+                    isBuy = subItemQuantityInBag(pl, itSpec, buySpec);
                 }
                 break;
         }
         return isBuy;
+    }
+
+    /** Hỗ trợ dữ liệu cũ có cùng một loại vật phẩm nằm ở nhiều ô hành trang. */
+    private long countItemQuantityInBag(Player player, int itemId) {
+        long total = 0;
+        if (player == null || player.inventory == null || player.inventory.itemsBag == null) {
+            return total;
+        }
+        for (Item item : player.inventory.itemsBag) {
+            if (item != null && item.isNotNullItem() && item.template != null
+                    && item.template.id == itemId && item.quantity > 0) {
+                total += item.quantity;
+            }
+        }
+        return total;
+    }
+
+    private boolean subItemQuantityInBag(Player player, int itemId, int quantity) {
+        if (quantity <= 0 || countItemQuantityInBag(player, itemId) < quantity) {
+            return false;
+        }
+        int remaining = quantity;
+        for (Item item : player.inventory.itemsBag) {
+            if (remaining <= 0) {
+                break;
+            }
+            if (item == null || !item.isNotNullItem() || item.template == null
+                    || item.template.id != itemId || item.quantity <= 0) {
+                continue;
+            }
+            int deducted = Math.min(item.quantity, remaining);
+            InventoryService.gI().subQuantityItemsBag(player, item, deducted);
+            remaining -= deducted;
+        }
+        return remaining == 0;
     }
 
     public void showConfirmSellItem(Player pl, int where, int index) {

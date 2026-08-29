@@ -84,6 +84,8 @@ public class UseItem {
     private static final int BUFF_GIAP_XEN_2_ID = 1153;
     private static final int TRANG_SACH_CU_ID = 1281;
     private static final long ROYAL_BOSS_RADAR_REGRET_DELAY_MS = 3 * 60 * 1_000L;
+    private static final int ROYAL_BOSS_RADAR_CHAT_REPEAT_COUNT = 3;
+    private static final long ROYAL_BOSS_RADAR_CHAT_REPEAT_INTERVAL_MS = 4_000L;
     private static final int SILVER_CHEST_GOLD_RATE = 70;
     private static final int SILVER_CHEST_CARD_RATE = 45;
     private static final int SILVER_CHEST_PUMPKIN_RATE = 50;
@@ -887,6 +889,9 @@ public class UseItem {
                             case 380: //cskb
                                 openCSKB(pl, item);
                                 break;
+                            case ConstItem.RADA_DO_VUONG:
+                                useRoyalBossRadar(pl, item);
+                                break;
                             case 1614:
                             case 1615:
                             case 1616:
@@ -915,9 +920,6 @@ public class UseItem {
                             case 1153:
                             case 1154:
                             case 1233:
-                            case ConstItem.RADA_DO_VUONG:
-                                useRoyalBossRadar(pl, item);
-                                break;
                             case 1628:
                             case ConstItem.BANH_TRUNG_THU_DAC_BIET:
                             case ConstItem.HOP_BANH_TRUNG_THU:
@@ -2153,6 +2155,11 @@ public class UseItem {
      * lộ khu vực; không trừ radar nếu hiện không có Boss Vương.
      */
     private void useRoyalBossRadar(Player pl, Item radar) {
+        if (pl == null || radar == null || radar.template == null
+                || radar.template.id != ConstItem.RADA_DO_VUONG) {
+            return;
+        }
+
         List<RoyalGhostBoss> activeBosses = new ArrayList<>();
         for (Boss boss : new ArrayList<>(BossManager.gI().getBosses())) {
             if (boss instanceof RoyalGhostBoss royalBoss
@@ -2189,10 +2196,11 @@ public class UseItem {
                     + " đã buff bẩn, không có thực lực, phải dựa vào radar"
                     + " để thể hiện sự yếu đuối của bản thân.");
             ChatGlobalService.gI().ThongBaoRoiDoSau(pl,
-                    "Tôi là người chơi ID " + pl.id
-                    + ", tôi đã hối hận về sự yếu đuối của bản thân."
+                    "Tôi đã hối hận về sự yếu đuối của bản thân."
                     + " Boss Vương đang ở map " + mapName + ".",
-                    ROYAL_BOSS_RADAR_REGRET_DELAY_MS);
+                    ROYAL_BOSS_RADAR_REGRET_DELAY_MS,
+                    ROYAL_BOSS_RADAR_CHAT_REPEAT_COUNT,
+                    ROYAL_BOSS_RADAR_CHAT_REPEAT_INTERVAL_MS);
             return;
         }
 
