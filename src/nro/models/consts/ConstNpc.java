@@ -154,12 +154,14 @@ public class ConstNpc {
     public static final byte DR_MYUU = 83;
     public static final byte XE_NUOC_MIA = 84;
     public static final byte LIO_DEP_TRAI = 85;
+    public static final byte CRISTIANO_BI = 86;
     //----------------------index menu------------------------------------------
     //menu o len tang map mabu
     public static final int GO_UPSTAIRS_MENU = 10000;
 
     //index menu base
     public static final int IGNORE_MENU = 72002;
+    public static final int RADAR_DO_VUONG_RESULT = 72003;
     public static final int BASE_MENU = 31072002;
     public static final int ORTHER_MENU = 50394;
 

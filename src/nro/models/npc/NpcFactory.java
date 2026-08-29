@@ -94,6 +94,7 @@ import nro.models.npc_list.ChiChi;
 import nro.models.npc_list.DrMyuu;
 import nro.models.npc_list.DuaHau;
 import nro.models.npc_list.LioDepTrai;
+import nro.models.npc_list.CristianoBi;
 import nro.models.npc_list.ToriBot;
 import nro.models.services.shenron.SummonDragon;
 import static nro.models.services.shenron.SummonDragon.SHENRON_1_STAR_WISHES_1;
@@ -236,6 +237,8 @@ public class NpcFactory {
                     new Bardock(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.LIO_DEP_TRAI ->
                     new LioDepTrai(mapId, status, cx, cy, tempId, avatar);
+                case ConstNpc.CRISTIANO_BI ->
+                    new CristianoBi(mapId, status, cx, cy, tempId, avatar);
                 default ->
                     new Npc(mapId, status, cx, cy, tempId, avatar) {
                         @Override
@@ -327,6 +330,10 @@ public class NpcFactory {
                 switch (player.idMark.getIndexMenu()) {
                     case ConstNpc.IGNORE_MENU -> {
                         // Không làm gì
+                    }
+                    case ConstNpc.RADAR_DO_VUONG_RESULT -> {
+                        player.royalBossRadarResultToken = 0L;
+                        player.idMark.setIndexMenu(ConstNpc.BASE_MENU);
                     }
 
                     case ConstNpc.MENU_THANH_CO_CLONE -> {

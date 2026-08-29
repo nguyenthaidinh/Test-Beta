@@ -41,7 +41,7 @@ import nro.models.skill.Skill;
  */
 public class SkillService {
 
-    private static final int JACKY_CHUN_CHUONG_DELAY = 60_000;
+    private static final int JACKY_CHUN_CHUONG_DELAY = 3 * 60_000;
     private static final int JACKY_CHUN_CHUONG_MULTIPLIER = 4;
     private static final long HIGH_DAMAGE_ANNOUNCE_THRESHOLD = 300_000_000L;
     private static final long HIGH_DAMAGE_ANNOUNCE_COOLDOWN = 5_000L;

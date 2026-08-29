@@ -27,6 +27,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import nro.models.consts.ConstTaskBadges;
 import nro.models.map.ItemMap;
 import nro.models.map.Zone;
@@ -86,6 +90,14 @@ public class UseItem {
     private static final long ROYAL_BOSS_RADAR_REGRET_DELAY_MS = 3 * 60 * 1_000L;
     private static final int ROYAL_BOSS_RADAR_CHAT_REPEAT_COUNT = 3;
     private static final long ROYAL_BOSS_RADAR_CHAT_REPEAT_INTERVAL_MS = 4_000L;
+    private static final long ROYAL_BOSS_RADAR_RESULT_TIMEOUT_MS = 60_000L;
+    private static final AtomicLong ROYAL_BOSS_RADAR_RESULT_SEQUENCE = new AtomicLong();
+    private static final ScheduledExecutorService ROYAL_BOSS_RADAR_RESULT_EXECUTOR
+            = Executors.newSingleThreadScheduledExecutor(task -> {
+                Thread thread = new Thread(task, "royal-boss-radar-result");
+                thread.setDaemon(true);
+                return thread;
+            });
     private static final int SILVER_CHEST_GOLD_RATE = 70;
     private static final int SILVER_CHEST_CARD_RATE = 45;
     private static final int SILVER_CHEST_PUMPKIN_RATE = 50;
@@ -2186,9 +2198,8 @@ public class UseItem {
 
             String bossName = boss.name;
             String mapName = bossZone.map.mapName;
-            Service.gI().sendThongBaoOK(pl,
-                    "Radar phát hiện " + bossName
-                    + " đang xuất hiện tại map " + mapName + ".");
+            String radarResult = "Radar phát hiện " + bossName
+                    + " đang xuất hiện tại map " + mapName + ".";
             InventoryService.gI().subQuantityItemsBag(pl, radar, 1);
             InventoryService.gI().sendItemBags(pl);
             ChatGlobalService.gI().ThongBaoRoiDo(pl,
@@ -2201,11 +2212,31 @@ public class UseItem {
                     ROYAL_BOSS_RADAR_REGRET_DELAY_MS,
                     ROYAL_BOSS_RADAR_CHAT_REPEAT_COUNT,
                     ROYAL_BOSS_RADAR_CHAT_REPEAT_INTERVAL_MS);
+            showRoyalBossRadarResult(pl, radarResult);
             return;
         }
 
         Service.gI().sendThongBao(pl,
                 "Radar không phát hiện được Boss Vương nào đang xuất hiện.");
+    }
+
+    private void showRoyalBossRadarResult(Player pl, String radarResult) {
+        if (pl == null || pl.idMark == null) {
+            return;
+        }
+        long resultToken = ROYAL_BOSS_RADAR_RESULT_SEQUENCE.incrementAndGet();
+        NpcService.gI().createMenuConMeo(pl, ConstNpc.RADAR_DO_VUONG_RESULT,
+                -1, radarResult, "OK");
+        pl.royalBossRadarResultToken = resultToken;
+        ROYAL_BOSS_RADAR_RESULT_EXECUTOR.schedule(() -> {
+            if (pl.royalBossRadarResultToken != resultToken || pl.idMark == null
+                    || pl.idMark.getIndexMenu() != ConstNpc.RADAR_DO_VUONG_RESULT) {
+                return;
+            }
+            pl.royalBossRadarResultToken = 0L;
+            pl.idMark.setIndexMenu(ConstNpc.BASE_MENU);
+            Service.gI().hideWaitDialog(pl);
+        }, ROYAL_BOSS_RADAR_RESULT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
     }
 
     private void controllerCallRongThan(Player pl, Item item) {

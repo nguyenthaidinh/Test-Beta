@@ -237,7 +237,8 @@ public final class HellWolfPetService {
     public int getCap(int level, int optionId) {
         level = clampLevel(level);
         return switch (optionId) {
-            case OPTION_HP, OPTION_KI, OPTION_DAMAGE -> level == 1 ? 70 : 100;
+            case OPTION_HP, OPTION_KI -> level == 1 ? 70 : 100;
+            case OPTION_DAMAGE -> level == 1 ? 40 : 70;
             case OPTION_CRITICAL_DAMAGE, OPTION_ARMOR -> switch (level) {
                 case 1, 2 -> 0;
                 case 3 -> 10;

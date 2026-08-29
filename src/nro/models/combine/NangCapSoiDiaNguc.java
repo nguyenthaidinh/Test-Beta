@@ -83,7 +83,7 @@ public final class NangCapSoiDiaNguc {
 
             int targetLevel = currentLevel + 1;
             int requiredMeat = getRequiredMeat(targetLevel);
-            int successRate = getSuccessRate(targetLevel);
+            int successRate = getActualSuccessRate(targetLevel);
             if (requiredMeat <= 0 || meat.quantity < requiredMeat) {
                 Service.gI().sendThongBao(player, "Không đủ "
                         + Util.numberToMoney(requiredMeat) + " Thịt tươi để nâng lên cấp " + targetLevel + ".");
@@ -145,6 +145,17 @@ public final class NangCapSoiDiaNguc {
         };
     }
 
+    private static int getActualSuccessRate(int targetLevel) {
+        return switch (targetLevel) {
+            case 2 -> 50;
+            case 3 -> 30;
+            case 4 -> 15;
+            case 5 -> 7;
+            case 6 -> 3;
+            default -> 0;
+        };
+    }
+
     public static String getUpgradeGuide() {
         return "Cấp 2: 100 Thịt tươi\n"
                 + "Cấp 3: 300 Thịt tươi\n"
@@ -157,12 +168,12 @@ public final class NangCapSoiDiaNguc {
 
     public static String getLevelBenefits(int level) {
         return switch (level) {
-            case 1 -> "HP, KI, Sức đánh tối đa 70%";
-            case 2 -> "HP, KI, Sức đánh tối đa 100%";
-            case 3 -> "HP, KI, Sức đánh 100%; Giáp và ST chí mạng 10%";
-            case 4 -> "HP, KI, Sức đánh 100%; Giáp và ST chí mạng 25%";
-            case 5 -> "Như cấp 4; Xuyên giáp, Tự sát, Laze và QCKK 20%";
-            case 6 -> "HP, KI, Sức đánh 100%; các chỉ số còn lại tối đa 30%";
+            case 1 -> "HP, KI tối đa 70%; Sức đánh tối đa 40%";
+            case 2 -> "HP, KI tối đa 100%; Sức đánh tối đa 70%";
+            case 3 -> "HP, KI 100%; Sức đánh 70%; Giáp và ST chí mạng 10%";
+            case 4 -> "HP, KI 100%; Sức đánh 70%; Giáp và ST chí mạng 25%";
+            case 5 -> "HP, KI 100%; Sức đánh 70%; Giáp và ST chí mạng 25%; Xuyên giáp, Tự sát, Laze và QCKK 20%";
+            case 6 -> "HP, KI 100%; Sức đánh 70%; các chỉ số còn lại tối đa 30%";
             default -> "Không xác định";
         };
     }

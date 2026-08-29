@@ -70,7 +70,7 @@ public class ItemService {
     private static final int DO_THAN_THANH_LEGACY_DISPLAY_PARAM_BI_CON = 252;
     private static final int DO_THAN_THANH_LEGACY_DISPLAY_PARAM_CAY_CON = 253;
     private static final int DO_THAN_THANH_LEGACY_DISPLAY_PARAM_BINH_CON = 254;
-    private static final String COSTUME_JACKY_CHUN_DESCRIPTION = "C\u1ea3i trang th\u00e0nh Jacky Chun\nM\u1ed7i 1 ph\u00fat, \u0111\u00f2n ch\u01b0\u1edfng \u0111\u1ea7u ti\u00ean x4 s\u00e1t th\u01b0\u01a1ng";
+    private static final String COSTUME_JACKY_CHUN_DESCRIPTION = "C\u1ea3i trang th\u00e0nh Jacky Chun\nM\u1ed7i 3 ph\u00fat, \u0111\u00f2n ch\u01b0\u1edfng \u0111\u1ea7u ti\u00ean x4 s\u00e1t th\u01b0\u01a1ng";
     private static final int[] COSTUME_JACKY_CHUN_CONTROLLED_OPTIONS = {5, 50, 77, 103, 117};
     private static final short ANGEL_DEMON_WINGS_ID = 1722;
     private static final String ANGEL_DEMON_WINGS_DESCRIPTION = "T\u0103ng 20% s\u1ee9c \u0111\u00e1nh, HP, KI v\u00e0 20% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss";

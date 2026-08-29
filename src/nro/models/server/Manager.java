@@ -881,7 +881,7 @@ public final class Manager {
             Logger.success(Logger.PURPLE + "Successfully loaded mob template (" + MOB_TEMPLATES.size() + ")\n");
 
             //load npc template
-            ps = ConnectionDatabase.prepareStatement("select * from npc_template");
+            ps = ConnectionDatabase.prepareStatement("select * from npc_template order by id asc");
             rs = ps.executeQuery();
             while (rs.next()) {
                 NpcTemplate npcTemp = new NpcTemplate();
