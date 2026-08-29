@@ -43,6 +43,7 @@ public class SkillService {
 
     private static final int JACKY_CHUN_CHUONG_DELAY = 3 * 60_000;
     private static final int JACKY_CHUN_CHUONG_MULTIPLIER = 4;
+    private static final int CUMBER_SELF_DESTRUCT_MULTIPLIER = 3;
     private static final long HIGH_DAMAGE_ANNOUNCE_THRESHOLD = 300_000_000L;
     private static final long HIGH_DAMAGE_ANNOUNCE_COOLDOWN = 5_000L;
     private final Map<Long, Long> lastHighDamageAnnouncements = new ConcurrentHashMap<>();
@@ -814,6 +815,8 @@ public class SkillService {
                     if (pl.isBoss) {
                         damePlayer = applyDameBoss(player, pl, damePlayer);
                         damePlayer = player.effectSkill.isMonkey ? damePlayer / 3 : damePlayer / 2;
+                    } else if (pl.isPl() && isCumberSelfDestructCostumeActive(player)) {
+                        damePlayer = multiplyDamageSafely(damePlayer, CUMBER_SELF_DESTRUCT_MULTIPLIER);
                     }
                     long hpBefore = pl.nPoint.hp;
                     pl.injured(player, limitDame(damePlayer), MapService.gI().isMapYardart(player.zone.map.mapId), false);
@@ -954,6 +957,24 @@ public class SkillService {
             dame += dame * plAtt.nPoint.tlDameBoss / 100L;
         }
         return dame;
+    }
+
+    private boolean isCumberSelfDestructCostumeActive(Player player) {
+        if (player == null || player.gender != ConstPlayer.XAYDA || player.isBoss
+                || player.inventory == null || player.inventory.itemsBody == null
+                || player.inventory.itemsBody.size() <= 5) {
+            return false;
+        }
+        Item costume = player.inventory.itemsBody.get(5);
+        return costume != null && costume.isNotNullItem()
+                && costume.template.id == ConstItem.CAI_TRANG_CUMBER;
+    }
+
+    private long multiplyDamageSafely(long damage, int multiplier) {
+        if (damage <= 0 || multiplier <= 0) {
+            return 0;
+        }
+        return damage > Long.MAX_VALUE / multiplier ? Long.MAX_VALUE : damage * multiplier;
     }
 
     private long applyJackyChunChuongDame(Player plAtt, long dame) {

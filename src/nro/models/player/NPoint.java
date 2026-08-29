@@ -503,6 +503,12 @@ public class NPoint {
                         && item.template.id != ConstItem.CAI_TRANG_CUMBER_SSJ
                         && isBodyItemOptionActive(item)) {
                     for (ItemOption io : item.itemOptions) {
+                        // Option 252 trên CT Cumber chỉ là dòng hiển thị. Sát thương x3 được xử lý
+                        // theo từng mục tiêu trong SkillService để tuyệt đối không nhân ba lên Boss.
+                        if (item.template.id == ConstItem.CAI_TRANG_CUMBER
+                                && io.optionTemplate != null && io.optionTemplate.id == 252) {
+                            continue;
+                        }
                         addOption(io);
                     }
                 }

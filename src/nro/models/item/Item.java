@@ -61,7 +61,7 @@ public class Item {
             if (itemOption.optionTemplate != null
                     && (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)
                     || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)
-                    && !isHellWolfFeatureOption(itemOption.optionTemplate.id))) {
+                    && !isReservedCombatFeatureOption(itemOption.optionTemplate.id))) {
                 continue;
             }
             strInfo += itemOption.getOptionString();
@@ -106,7 +106,7 @@ public class Item {
                 continue;
             }
             if (ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)
-                    && !isHellWolfFeatureOption(itemOption.optionTemplate.id)) {
+                    && !isReservedCombatFeatureOption(itemOption.optionTemplate.id)) {
                 continue;
             }
             clientOptions.add(itemOption);
@@ -114,10 +114,16 @@ public class Item {
         return clientOptions;
     }
 
-    private boolean isHellWolfFeatureOption(int optionId) {
-        return this.template != null
-                && (this.template.id == ConstItem.SOI_DIA_NGUC || this.template.id == ConstItem.HON_MA)
+    private boolean isReservedCombatFeatureOption(int optionId) {
+        if (this.template == null) {
+            return false;
+        }
+        boolean hellWolfOption = (this.template.id == ConstItem.SOI_DIA_NGUC
+                || this.template.id == ConstItem.HON_MA)
                 && optionId >= 251 && optionId <= 254;
+        boolean cumberSelfDestructOption = this.template.id == ConstItem.CAI_TRANG_CUMBER
+                && optionId == 252;
+        return hellWolfOption || cumberSelfDestructOption;
     }
 
     private String getDoThanThanhInfo() {
@@ -438,7 +444,7 @@ public class Item {
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
                     && io.optionTemplate.id != 107 && io.optionTemplate.id != 218
                     && (!ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)
-                    || isHellWolfFeatureOption(io.optionTemplate.id))) {
+                    || isReservedCombatFeatureOption(io.optionTemplate.id))) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -478,7 +484,7 @@ public class Item {
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
                     && io.optionTemplate.id != 107
                     && (!ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)
-                    || isHellWolfFeatureOption(io.optionTemplate.id))) {
+                    || isReservedCombatFeatureOption(io.optionTemplate.id))) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -503,7 +509,7 @@ public class Item {
             if (io.optionTemplate.id != 72 && io.optionTemplate.id != 73 && io.optionTemplate.id != 102
                     && io.optionTemplate.id != 107 && io.optionTemplate.id != 218
                     && (!ItemService.isDoThanThanhDisplayOption(io.optionTemplate.id)
-                    || isHellWolfFeatureOption(io.optionTemplate.id))) {
+                    || isReservedCombatFeatureOption(io.optionTemplate.id))) {
                 optionInfo.add(io.getOptionString());
             }
         }
@@ -665,7 +671,7 @@ public class Item {
             if (itemOption.optionTemplate != null
                     && (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)
                     || ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)
-                    && !isHellWolfFeatureOption(itemOption.optionTemplate.id))) {
+                    && !isReservedCombatFeatureOption(itemOption.optionTemplate.id))) {
                 continue;
             }
             strInfo += itemOption.getOptionString() + "\n";

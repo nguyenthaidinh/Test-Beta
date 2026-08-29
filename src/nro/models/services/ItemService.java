@@ -43,10 +43,12 @@ public class ItemService {
     private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
     private static final short COSTUME_BILL_BI_NGO_ID = (short) ConstItem.CAI_TRANG_BILL_BI_NGO;
     private static final String COSTUME_BILL_BI_NGO_DESCRIPTION = "T\u0103ng 40% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
+    private static final short COSTUME_CUMBER_ID = (short) ConstItem.CAI_TRANG_CUMBER;
+    private static final String COSTUME_CUMBER_DESCRIPTION = "C\u1ea3i trang d\u00e0nh cho Xayda: t\u0103ng 40% HP, 40% KI, 30% s\u1ee9c \u0111\u00e1nh; x3 s\u00e1t th\u01b0\u01a1ng T\u1ef1 s\u00e1t khi \u0111\u00e1nh ng\u01b0\u1eddi ch\u01a1i, kh\u00f4ng t\u0103ng s\u00e1t th\u01b0\u01a1ng l\u00ean Boss";
     private static final short COSTUME_CUMBER_SSJ_ID = (short) ConstItem.CAI_TRANG_CUMBER_SSJ;
     private static final int CUMBER_RANK_DAME_OPTION_ID = 39;
     private static final String COSTUME_CUMBER_SSJ_DESCRIPTION = "T\u0103ng 40% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss; \u0110\u1eb3ng c\u1ea5p +20% s\u1ee9c \u0111\u00e1nh. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
-    private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 39, 50, 77, 96, 103, 106, 108, 117, 204};
+    private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 39, 50, 77, 96, 103, 106, 108, 117, 204, 252};
     private static final short COSTUME_JACKY_CHUN_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
     private static final short FRIED_SHRIMP_ID = (short) ConstItem.TOM_TAM_BOT_CHIEN_XU;
     private static final String FRIED_SHRIMP_DESCRIPTION = "T\u1eb7ng cho Whis ho\u1eb7c \u0103n v\u00e0o \u0111\u1ec3 t\u0103ng 5% HP v\u00e0 5% KI trong v\u00f2ng 10 ph\u00fat";
@@ -325,13 +327,17 @@ public class ItemService {
         if (item == null || item.template == null
                 || (item.template.id != COSTUME_GOHAN_ID
                 && item.template.id != COSTUME_BILL_BI_NGO_ID
+                && item.template.id != COSTUME_CUMBER_ID
                 && item.template.id != COSTUME_CUMBER_SSJ_ID)) {
             return;
         }
         boolean isBillBiNgo = item.template.id == COSTUME_BILL_BI_NGO_ID;
+        boolean isCumber = item.template.id == COSTUME_CUMBER_ID;
         boolean isCumberSsj = item.template.id == COSTUME_CUMBER_SSJ_ID;
         if (isCumberSsj) {
             item.template.description = COSTUME_CUMBER_SSJ_DESCRIPTION;
+        } else if (isCumber) {
+            item.template.description = COSTUME_CUMBER_DESCRIPTION;
         } else if (isBillBiNgo) {
             item.template.description = COSTUME_BILL_BI_NGO_DESCRIPTION;
         } else {
@@ -340,9 +346,18 @@ public class ItemService {
         if (item.itemOptions == null) {
             item.itemOptions = new ArrayList<>();
         }
+        if (isCumber) {
+            // Dọn option Set Đồ Thần Thánh giả do mã hiển thị cũ 252 từng bị đổi thành Set Bi Con.
+            // Phạm vi chỉ item 1274 nên không tác động bất kỳ trang bị Set thật nào.
+            item.itemOptions.removeIf(io -> io != null && io.optionTemplate != null
+                    && (isDoThanThanhSetOption(io.optionTemplate.id, io.param)
+                    || isDoThanThanhDisplayOption(io.optionTemplate.id)));
+        }
         item.itemOptions.removeIf(this::isGohanCostumeControlledOption);
         if (isCumberSsj) {
             item.itemOptions.addAll(getCumberSsjCostumeOptions());
+        } else if (isCumber) {
+            item.itemOptions.addAll(getCumberCostumeOptions());
         } else if (isBillBiNgo) {
             item.itemOptions.addAll(getBillBiNgoCostumeOptions());
         } else {
@@ -662,6 +677,16 @@ public class ItemService {
         List<ItemOption> options = getBillBiNgoCostumeOptions();
         // Chỉ dùng để hiển thị dòng cuối; 20% SĐ được cộng chồng sau 40% trong NPoint.
         options.add(new ItemOption(CUMBER_RANK_DAME_OPTION_ID, 20));
+        return options;
+    }
+
+    public List<ItemOption> getCumberCostumeOptions() {
+        List<ItemOption> options = new ArrayList<>();
+        options.add(new ItemOption(77, 40));
+        options.add(new ItemOption(103, 40));
+        options.add(new ItemOption(50, 30));
+        // Chỉ để hiển thị +200% tương đương x3; SkillService áp dụng riêng lên người chơi.
+        options.add(new ItemOption(252, 200));
         return options;
     }
 
@@ -1188,9 +1213,12 @@ public class ItemService {
     }
 
     public static int[] migrateDoThanThanhDisplayOption(int itemId, int optionId, int optionParam) {
-        if ((itemId == ConstItem.SOI_DIA_NGUC || itemId == ConstItem.HON_MA)
+        boolean isHellWolfFeature = (itemId == ConstItem.SOI_DIA_NGUC || itemId == ConstItem.HON_MA)
                 && optionId >= HellWolfPetService.OPTION_ARMOR_PENETRATION
-                && optionId <= HellWolfPetService.OPTION_QCKK_DAMAGE) {
+                && optionId <= HellWolfPetService.OPTION_QCKK_DAMAGE;
+        boolean isCumberSelfDestruct = itemId == ConstItem.CAI_TRANG_CUMBER
+                && optionId == HellWolfPetService.OPTION_SELF_DESTRUCT_DAMAGE;
+        if (isHellWolfFeature || isCumberSelfDestruct) {
             return new int[]{optionId, optionParam};
         }
         return migrateDoThanThanhDisplayOption(optionId, optionParam);
