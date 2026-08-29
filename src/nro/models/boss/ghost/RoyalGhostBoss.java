@@ -28,7 +28,7 @@ import nro.models.utils.Util;
 
 /**
  * Năm Boss Vương của sự kiện Hồn Ma. Mỗi loại là một boss độc lập, dùng trực
- * tiếp bộ head/body/leg của các item 1087-1091 và cùng xuất hiện theo đợt 2 giờ.
+ * tiếp bộ head/body/leg của các item 1087-1091 và cùng xuất hiện theo đợt 1 giờ.
  */
 public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
 
@@ -49,7 +49,7 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     private static final long CAY_TRANSFORMED_MAX_HP = 20_000_000_000L;
     private static final long CAY_TRANSFORMATION_CHAT_DELAY_MS = 2_000L;
     private static final long SVK_ESCAPE_DELAY_MS = 2_000L;
-    private static final long SVK_REPEAT_CHAT_DELAY_MS = 2_000L;
+    private static final long REPEAT_CHAT_DELAY_MS = 2_000L;
     private static final long NGAO_INTRO_DELAY_MS = 2_000L;
     private static final long NGAO_MASS_KILL_INTERVAL_MS = 1_000L;
     private static final int NGAO_MASS_KILL_WAVES = 5;
@@ -60,13 +60,32 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         "Cà phê không?",
         "Đi cà phê không?"
     };
+    private static final String[] CAY_REPEAT_CHATS = {
+        "Được ấy, gâu gâu.",
+        "Xương rồng đơm lá đơm hoa",
+        "Nước đong đầy trên cao nguyên đá",
+        "Là ngày Cầy Vương trở về nhà"
+    };
     private static final String[] NGAO_RAMPAGE_CHATS = {
         "Đang ngủ",
         "Dậy rồi",
         "Dậy từ lâu rồi",
         "Im im im tao thích im đấy"
     };
-    private static final int RESPAWN_SECONDS = 2 * 60 * 60;
+    private static final String[] NGAO_REPEAT_CHATS = {
+        "Cái gì đang học bài hả?",
+        "Đang ngủ",
+        "Dậy rồi",
+        "Dậy từ lâu rồi",
+        "Im im im tao thích im đấy"
+    };
+    private static final String[] ALO_VU_A_REPEAT_CHATS = {
+        "Alo Vũ à!"
+    };
+    private static final String[] NEZUKO_REPEAT_CHATS = {
+        "Ta là Nezuko Vương!"
+    };
+    private static final int RESPAWN_SECONDS = 60 * 60;
     private static final long RESPAWN_WAVE_MILLIS = RESPAWN_SECONDS * 1_000L;
 
     private static final Object WAVE_LOCK = new Object();
@@ -103,8 +122,6 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     private long cayTransformationNextActionTime;
     private boolean svkEscapeUsed;
     private boolean svkEscapeInProgress;
-    private boolean svkRepeatChatActive;
-    private int svkRepeatChatIndex;
     private long svkNextActionTime;
     private boolean ngaoRampageUsed;
     private boolean ngaoRampageInProgress;
@@ -112,6 +129,8 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     private int ngaoMassKillCount;
     private int ngaoRampageChatIndex;
     private long ngaoNextActionTime;
+    private int repeatChatIndex;
+    private long nextRepeatChatTime;
 
     public RoyalGhostBoss(int royalType) throws Exception {
         super(royalType, true, false, createData(royalType));
@@ -219,8 +238,6 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         this.cayTransformationNextActionTime = 0;
         this.svkEscapeUsed = false;
         this.svkEscapeInProgress = false;
-        this.svkRepeatChatActive = false;
-        this.svkRepeatChatIndex = 0;
         this.svkNextActionTime = 0;
         this.ngaoRampageUsed = false;
         this.ngaoRampageInProgress = false;
@@ -228,6 +245,8 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         this.ngaoMassKillCount = 0;
         this.ngaoRampageChatIndex = 0;
         this.ngaoNextActionTime = 0;
+        this.repeatChatIndex = 0;
+        this.nextRepeatChatTime = 0;
         this.playerSkill.prepareQCKK = false;
         this.effectSkill.isCharging = false;
         this.effectSkill.countCharging = 0;
@@ -252,6 +271,7 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         updateCayTransformationState();
         updateSvkSpecialState();
         updateNgaoRampageState();
+        updateRepeatChat();
     }
 
     @Override
@@ -418,8 +438,6 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         this.cayTransformationNextActionTime = 0;
         this.svkEscapeUsed = false;
         this.svkEscapeInProgress = false;
-        this.svkRepeatChatActive = false;
-        this.svkRepeatChatIndex = 0;
         this.svkNextActionTime = 0;
         this.ngaoRampageUsed = false;
         this.ngaoRampageInProgress = false;
@@ -427,6 +445,8 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         this.ngaoMassKillCount = 0;
         this.ngaoRampageChatIndex = 0;
         this.ngaoNextActionTime = 0;
+        this.repeatChatIndex = 0;
+        this.nextRepeatChatTime = 0;
         if (this.playerSkill != null) {
             this.playerSkill.prepareQCKK = false;
         }
@@ -551,6 +571,7 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
                 this.cayTransformationInProgress = false;
                 this.cayTransformationStage = 3;
                 this.cayTransformationNextActionTime = 0;
+                this.nextRepeatChatTime = System.currentTimeMillis() + REPEAT_CHAT_DELAY_MS;
             }
         }
     }
@@ -579,8 +600,6 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
     private void startSvkEscape() {
         this.svkEscapeUsed = true;
         this.svkEscapeInProgress = true;
-        this.svkRepeatChatActive = false;
-        this.svkRepeatChatIndex = 0;
         this.svkNextActionTime = System.currentTimeMillis() + SVK_ESCAPE_DELAY_MS;
         this.chat("Có kỹ năng không?");
     }
@@ -591,7 +610,6 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
         }
         if (this.isDie() || this.zone == null) {
             this.svkEscapeInProgress = false;
-            this.svkRepeatChatActive = false;
             this.svkNextActionTime = 0;
             return;
         }
@@ -602,21 +620,10 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
             }
             relocateSvkAndHeal();
             this.svkEscapeInProgress = false;
-            this.svkRepeatChatActive = true;
-            this.svkRepeatChatIndex = 0;
-            chatNextSvkRepeatLine();
-            this.svkNextActionTime = now + SVK_REPEAT_CHAT_DELAY_MS;
-            return;
+            this.repeatChatIndex = 0;
+            this.nextRepeatChatTime = 0;
+            this.svkNextActionTime = 0;
         }
-        if (this.svkRepeatChatActive && now >= this.svkNextActionTime) {
-            chatNextSvkRepeatLine();
-            this.svkNextActionTime = now + SVK_REPEAT_CHAT_DELAY_MS;
-        }
-    }
-
-    private void chatNextSvkRepeatLine() {
-        this.chat(SVK_REPEAT_CHATS[this.svkRepeatChatIndex]);
-        this.svkRepeatChatIndex = (this.svkRepeatChatIndex + 1) % SVK_REPEAT_CHATS.length;
     }
 
     private void relocateSvkAndHeal() {
@@ -740,7 +747,39 @@ public final class RoyalGhostBoss extends Boss implements ControlEffectImmune {
             this.ngaoRampageStage = 3;
             this.ngaoNextActionTime = 0;
             killAllPlayersInCurrentZone();
+            this.nextRepeatChatTime = System.currentTimeMillis() + REPEAT_CHAT_DELAY_MS;
         }
+    }
+
+    private void updateRepeatChat() {
+        if (this.zone == null || this.isDie()
+                || this.bossStatus != BossStatus.ACTIVE
+                || this.recoveryTargetHp > 0 || isSpecialTransitionInProgress()) {
+            return;
+        }
+        String[] chats = getRepeatChats();
+        if (chats.length == 0) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now < this.nextRepeatChatTime) {
+            return;
+        }
+        this.repeatChatIndex %= chats.length;
+        this.chat(chats[this.repeatChatIndex]);
+        this.repeatChatIndex = (this.repeatChatIndex + 1) % chats.length;
+        this.nextRepeatChatTime = now + REPEAT_CHAT_DELAY_MS;
+    }
+
+    private String[] getRepeatChats() {
+        return switch (this.royalType) {
+            case BossID.GHOST_KING_CAY -> CAY_REPEAT_CHATS;
+            case BossID.GHOST_KING_NGAO -> NGAO_REPEAT_CHATS;
+            case BossID.GHOST_KING_ALO_VU_A -> ALO_VU_A_REPEAT_CHATS;
+            case BossID.GHOST_KING_SVK -> SVK_REPEAT_CHATS;
+            case BossID.GHOST_KING_NEZUKO -> NEZUKO_REPEAT_CHATS;
+            default -> new String[0];
+        };
     }
 
     private Player getRandomAlivePlayerInCurrentZone() {

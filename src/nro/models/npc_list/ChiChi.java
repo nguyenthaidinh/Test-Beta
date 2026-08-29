@@ -30,12 +30,16 @@ public class ChiChi extends Npc {
     private static final int MENU_BUY_TRAIN_ARMOR_5 = 186900;
     private static final int MENU_BUY_CLAN_CAPSULE = 186901;
     private static final int MENU_BUY_100_CLAN_CAPSULE = 186902;
+    private static final int MENU_BUY_1000_FRESH_MEAT = 186903;
     private static final short TRAIN_ARMOR_5_ITEM_ID = 1869;
     private static final long TRAIN_ARMOR_5_GOLD_COST = 36_000_000_000L;
     private static final int CLAN_CAPSULE_AMOUNT = 1;
     private static final int CLAN_CAPSULE_COST_TV = 10;
     private static final int CLAN_CAPSULE_BULK_AMOUNT = 100;
     private static final int CLAN_CAPSULE_BULK_COST_TV = 1_200;
+    private static final short FRESH_MEAT_ITEM_ID = (short) ConstItem.THIT_TUOI_NANG_CAP_SOI;
+    private static final int FRESH_MEAT_BULK_AMOUNT = 1_000;
+    private static final int FRESH_MEAT_BULK_GEM_COST = 4_000_000;
 
     public ChiChi(int mapId, int status, int cx, int cy, int tempId, int avartar) {
         super(mapId, status, cx, cy, tempId, avartar);
@@ -58,6 +62,7 @@ public class ChiChi extends Npc {
             menu.add(menu.size() - 1, "Top\nHộp Kẹo\nMa Quỷ");
             menu.add(menu.size() - 1, "Top\nCapsule\nHalloween");
             menu.add(menu.size() - 1, "Top\nTi\u00eau\nTh\u1ecfi V\u00e0ng");
+            menu.add(menu.size() - 1, "1K Thịt tươi\n4Tr Ngọc");
             String[] menus = menu.toArray(new String[0]);
 
             createOtherMenu(player, ConstNpc.BASE_MENU,
@@ -129,6 +134,11 @@ public class ChiChi extends Npc {
                                     "Xem \u0111i\u1ec3m",
                                     "\u0110\u00f3ng");
                             break;
+                        case 11:
+                            createOtherMenu(player, MENU_BUY_1000_FRESH_MEAT,
+                                    "Con có muốn mua nhanh 1.000 Thịt tươi với giá 4.000.000 ngọc không?",
+                                    "Mua", "Từ chối");
+                            break;
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_BOX_TOP) {
                     switch (select) {
@@ -198,6 +208,10 @@ public class ChiChi extends Npc {
                     if (select == 0) {
                         buyClanCapsule(player, CLAN_CAPSULE_BULK_AMOUNT, CLAN_CAPSULE_BULK_COST_TV);
                     }
+                } else if (player.idMark.getIndexMenu() == MENU_BUY_1000_FRESH_MEAT) {
+                    if (select == 0) {
+                        buyFreshMeatBulk(player);
+                    }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_EXCHANGE) {
                     HalloweenExchangeService.handleExchange(player, select);
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HAND_CANDY_EXCHANGE) {
@@ -240,6 +254,56 @@ public class ChiChi extends Npc {
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendMoney(player);
         Service.gI().sendThongBao(player, "Mua thành công " + trainArmor.template.name);
+    }
+
+    private void buyFreshMeatBulk(Player player) {
+        synchronized (player) {
+            if (player.inventory.gem < FRESH_MEAT_BULK_GEM_COST) {
+                Service.gI().sendThongBao(player, "Bạn không đủ ngọc, còn thiếu "
+                        + Util.numberToMoney(FRESH_MEAT_BULK_GEM_COST - player.inventory.gem) + " ngọc.");
+                return;
+            }
+
+            Item freshMeat = ItemService.gI().createNewItem(FRESH_MEAT_ITEM_ID, FRESH_MEAT_BULK_AMOUNT);
+            if (freshMeat == null || freshMeat.template == null) {
+                Service.gI().sendThongBao(player, "Vật phẩm Thịt tươi không tồn tại.");
+                return;
+            }
+            freshMeat.itemOptions.add(new Item.ItemOption(73, 0));
+            if (!canStoreFreshMeatBundle(player, freshMeat)) {
+                Service.gI().sendThongBao(player,
+                        "Hành trang không còn đủ chỗ để nhận 1.000 Thịt tươi.");
+                return;
+            }
+            if (!InventoryService.gI().addItemBag(player, freshMeat)) {
+                Service.gI().sendThongBao(player, "Không thể thêm Thịt tươi vào hành trang.");
+                return;
+            }
+
+            player.inventory.gem -= FRESH_MEAT_BULK_GEM_COST;
+            InventoryService.gI().sendItemBags(player);
+            Service.gI().sendMoney(player);
+            Service.gI().sendThongBao(player, "Mua thành công "
+                    + Util.numberToMoney(FRESH_MEAT_BULK_AMOUNT) + " Thịt tươi với giá "
+                    + Util.numberToMoney(FRESH_MEAT_BULK_GEM_COST) + " ngọc.");
+        }
+    }
+
+    private boolean canStoreFreshMeatBundle(Player player, Item freshMeat) {
+        long remainingCapacity = 0;
+        for (Item bagItem : player.inventory.itemsBag) {
+            if (bagItem == null || !bagItem.isNotNullItem()) {
+                remainingCapacity += 99_999;
+            } else if (freshMeat.template.isUpToUp
+                    && bagItem.template.id == FRESH_MEAT_ITEM_ID
+                    && InventoryService.checkListsEqual(bagItem.itemOptions, freshMeat.itemOptions)) {
+                remainingCapacity += Math.max(0, 99_999 - bagItem.quantity);
+            }
+            if (remainingCapacity >= FRESH_MEAT_BULK_AMOUNT) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void buyClanCapsule(Player player, int amount, int cost) {

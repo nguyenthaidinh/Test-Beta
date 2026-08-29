@@ -13,7 +13,6 @@ import nro.models.utils.Util;
 public final class NangCapSoiDiaNguc {
 
     private static final int GEM_COST = 5_000;
-    private static final int SUCCESS_RATE = 50;
 
     private NangCapSoiDiaNguc() {
     }
@@ -36,15 +35,16 @@ public final class NangCapSoiDiaNguc {
 
         int targetLevel = currentLevel + 1;
         int requiredMeat = getRequiredMeat(targetLevel);
+        int successRate = getSuccessRate(targetLevel);
         player.combineNew.goldCombine = 0;
         player.combineNew.gemCombine = GEM_COST;
-        player.combineNew.ratioCombine = SUCCESS_RATE;
+        player.combineNew.ratioCombine = successRate;
 
         String npcSay = "Nâng Sói Địa Ngục từ cấp " + currentLevel + " lên cấp " + targetLevel + "\n"
                 + "Cần: " + Util.numberToMoney(requiredMeat) + " Thịt tươi\n"
                 + "Phí nâng cấp: " + Util.numberToMoney(GEM_COST) + " ngọc\n"
                 + "Hiện có trong ô nâng cấp: " + Util.numberToMoney(meat.quantity) + " Thịt tươi\n"
-                + "Tỉ lệ thành công: " + SUCCESS_RATE + "%\n"
+                + "Tỉ lệ thành công: " + successRate + "%\n"
                 + "Chỉ số mở ở cấp " + targetLevel + ":\n" + getLevelBenefits(targetLevel) + "\n"
                 + "Thành công hoặc thất bại đều tiêu hao Thịt tươi và ngọc.";
         if (meat.quantity < requiredMeat) {
@@ -83,6 +83,7 @@ public final class NangCapSoiDiaNguc {
 
             int targetLevel = currentLevel + 1;
             int requiredMeat = getRequiredMeat(targetLevel);
+            int successRate = getSuccessRate(targetLevel);
             if (requiredMeat <= 0 || meat.quantity < requiredMeat) {
                 Service.gI().sendThongBao(player, "Không đủ "
                         + Util.numberToMoney(requiredMeat) + " Thịt tươi để nâng lên cấp " + targetLevel + ".");
@@ -94,7 +95,7 @@ public final class NangCapSoiDiaNguc {
                 return;
             }
 
-            boolean success = Util.isTrue(SUCCESS_RATE, 100);
+            boolean success = Util.isTrue(successRate, 100);
             if (success && !wolfService.upgradeLevel(wolf)) {
                 Service.gI().sendThongBao(player, "Không thể nâng cấp Sói Địa Ngục.");
                 return;
@@ -133,13 +134,25 @@ public final class NangCapSoiDiaNguc {
         };
     }
 
+    public static int getSuccessRate(int targetLevel) {
+        return switch (targetLevel) {
+            case 2 -> 50;
+            case 3 -> 40;
+            case 4 -> 30;
+            case 5 -> 10;
+            case 6 -> 5;
+            default -> 0;
+        };
+    }
+
     public static String getUpgradeGuide() {
         return "Cấp 2: 100 Thịt tươi\n"
                 + "Cấp 3: 300 Thịt tươi\n"
                 + "Cấp 4: 1.000 Thịt tươi\n"
                 + "Cấp 5: 3.000 Thịt tươi\n"
                 + "Cấp 6: 5.000 Thịt tươi\n"
-                + "Mỗi lượt: 5.000 ngọc, thành công 50%";
+                + "Mỗi lượt: 5.000 ngọc\n"
+                + "Tỉ lệ lên cấp 2/3/4/5/6: 50%/40%/30%/10%/5%";
     }
 
     public static String getLevelBenefits(int level) {
