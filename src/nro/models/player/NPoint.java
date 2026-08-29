@@ -1941,11 +1941,6 @@ public class NPoint {
             if (this.player.itemTime != null && this.player.itemTime.isUseDK) {
                 tiemNang += tn * 2;
             }
-            if (player.zone.map.mapId >= 135 && player.zone.map.mapId <= 138) {
-                if (this.player.itemTime != null && this.player.itemTime.isUseKhoBauX2) {
-                    tiemNang += tn * 2;
-                }
-            }
             if (this.player.satellite != null && this.player.satellite.isIntelligent) {
                 tiemNang += tn / 5;
             }

@@ -1,9 +1,11 @@
 package nro.models.services_func;
 
 import nro.models.boss.Boss;
+import nro.models.boss.Boss_Manager.BossManager;
 import nro.models.boss.event.Halloween.HalloweenExchangeService;
 import nro.models.boss.event.Halloween.HalloweenRewards;
 import nro.models.boss.Boss_mini.SoiHecQuyn;
+import nro.models.boss.ghost.RoyalGhostBoss;
 import nro.models.services.shenron.SummonDragon;
 import nro.models.combine.CombineService;
 import nro.models.boss.BossID;
@@ -81,6 +83,7 @@ public class UseItem {
     private static final int BUFF_BO_HUYET_2_ID = 1152;
     private static final int BUFF_GIAP_XEN_2_ID = 1153;
     private static final int TRANG_SACH_CU_ID = 1281;
+    private static final long ROYAL_BOSS_RADAR_REGRET_DELAY_MS = 3 * 60 * 1_000L;
     private static final int SILVER_CHEST_GOLD_RATE = 70;
     private static final int SILVER_CHEST_CARD_RATE = 45;
     private static final int SILVER_CHEST_PUMPKIN_RATE = 50;
@@ -912,7 +915,9 @@ public class UseItem {
                             case 1153:
                             case 1154:
                             case 1233:
-                            case 1532:
+                            case ConstItem.RADA_DO_VUONG:
+                                useRoyalBossRadar(pl, item);
+                                break;
                             case 1628:
                             case ConstItem.BANH_TRUNG_THU_DAC_BIET:
                             case ConstItem.HOP_BANH_TRUNG_THU:
@@ -2123,14 +2128,6 @@ public class UseItem {
                         + " vừa sử dụng Bột mì để rơi vào trạng thái thiếu tỉnh táo, các cư dân hãy cẩn thận.");
                 break;
 
-            case 1532: //máy dò đồ
-                pl.itemTime.lastTimeUseKhoBauX2 = System.currentTimeMillis();
-                pl.itemTime.isUseKhoBauX2 = true;
-
-//            case 2109: //máy dò đồ
-//                pl.itemTime.lastTimeUseMayDo2 = System.currentTimeMillis();
-//                pl.itemTime.isUseMayDo2 = true;
-                break;
             case 1628: //máy dò đồ
                 long currentTime = System.currentTimeMillis();
 
@@ -2149,6 +2146,58 @@ public class UseItem {
         ItemTimeService.gI().sendAllItemTime(pl);
         InventoryService.gI().subQuantityItemsBag(pl, item, 1);
         InventoryService.gI().sendItemBags(pl);
+    }
+
+    /**
+     * Dò ngẫu nhiên một Boss Vương đang sống. Chỉ hiện tên map, không
+     * lộ khu vực; không trừ radar nếu hiện không có Boss Vương.
+     */
+    private void useRoyalBossRadar(Player pl, Item radar) {
+        List<RoyalGhostBoss> activeBosses = new ArrayList<>();
+        for (Boss boss : new ArrayList<>(BossManager.gI().getBosses())) {
+            if (boss instanceof RoyalGhostBoss royalBoss
+                    && !royalBoss.isDie()
+                    && royalBoss.zone != null
+                    && royalBoss.zone.map != null) {
+                activeBosses.add(royalBoss);
+            }
+        }
+
+        if (activeBosses.isEmpty()) {
+            Service.gI().sendThongBao(pl,
+                    "Radar không phát hiện được Boss Vương nào đang xuất hiện.");
+            return;
+        }
+
+        int startIndex = Util.nextInt(0, activeBosses.size() - 1);
+        for (int i = 0; i < activeBosses.size(); i++) {
+            RoyalGhostBoss boss = activeBosses.get((startIndex + i) % activeBosses.size());
+            Zone bossZone = boss.zone;
+            if (boss.isDie() || bossZone == null || bossZone.map == null) {
+                continue;
+            }
+
+            String bossName = boss.name;
+            String mapName = bossZone.map.mapName;
+            Service.gI().sendThongBaoOK(pl,
+                    "Radar phát hiện " + bossName
+                    + " đang xuất hiện tại map " + mapName + ".");
+            InventoryService.gI().subQuantityItemsBag(pl, radar, 1);
+            InventoryService.gI().sendItemBags(pl);
+            ChatGlobalService.gI().ThongBaoRoiDo(pl,
+                    "Người chơi " + pl.name
+                    + " đã buff bẩn, không có thực lực, phải dựa vào radar"
+                    + " để thể hiện sự yếu đuối của bản thân.");
+            ChatGlobalService.gI().ThongBaoRoiDoSau(pl,
+                    "Tôi là người chơi ID " + pl.id
+                    + ", tôi đã hối hận về sự yếu đuối của bản thân."
+                    + " Boss Vương đang ở map " + mapName + ".",
+                    ROYAL_BOSS_RADAR_REGRET_DELAY_MS);
+            return;
+        }
+
+        Service.gI().sendThongBao(pl,
+                "Radar không phát hiện được Boss Vương nào đang xuất hiện.");
     }
 
     private void controllerCallRongThan(Player pl, Item item) {

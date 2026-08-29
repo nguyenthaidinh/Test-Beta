@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import nro.models.server.Maintenance;
 
 /**
@@ -22,6 +24,12 @@ public class ChatGlobalService implements Runnable {
 
     private static final int COUNT_CHAT = 100;
     private static final int COUNT_WAIT = 100;
+    private static final ScheduledExecutorService DELAYED_CHAT_EXECUTOR
+            = Executors.newSingleThreadScheduledExecutor(task -> {
+                Thread thread = new Thread(task, "delayed-global-chat");
+                thread.setDaemon(true);
+                return thread;
+            });
     private static ChatGlobalService i;
 
     private final List<ChatGlobal> listChatting;
@@ -51,6 +59,26 @@ public class ChatGlobalService implements Runnable {
 
     public void ThongBaoRoiDo(Player player, String text) {
         waitingChat.add(new ChatGlobal(player, text.length() > 200 ? text.substring(0, 200) : text));
+    }
+
+    /**
+     * Chụp lại thông tin người gửi ngay khi hẹn giờ, sau đó mới đưa tin
+     * vào kênh thế giới. Nhờ vậy tin vẫn đúng người, đúng nội dung kể
+     * cả khi người chơi đã thoát game trong thời gian chờ.
+     */
+    public void ThongBaoRoiDoSau(Player player, String text, long delayMillis) {
+        if (player == null || text == null) {
+            return;
+        }
+        String message = text.length() > 200 ? text.substring(0, 200) : text;
+        ChatGlobal delayedChat = new ChatGlobal(player, message);
+        DELAYED_CHAT_EXECUTOR.schedule(
+                () -> {
+                    chatGlobal(delayedChat);
+                    delayedChat.dispose();
+                },
+                Math.max(0L, delayMillis),
+                TimeUnit.MILLISECONDS);
     }
 
     public void ThongBaoDapDo(Player player, String text) {
