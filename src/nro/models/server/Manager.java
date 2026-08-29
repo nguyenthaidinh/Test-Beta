@@ -765,6 +765,7 @@ public final class Manager {
             ensureItemOptionTemplate(252, "Sát thương Tự sát +#%");
             ensureItemOptionTemplate(253, "Sát thương Laze +#%");
             ensureItemOptionTemplate(254, "Sát thương Quả cầu Kênh Khi +#%");
+            ensureItemOptionTemplate(39, "Đẳng cấp +#% SĐ");
             ensureItemOptionTemplate(233, "Set Gohan");
             ensureItemOptionTemplate(191, "Set SVK con\n(5 m\u00f3n +125% s\u00e1t th\u01b0\u01a1ng Kamejoko)");
             ensureItemOptionTemplate(192, "Set S\u01a1n con\n(5 m\u00f3n +50% xuy\u00ean gi\u00e1p, +40% s\u00e1t th\u01b0\u01a1ng Kaioken)");

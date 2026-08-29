@@ -2,6 +2,7 @@ package nro.models.player;
 
 import nro.models.radar.Card;
 import nro.models.radar.OptionCard;
+import nro.models.consts.ConstItem;
 import nro.models.consts.ConstPlayer;
 import nro.models.consts.ConstRatio;
 import nro.models.intrinsic.Intrinsic;
@@ -219,7 +220,9 @@ public class NPoint {
     public short tlHpGiamODo;
 
     public boolean isGogeta;
-    public boolean isLioDepTrai;  // CT Lio đẹp trai (1815) hoặc CT Gohan (1781)
+    public boolean isLioDepTrai;  // Nhóm CT Lio/Gohan/Bill Bí Ngô/Cumber chỉ có tác dụng khi hợp thể
+    public boolean isBillBiNgo;   // CT Bill Bí Ngô dùng 40% SĐ thay vì 30%
+    public boolean isCumberSsj;   // CT Cumber SSJ: +40%, sau đó Đẳng cấp cộng chồng thêm 20%
 
     public int tlSpeed;
 
@@ -485,7 +488,10 @@ public class NPoint {
                 ItemService.gI().normalizeBrolyRedCostumeOptions(item);
                 ItemService.gI().normalizeBrolyCostumeOptions(item);
                 HellWolfPetService.gI().normalizePet(item);
-                if (item.template.id == 1781 && isFusionActive()) {
+                if ((item.template.id == 1781
+                        || item.template.id == ConstItem.CAI_TRANG_BILL_BI_NGO
+                        || item.template.id == ConstItem.CAI_TRANG_CUMBER_SSJ)
+                        && isFusionActive()) {
                     for (ItemOption io : item.itemOptions) {
                         if (io.optionTemplate.id == 204) {
                             addOption(io);
@@ -493,6 +499,8 @@ public class NPoint {
                     }
                 }
                 if (item.template.id != 1815 && item.template.id != 1781
+                        && item.template.id != ConstItem.CAI_TRANG_BILL_BI_NGO
+                        && item.template.id != ConstItem.CAI_TRANG_CUMBER_SSJ
                         && isBodyItemOptionActive(item)) {
                     for (ItemOption io : item.itemOptions) {
                         addOption(io);
@@ -728,6 +736,8 @@ public class NPoint {
     private void setOutfitFusion() {
         this.isGogeta = false;
         this.isLioDepTrai = false;
+        this.isBillBiNgo = false;
+        this.isCumberSsj = false;
         if (this.player.inventory.itemsBody.size() < 6 || this.player.pet == null || this.player.pet.inventory.itemsBody.size() < 6) {
             return;
         }
@@ -736,10 +746,16 @@ public class NPoint {
         if (skin.isNotNullItem() && pskin.isNotNullItem()) {
             this.isGogeta = skin.template.id == 2133 && pskin.template.id == 2134 || skin.template.id == 2134 && pskin.template.id == 2133;
         }
-        // CT Lio đẹp trai và CT Gohan - chỉ có tác dụng khi hợp thể
+        // Nhóm CT Lio/Gohan/Bill Bí Ngô/Cumber SSJ - chỉ có tác dụng khi hợp thể
         this.isLioDepTrai = isFusionActive()
                 && skin.isNotNullItem()
-                && (skin.template.id == 1815 || skin.template.id == 1781);
+                && (skin.template.id == 1815 || skin.template.id == 1781
+                || skin.template.id == ConstItem.CAI_TRANG_BILL_BI_NGO
+                || skin.template.id == ConstItem.CAI_TRANG_CUMBER_SSJ);
+        this.isBillBiNgo = this.isLioDepTrai
+                && skin.template.id == ConstItem.CAI_TRANG_BILL_BI_NGO;
+        this.isCumberSsj = this.isLioDepTrai
+                && skin.template.id == ConstItem.CAI_TRANG_CUMBER_SSJ;
     }
 
     private void setLioDepTraiBonus() {
@@ -760,7 +776,9 @@ public class NPoint {
         if (skin == null || !skin.isNotNullItem() || skin.itemOptions == null) {
             return 0;
         }
-        if (skin.template.id == 1815 || skin.template.id == 1781) {
+        if (skin.template.id == 1815 || skin.template.id == 1781
+                || skin.template.id == ConstItem.CAI_TRANG_BILL_BI_NGO
+                || skin.template.id == ConstItem.CAI_TRANG_CUMBER_SSJ) {
             return 0;
         }
         int buff = 0;
@@ -1027,7 +1045,7 @@ public class NPoint {
             hpMax += (hpMax * 10 / 100L);
         }
 
-        // CT Lio đẹp trai / Gohan +50% HP
+        // Nhóm CT hợp thể Lio/Gohan/Bill/Cumber +50% HP
         if (this.isLioDepTrai) {
             hpMax += (hpMax * 50 / 100L);
         }
@@ -1189,7 +1207,7 @@ public class NPoint {
             mpMax += (mpMax * 10 / 100L);
         }
 
-        // CT Lio đẹp trai / Gohan +50% KI
+        // Nhóm CT hợp thể Lio/Gohan/Bill/Cumber +50% KI
         if (this.isLioDepTrai) {
             mpMax += (mpMax * 50 / 100L);
         }
@@ -1425,9 +1443,15 @@ public class NPoint {
             dame += (dame * 10 / 100L);
         }
 
-        // CT Lio đẹp trai / Gohan +30% SĐ + 20% SĐCM
+        // Cumber cộng chồng: 100% -> 140% -> 168% (tổng hiệu quả +68%).
         if (this.isLioDepTrai) {
-            dame += (dame * 30 / 100L);
+            if (this.isCumberSsj) {
+                dame += (dame * 40 / 100L);
+                dame += (dame * 20 / 100L);
+            } else {
+                int costumeDamePercent = this.isBillBiNgo ? 40 : 30;
+                dame += (dame * costumeDamePercent / 100L);
+            }
             this.tlDameCrit.add(20);
             this.tlSDCM += 20;
             if (this.tlSexyDame < 25) {

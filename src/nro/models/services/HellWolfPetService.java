@@ -268,7 +268,7 @@ public final class HellWolfPetService {
     public int getSoulIncrement(int optionId) {
         return switch (optionId) {
             case OPTION_HP, OPTION_KI -> 5;
-            case OPTION_DAMAGE -> 3;
+            case OPTION_DAMAGE -> 2;
             case OPTION_CRITICAL_DAMAGE, OPTION_ARMOR, OPTION_ARMOR_PENETRATION,
                     OPTION_SELF_DESTRUCT_DAMAGE, OPTION_LAZE_DAMAGE, OPTION_QCKK_DAMAGE -> 2;
             default -> 0;

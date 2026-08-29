@@ -14,9 +14,16 @@ ON DUPLICATE KEY UPDATE
     `avatar` = VALUES(`avatar`);
 
 UPDATE `map_template`
+SET `npcs` = REPLACE(
+    REPLACE(`npcs`, '[86,80,408]', '[86,1080,408]'),
+    '[86,120,408]', '[86,1080,408]'
+)
+WHERE `id` = 14;
+
+UPDATE `map_template`
 SET `npcs` = CASE
-    WHEN TRIM(`npcs`) = '[]' THEN '[[86,80,408]]'
-    ELSE CONCAT(LEFT(TRIM(`npcs`), CHAR_LENGTH(TRIM(`npcs`)) - 1), ',[86,80,408]]')
+    WHEN TRIM(`npcs`) = '[]' THEN '[[86,1080,408]]'
+    ELSE CONCAT(LEFT(TRIM(`npcs`), CHAR_LENGTH(TRIM(`npcs`)) - 1), ',[86,1080,408]]')
 END
 WHERE `id` = 14
   AND REPLACE(`npcs`, ' ', '') NOT LIKE '%[86,%';

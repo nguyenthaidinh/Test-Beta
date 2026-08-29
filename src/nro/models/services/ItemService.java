@@ -41,7 +41,12 @@ public class ItemService {
     private static final int[] COSTUME_SSJ4_CONTROLLED_OPTIONS = {50, 77, 103, 106, 204};
     private static final short COSTUME_GOHAN_ID = 1781;
     private static final String COSTUME_GOHAN_DESCRIPTION = "T\u0103ng 30% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
-    private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 50, 77, 96, 103, 106, 108, 117, 204};
+    private static final short COSTUME_BILL_BI_NGO_ID = (short) ConstItem.CAI_TRANG_BILL_BI_NGO;
+    private static final String COSTUME_BILL_BI_NGO_DESCRIPTION = "T\u0103ng 40% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
+    private static final short COSTUME_CUMBER_SSJ_ID = (short) ConstItem.CAI_TRANG_CUMBER_SSJ;
+    private static final int CUMBER_RANK_DAME_OPTION_ID = 39;
+    private static final String COSTUME_CUMBER_SSJ_DESCRIPTION = "T\u0103ng 40% s\u1ee9c \u0111\u00e1nh, 50% HP, KI; +20% s\u1ee9c \u0111\u00e1nh ch\u00ed m\u1ea1ng; h\u00fat 10% KI; \u0110\u1eb9p +25% s\u1ee9c \u0111\u00e1nh; t\u0103ng 30% s\u00e1t th\u01b0\u01a1ng l\u00ean Boss; \u0110\u1eb3ng c\u1ea5p +20% s\u1ee9c \u0111\u00e1nh. Ch\u1ec9 c\u00f3 t\u00e1c d\u1ee5ng khi h\u1ee3p th\u1ec3";
+    private static final int[] COSTUME_GOHAN_CONTROLLED_OPTIONS = {5, 39, 50, 77, 96, 103, 106, 108, 117, 204};
     private static final short COSTUME_JACKY_CHUN_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
     private static final short FRIED_SHRIMP_ID = (short) ConstItem.TOM_TAM_BOT_CHIEN_XU;
     private static final String FRIED_SHRIMP_DESCRIPTION = "T\u1eb7ng cho Whis ho\u1eb7c \u0103n v\u00e0o \u0111\u1ec3 t\u0103ng 5% HP v\u00e0 5% KI trong v\u00f2ng 10 ph\u00fat";
@@ -317,15 +322,32 @@ public class ItemService {
     }
 
     public void normalizeGohanCostumeOptions(Item item) {
-        if (item == null || item.template == null || item.template.id != COSTUME_GOHAN_ID) {
+        if (item == null || item.template == null
+                || (item.template.id != COSTUME_GOHAN_ID
+                && item.template.id != COSTUME_BILL_BI_NGO_ID
+                && item.template.id != COSTUME_CUMBER_SSJ_ID)) {
             return;
         }
-        item.template.description = COSTUME_GOHAN_DESCRIPTION;
+        boolean isBillBiNgo = item.template.id == COSTUME_BILL_BI_NGO_ID;
+        boolean isCumberSsj = item.template.id == COSTUME_CUMBER_SSJ_ID;
+        if (isCumberSsj) {
+            item.template.description = COSTUME_CUMBER_SSJ_DESCRIPTION;
+        } else if (isBillBiNgo) {
+            item.template.description = COSTUME_BILL_BI_NGO_DESCRIPTION;
+        } else {
+            item.template.description = COSTUME_GOHAN_DESCRIPTION;
+        }
         if (item.itemOptions == null) {
             item.itemOptions = new ArrayList<>();
         }
         item.itemOptions.removeIf(this::isGohanCostumeControlledOption);
-        item.itemOptions.addAll(getGohanCostumeOptions());
+        if (isCumberSsj) {
+            item.itemOptions.addAll(getCumberSsjCostumeOptions());
+        } else if (isBillBiNgo) {
+            item.itemOptions.addAll(getBillBiNgoCostumeOptions());
+        } else {
+            item.itemOptions.addAll(getGohanCostumeOptions());
+        }
         item.info = item.getInfo();
         item.content = item.getContent();
     }
@@ -630,9 +652,26 @@ public class ItemService {
         return options;
     }
 
+    public List<ItemOption> getBillBiNgoCostumeOptions() {
+        List<ItemOption> options = getFusionGohanStyleCostumeOptions(40);
+        options.add(new ItemOption(204, 30));
+        return options;
+    }
+
+    public List<ItemOption> getCumberSsjCostumeOptions() {
+        List<ItemOption> options = getBillBiNgoCostumeOptions();
+        // Chỉ dùng để hiển thị dòng cuối; 20% SĐ được cộng chồng sau 40% trong NPoint.
+        options.add(new ItemOption(CUMBER_RANK_DAME_OPTION_ID, 20));
+        return options;
+    }
+
     public List<ItemOption> getLioDepTraiCostumeOptions() {
+        return getFusionGohanStyleCostumeOptions(30);
+    }
+
+    private List<ItemOption> getFusionGohanStyleCostumeOptions(int damePercent) {
         List<ItemOption> options = new ArrayList<>();
-        options.add(new ItemOption(50, 30));
+        options.add(new ItemOption(50, damePercent));
         options.add(new ItemOption(77, 50));
         options.add(new ItemOption(103, 50));
         options.add(new ItemOption(5, 20));

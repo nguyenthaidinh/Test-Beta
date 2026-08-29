@@ -15,6 +15,7 @@ import nro.models.item.Item;
 import nro.models.item.ItemTime;
 import nro.models.npc.MagicTree;
 import nro.models.consts.ConstPlayer;
+import nro.models.consts.ConstItem;
 import nro.models.consts.ConstTask;
 import nro.models.npc.MabuEgg;
 import nro.models.mob.MobMe;
@@ -81,7 +82,7 @@ import nro.models.task.BadgesTaskService;
 public class Player implements Runnable {
 
     public long lastTimeEatPea;
-    public long lastTimeLioDepTraiHeal;  // CT Lio đẹp trai / Gohan hồi HP
+    public long lastTimeLioDepTraiHeal;  // Nhóm CT hợp thể Lio/Gohan/Bill/Cumber hồi HP
     public Map<Integer, Long> activeEffects = new HashMap<>();
     @Setter
     @Getter
@@ -471,7 +472,7 @@ public class Player implements Runnable {
                     if (nPoint != null) {
                         nPoint.update();
                     }
-                    // CT Lio đẹp trai / Gohan: hồi 5% HP mỗi 30s khi hợp thể
+                    // Nhóm CT Lio/Gohan/Bill Bí Ngô/Cumber SSJ: hồi 5% HP mỗi 30s khi hợp thể
                     if (this.isPl() && !this.isDie() && this.nPoint != null && this.nPoint.isLioDepTrai
                             && Util.canDoWithTime(this.lastTimeLioDepTraiHeal, 30000)) {
                         long hoiHp = this.nPoint.hpMax * 5 / 100;
@@ -748,7 +749,9 @@ public class Player implements Runnable {
             Item outfit = this.inventory.itemsBody.get(5);
             if (outfit.isNotNullItem()
                     && (outfit.template.id == 1780 || outfit.template.id == 1781
-                    || outfit.template.id == 1815 || outfit.template.id == 1870)) {
+                    || outfit.template.id == 1815 || outfit.template.id == 1870
+                    || outfit.template.id == ConstItem.CAI_TRANG_BILL_BI_NGO
+                    || outfit.template.id == ConstItem.CAI_TRANG_CUMBER_SSJ)) {
                 return outfit;
             }
         }
