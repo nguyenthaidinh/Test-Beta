@@ -72,7 +72,7 @@ public class VuaQuySaTang extends DeathOrAliveArena {
                 die(plAtt);
             }
 
-            return (int) damage;
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }

@@ -171,7 +171,7 @@ public abstract class TrainingBoss extends Boss {
                 die(plAtt);
             }
 
-            return (int) damage;
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }

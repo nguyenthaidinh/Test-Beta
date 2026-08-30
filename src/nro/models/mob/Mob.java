@@ -400,7 +400,7 @@ public class Mob {
             return;
         }
 
-        int dameMob = this.point.getDameAttack();
+        long dameMob = this.point.getDameAttack();
 
         if (player.charms != null && player.charms.tdDaTrau > System.currentTimeMillis()) {
             dameMob /= 2;
@@ -414,7 +414,7 @@ public class Mob {
         }
 
         if (this.lvMob > 0 && !MapService.gI().isMapPhoBan(this.zone.map.mapId)) {
-            dameMob = (int) (player.nPoint.hpMax * 0.1);
+            dameMob = player.nPoint.hpMax / 10L;
         }
 
         if (player.satellite != null && player.satellite.isDefend) {
@@ -422,17 +422,19 @@ public class Mob {
         }
 
         if (player.itemTime != null && player.itemTime.isUseCMS) {
-            dameMob = (int) Math.round(dameMob * 0.1);
+            dameMob /= 10L;
         }
 
         if (this.lvMob > 0 && player.charms != null && player.charms.tdOaiHung > System.currentTimeMillis()) {
             // giữ nguyên dameMob
         }
 
-        int dame = player.injured(null, dameMob, false, true);
-        this.sendMobAttackMe(player, dame);
+        long hpBefore = player.nPoint.hp;
+        player.injured(null, dameMob, false, true);
+        long actualDamage = Math.max(0L, hpBefore - player.nPoint.hp);
+        this.sendMobAttackMe(player, player.nPoint.getClientDamage(actualDamage));
         this.sendMobAttackPlayer(player);
-        this.phanSatThuong(player, dame);
+        this.phanSatThuong(player, actualDamage);
     }
 
     private void sendMobAttackMe(Player player, int dame) {
@@ -1333,27 +1335,24 @@ public class Mob {
     }
 
     private void phanSatThuong(Player plTarget, long dame) {
-        if (plTarget.nPoint == null) {
-            return;
-        }
-        if (plTarget == null || plTarget.inventory == null) {
+        if (plTarget == null || plTarget.nPoint == null || plTarget.inventory == null) {
             return;
         }
         int percentPST = plTarget.nPoint.tlPST;
         if (percentPST != 0) {
-            int damePST = (int) (long) (dame * percentPST / 100L);
+            long damePST = dame * percentPST / 100L;
             Message msg;
             try {
                 msg = new Message(-9);
                 msg.writer().writeByte(this.id);
                 if (damePST >= this.point.hp) {
-                    damePST = this.point.hp - 1;
+                    damePST = Math.max(0L, this.point.hp - 1L);
                 }
                 int hpMob = this.point.hp;
                 injured(null, damePST, true);
-                damePST = hpMob - this.point.hp;
+                int actualDamage = hpMob - this.point.hp;
                 msg.writer().writeInt(this.point.hp);
-                msg.writer().writeInt(damePST);
+                msg.writer().writeInt(actualDamage);
                 msg.writer().writeBoolean(false);
                 msg.writer().writeByte(36);
                 Service.gI().sendMessAllPlayerInMap(this.zone, msg);

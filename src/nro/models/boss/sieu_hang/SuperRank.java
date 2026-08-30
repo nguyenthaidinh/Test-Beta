@@ -200,7 +200,7 @@ public abstract class SuperRank extends Boss {
                     case Skill.MASENKO:
                     case Skill.ANTOMIC:
                         if (this.nPoint.voHieuChuong > 0) {
-                            PlayerService.gI().hoiPhuc(this, 0, (int) (damage * this.nPoint.voHieuChuong / 100));
+                            PlayerService.gI().hoiPhuc(this, 0, damage * this.nPoint.voHieuChuong / 100L);
                             return 0;
                         }
                         break;
@@ -332,7 +332,7 @@ public abstract class SuperRank extends Boss {
                 setDie(plAtt);
             }
 
-            return NPoint.toClientStat(damage);
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }

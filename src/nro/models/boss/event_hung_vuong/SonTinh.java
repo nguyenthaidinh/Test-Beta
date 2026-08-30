@@ -92,7 +92,7 @@ public class SonTinh extends Boss {
                 this.setDie(plAtt);
                 die(plAtt);
             }
-            return (int) damage;
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }
@@ -179,7 +179,7 @@ public class SonTinh extends Boss {
                         move(pl.location.x + (Util.nextInt(0, 1) == 1 ? move : -move), this.location.y);
                     }
                     if (pl.isPl()) {
-                        this.nPoint.dame = (int) Math.min(pl.nPoint.hpMax / 30, Integer.MAX_VALUE);
+                        this.nPoint.dame = pl.nPoint.hpMax / 30L;
                     } else {
                         this.nPoint.dame = 10000;
                     }

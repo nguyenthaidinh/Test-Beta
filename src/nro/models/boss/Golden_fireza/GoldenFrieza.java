@@ -178,7 +178,7 @@ public class GoldenFrieza extends Boss {
             die(plAtt);
         }
 
-        return (int) damage;
+        return this.nPoint.getClientDamage(damage);
     }
 
     @Override

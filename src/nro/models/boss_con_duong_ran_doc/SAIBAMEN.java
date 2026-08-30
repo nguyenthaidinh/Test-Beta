@@ -120,7 +120,7 @@ public class SAIBAMEN extends Boss {
             if (isDie()) {
                 setBom(plAtt);
             }
-            return (int) damage;
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }

@@ -184,7 +184,7 @@ public class SieuBoHung extends Boss {
                 return 0;
             }
 
-            return (int) damage;
+            return this.nPoint.getClientDamage(damage);
         }
         return 0;
     }

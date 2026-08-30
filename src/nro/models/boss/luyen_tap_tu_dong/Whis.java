@@ -80,7 +80,7 @@ public class Whis extends TrainingBoss {
             this.setDie(plAtt);
             die(plAtt);
         }
-        return (int) damage;
+        return this.nPoint.getClientDamage(damage);
     }
 
     @Override

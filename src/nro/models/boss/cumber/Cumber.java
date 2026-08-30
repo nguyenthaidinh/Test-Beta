@@ -109,7 +109,7 @@ public class Cumber extends Boss {
                 this.setDie(plAtt);
                 die(plAtt);
             }
-            return (int) damage;
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }

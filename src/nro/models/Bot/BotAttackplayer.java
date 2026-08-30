@@ -155,7 +155,7 @@ public class BotAttackplayer extends Bot {
         long hpBefore = targetPlayer.nPoint.hp;
         targetPlayer.injured(this, isMiss ? 0 : damage, false, false);
         long realDame = Math.max(0, hpBefore - targetPlayer.nPoint.hp);
-        int clientRealDame = NPoint.toClientStat(realDame);
+        int clientRealDame = targetPlayer.nPoint.getClientDamage(realDame);
 
         Skill skill = playerSkill.skillSelect;
 
@@ -236,7 +236,7 @@ public class BotAttackplayer extends Bot {
             msg.writer().writeInt((int) attacker.id);
             long hpBefore = attacker.nPoint.hp;
             attacker.injured(attacker, damePST, true, false);
-            int damePSTHit = NPoint.toClientStat(Math.max(0, hpBefore - attacker.nPoint.hp));
+            int damePSTHit = attacker.nPoint.getClientDamage(Math.max(0, hpBefore - attacker.nPoint.hp));
             msg.writer().writeInt(attacker.nPoint.getClientHp());
             msg.writer().writeInt(damePSTHit);
             msg.writer().writeBoolean(false);

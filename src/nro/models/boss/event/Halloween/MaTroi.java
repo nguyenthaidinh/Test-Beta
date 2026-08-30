@@ -51,7 +51,7 @@ public class MaTroi extends Boss {
                 this.setDie(plAtt);
                 die(plAtt);
             }
-            return (int) damage;
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }
@@ -66,7 +66,7 @@ public class MaTroi extends Boss {
                 if (pl == null || pl.isDie()) {
                     return;
                 }
-                this.nPoint.dame = (int) Math.min(pl.nPoint.hpMax / Util.nextInt(30, 50), Integer.MAX_VALUE);
+                this.nPoint.dame = pl.nPoint.hpMax / Util.nextInt(30, 50);
                 this.playerSkill.skillSelect = this.playerSkill.skills.get(Util.nextInt(0, this.playerSkill.skills.size() - 1));
                 if (Util.getDistance(this, pl) <= this.getRangeCanAttackWithSkillSelect()) {
                     if (Util.isTrue(5, 20)) {

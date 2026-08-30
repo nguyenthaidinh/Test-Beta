@@ -55,7 +55,7 @@ public class BlackGoku extends Boss {
                 this.nPoint.subHP(damageToTake);
             }
             tryUseEscapeSkill();
-            return (int) Math.min(damageToTake, Integer.MAX_VALUE);
+            return this.nPoint.getClientDamage(damageToTake);
         }
 
         this.nPoint.subHP(damage);
@@ -65,7 +65,7 @@ public class BlackGoku extends Boss {
         } else {
             tryUseEscapeSkill();
         }
-        return (int) Math.min(damage, Integer.MAX_VALUE);
+        return this.nPoint.getClientDamage(damage);
     }
 
     @Override

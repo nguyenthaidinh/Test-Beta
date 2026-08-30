@@ -66,7 +66,7 @@ public class AnTrom extends Boss {
             }
             this.playerSkill.skillSelect = this.playerSkill.skills.get(Util.nextInt(0, this.playerSkill.skills.size() - 1));
             SkillService.gI().useSkill(this, plAtt, null, -1, null);
-            return (int) damage;
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }

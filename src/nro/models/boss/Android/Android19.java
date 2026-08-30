@@ -68,7 +68,7 @@ public class Android19 extends Boss {
                 case Skill.KAMEJOKO:
                 case Skill.MASENKO:
                 case Skill.ANTOMIC:
-                    int hpHoi = (int) ((long) damage * 80 / 100);
+                    long hpHoi = damage * 80L / 100L;
                     PlayerService.gI().hoiPhuc(this, hpHoi, 0);
                     if (Util.isTrue(1, 5)) {
                         this.chat("Hấp thụ.. các ngươi nghĩ sao vậy?");

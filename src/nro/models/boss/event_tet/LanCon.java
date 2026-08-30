@@ -206,7 +206,7 @@ public synchronized int injured(Player plAtt, long damage, boolean piercing, boo
             return 0;
         }
         this.nPoint.subHP(damage);
-        return (int) damage;
+        return this.nPoint.getClientDamage(damage);
     } else {
         return 0;
     }

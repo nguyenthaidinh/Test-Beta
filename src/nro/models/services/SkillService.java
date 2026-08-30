@@ -935,7 +935,7 @@ public class SkillService {
                     }
                     long hpBefore = plAtt.nPoint.hp;
                     plAtt.injured(plAtt, damePST, true, false);
-                    int damePSTHit = NPoint.toClientStat(Math.max(0, hpBefore - plAtt.nPoint.hp));
+                    int damePSTHit = plAtt.nPoint.getClientDamage(Math.max(0, hpBefore - plAtt.nPoint.hp));
                     msg.writer().writeInt(plAtt.nPoint.getClientHp());
                     msg.writer().writeInt(damePSTHit);
                     msg.writer().writeBoolean(false);
@@ -1111,7 +1111,7 @@ public class SkillService {
         long hpBefore = plInjure.nPoint.hp;
         plInjure.injured(plAtt, miss ? 0 : dameAttack, false, false);
         long dameHit = Math.max(0, hpBefore - plInjure.nPoint.hp);
-        int clientDameHit = NPoint.toClientStat(dameHit);
+        int clientDameHit = plInjure.nPoint.getClientDamage(dameHit);
         if (plAtt.playerSkill == null) {
             return;
         }
@@ -1124,7 +1124,7 @@ public class SkillService {
         if (plInjure instanceof Yardart) {
             if (plInjure.nPoint.hp < dameHit) {
                 dameHit = Math.max(0, plInjure.nPoint.hp - 1);
-                clientDameHit = NPoint.toClientStat(dameHit);
+                clientDameHit = plInjure.nPoint.getClientDamage(dameHit);
                 if (clientDameHit == 0) {
                     return;
                 }

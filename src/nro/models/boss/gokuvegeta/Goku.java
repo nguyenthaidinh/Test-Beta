@@ -47,6 +47,6 @@ public class Goku extends Boss {
             this.setDie(plAtt);
             die(plAtt);
         }
-        return (int) Math.min(damage, Integer.MAX_VALUE);
+        return this.nPoint.getClientDamage(damage);
     }
 }

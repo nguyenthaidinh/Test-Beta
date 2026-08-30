@@ -122,7 +122,7 @@ public class Pocolo extends Boss {
             this.setDie(plAtt);
             die(plAtt);
         }
-        return (int) damage;
+        return this.nPoint.getClientDamage(damage);
     }
 
     @Override
@@ -323,7 +323,7 @@ class PocoloClone extends Boss {
             this.setDie(plAtt);
             die(plAtt);
         }
-        return (int) damage;
+        return this.nPoint.getClientDamage(damage);
     }
 
     @Override

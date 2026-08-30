@@ -749,7 +749,7 @@ public class Boss extends Player implements IBoss {
                 die(plAtt);
             }
 
-            return nro.models.player.NPoint.toClientStat(damage);
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }
@@ -762,6 +762,9 @@ public class Boss extends Player implements IBoss {
         int effectiveReduction = reductionPercent;
         if (plAtt != null && plAtt.setClothes != null && plAtt.setClothes.sonCon >= 5) {
             effectiveReduction -= 50;
+        }
+        if (plAtt != null && plAtt.nPoint != null) {
+            effectiveReduction -= Math.max(0, plAtt.nPoint.tlXuyenGiapSoi);
         }
         effectiveReduction = Math.max(0, effectiveReduction);
         if (plAtt != null) {

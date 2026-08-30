@@ -96,6 +96,9 @@ public class ShopService {
     private static final short JACKY_CHUN_COSTUME_ITEM_ID = (short) ConstItem.CAI_TRANG_JACKY_CHUN;
     private static final int JACKY_CHUN_COSTUME_RUBY_COST = 2_000_000;
     private static final int JACKY_CHUN_COSTUME_EXPIRE_DAYS = 7;
+    private static final int CHI_CHI_CUMBER_COSTUME_SHOP_ID = -ConstItem.CAI_TRANG_CUMBER;
+    private static final short CUMBER_COSTUME_ITEM_ID = (short) ConstItem.CAI_TRANG_CUMBER;
+    private static final int CUMBER_COSTUME_GOLD_BAR_COST = 5_000_000;
     private static final int OPTION_EXPIRE_DAYS = 93;
     private static final short[] FEATURED_EVENT_ITEM_IDS = {1780, 1781, 1722, 1784, 1783};
     private static final int[] FEATURED_EVENT_ITEM_GEM_COSTS = {3_000_000, 3_000_000, 1_000_000, 800_000, 600_000};
@@ -133,6 +136,7 @@ public class ShopService {
                 ensureTrumTop1InChiChiShop(shop);
                 ensureSsj4CostumesInChiChiShop(shop);
                 ensureJackyChunCostumeInChiChiShop(shop);
+                ensureCumberCostumeInChiChiShop(shop);
                 ensureFeaturedEventItemsInChiChiShop(shop);
                 ensureEarringSoulInChiChiShop(shop);
                 ensureBlueStoneInChiChiShop(shop);
@@ -459,6 +463,63 @@ public class ShopService {
         return true;
     }
 
+    /** Bán Cải trang Cumber trong tab sự kiện Chi Chi với giá 5.000.000 Thỏi vàng. */
+    private void ensureCumberCostumeInChiChiShop(Shop shop) {
+        if (shop == null || shop.tabShops == null || shop.tabShops.isEmpty()) {
+            return;
+        }
+        TabShop eventTab = null;
+        for (TabShop tabShop : shop.tabShops) {
+            if (tabShop.id == TAB_CHI_CHI_EVENT_ID) {
+                eventTab = tabShop;
+                break;
+            }
+        }
+        if (eventTab == null) {
+            eventTab = shop.tabShops.get(0);
+        }
+
+        ItemShop cumberCostume = null;
+        for (TabShop tabShop : shop.tabShops) {
+            for (int i = tabShop.itemShops.size() - 1; i >= 0; i--) {
+                ItemShop itemShop = tabShop.itemShops.get(i);
+                if (itemShop != null && itemShop.temp != null
+                        && itemShop.temp.id == CUMBER_COSTUME_ITEM_ID) {
+                    if (cumberCostume == null) {
+                        cumberCostume = itemShop;
+                    }
+                    tabShop.itemShops.remove(i);
+                }
+            }
+        }
+        if (cumberCostume == null) {
+            cumberCostume = new ItemShop();
+        }
+        if (!configureCumberCostumeShopItem(cumberCostume, eventTab)) {
+            return;
+        }
+        eventTab.itemShops.add(Math.min(4, eventTab.itemShops.size()), cumberCostume);
+    }
+
+    private boolean configureCumberCostumeShopItem(ItemShop itemShop, TabShop eventTab) {
+        Item costume = ItemService.gI().createNewItem(CUMBER_COSTUME_ITEM_ID);
+        if (costume == null || costume.template == null) {
+            return false;
+        }
+        itemShop.id = CHI_CHI_CUMBER_COSTUME_SHOP_ID;
+        itemShop.tabShop = eventTab;
+        itemShop.temp = costume.template;
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = CUMBER_COSTUME_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
+        itemShop.options.clear();
+        for (ItemOption option : costume.itemOptions) {
+            itemShop.options.add(new ItemOption(option));
+        }
+        return true;
+    }
+
     private void ensureFeaturedEventItemsInChiChiShop(Shop shop) {
         if (shop == null || shop.tabShops == null) {
             return;
@@ -596,6 +657,7 @@ public class ShopService {
                         || itemShop.id == CHI_CHI_EARRING_SOUL_SHOP_ID
                         || itemShop.id == CHI_CHI_BLUE_STONE_SHOP_ID
                         || itemShop.id == CHI_CHI_ROYAL_BOSS_RADAR_SHOP_ID
+                        || itemShop.id == CHI_CHI_CUMBER_COSTUME_SHOP_ID
                         || itemShop.temp.id == LEGENDARY_MAP_ITEM_ID) {
                     continue;
                 }

@@ -37,8 +37,8 @@ import nro.models.utils.TimeUtil;
 public class NPoint {
 
     public static final byte MAX_LIMIT = 15;
-    public static final long MAX_PLAYER_HP = 20_000_000_000L;
-    public static final long MAX_PLAYER_DAME = 20_000_000_000L;
+    public static final long MAX_PLAYER_HP = 100_000_000_000L;
+    public static final long MAX_PLAYER_DAME = 100_000_000_000L;
     private static final long BASE_CRIT_UPGRADE_TIEM_NANG = 12_500L;
     private static final long HIGH_CRIT_UPGRADE_TIEM_NANG_DIVISOR = 30L;
     private static final int HIGH_CRIT_UPGRADE_FROM = 12;
@@ -77,9 +77,9 @@ public class NPoint {
 
     public long hp, hpMax, hpg;
 
-    // Chỉ bật cho thực thể có HP vượt giới hạn int của giao thức client.
-    // Mặc định false nên không thay đổi cách hiển thị của người chơi/boss cũ.
-    private boolean scaleClientHpToIntRange;
+    // Giao thức client chỉ nhận int. Mặc định quy đổi HP lớn theo tỷ lệ để
+    // thanh HP vẫn chạy đúng, còn server giữ HP thật bằng long.
+    private boolean scaleClientHpToIntRange = true;
     public int mp, mpMax, mpg;
     public long dame;
     public int dameg;
@@ -174,6 +174,9 @@ public class NPoint {
     public short tlxgcc;
 
     public short tlxgc;
+
+    /** Xuyên giáp dùng chung cho mọi kỹ năng, chỉ được cộng từ Sói Địa Ngục. */
+    public short tlXuyenGiapSoi;
 
     public int tlDameTuSat;
     public int tlDameLaze;
@@ -653,6 +656,7 @@ public class NPoint {
             case HellWolfPetService.OPTION_ARMOR_PENETRATION:
                 this.tlxgc += io.param;
                 this.tlxgcc += io.param;
+                this.tlXuyenGiapSoi += io.param;
                 break;
             case HellWolfPetService.OPTION_SELF_DESTRUCT_DAMAGE:
                 this.tlDameTuSat += io.param;
@@ -1323,6 +1327,20 @@ public class NPoint {
         return toClientStat(this.hpMax);
     }
 
+    public int getClientDamage(long damage) {
+        if (damage <= 0) {
+            return 0;
+        }
+        if (scaleClientHpToIntRange && this.hpMax > Integer.MAX_VALUE) {
+            if (damage >= this.hpMax) {
+                return Integer.MAX_VALUE;
+            }
+            long scaledDamage = Math.round((double) damage * Integer.MAX_VALUE / this.hpMax);
+            return (int) Math.max(1L, Math.min(scaledDamage, Integer.MAX_VALUE));
+        }
+        return toClientStat(damage);
+    }
+
     public void setScaleClientHpToIntRange(boolean scaleClientHpToIntRange) {
         this.scaleClientHpToIntRange = scaleClientHpToIntRange;
     }
@@ -1621,6 +1639,7 @@ public class NPoint {
         this.tlGiap = 0;
         this.tlxgcc = 0;
         this.tlxgc = 0;
+        this.tlXuyenGiapSoi = 0;
         this.tlDameTuSat = 0;
         this.tlDameLaze = 0;
         this.tlDameQCKK = 0;

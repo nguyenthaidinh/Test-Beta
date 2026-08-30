@@ -1129,7 +1129,7 @@ public class Player implements Runnable {
                 switch (plAtt.playerSkill.skillSelect.template.id) {
                     case Skill.KAMEJOKO, Skill.MASENKO, Skill.ANTOMIC -> {
                         if (this.nPoint.voHieuChuong > 0) {
-                            PlayerService.gI().hoiPhuc(this, 0, (int) (damage * this.nPoint.voHieuChuong / 100));
+                            PlayerService.gI().hoiPhuc(this, 0, damage * this.nPoint.voHieuChuong / 100L);
                             return 0;
                         }
                     }
@@ -1149,6 +1149,7 @@ public class Player implements Runnable {
                 }
 
                 int bonusXuyenGiapSonCon = plAtt.setClothes != null && plAtt.setClothes.sonCon >= 5 ? 50 : 0;
+                int xuyenGiapSoi = Math.max(0, plAtt.nPoint.tlXuyenGiapSoi);
                 int tlXuyenGiapChuong = plAtt.nPoint.tlxgc + bonusXuyenGiapSonCon;
                 int tlXuyenGiapCanChien = plAtt.nPoint.tlxgcc + bonusXuyenGiapSonCon;
 
@@ -1168,15 +1169,14 @@ public class Player implements Runnable {
                         }
                     }
                     case Skill.QUA_CAU_KENH_KHI, Skill.DICH_CHUYEN_TUC_THOI -> {
-                        if (bonusXuyenGiapSonCon > 0) {
-                            tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon);
-                        }
+                        tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon - xuyenGiapSoi);
                     }
                     case Skill.MAKANKOSAPPO -> {
                         tlGiap = Math.min(86, Math.max(0, tlGiap));
-                        tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon);
+                        tlGiap = Math.max(0, tlGiap - bonusXuyenGiapSonCon - xuyenGiapSoi);
                         tlGiap = plAtt.applyFlourLazeArmorPenetration(tlGiap);
                     }
+                    default -> tlGiap = Math.max(0, tlGiap - xuyenGiapSoi);
                 }
             }
 
@@ -1274,7 +1274,7 @@ public class Player implements Runnable {
                 }
             }
 
-            return NPoint.toClientStat(damage);
+            return this.nPoint.getClientDamage(damage);
         } else {
             return 0;
         }
