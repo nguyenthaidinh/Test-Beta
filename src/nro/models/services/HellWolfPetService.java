@@ -90,8 +90,8 @@ public final class HellWolfPetService {
         normalizeTemplate(pet.template);
 
         ItemOption levelOption = findOption(pet, OPTION_LEVEL);
-        boolean legacyPet = levelOption == null;
-        int level = legacyPet ? MIN_LEVEL : clampLevel(levelOption.param);
+        boolean missingLevel = levelOption == null;
+        int level = missingLevel ? MIN_LEVEL : clampLevel(levelOption.param);
 
         List<ItemOption> preservedOptions = new ArrayList<>();
         Map<Integer, Integer> controlledValues = new LinkedHashMap<>();
@@ -105,13 +105,26 @@ public final class HellWolfPetService {
                 continue;
             }
             if (isSoulOption(optionId)) {
-                if (!legacyPet) {
-                    controlledValues.merge(optionId, Math.max(0, option.param), Math::max);
-                }
+                controlledValues.merge(optionId, Math.max(0, option.param), Math::max);
                 continue;
             }
             hasNonTradeOption |= optionId == 30;
             preservedOptions.add(option);
+        }
+
+        /*
+         * Không được coi một Sói đang có chỉ số ép nhưng bị thiếu option cấp là
+         * pet cũ. Nếu tiếp tục chuẩn hóa, toàn bộ chỉ số sẽ bị xóa và Sói bị đưa
+         * về cấp 1. Giữ nguyên dữ liệu để admin có thể phục hồi cấp; các chức
+         * năng nâng/ép sẽ khóa vật phẩm này qua getLevel() trả về 0.
+         */
+        if (missingLevel && !controlledValues.isEmpty()) {
+            if (!hasNonTradeOption) {
+                pet.itemOptions.add(new ItemOption(30, 1));
+            }
+            pet.info = pet.getInfo();
+            pet.content = pet.getContent();
+            return;
         }
 
         if (!hasNonTradeOption) {
@@ -188,7 +201,7 @@ public final class HellWolfPetService {
     public int getLevel(Item pet) {
         normalizePet(pet);
         ItemOption levelOption = findOption(pet, OPTION_LEVEL);
-        return levelOption == null ? MIN_LEVEL : clampLevel(levelOption.param);
+        return levelOption == null ? 0 : clampLevel(levelOption.param);
     }
 
     public int getOptionValue(Item pet, int optionId) {
@@ -235,6 +248,9 @@ public final class HellWolfPetService {
     }
 
     public int getCap(int level, int optionId) {
+        if (level < MIN_LEVEL || level > MAX_LEVEL) {
+            return 0;
+        }
         level = clampLevel(level);
         return switch (optionId) {
             case OPTION_HP, OPTION_KI -> level == 1 ? 70 : 100;

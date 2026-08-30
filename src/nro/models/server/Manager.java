@@ -728,6 +728,7 @@ public final class Manager {
                         ItemService.gI().normalizeJackyChunCostumeTemplate(itemTemp);
                         ItemService.gI().normalizeFriedShrimpTemplate(itemTemp);
                         ItemService.gI().normalizeFlourTemplate(itemTemp);
+                        ItemService.gI().normalizeLargeFortuneBagTemplate(itemTemp);
                         HellWolfPetService.gI().normalizeTemplate(itemTemp);
                         ITEM_TEMPLATES.add(itemTemp);
                     } while (rs.next());

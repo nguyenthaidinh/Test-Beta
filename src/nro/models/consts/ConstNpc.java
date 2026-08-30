@@ -203,6 +203,7 @@ public class ConstNpc {
     public static final int MENU_HON_MA = 562;
     public static final int MENU_BT2_ACTIONS = 563;
     public static final int MENU_BT3_ACTIONS = 564;
+    public static final int MENU_PHUONG_HOANG_LUA = 565;
     //index menu whis
     public static final int MENU_DAP_DO = 508;
 

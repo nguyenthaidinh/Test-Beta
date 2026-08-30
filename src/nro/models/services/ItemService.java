@@ -106,6 +106,9 @@ public class ItemService {
     private static final String DEVIL_CANDY_BOX_DESCRIPTION = "Mở có tỉ lệ: Xe bí ngô, Pet Mèo Phù Thủy, Cờ hồn Mabư, Kẹo não người, Kẹo bí ngô mỗi món 5%; Cờ hồn Xên Bọ Hung 0.5%; Thiệp Halloween x10-100 và Bí ngô x10-100 mỗi món 2.25%; Kẹo bàn tay x1-150, Thỏi vàng x50-150, Cuồng nộ 2, Bổ huyết 2, Giáp xên 2 x1-5 mỗi món 12%; Trang sách cũ x150-500 tỉ lệ 10%. Xe bí ngô, Pet Mèo Phù Thủy, Cờ hồn Mabư có 5% vĩnh viễn, còn lại HSD ngẫu nhiên 1/3/5/7/10/15 ngày; Cờ hồn Xên Bọ Hung HSD 1/3/5/7/10 ngày, 5% vĩnh viễn khi trúng cờ. Kẹo não người, Kẹo bí ngô, Kẹo bàn tay, Thỏi vàng, Thiệp Halloween, Bí ngô, Trang sách cũ và buff cấp 2 không có HSD.";
     private static final short SOUL_DETECTOR_ID = (short) ConstItem.MAY_DO_LINH_HON;
     private static final String SOUL_DETECTOR_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 k\u00edch ho\u1ea1t M\u00e1y d\u00f2 linh h\u1ed3n trong 30 ph\u00fat, c\u00f3 th\u1ec3 c\u1ed9ng d\u1ed3n th\u1eddi gian. Khi \u0111\u00e1nh qu\u00e1i \u1edf T\u01b0\u01a1ng lai c\u00f3 5% t\u1ec9 l\u1ec7 nh\u1eadn K\u1eb9o b\u00e0n tay.";
+    private static final short LARGE_FORTUNE_BAG_ID = (short) ConstItem.TUI_CANH_TY_2020;
+    private static final String LARGE_FORTUNE_BAG_NAME = "T\u00e0i l\u1ed9c qu\u00e1 l\u1edbn";
+    private static final String LARGE_FORTUNE_BAG_DESCRIPTION = "M\u1edf ng\u1eabu nhi\u00ean 1-3 ph\u1ea7n qu\u00e0: buff c\u1ea5p 2, \u0110\u00e1 ng\u0169 s\u1eafc, H\u1ed3n ma, Th\u1ecfi v\u00e0ng, \u0111\u00e1 n\u00e2ng c\u1ea5p ho\u1eb7c Trang s\u00e1ch c\u0169.";
     private static final short HUY_DIET_CAPSULE_ID = (short) ConstItem.HOP_CAPSULE;
     private static final String HUY_DIET_CAPSULE_DESCRIPTION = "Sử dụng để chọn hành tinh Xayda, Trái Đất hoặc Namek và nhận đủ 1 set Hủy Diệt của hành tinh đã chọn.";
     private static final int HUY_DIET_SET_SIZE = 5;
@@ -180,6 +183,7 @@ public class ItemService {
         normalizePumpkinCarriageMountOptions(item);
         HellWolfPetService.gI().normalizePet(item);
         HellWolfPetService.gI().normalizeSoul(item);
+        PhuongHoangLuaService.gI().normalize(item);
         item.content = item.getContent();
         item.info = item.getInfo();
         return item;
@@ -206,6 +210,7 @@ public class ItemService {
         normalizePumpkinCarriageMountOptions(it);
         HellWolfPetService.gI().normalizePet(it);
         HellWolfPetService.gI().normalizeSoul(it);
+        PhuongHoangLuaService.gI().normalize(it);
         return it;
     }
 
@@ -222,6 +227,7 @@ public class ItemService {
         normalizeFriedShrimpTemplate(item.template);
         normalizeFlourTemplate(item.template);
         normalizePumpkinCandyTemplate(item.template);
+        normalizeLargeFortuneBagTemplate(item.template);
         item.quantity = quantity;
         item.createTime = System.currentTimeMillis();
 
@@ -233,6 +239,7 @@ public class ItemService {
         normalizeAngelDemonWingsOptions(item);
         normalizeBrolyRedCostumeOptions(item);
         normalizeBrolyCostumeOptions(item);
+        PhuongHoangLuaService.gI().normalize(item);
         item.content = item.getContent();
         item.info = item.getInfo();
         return item;
@@ -400,6 +407,14 @@ public class ItemService {
             return;
         }
         template.description = FLOUR_DESCRIPTION;
+    }
+
+    public void normalizeLargeFortuneBagTemplate(Template.ItemTemplate template) {
+        if (template == null || template.id != LARGE_FORTUNE_BAG_ID) {
+            return;
+        }
+        template.name = LARGE_FORTUNE_BAG_NAME;
+        template.description = LARGE_FORTUNE_BAG_DESCRIPTION;
     }
 
     public void normalizeAngelDemonWingsOptions(Item item) {
@@ -1213,7 +1228,9 @@ public class ItemService {
     }
 
     public static int[] migrateDoThanThanhDisplayOption(int itemId, int optionId, int optionParam) {
-        boolean isHellWolfFeature = (itemId == ConstItem.SOI_DIA_NGUC || itemId == ConstItem.HON_MA)
+        boolean isHellWolfFeature = (itemId == ConstItem.SOI_DIA_NGUC
+                || itemId == ConstItem.HON_MA
+                || itemId == ConstItem.PHUONG_HOANG_LUA)
                 && optionId >= HellWolfPetService.OPTION_ARMOR_PENETRATION
                 && optionId <= HellWolfPetService.OPTION_QCKK_DAMAGE;
         boolean isCumberSelfDestruct = itemId == ConstItem.CAI_TRANG_CUMBER
@@ -1247,6 +1264,7 @@ public class ItemService {
     public Item createItemFromItemMap(ItemMap itemMap) {
         Item item = createNewItem(itemMap.itemTemplate.id, itemMap.quantity);
         item.itemOptions = itemMap.options;
+        PhuongHoangLuaService.gI().normalize(item);
         return item;
     }
 

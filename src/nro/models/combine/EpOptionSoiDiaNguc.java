@@ -1,6 +1,7 @@
 package nro.models.combine;
 
 import nro.models.consts.ConstNpc;
+import nro.models.database.PlayerDAO;
 import nro.models.item.Item;
 import nro.models.item.Item.ItemOption;
 import nro.models.player.Player;
@@ -37,6 +38,12 @@ public final class EpOptionSoiDiaNguc {
 
         int optionId = soulOption.optionTemplate.id;
         int level = wolfService.getLevel(pet);
+        if (level < HellWolfPetService.MIN_LEVEL) {
+            showCloseMenu(player, "Sói Địa Ngục đang thiếu dữ liệu cấp nhưng vẫn còn chỉ số.\n"
+                    + "Hệ thống đã giữ nguyên toàn bộ option và tạm khóa ép.\n"
+                    + "Hãy báo admin kiểm tra, không được bỏ hoặc thay đổi vật phẩm này.");
+            return;
+        }
         int requiredLevel = wolfService.getRequiredLevel(optionId);
         int cap = wolfService.getCap(level, optionId);
         int current = wolfService.getOptionValue(pet, optionId);
@@ -101,6 +108,11 @@ public final class EpOptionSoiDiaNguc {
 
             int optionId = soulOption.optionTemplate.id;
             int level = wolfService.getLevel(pet);
+            if (level < HellWolfPetService.MIN_LEVEL) {
+                Service.gI().sendThongBao(player,
+                        "Sói Địa Ngục đang thiếu dữ liệu cấp. Option đã được bảo vệ, hãy báo admin kiểm tra.");
+                return;
+            }
             int cap = wolfService.getCap(level, optionId);
             int current = wolfService.getOptionValue(pet, optionId);
             if (cap <= 0 || current >= cap) {
@@ -133,6 +145,7 @@ public final class EpOptionSoiDiaNguc {
             if (InventoryService.gI().getIndexItemBag(player, soul) < 0) {
                 player.combineNew.itemsCombine.remove(soul);
             }
+            boolean savedImmediately = PlayerDAO.updateInventoryAndBag(player);
             if (success) {
                 CombineService.gI().sendEffectSuccessCombine(player);
                 Service.gI().sendThongBao(player, "Ép thành công: "
@@ -148,6 +161,10 @@ public final class EpOptionSoiDiaNguc {
             InventoryService.gI().sendItemBags(player);
             Service.gI().sendMoney(player);
             CombineService.gI().reOpenItemCombine(player);
+            if (!savedImmediately) {
+                Service.gI().sendThongBao(player,
+                        "Cảnh báo: chưa thể lưu ngay dữ liệu ép Sói, vui lòng không thoát game và báo admin.");
+            }
         }
     }
 

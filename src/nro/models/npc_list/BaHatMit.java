@@ -92,7 +92,8 @@ public class BaHatMit extends Npc {
                             "Nâng cấp\nVật phẩm",
                             "Bông tai\nPorata\nCấp 2 / 3",
                             "Làm phép\nNhập đá",
-                            "Nhập\nNgọc Rồng"
+                            "Nhập\nNgọc Rồng",
+                            "Phượng hoàng\nlửa"
                     ));
 
                     // Thêm thưởng bùa nếu còn lượt hôm nay (đặt lên đầu để case 0 vẫn là thưởng bùa)
@@ -361,6 +362,20 @@ public class BaHatMit extends Npc {
                             case 6:
                                 CombineService.gI().openTabCombine(player, CombineService.NHAP_NGOC_RONG);
                                 break;
+                            case 7:
+                                createOtherMenu(player, ConstNpc.MENU_PHUONG_HOANG_LUA,
+                                        "Ta có thể giúp ngươi nâng cấp hoặc tẩy chỉ số Phượng hoàng lửa.",
+                                        "Nâng cấp",
+                                        "Tẩy chỉ số",
+                                        "Đóng");
+                                break;
+                        }
+                    } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_PHUONG_HOANG_LUA) {
+                        switch (select) {
+                            case 0 -> CombineService.gI().openTabCombine(player, CombineService.NANG_CAP_PHUONG_HOANG_LUA);
+                            case 1 -> CombineService.gI().openTabCombine(player, CombineService.TAY_CHI_SO_PHUONG_HOANG_LUA);
+                            default -> {
+                            }
                         }
                     } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_SACH_TUYET_KY) {
                         switch (select) {
@@ -441,7 +456,7 @@ public class BaHatMit extends Npc {
                         }
                     } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_START_COMBINE) {
                         switch (player.combineNew.typeCombine) {
-                            case CombineService.EP_SAO_TRANG_BI, CombineService.PHA_LE_HOA_TRANG_BI, CombineService.CHUYEN_HOA_TRANG_BI_VANG, CombineService.CHUYEN_HOA_TRANG_BI_NGOC, CombineService.PHAN_RA_TRANG_BI_KH, CombineService.TAI_TAO_CAPSULE_KH, CombineService.HIEN_TE_THAN_LINH, CombineService.NANG_CAP_SAO_PHA_LE, CombineService.DANH_BONG_SAO_PHA_LE, CombineService.CUONG_HOA_LO_SAO_PHA_LE, CombineService.TAO_DA_HEMATITE, CombineService.NANG_CAP_VAT_PHAM, CombineService.NANG_CAP_BONG_TAI, CombineService.NANG_CHI_SO_BONG_TAI, CombineService.NANG_CAP_BONG_TAI3, CombineService.NANG_CHI_SO_BONG_TAI3, CombineService.NHAP_NGOC_RONG, CombineService.BAN_DO_THAN_LINH_LIO, CombineService.PHAN_RA_DO_THAN_LINH, CombineService.LAM_PHEP_NHAP_DA, CombineService.GIAM_DINH_SACH, CombineService.TAY_SACH, CombineService.NANG_CAP_SACH_TUYET_KY, CombineService.HOI_PHUC_SACH, CombineService.PHAN_RA_SACH -> {
+                            case CombineService.EP_SAO_TRANG_BI, CombineService.PHA_LE_HOA_TRANG_BI, CombineService.CHUYEN_HOA_TRANG_BI_VANG, CombineService.CHUYEN_HOA_TRANG_BI_NGOC, CombineService.PHAN_RA_TRANG_BI_KH, CombineService.TAI_TAO_CAPSULE_KH, CombineService.HIEN_TE_THAN_LINH, CombineService.NANG_CAP_SAO_PHA_LE, CombineService.DANH_BONG_SAO_PHA_LE, CombineService.CUONG_HOA_LO_SAO_PHA_LE, CombineService.TAO_DA_HEMATITE, CombineService.NANG_CAP_VAT_PHAM, CombineService.NANG_CAP_BONG_TAI, CombineService.NANG_CHI_SO_BONG_TAI, CombineService.NANG_CAP_BONG_TAI3, CombineService.NANG_CHI_SO_BONG_TAI3, CombineService.NHAP_NGOC_RONG, CombineService.BAN_DO_THAN_LINH_LIO, CombineService.PHAN_RA_DO_THAN_LINH, CombineService.LAM_PHEP_NHAP_DA, CombineService.GIAM_DINH_SACH, CombineService.TAY_SACH, CombineService.NANG_CAP_SACH_TUYET_KY, CombineService.HOI_PHUC_SACH, CombineService.PHAN_RA_SACH, CombineService.NANG_CAP_PHUONG_HOANG_LUA, CombineService.TAY_CHI_SO_PHUONG_HOANG_LUA -> {
                                 switch (select) {
                                     case 0 ->
                                         CombineService.gI().startCombine(player);

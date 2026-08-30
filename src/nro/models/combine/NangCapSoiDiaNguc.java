@@ -2,6 +2,7 @@ package nro.models.combine;
 
 import nro.models.consts.ConstItem;
 import nro.models.consts.ConstNpc;
+import nro.models.database.PlayerDAO;
 import nro.models.item.Item;
 import nro.models.player.Player;
 import nro.models.services.HellWolfPetService;
@@ -28,6 +29,12 @@ public final class NangCapSoiDiaNguc {
         HellWolfPetService wolfService = HellWolfPetService.gI();
         wolfService.normalizePet(wolf);
         int currentLevel = wolfService.getLevel(wolf);
+        if (currentLevel < HellWolfPetService.MIN_LEVEL) {
+            showCloseMenu(player, "Sói Địa Ngục đang thiếu dữ liệu cấp nhưng vẫn còn chỉ số.\n"
+                    + "Hệ thống đã giữ nguyên toàn bộ option và tạm khóa nâng cấp.\n"
+                    + "Hãy báo admin kiểm tra, không được bỏ hoặc thay đổi vật phẩm này.");
+            return;
+        }
         if (currentLevel >= HellWolfPetService.MAX_LEVEL) {
             showCloseMenu(player, "Sói Địa Ngục đã đạt cấp tối đa 6.");
             return;
@@ -76,6 +83,11 @@ public final class NangCapSoiDiaNguc {
 
             HellWolfPetService wolfService = HellWolfPetService.gI();
             int currentLevel = wolfService.getLevel(wolf);
+            if (currentLevel < HellWolfPetService.MIN_LEVEL) {
+                Service.gI().sendThongBao(player,
+                        "Sói Địa Ngục đang thiếu dữ liệu cấp. Option đã được bảo vệ, hãy báo admin kiểm tra.");
+                return;
+            }
             if (currentLevel >= HellWolfPetService.MAX_LEVEL) {
                 Service.gI().sendThongBao(player, "Sói Địa Ngục đã đạt cấp tối đa 6.");
                 return;
@@ -106,6 +118,7 @@ public final class NangCapSoiDiaNguc {
             if (InventoryService.gI().getIndexItemBag(player, meat) < 0) {
                 player.combineNew.itemsCombine.remove(meat);
             }
+            boolean savedImmediately = PlayerDAO.updateInventoryAndBag(player);
             if (success) {
                 CombineService.gI().sendEffectSuccessCombine(player);
                 Service.gI().sendThongBao(player, "Nâng cấp thành công Sói Địa Ngục lên cấp " + targetLevel
@@ -120,6 +133,10 @@ public final class NangCapSoiDiaNguc {
             InventoryService.gI().sendItemBags(player);
             Service.gI().sendMoney(player);
             CombineService.gI().reOpenItemCombine(player);
+            if (!savedImmediately) {
+                Service.gI().sendThongBao(player,
+                        "Cảnh báo: chưa thể lưu ngay dữ liệu nâng Sói, vui lòng không thoát game và báo admin.");
+            }
         }
     }
 

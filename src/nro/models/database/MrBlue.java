@@ -30,6 +30,7 @@ import nro.models.services.ClanService;
 import nro.models.services.IntrinsicService;
 import nro.models.services.ItemService;
 import nro.models.services.HellWolfPetService;
+import nro.models.services.PhuongHoangLuaService;
 import nro.models.map.service.MapService;
 import nro.models.services.Service;
 import nro.models.services.TaskService;
@@ -1439,6 +1440,7 @@ public class MrBlue {
         if (options == null || options.isEmpty()) {
             HellWolfPetService.gI().normalizePet(item);
             HellWolfPetService.gI().normalizeSoul(item);
+            PhuongHoangLuaService.gI().normalize(item);
             return;
         }
         item.itemOptions.clear();
@@ -1464,6 +1466,7 @@ public class MrBlue {
         ItemService.gI().normalizeBrolyCostumeOptions(item);
         HellWolfPetService.gI().normalizePet(item);
         HellWolfPetService.gI().normalizeSoul(item);
+        PhuongHoangLuaService.gI().normalize(item);
     }
 
     private static void initJackyChunCostumeWearTime(Player player) {

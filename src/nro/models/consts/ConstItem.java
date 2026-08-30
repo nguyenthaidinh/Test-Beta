@@ -1130,7 +1130,7 @@ public class ConstItem {
     public static final int MAY_DO_NGOC_RONG_SU_KIEN = 1115;
     public static final int HOM_HALLOWEEN = 1116;
     public static final int THIEP_HALLOWEEN = 1117;
-    public static final int PHUONG_HOANG_LUA = 1148;
+    public static final int PHUONG_HOANG_LUA = 1144;
     public static final int CAI_TRANG_SSJ_3_WHITE = 1149;
     public static final int NOEL_2022_GOKU = 1159;
     public static final int NOEL_2022_CADIC = 1160;

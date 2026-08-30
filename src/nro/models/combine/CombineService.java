@@ -67,6 +67,8 @@ public class CombineService {
     public static final int BAN_DO_THAN_LINH_LIO = 999;
     public static final int EP_OPTION_SOI_DIA_NGUC = 1000;
     public static final int NANG_CAP_SOI_DIA_NGUC = 1001;
+    public static final int NANG_CAP_PHUONG_HOANG_LUA = 1002;
+    public static final int TAY_CHI_SO_PHUONG_HOANG_LUA = 1003;
     private static CombineService instance;
     
     public final Npc baHatMit;
@@ -147,6 +149,12 @@ public class CombineService {
                 break;
             case NANG_CAP_SOI_DIA_NGUC:
                 NangCapSoiDiaNguc.showInfoCombine(player);
+                break;
+            case NANG_CAP_PHUONG_HOANG_LUA:
+                NangCapPhuongHoangLua.showInfoCombine(player);
+                break;
+            case TAY_CHI_SO_PHUONG_HOANG_LUA:
+                TayChiSoPhuongHoangLua.showInfoCombine(player);
                 break;
             case NHAP_NGOC_RONG:
                 NhapNgocRong.showInfoCombine(player);
@@ -247,6 +255,12 @@ public class CombineService {
                 break;
             case NANG_CAP_SOI_DIA_NGUC:
                 NangCapSoiDiaNguc.upgrade(player);
+                break;
+            case NANG_CAP_PHUONG_HOANG_LUA:
+                NangCapPhuongHoangLua.upgrade(player);
+                break;
+            case TAY_CHI_SO_PHUONG_HOANG_LUA:
+                TayChiSoPhuongHoangLua.reroll(player);
                 break;
             case NHAP_NGOC_RONG:
                 NhapNgocRong.nhapNgocRong(player);
@@ -687,6 +701,10 @@ public class CombineService {
                 return "Ta sẽ giúp ngươi\nép Hồn ma vào\nSói Địa Ngục";
             case NANG_CAP_SOI_DIA_NGUC:
                 return "Ta sẽ giúp ngươi\ndùng Thịt tươi nâng cấp\nSói Địa Ngục";
+            case NANG_CAP_PHUONG_HOANG_LUA:
+                return "Ta sẽ giúp ngươi\nkhai mở sức mạnh\nPhượng hoàng lửa";
+            case TAY_CHI_SO_PHUONG_HOANG_LUA:
+                return "Ta sẽ giúp ngươi\ntẩy và tạo lại chỉ số\nPhượng hoàng lửa";
             case NHAP_NGOC_RONG:
                 return "Ta sẽ phù phép\ncho 7 viên Ngọc Rồng\nthành 1 viên Ngọc Rồng cấp cao";
             case NANG_CAP_VAT_PHAM:
@@ -759,6 +777,14 @@ public class CombineService {
                 return "Chọn 1 Sói Địa Ngục và Thịt tươi\n"
                         + NangCapSoiDiaNguc.getUpgradeGuide()
                         + "\nSau đó chọn 'Nâng cấp'";
+            case NANG_CAP_PHUONG_HOANG_LUA:
+                return "Chọn 1 Phượng hoàng lửa và Đá ngũ sắc\n"
+                        + NangCapPhuongHoangLua.getUpgradeGuide()
+                        + "\nSau đó chọn 'Nâng cấp'";
+            case TAY_CHI_SO_PHUONG_HOANG_LUA:
+                return "Chọn đúng 1 Phượng hoàng lửa cần tẩy\n"
+                        + TayChiSoPhuongHoangLua.getRerollGuide()
+                        + "\nSau đó chọn 'Tẩy chỉ số'";
             case CHUYEN_HOA_TRANG_BI_NGOC:
             case CHUYEN_HOA_TRANG_BI_VANG:
                 return "Vào hành trang\nChọn trang bị gốc\n(Áo,quần,găng,giày hoặc rada)\ntừ cấp[+4] trở lên\nChọn tiếp trang bị mới\nchưa nâng cấp cần nhập thể\nsau đó chọn 'Nâng cấp'";

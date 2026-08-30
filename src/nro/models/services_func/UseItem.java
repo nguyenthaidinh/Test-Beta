@@ -53,6 +53,7 @@ import nro.models.services.PlayerService;
 import nro.models.services.TaskService;
 import nro.models.services.InventoryService;
 import nro.models.services.EventLeaderboardService;
+import nro.models.services.HellWolfPetService;
 import nro.models.map.service.MapService;
 import nro.models.services_dungeon.NgocRongNamecService;
 import nro.models.map.service.ItemMapService;
@@ -84,9 +85,21 @@ public class UseItem {
     private static final byte ACCEPT_THROW_ITEM = 2;
     private static final byte ACCEPT_USE_ITEM = 3;
     private static final int BUFF_CUONG_NO_2_ID = 1150;
+    private static final int BUFF_BO_KHI_2_ID = 1151;
     private static final int BUFF_BO_HUYET_2_ID = 1152;
     private static final int BUFF_GIAP_XEN_2_ID = 1153;
     private static final int TRANG_SACH_CU_ID = 1281;
+    private static final int LARGE_FORTUNE_COMMON_REWARD_WEIGHT = 10;
+    private static final int LARGE_FORTUNE_GHOST_SOUL_WEIGHT = 3;
+    private static final int LARGE_FORTUNE_GHOST_SOUL_CATEGORY = 5;
+    private static final int LARGE_FORTUNE_REWARD_CATEGORY_COUNT = 9;
+    private static final int[] LARGE_FORTUNE_UPGRADE_STONE_IDS = {
+        ConstItem.DA_TITAN,
+        ConstItem.DA_RUBY,
+        ConstItem.DA_LUC_BAO,
+        ConstItem.DA_THACH_ANH_TIM,
+        ConstItem.DA_SAPHIA
+    };
     private static final long ROYAL_BOSS_RADAR_REGRET_DELAY_MS = 3 * 60 * 1_000L;
     private static final int ROYAL_BOSS_RADAR_CHAT_REPEAT_COUNT = 3;
     private static final long ROYAL_BOSS_RADAR_CHAT_REPEAT_INTERVAL_MS = 4_000L;
@@ -792,6 +805,9 @@ public class UseItem {
                                 break;
                             case ConstItem.HOP_KEO_MA_QUY:
                                 UseItem.gI().openDevilCandyBox(pl, item);
+                                break;
+                            case ConstItem.TUI_CANH_TY_2020:
+                                UseItem.gI().openLargeFortuneBag(pl, item);
                                 break;
                             case ConstItem.RUONG_BAC:
                             case ConstItem.RUONG_VANG:
@@ -1863,6 +1879,102 @@ public class UseItem {
         InventoryService.gI().sendItemBags(pl);
         Service.gI().sendThongBao(pl, rewardMessage);
         CombineService.gI().sendEffectOpenItem(pl, chest.template.iconID, rewards.get(rewards.size() - 1).template.iconID);
+    }
+
+    private void openLargeFortuneBag(Player pl, Item bag) {
+        int rewardCount = Util.nextInt(1, 3);
+        List<Item> rewards = createLargeFortuneRewards(rewardCount);
+        int emptyNeed = countBagSlotsNeeded(rewards);
+        if (InventoryService.gI().getCountEmptyBag(pl) < emptyNeed) {
+            Service.gI().sendThongBao(pl, "Cần ít nhất " + emptyNeed
+                    + " ô trống hành trang để mở " + bag.template.name + ".");
+            return;
+        }
+
+        String rewardMessage = buildLargeFortuneRewardMessage(bag, rewards);
+        for (Item reward : rewards) {
+            if (!InventoryService.gI().addItemBag(pl, reward)) {
+                Service.gI().sendThongBao(pl, "Hành trang đã đầy, không thể mở " + bag.template.name + ".");
+                return;
+            }
+        }
+
+        InventoryService.gI().subQuantityItemsBag(pl, bag, 1);
+        InventoryService.gI().sendItemBags(pl);
+        Service.gI().sendThongBao(pl, rewardMessage);
+        CombineService.gI().sendEffectOpenItem(pl, bag.template.iconID,
+                rewards.get(rewards.size() - 1).template.iconID);
+    }
+
+    private List<Item> createLargeFortuneRewards(int rewardCount) {
+        List<Item> rewards = new ArrayList<>();
+        int count = Math.max(1, Math.min(3, rewardCount));
+        for (int i = 0; i < count; i++) {
+            int category = drawLargeFortuneRewardCategory();
+            rewards.add(createLargeFortuneReward(category));
+        }
+        return rewards;
+    }
+
+    private int drawLargeFortuneRewardCategory() {
+        int totalWeight = 0;
+        for (int category = 0; category < LARGE_FORTUNE_REWARD_CATEGORY_COUNT; category++) {
+            totalWeight += getLargeFortuneRewardWeight(category);
+        }
+
+        int roll = Util.nextInt(1, totalWeight);
+        for (int category = 0; category < LARGE_FORTUNE_REWARD_CATEGORY_COUNT; category++) {
+            roll -= getLargeFortuneRewardWeight(category);
+            if (roll <= 0) {
+                return category;
+            }
+        }
+        return LARGE_FORTUNE_REWARD_CATEGORY_COUNT - 1;
+    }
+
+    private int getLargeFortuneRewardWeight(int category) {
+        return category == LARGE_FORTUNE_GHOST_SOUL_CATEGORY
+                ? LARGE_FORTUNE_GHOST_SOUL_WEIGHT : LARGE_FORTUNE_COMMON_REWARD_WEIGHT;
+    }
+
+    private Item createLargeFortuneReward(int category) {
+        return switch (category) {
+            case 0 -> createRewardItem(BUFF_CUONG_NO_2_ID, Util.nextInt(1, 5));
+            case 1 -> createRewardItem(BUFF_BO_HUYET_2_ID, Util.nextInt(1, 5));
+            case 2 -> createRewardItem(BUFF_GIAP_XEN_2_ID, Util.nextInt(1, 5));
+            case 3 -> createRewardItem(BUFF_BO_KHI_2_ID, Util.nextInt(1, 5));
+            case 4 -> createRewardItem(ConstItem.DA_NGU_SAC, Util.nextInt(1, 3));
+            case LARGE_FORTUNE_GHOST_SOUL_CATEGORY -> createLargeFortuneGhostSoul();
+            case 6 -> createRewardItem(ConstItem.THOI_VANG, Util.nextInt(1, 200));
+            case 7 -> createRewardItem(randomFrom(LARGE_FORTUNE_UPGRADE_STONE_IDS), Util.nextInt(1, 100));
+            case 8 -> createRewardItem(TRANG_SACH_CU_ID, Util.nextInt(1, 10));
+            default -> createRewardItem(ConstItem.THOI_VANG, 1);
+        };
+    }
+
+    private Item createLargeFortuneGhostSoul() {
+        Item ghostSoul = createRewardItem(ConstItem.HON_MA, 1);
+        HellWolfPetService.gI().normalizeSoul(ghostSoul);
+        return ghostSoul;
+    }
+
+    private String buildLargeFortuneRewardMessage(Item bag, List<Item> rewards) {
+        StringBuilder message = new StringBuilder("Mở ").append(bag.template.name).append(" nhận được:");
+        for (Item reward : rewards) {
+            message.append("\n").append(reward.template.name);
+            if (reward.quantity > 1) {
+                message.append(" x").append(reward.quantity);
+            }
+            if (reward.template.id == ConstItem.HON_MA && reward.itemOptions != null) {
+                ItemOption soulOption = HellWolfPetService.gI().getSoulStatOption(reward);
+                if (soulOption != null) {
+                    message.append(" - ")
+                            .append(HellWolfPetService.gI().getOptionName(soulOption.optionTemplate.id))
+                            .append(" +").append(soulOption.param).append("%");
+                }
+            }
+        }
+        return message.toString();
     }
 
     private List<Item> createSilverPirateChestRewards() {

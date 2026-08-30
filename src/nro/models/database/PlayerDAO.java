@@ -349,6 +349,63 @@ public class PlayerDAO {
         }
     }
 
+    /**
+     * Lưu ngay tiền tệ và hành trang sau các thao tác Sói Địa Ngục có chi phí
+     * lớn. Chỉ cập nhật đúng hai trường này để không ghi sai vị trí/map của
+     * người chơi đang online như khi gọi updatePlayer() đầy đủ.
+     */
+    public static boolean updateInventoryAndBag(Player player) {
+        if (player == null || player.inventory == null || player.inventory.itemsBag == null
+                || player.idMark == null || !player.idMark.isLoadedAllDataPlayer()) {
+            return false;
+        }
+        try {
+            JSONArray inventoryData = new JSONArray();
+            inventoryData.add(player.inventory.gold > Inventory.LIMIT_GOLD
+                    ? Inventory.LIMIT_GOLD : player.inventory.gold);
+            inventoryData.add(player.inventory.gem);
+            inventoryData.add(player.inventory.ruby);
+            inventoryData.add(player.inventory.coupon);
+            inventoryData.add(player.inventory.event);
+
+            JSONArray bagData = new JSONArray();
+            for (Item item : player.inventory.itemsBag) {
+                JSONArray dataItem = new JSONArray();
+                JSONArray options = new JSONArray();
+                if (item != null && item.isNotNullItem()) {
+                    dataItem.add(item.template.id);
+                    dataItem.add(item.quantity);
+                    if (item.itemOptions != null) {
+                        for (Item.ItemOption option : item.itemOptions) {
+                            if (option == null || option.optionTemplate == null) {
+                                continue;
+                            }
+                            JSONArray optionData = new JSONArray();
+                            optionData.add(option.optionTemplate.id);
+                            optionData.add(option.param);
+                            options.add(optionData.toJSONString());
+                        }
+                    }
+                } else {
+                    dataItem.add(-1);
+                    dataItem.add(0);
+                }
+                dataItem.add(options.toJSONString());
+                dataItem.add(item == null ? 0L : item.createTime);
+                bagData.add(dataItem.toJSONString());
+            }
+
+            int updated = LocalManager.executeUpdate(
+                    "UPDATE player SET data_inventory = ?, items_bag = ? WHERE id = ?",
+                    inventoryData.toJSONString(), bagData.toJSONString(), player.id);
+            return updated > 0;
+        } catch (Exception e) {
+            Logger.logException(PlayerDAO.class, e,
+                    "Lỗi lưu nhanh hành trang sau khi xử lý Sói Địa Ngục của " + player.name);
+            return false;
+        }
+    }
+
     public static void updatePlayer(Player player) {
         if (player != null && player.idMark.isLoadedAllDataPlayer()) {
             long st = System.currentTimeMillis();

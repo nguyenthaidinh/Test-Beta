@@ -175,7 +175,7 @@ public class NPoint {
 
     public short tlxgc;
 
-    /** Xuyên giáp dùng chung cho mọi kỹ năng, chỉ được cộng từ Sói Địa Ngục. */
+    /** Xuyên giáp dùng chung cho mọi kỹ năng từ các vật phẩm có option 251. */
     public short tlXuyenGiapSoi;
 
     public int tlDameTuSat;
