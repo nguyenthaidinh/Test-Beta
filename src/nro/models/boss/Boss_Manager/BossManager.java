@@ -101,6 +101,7 @@ import nro.models.boss.than_huy_diet.BeerusBoss;
 import nro.models.boss.than_huy_diet.WhisBoss;
 import nro.models.boss.ghost.PlanetGhostBoss;
 import nro.models.boss.ghost.RoyalGhostBoss;
+import nro.models.boss.ngu_hanh_son.NguHanhSonBoss;
 import nro.models.player.Player;
 import nro.models.network.Message;
 import nro.models.map.service.MapService;
@@ -199,6 +200,7 @@ public class BossManager implements Runnable {
         this.createBoss(BossID.GHOST_KING_ALO_VU_A);
         this.createBoss(BossID.GHOST_KING_SVK);
         this.createBoss(BossID.GHOST_KING_NEZUKO);
+        this.createBoss(BossID.NGU_HANH_SON_CHAIN);
 
     }
 
@@ -425,6 +427,8 @@ public class BossManager implements Runnable {
                         BossID.GHOST_KING_ALO_VU_A, BossID.GHOST_KING_SVK,
                         BossID.GHOST_KING_NEZUKO ->
                     new RoyalGhostBoss(bossID);
+                case BossID.NGU_HANH_SON_CHAIN ->
+                    new NguHanhSonBoss();
                 default ->
                     null;
             };

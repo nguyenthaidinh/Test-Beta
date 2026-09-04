@@ -247,12 +247,9 @@ public class Mob {
             tiemNang = 1;
         }
         if (pl.nPoint != null) {
-            tiemNang = (int) pl.nPoint.calSucManhTiemNang(tiemNang);
+            tiemNang = pl.nPoint.calSucManhTiemNang(tiemNang);
         } else {
             return 0;
-        }
-        if (pl.zone.map.mapId == 122 || pl.zone.map.mapId == 123 || pl.zone.map.mapId == 124) {
-            //tiemNang *= 2;
         }
         return tiemNang;
     }

@@ -34,7 +34,8 @@ public class DataGame {
     public static byte vsData = 9;
     public static byte vsMap = 3;
     public static byte vsSkill = 1;
-    public static byte vsItem = 13;
+    // Bắt client tải lại bảng option an toàn 0..250 sau khi tách option nội bộ.
+    public static byte vsItem = 14;
     public static int vsRes = 1;
     public static short maxSmallVersion = 32767;
 

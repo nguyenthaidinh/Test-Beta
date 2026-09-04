@@ -83,6 +83,8 @@ public class NPoint {
     public int mp, mpMax, mpg;
     public long dame;
     public int dameg;
+    // Chỉ dùng cho boss có yêu cầu sát thương đấm cố định; 0 giữ nguyên logic cũ.
+    public long fixedBossMeleeDamage;
     public int def, defg;
     public int crit, critg, critdragon;
     public byte speed = 8;
@@ -1739,6 +1741,14 @@ public class NPoint {
         int percentDameSkill = 0;
         int percentXDame = 0;
         Skill skillSelect = player.playerSkill.skillSelect;
+        if (this.fixedBossMeleeDamage > 0 && this.player.isBoss
+                && SkillUtil.isUseSkillDam(this.player)) {
+            // Không áp dụng chí mạng, hệ số skill hay dao động ngẫu nhiên ±5%.
+            this.isCrit = false;
+            this.isCrit100 = false;
+            this.isCritTele = false;
+            return Math.min(this.fixedBossMeleeDamage, MAX_PLAYER_DAME);
+        }
         if (skillSelect.template.id != Skill.DICH_CHUYEN_TUC_THOI && isCritTele) {
             isCrit = true;
             isCritTele = false;
@@ -2008,7 +2018,7 @@ public class NPoint {
                 }
             }
             if (MapService.gI().isMapNguHanhSon(this.player.zone.map.mapId)) {
-                tiemNang *= 1;
+                tiemNang *= 2;
             }
             if (MapService.gI().AllMap(this.player.zone.map.mapId)) {
                 //  tiemNang *= 10; //x x3 tiềm năng toàn server

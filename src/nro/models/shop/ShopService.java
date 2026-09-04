@@ -87,6 +87,8 @@ public class ShopService {
     private static final int SOUL_DETECTOR_GOLD_BAR_COST = 100;
     private static final short DEVIL_CANDY_BOX_ITEM_ID = (short) ConstItem.HOP_KEO_MA_QUY;
     private static final int DEVIL_CANDY_BOX_GOLD_BAR_COST = 200;
+    private static final short LARGE_FORTUNE_BAG_ITEM_ID = (short) ConstItem.TUI_CANH_TY_2020;
+    private static final int LARGE_FORTUNE_BAG_GOLD_BAR_COST = 200;
     private static final short HUY_DIET_CAPSULE_ITEM_ID = (short) ConstItem.HOP_CAPSULE;
     private static final int HUY_DIET_CAPSULE_GOLD_BAR_COST = 10_000;
     private static final short TRUM_TOP_1_ITEM_ID = 1870;
@@ -151,6 +153,7 @@ public class ShopService {
                 ensureSoulDetectorInHalloweenEventShop(shop);
                 ensureDevilCandyBoxInHalloweenEventShop(shop);
                 ensureHuyDietCapsuleInHalloweenEventShop(shop);
+                ensureLargeFortuneBagInHalloweenEventShop(shop);
             }
             for (TabShop tabShop : shop.tabShops) {
                 for (ItemShop item : tabShop.itemShops) {
@@ -1116,6 +1119,53 @@ public class ShopService {
         return true;
     }
 
+    /** Bán Tài lộc quá lớn trong Shop sự kiện Chi Chi với giá 200 Thỏi vàng. */
+    private void ensureLargeFortuneBagInHalloweenEventShop(Shop shop) {
+        if (shop == null || shop.tabShops == null) {
+            return;
+        }
+        shop.typeShop = SPEC_SHOP;
+        TabShop eventTab = shop.tabShops.isEmpty() ? null : shop.tabShops.get(0);
+        if (eventTab == null) {
+            return;
+        }
+
+        ItemShop fortuneBag = null;
+        for (ItemShop itemShop : eventTab.itemShops) {
+            if (itemShop != null && itemShop.temp != null
+                    && itemShop.temp.id == LARGE_FORTUNE_BAG_ITEM_ID) {
+                fortuneBag = itemShop;
+                break;
+            }
+        }
+        boolean isNewShopItem = fortuneBag == null;
+        if (fortuneBag == null) {
+            fortuneBag = new ItemShop();
+            fortuneBag.id = -LARGE_FORTUNE_BAG_ITEM_ID;
+        }
+        if (!configureLargeFortuneBagShopItem(fortuneBag, eventTab)) {
+            return;
+        }
+        if (isNewShopItem) {
+            eventTab.itemShops.add(Math.min(3, eventTab.itemShops.size()), fortuneBag);
+        }
+    }
+
+    private boolean configureLargeFortuneBagShopItem(ItemShop itemShop, TabShop eventTab) {
+        itemShop.tabShop = eventTab;
+        itemShop.temp = ItemService.gI().getTemplate(LARGE_FORTUNE_BAG_ITEM_ID);
+        if (itemShop.temp == null) {
+            return false;
+        }
+        ItemService.gI().normalizeLargeFortuneBagTemplate(itemShop.temp);
+        itemShop.isNew = true;
+        itemShop.typeSell = COST_GEM;
+        itemShop.cost = LARGE_FORTUNE_BAG_GOLD_BAR_COST;
+        itemShop.iconSpec = GOLD_BAR_ICON_ID;
+        itemShop.options.clear();
+        return true;
+    }
+
     private Shop resolveShopBua(Player player, Shop s) {
         for (TabShop tabShop : s.tabShops) {
             for (ItemShop item : tabShop.itemShops) {
@@ -1178,6 +1228,9 @@ public class ShopService {
         boolean addedDoThanThanhDisplay = false;
         for (Item.ItemOption option : options) {
             if (option == null || option.optionTemplate == null) {
+                continue;
+            }
+            if (option.optionTemplate.id > 250) {
                 continue;
             }
             if (ItemService.isDoThanThanhSetOption(option.optionTemplate.id, option.param)) {

@@ -2,6 +2,7 @@ package nro.models.combine;
 
 import nro.models.consts.ConstItem;
 import nro.models.consts.ConstNpc;
+import nro.models.database.PlayerDAO;
 import nro.models.item.Item;
 import nro.models.player.Player;
 import nro.models.services.InventoryService;
@@ -26,13 +27,18 @@ public final class NangCapPhuongHoangLua {
         PhuongHoangLuaService phoenixService = PhuongHoangLuaService.gI();
         boolean firstInitialization = !phoenixService.isInitialized(phoenix);
         phoenixService.normalize(phoenix);
+        int currentLevel = phoenixService.getLevel(phoenix);
+        if (currentLevel < PhuongHoangLuaService.MIN_LEVEL) {
+            showCloseMenu(player, "Phượng hoàng lửa đang thiếu dòng cấp (option 72). "
+                    + "Vật phẩm đã được giữ nguyên để tránh mất chỉ số. Hãy báo admin kiểm tra và phục hồi cấp trước khi nâng.");
+            return;
+        }
         if (firstInitialization) {
             InventoryService.gI().sendItemBags(player);
             Service.gI().sendThongBao(player,
                     "Phượng hoàng lửa đã được khai mở cấp 1 với KI ngẫu nhiên từ 1-70%.");
         }
 
-        int currentLevel = phoenixService.getLevel(phoenix);
         if (currentLevel >= PhuongHoangLuaService.MAX_LEVEL) {
             showCloseMenu(player, "Phượng hoàng lửa đã đạt cấp tối đa 6.\nChỉ số: "
                     + phoenixService.getStatSummary(phoenix));
@@ -91,6 +97,11 @@ public final class NangCapPhuongHoangLua {
             PhuongHoangLuaService phoenixService = PhuongHoangLuaService.gI();
             phoenixService.normalize(phoenix);
             int currentLevel = phoenixService.getLevel(phoenix);
+            if (currentLevel < PhuongHoangLuaService.MIN_LEVEL) {
+                Service.gI().sendThongBao(player,
+                        "Phượng hoàng lửa đang thiếu dòng cấp (option 72). Vật phẩm được khóa nâng để tránh mất chỉ số; hãy báo admin.");
+                return;
+            }
             if (currentLevel >= PhuongHoangLuaService.MAX_LEVEL) {
                 Service.gI().sendThongBao(player, "Phượng hoàng lửa đã đạt cấp tối đa 6.");
                 return;
@@ -123,6 +134,7 @@ public final class NangCapPhuongHoangLua {
             if (InventoryService.gI().getIndexItemBag(player, stone) < 0) {
                 player.combineNew.itemsCombine.remove(stone);
             }
+            boolean savedImmediately = PlayerDAO.updateInventoryAndBag(player);
 
             if (success) {
                 CombineService.gI().sendEffectSuccessCombine(player);
@@ -140,6 +152,10 @@ public final class NangCapPhuongHoangLua {
             InventoryService.gI().sendItemBags(player);
             Service.gI().sendMoney(player);
             CombineService.gI().reOpenItemCombine(player);
+            if (!savedImmediately) {
+                Service.gI().sendThongBao(player,
+                        "Cảnh báo: chưa thể lưu ngay dữ liệu Phượng hoàng lửa, vui lòng không thoát game và báo admin.");
+            }
         }
     }
 

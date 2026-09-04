@@ -95,6 +95,8 @@ import nro.models.npc_list.DrMyuu;
 import nro.models.npc_list.DuaHau;
 import nro.models.npc_list.LioDepTrai;
 import nro.models.npc_list.CristianoBi;
+import nro.models.npc_list.DuongTang;
+import nro.models.npc_list.NgoKhong;
 import nro.models.npc_list.ToriBot;
 import nro.models.services.shenron.SummonDragon;
 import static nro.models.services.shenron.SummonDragon.SHENRON_1_STAR_WISHES_1;
@@ -239,6 +241,10 @@ public class NpcFactory {
                     new LioDepTrai(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.CRISTIANO_BI ->
                     new CristianoBi(mapId, status, cx, cy, tempId, avatar);
+                case ConstNpc.DUONG_TANG ->
+                    new DuongTang(mapId, status, cx, cy, tempId, avatar);
+                case ConstNpc.NGO_KHONG ->
+                    new NgoKhong(mapId, status, cx, cy, tempId, avatar);
                 default ->
                     new Npc(mapId, status, cx, cy, tempId, avatar) {
                         @Override

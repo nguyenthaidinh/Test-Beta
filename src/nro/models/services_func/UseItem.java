@@ -93,6 +93,9 @@ public class UseItem {
     private static final int LARGE_FORTUNE_GHOST_SOUL_WEIGHT = 3;
     private static final int LARGE_FORTUNE_GHOST_SOUL_CATEGORY = 5;
     private static final int LARGE_FORTUNE_REWARD_CATEGORY_COUNT = 9;
+    private static final int LARGE_FORTUNE_PHOENIX_CATEGORY = 9;
+    /** Mỗi ô quà có 1/15.000 (xấp xỉ 0,00667%) cơ hội nhận Phượng hoàng lửa. */
+    private static final int LARGE_FORTUNE_PHOENIX_RATE_DENOMINATOR = 15_000;
     private static final int[] LARGE_FORTUNE_UPGRADE_STONE_IDS = {
         ConstItem.DA_TITAN,
         ConstItem.DA_RUBY,
@@ -1917,6 +1920,10 @@ public class UseItem {
     }
 
     private int drawLargeFortuneRewardCategory() {
+        if (Util.nextInt(1, LARGE_FORTUNE_PHOENIX_RATE_DENOMINATOR) == 1) {
+            return LARGE_FORTUNE_PHOENIX_CATEGORY;
+        }
+
         int totalWeight = 0;
         for (int category = 0; category < LARGE_FORTUNE_REWARD_CATEGORY_COUNT; category++) {
             totalWeight += getLargeFortuneRewardWeight(category);
@@ -1948,6 +1955,7 @@ public class UseItem {
             case 6 -> createRewardItem(ConstItem.THOI_VANG, Util.nextInt(1, 200));
             case 7 -> createRewardItem(randomFrom(LARGE_FORTUNE_UPGRADE_STONE_IDS), Util.nextInt(1, 100));
             case 8 -> createRewardItem(TRANG_SACH_CU_ID, Util.nextInt(1, 10));
+            case LARGE_FORTUNE_PHOENIX_CATEGORY -> createRewardItem(ConstItem.PHUONG_HOANG_LUA, 1);
             default -> createRewardItem(ConstItem.THOI_VANG, 1);
         };
     }

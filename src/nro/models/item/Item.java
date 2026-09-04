@@ -95,6 +95,11 @@ public class Item {
             if (itemOption == null || itemOption.optionTemplate == null) {
                 continue;
             }
+            // Client gốc chỉ biết bảng option 0..250. Mọi option mở rộng chỉ
+            // được lưu và tính ở server, tuyệt đối không gửi ID đó sang client.
+            if (itemOption.optionTemplate.id > 250) {
+                continue;
+            }
             if (ItemService.isDoThanThanhSetOption(itemOption.optionTemplate.id, itemOption.param)) {
                 if (!addedDoThanThanhDisplay) {
                     ItemOption displayOption = ItemService.getDoThanThanhDisplayOption(itemOption.param);
@@ -105,8 +110,7 @@ public class Item {
                 }
                 continue;
             }
-            if (ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)
-                    && !isReservedCombatFeatureOption(itemOption.optionTemplate.id)) {
+            if (ItemService.isDoThanThanhDisplayOption(itemOption.optionTemplate.id)) {
                 continue;
             }
             clientOptions.add(itemOption);
@@ -119,11 +123,10 @@ public class Item {
             return false;
         }
         boolean hellWolfOption = (this.template.id == ConstItem.SOI_DIA_NGUC
-                || this.template.id == ConstItem.HON_MA)
+                || this.template.id == ConstItem.HON_MA
+                || this.template.id == ConstItem.PHUONG_HOANG_LUA)
                 && optionId >= 251 && optionId <= 254;
-        boolean cumberSelfDestructOption = this.template.id == ConstItem.CAI_TRANG_CUMBER
-                && optionId == 252;
-        return hellWolfOption || cumberSelfDestructOption;
+        return hellWolfOption;
     }
 
     private String getDoThanThanhInfo() {

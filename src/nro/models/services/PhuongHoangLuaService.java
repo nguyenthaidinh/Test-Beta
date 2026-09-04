@@ -84,8 +84,9 @@ public final class PhuongHoangLuaService {
         }
 
         ItemOption oldLevel = findOption(item, OPTION_LEVEL);
-        boolean firstInitialization = oldLevel == null;
-        int level = firstInitialization ? MIN_LEVEL : clampLevel(oldLevel.param);
+        boolean missingLevel = oldLevel == null;
+        boolean invalidLevel = oldLevel != null && !isValidLevel(oldLevel.param);
+        int level = missingLevel || invalidLevel ? 0 : oldLevel.param;
 
         List<ItemOption> preserved = new ArrayList<>();
         Map<Integer, Integer> values = new LinkedHashMap<>();
@@ -101,6 +102,24 @@ public final class PhuongHoangLuaService {
             } else {
                 preserved.add(option);
             }
+        }
+
+        /*
+         * Vật phẩm mới thật sự chưa có cấp và cũng chưa có chỉ số hệ Phượng
+         * hoàng thì được khai mở ở cấp 1. Nếu đã có bất kỳ chỉ số hệ Phượng
+         * hoàng nhưng lại thiếu option 72, dữ liệu có thể đã bị lỗi lưu/đọc.
+         * Tuyệt đối không tự đưa về cấp 1 vì sẽ làm mất các dòng cấp cao.
+         * Giữ nguyên toàn bộ dữ liệu; getLevel() trả về 0 để khóa nâng/tẩy cho
+         * tới khi admin phục hồi đúng option cấp.
+         */
+        if (invalidLevel || (missingLevel && !values.isEmpty())) {
+            item.info = item.getInfo();
+            item.content = item.getContent();
+            return;
+        }
+
+        if (missingLevel) {
+            level = MIN_LEVEL;
         }
 
         if (!values.containsKey(OPTION_KI)) {
@@ -155,7 +174,7 @@ public final class PhuongHoangLuaService {
     public int getLevel(Item item) {
         normalize(item);
         ItemOption level = findOption(item, OPTION_LEVEL);
-        return level == null ? MIN_LEVEL : clampLevel(level.param);
+        return level == null || !isValidLevel(level.param) ? 0 : level.param;
     }
 
     /** Gọi duy nhất sau khi lần đập cấp đã thành công. */
@@ -165,7 +184,8 @@ public final class PhuongHoangLuaService {
             return false;
         }
         int currentLevel = getLevel(item);
-        if (targetLevel != currentLevel + 1 || targetLevel > MAX_LEVEL) {
+        if (currentLevel < MIN_LEVEL
+                || targetLevel != currentLevel + 1 || targetLevel > MAX_LEVEL) {
             return false;
         }
 
@@ -198,6 +218,9 @@ public final class PhuongHoangLuaService {
             return false;
         }
         int level = getLevel(item);
+        if (level < MIN_LEVEL) {
+            return false;
+        }
         removeControlledStats(item);
         setOption(item, OPTION_LEVEL, level);
         setOption(item, OPTION_KI, randomPercent(level >= 4 ? 100 : 70));
@@ -314,7 +337,7 @@ public final class PhuongHoangLuaService {
         options.add(new ItemOption(optionId, value));
     }
 
-    private int clampLevel(int level) {
-        return Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, level));
+    private boolean isValidLevel(int level) {
+        return level >= MIN_LEVEL && level <= MAX_LEVEL;
     }
 }

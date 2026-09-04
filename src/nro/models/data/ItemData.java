@@ -9,6 +9,12 @@ import nro.models.player_system.Template;
 
 public class ItemData {
 
+    /**
+     * Client gốc chỉ có bảng option 0..250. Các option 251..254 là dữ liệu
+     * chiến đấu nội bộ của server, không được đưa vào gói tải tài nguyên.
+     */
+    private static final int CLIENT_ITEM_OPTION_TEMPLATE_COUNT = 251;
+
     public static void updateItem(MySession session) {
         updateItemOptionItemplate(session);
         updateItemArrHead2FTemplate(session);
@@ -23,8 +29,11 @@ public class ItemData {
             msg.writer().writeByte(8);
             msg.writer().writeByte(DataGame.vsItem); //vcitem
             msg.writer().writeByte(0); //update option
-            msg.writer().writeByte(Manager.ITEM_OPTION_TEMPLATES.size());
-            for (ItemOptionTemplate io : Manager.ITEM_OPTION_TEMPLATES) {
+            int optionCount = Math.min(CLIENT_ITEM_OPTION_TEMPLATE_COUNT,
+                    Manager.ITEM_OPTION_TEMPLATES.size());
+            msg.writer().writeByte(optionCount);
+            for (int i = 0; i < optionCount; i++) {
+                ItemOptionTemplate io = Manager.ITEM_OPTION_TEMPLATES.get(i);
                 msg.writer().writeUTF(io.name);
                 msg.writer().writeByte(io.type);
             }

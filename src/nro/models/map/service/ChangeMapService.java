@@ -361,6 +361,14 @@ public class ChangeMapService {
                 zoneJoin = MapService.gI().getMapCanJoin(pl, mapId, zoneId);
             }
         }
+        if (isBlockedNguHanhSonEntry(pl, zoneJoin)) {
+            if (pl.zone != null) {
+                resetPoint(pl);
+            }
+            Service.gI().sendThongBao(pl,
+                    "Ch\u1ec9 c\u00f3 th\u1ec3 v\u00e0o Ng\u0169 H\u00e0nh S\u01a1n qua NPC \u0110\u01b0\u1eddng T\u0103ng t\u1ea1i L\u00e0ng Aru.");
+            return;
+        }
         if (typeSpace == TELEPORT_YARDRAT) {
             zoneJoin = checkMapCanJoinByYardart(pl, zoneJoin);
         }
@@ -500,8 +508,11 @@ public class ChangeMapService {
         if (zoneJoin == null) {
             wp = MapService.gI().getWaypointPlayerIn(player);
             if (wp != null) {
-                int zoneId = MapService.gI().isMapThanhCo(player.zone.map.mapId)
-                        && MapService.gI().isMapThanhCo(wp.goMap) ? player.zone.zoneId : -1;
+                boolean keepCurrentZone = (MapService.gI().isMapThanhCo(player.zone.map.mapId)
+                        && MapService.gI().isMapThanhCo(wp.goMap))
+                        || (MapService.gI().isMapNguHanhSon(player.zone.map.mapId)
+                        && MapService.gI().isMapNguHanhSon(wp.goMap));
+                int zoneId = keepCurrentZone ? player.zone.zoneId : -1;
                 zoneJoin = MapService.gI().getMapCanJoin(player, wp.goMap, zoneId);
                 if (zoneJoin != null) {
                     xGo = wp.goX;
@@ -1132,10 +1143,32 @@ public class ChangeMapService {
         if (zoneJoin == null || zoneJoin.map == null) {
             return null;
         }
-        if ((!player.isBoss && !player.isAdmin()) && (zoneJoin.map.mapId == 122 || zoneJoin.map.mapId == 123 || zoneJoin.map.mapId == 124)) {
+        if (!player.isBoss && !player.isAdmin()
+                && MapService.gI().isMapNguHanhSon(zoneJoin.map.mapId)) {
+            Service.gI().sendThongBao(player,
+                    "Kh\u00f4ng th\u1ec3 d\u00f9ng d\u1ecbch chuy\u1ec3n t\u1ee9c th\u1eddi trong Ng\u0169 H\u00e0nh S\u01a1n.");
             return null;
         }
         return zoneJoin;
+    }
+
+    private boolean isBlockedNguHanhSonEntry(Player player, Zone zoneJoin) {
+        if (player == null || zoneJoin == null || zoneJoin.map == null
+                || !MapService.gI().isMapNguHanhSon(zoneJoin.map.mapId)) {
+            return false;
+        }
+        if (player.isBoss || player.isAdmin()) {
+            return false;
+        }
+        if (player.zone != null && player.zone.map != null
+                && MapService.gI().isMapNguHanhSon(player.zone.map.mapId)) {
+            return false;
+        }
+        if (player.allowEnterNguHanhSon) {
+            player.allowEnterNguHanhSon = false;
+            return false;
+        }
+        return true;
     }
 
     private boolean isBlockedPirateIslandEntry(Player player, Zone zoneJoin) {

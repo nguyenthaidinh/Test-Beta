@@ -31,6 +31,7 @@ public class ChiChi extends Npc {
     private static final int MENU_BUY_CLAN_CAPSULE = 186901;
     private static final int MENU_BUY_100_CLAN_CAPSULE = 186902;
     private static final int MENU_BUY_1000_FRESH_MEAT = 186903;
+    private static final int MENU_EVENT_LEADERBOARDS = 186904;
     private static final short TRAIN_ARMOR_5_ITEM_ID = 1869;
     private static final long TRAIN_ARMOR_5_GOLD_COST = 36_000_000_000L;
     private static final int CLAN_CAPSULE_AMOUNT = 1;
@@ -56,12 +57,9 @@ public class ChiChi extends Npc {
                     "Đóng"));
 
             menu.add(menu.size() - 1, "Shop\nsự kiện");
-            menu.add(menu.size() - 1, "Top\nHòm\nHalloween");
+            menu.add(menu.size() - 1, "Các BXH\nsự kiện");
             menu.add(menu.size() - 1, "Đổi quà\nHalloween");
             menu.add(menu.size() - 1, "Đổi\nKẹo\nbàn tay");
-            menu.add(menu.size() - 1, "Top\nHộp Kẹo\nMa Quỷ");
-            menu.add(menu.size() - 1, "Top\nCapsule\nHalloween");
-            menu.add(menu.size() - 1, "Top\nTi\u00eau\nTh\u1ecfi V\u00e0ng");
             menu.add(menu.size() - 1, "1K Thịt tươi\n4Tr Ngọc");
             String[] menus = menu.toArray(new String[0]);
 
@@ -101,11 +99,7 @@ public class ChiChi extends Npc {
                             ShopService.gI().opendShop(player, HALLOWEEN_EVENT_SHOP_TAG, false);
                             break;
                         case 5:
-                            createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_BOX_TOP,
-                                    "Đua top mở Hòm Halloween.\nMỗi lần mở thành công 1 Hòm Halloween sẽ được tính 1 điểm.",
-                                    "Top 100\nHòm\nHalloween",
-                                    "Xem điểm",
-                                    "Đóng");
+                            openEventLeaderboardsMenu(player);
                             break;
                         case 6:
                             HalloweenExchangeService.openExchangeMenu(player, this);
@@ -114,41 +108,19 @@ public class ChiChi extends Npc {
                             HalloweenExchangeService.openHandCandyExchangeMenu(player, this);
                             break;
                         case 8:
-                            createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_CANDY_BOX_TOP,
-                                    "Đua top mở Hộp Kẹo Ma Quỷ.\nMỗi lần mở thành công 1 Hộp Kẹo Ma Quỷ sẽ được tính 1 điểm.",
-                                    "Top 100\nHộp Kẹo\nMa Quỷ",
-                                    "Xem điểm",
-                                    "Đóng");
-                            break;
-                        case 9:
-                            createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_CAPSULE_TOP,
-                                    "Đua top mở Capsule Halloween.\nMỗi lần mở thành công 1 Capsule Halloween sẽ được tính 1 điểm.",
-                                    "Top 100\nCapsule\nHalloween",
-                                    "Xem điểm",
-                                    "Đóng");
-                            break;
-                        case 10:
-                            createOtherMenu(player, ConstNpc.MENU_GOLD_BAR_SPEND_TOP,
-                                    "\u0110ua top ti\u00eau Th\u1ecfi V\u00e0ng.\nM\u1ed7i 1 Th\u1ecfi V\u00e0ng th\u1ef1c t\u1ebf d\u00f9ng \u0111\u1ec3 mua/b\u00e1n v\u1eadt ph\u1ea9m s\u1ebd t\u00ednh 1 \u0111i\u1ec3m.",
-                                    "Top 100\nTi\u00eau\nTh\u1ecfi V\u00e0ng",
-                                    "Xem \u0111i\u1ec3m",
-                                    "\u0110\u00f3ng");
-                            break;
-                        case 11:
                             createOtherMenu(player, MENU_BUY_1000_FRESH_MEAT,
                                     "Con có muốn mua nhanh 1.000 Thịt tươi với giá 4.000.000 ngọc không?",
                                     "Mua", "Từ chối");
                             break;
                     }
+                } else if (player.idMark.getIndexMenu() == MENU_EVENT_LEADERBOARDS) {
+                    handleEventLeaderboardMenu(player, select);
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_BOX_TOP) {
                     switch (select) {
                         case 0:
-                            Service.gI().showListTopHiddenPoint(player, Manager.TopHalloweenBox);
+                            Service.gI().showListTop(player, Manager.TopHalloweenBox);
                             break;
                         case 1:
-                            if (hideTopPointForPlayer(player)) {
-                                break;
-                            }
                             player.point_halloween_box = Math.max(player.point_halloween_box,
                                     EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_BOX, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_box + " Hòm Halloween.");
@@ -157,12 +129,9 @@ public class ChiChi extends Npc {
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_CAPSULE_TOP) {
                     switch (select) {
                         case 0:
-                            Service.gI().showListTopHiddenPoint(player, Manager.TopHalloweenCapsule);
+                            Service.gI().showListTop(player, Manager.TopHalloweenCapsule);
                             break;
                         case 1:
-                            if (hideTopPointForPlayer(player)) {
-                                break;
-                            }
                             player.point_halloween_capsule = Math.max(player.point_halloween_capsule,
                                     EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_CAPSULE, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_capsule + " Capsule Halloween.");
@@ -171,12 +140,9 @@ public class ChiChi extends Npc {
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_HALLOWEEN_CANDY_BOX_TOP) {
                     switch (select) {
                         case 0:
-                            Service.gI().showListTopHiddenPoint(player, Manager.TopHalloweenCandyBox);
+                            Service.gI().showListTop(player, Manager.TopHalloweenCandyBox);
                             break;
                         case 1:
-                            if (hideTopPointForPlayer(player)) {
-                                break;
-                            }
                             player.point_halloween_candy_box = Math.max(player.point_halloween_candy_box,
                                     EventLeaderboardService.gI().getPoint(EventLeaderboardService.HALLOWEEN_CANDY_BOX, player.id));
                             Service.gI().sendThongBao(player, "Bạn đã mở " + player.point_halloween_candy_box + " Hộp Kẹo Ma Quỷ.");
@@ -185,7 +151,7 @@ public class ChiChi extends Npc {
                 } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_GOLD_BAR_SPEND_TOP) {
                     switch (select) {
                         case 0:
-                            Service.gI().showListTopHiddenPoint(player, Manager.TopGoldBarSpend);
+                            Service.gI().showListTop(player, Manager.TopGoldBarSpend);
                             break;
                         case 1:
                             String point = GoldBarSpendService.gI().getPoint(player.id);
@@ -221,12 +187,45 @@ public class ChiChi extends Npc {
         }
     }
 
-    private boolean hideTopPointForPlayer(Player player) {
-        if (player != null && !player.isAdmin()) {
-            Service.gI().sendThongBao(player, "\u0110i\u1ec3m top \u0111ang \u0111\u01b0\u1ee3c \u1ea9n.");
-            return true;
+    private void openEventLeaderboardsMenu(Player player) {
+        createOtherMenu(player, MENU_EVENT_LEADERBOARDS,
+                "Các bảng xếp hạng vẫn được lưu để người chơi xem lại sau khi sự kiện kết thúc.",
+                "Top Hòm\nHalloween",
+                "Top Hộp Kẹo\nMa Quỷ",
+                "Top Capsule\nHalloween",
+                "Top Tiêu\nThỏi Vàng",
+                "Top Quà\nThiếu Nhi",
+                "Top Làm\nNước Mía",
+                "Top Kem\nTrái Cây",
+                "Top Vòng Quay",
+                "BXH Săn\nBoss",
+                "BXH Săn\nHồn Ma",
+                "Đóng");
+    }
+
+    private void handleEventLeaderboardMenu(Player player, int select) {
+        switch (select) {
+            case 0 -> createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_BOX_TOP,
+                    "Đua top mở Hòm Halloween.\nMỗi lần mở thành công 1 Hòm Halloween sẽ được tính 1 điểm.",
+                    "Top 100\nHòm\nHalloween", "Xem điểm", "Đóng");
+            case 1 -> createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_CANDY_BOX_TOP,
+                    "Đua top mở Hộp Kẹo Ma Quỷ.\nMỗi lần mở thành công 1 Hộp Kẹo Ma Quỷ sẽ được tính 1 điểm.",
+                    "Top 100\nHộp Kẹo\nMa Quỷ", "Xem điểm", "Đóng");
+            case 2 -> createOtherMenu(player, ConstNpc.MENU_HALLOWEEN_CAPSULE_TOP,
+                    "Đua top mở Capsule Halloween.\nMỗi lần mở thành công 1 Capsule Halloween sẽ được tính 1 điểm.",
+                    "Top 100\nCapsule\nHalloween", "Xem điểm", "Đóng");
+            case 3 -> createOtherMenu(player, ConstNpc.MENU_GOLD_BAR_SPEND_TOP,
+                    "Đua top tiêu Thỏi Vàng.\nMỗi 1 Thỏi Vàng thực tế dùng để mua/bán vật phẩm sẽ tính 1 điểm.",
+                    "Top 100\nTiêu\nThỏi Vàng", "Xem điểm", "Đóng");
+            case 4 -> Service.gI().showListTop(player, Manager.Topsukien);
+            case 5 -> Service.gI().showListTop(player, Manager.Topsukien1);
+            case 6 -> Service.gI().showListTop(player, Manager.Topsukien2);
+            case 7 -> Service.gI().showListTop(player, Manager.TopLuckyRound);
+            case 8 -> Service.gI().showTopBossHunter(player);
+            case 9 -> Service.gI().showTopGhostHunter(player);
+            default -> {
+            }
         }
-        return false;
     }
 
     private void buyTrainArmor5(Player player) {

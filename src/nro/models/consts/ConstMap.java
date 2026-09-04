@@ -165,6 +165,7 @@ public class ConstMap {
     public static final int DAO_HAI_TAC_1 = 186;
     public static final int DAO_HAI_TAC_2 = 187;
     public static final int DAO_HAI_TAC_3 = 188;
+    public static final int PHONG_LUYEN_TAP_NGU_HANH_SON = 189;
     //type change map
     public static final int CHANGE_CAPSULE = 500;
     public static final int CHANGE_BLACK_BALL = 501;

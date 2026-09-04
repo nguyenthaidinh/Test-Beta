@@ -219,4 +219,7 @@ public class BossID {
     public static final int GHOST_KING_ALO_VU_A = -1001012;
     public static final int GHOST_KING_SVK = -1001013;
     public static final int GHOST_KING_NEZUKO = -1001014;
+
+    //========================NGU HANH SON========================
+    public static final int NGU_HANH_SON_CHAIN = -1001020;
 }

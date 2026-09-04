@@ -350,8 +350,8 @@ public class PlayerDAO {
     }
 
     /**
-     * Lưu ngay tiền tệ và hành trang sau các thao tác Sói Địa Ngục có chi phí
-     * lớn. Chỉ cập nhật đúng hai trường này để không ghi sai vị trí/map của
+     * Lưu ngay tiền tệ và hành trang sau các thao tác vật phẩm có chi phí lớn.
+     * Chỉ cập nhật đúng hai trường này để không ghi sai vị trí/map của
      * người chơi đang online như khi gọi updatePlayer() đầy đủ.
      */
     public static boolean updateInventoryAndBag(Player player) {

@@ -2,6 +2,7 @@ package nro.models.combine;
 
 import nro.models.consts.ConstItem;
 import nro.models.consts.ConstNpc;
+import nro.models.database.PlayerDAO;
 import nro.models.item.Item;
 import nro.models.player.Player;
 import nro.models.services.GoldBarSpendService;
@@ -26,6 +27,11 @@ public final class TayChiSoPhuongHoangLua {
         PhuongHoangLuaService phoenixService = PhuongHoangLuaService.gI();
         phoenixService.normalize(phoenix);
         int level = phoenixService.getLevel(phoenix);
+        if (level < PhuongHoangLuaService.MIN_LEVEL) {
+            showCloseMenu(player, "Phượng hoàng lửa đang thiếu dòng cấp (option 72). "
+                    + "Vật phẩm đã được giữ nguyên để tránh mất chỉ số. Hãy báo admin kiểm tra và phục hồi cấp trước khi tẩy.");
+            return;
+        }
         int goldBarCost = getGoldBarCost(level);
         int gemCost = getGemCost(level);
         long currentGoldBars = countGoldBars(player);
@@ -69,6 +75,11 @@ public final class TayChiSoPhuongHoangLua {
             PhuongHoangLuaService phoenixService = PhuongHoangLuaService.gI();
             phoenixService.normalize(phoenix);
             int level = phoenixService.getLevel(phoenix);
+            if (level < PhuongHoangLuaService.MIN_LEVEL) {
+                Service.gI().sendThongBao(player,
+                        "Phượng hoàng lửa đang thiếu dòng cấp (option 72). Vật phẩm được khóa tẩy để tránh mất chỉ số; hãy báo admin.");
+                return;
+            }
             int goldBarCost = getGoldBarCost(level);
             int gemCost = getGemCost(level);
             if (countGoldBars(player) < goldBarCost) {
@@ -94,6 +105,7 @@ public final class TayChiSoPhuongHoangLua {
             }
             player.inventory.subGem(gemCost);
             GoldBarSpendService.gI().addPoint(player, goldBarCost);
+            boolean savedImmediately = PlayerDAO.updateInventoryAndBag(player);
 
             CombineService.gI().sendEffectSuccessCombine(player);
             Service.gI().sendThongBao(player,
@@ -102,6 +114,10 @@ public final class TayChiSoPhuongHoangLua {
             InventoryService.gI().sendItemBags(player);
             Service.gI().sendMoney(player);
             CombineService.gI().reOpenItemCombine(player);
+            if (!savedImmediately) {
+                Service.gI().sendThongBao(player,
+                        "Cảnh báo: chưa thể lưu ngay dữ liệu Phượng hoàng lửa, vui lòng không thoát game và báo admin.");
+            }
         }
     }
 

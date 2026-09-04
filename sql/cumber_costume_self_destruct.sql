@@ -5,10 +5,6 @@
 SET NAMES utf8mb4;
 START TRANSACTION;
 
-INSERT INTO `item_option_template` (`id`, `NAME`) VALUES
-    (252, 'Sát thương Tự sát +#%')
-ON DUPLICATE KEY UPDATE `NAME` = VALUES(`NAME`);
-
 UPDATE `item_template`
 SET `description` = 'Cải trang dành cho Xayda: tăng 40% HP, 40% KI, 30% sức đánh; x3 sát thương Tự sát khi đánh người chơi, không tăng sát thương lên Boss'
 WHERE `id` = 1274;
@@ -100,10 +96,6 @@ FROM `item_shop`
 WHERE `id` = @cumber_shop_item_id
 UNION ALL
 SELECT @cumber_shop_item_id, 50, 30
-FROM `item_shop`
-WHERE `id` = @cumber_shop_item_id
-UNION ALL
-SELECT @cumber_shop_item_id, 252, 200
 FROM `item_shop`
 WHERE `id` = @cumber_shop_item_id;
 

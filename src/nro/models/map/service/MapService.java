@@ -545,7 +545,8 @@ public class MapService {
     }
 
     public boolean isMapNguHanhSon(int mapId) {
-        return mapId >= 122 && mapId <= 124;
+        return (mapId >= ConstMap.NGU_HANH_SON && mapId <= ConstMap.NGU_HANH_SON_124)
+                || mapId == ConstMap.PHONG_LUYEN_TAP_NGU_HANH_SON;
     }
 
     public boolean AllMap(int mapId) {

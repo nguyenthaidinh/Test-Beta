@@ -108,7 +108,7 @@ public class ItemService {
     private static final String SOUL_DETECTOR_DESCRIPTION = "S\u1eed d\u1ee5ng \u0111\u1ec3 k\u00edch ho\u1ea1t M\u00e1y d\u00f2 linh h\u1ed3n trong 30 ph\u00fat, c\u00f3 th\u1ec3 c\u1ed9ng d\u1ed3n th\u1eddi gian. Khi \u0111\u00e1nh qu\u00e1i \u1edf T\u01b0\u01a1ng lai c\u00f3 5% t\u1ec9 l\u1ec7 nh\u1eadn K\u1eb9o b\u00e0n tay.";
     private static final short LARGE_FORTUNE_BAG_ID = (short) ConstItem.TUI_CANH_TY_2020;
     private static final String LARGE_FORTUNE_BAG_NAME = "T\u00e0i l\u1ed9c qu\u00e1 l\u1edbn";
-    private static final String LARGE_FORTUNE_BAG_DESCRIPTION = "M\u1edf ng\u1eabu nhi\u00ean 1-3 ph\u1ea7n qu\u00e0: buff c\u1ea5p 2, \u0110\u00e1 ng\u0169 s\u1eafc, H\u1ed3n ma, Th\u1ecfi v\u00e0ng, \u0111\u00e1 n\u00e2ng c\u1ea5p ho\u1eb7c Trang s\u00e1ch c\u0169.";
+    private static final String LARGE_FORTUNE_BAG_DESCRIPTION = "M\u1edf ng\u1eabu nhi\u00ean 1-3 ph\u1ea7n qu\u00e0: buff c\u1ea5p 2, \u0110\u00e1 ng\u0169 s\u1eafc, H\u1ed3n ma, Th\u1ecfi v\u00e0ng, \u0111\u00e1 n\u00e2ng c\u1ea5p ho\u1eb7c Trang s\u00e1ch c\u0169; c\u00f3 t\u1ec9 l\u1ec7 c\u1ef1c th\u1ea5p nh\u1eadn Ph\u01b0\u1ee3ng ho\u00e0ng l\u1eeda.";
     private static final short HUY_DIET_CAPSULE_ID = (short) ConstItem.HOP_CAPSULE;
     private static final String HUY_DIET_CAPSULE_DESCRIPTION = "Sử dụng để chọn hành tinh Xayda, Trái Đất hoặc Namek và nhận đủ 1 set Hủy Diệt của hành tinh đã chọn.";
     private static final int HUY_DIET_SET_SIZE = 5;
@@ -700,8 +700,8 @@ public class ItemService {
         options.add(new ItemOption(77, 40));
         options.add(new ItemOption(103, 40));
         options.add(new ItemOption(50, 30));
-        // Chỉ để hiển thị +200% tương đương x3; SkillService áp dụng riêng lên người chơi.
-        options.add(new ItemOption(252, 200));
+        // Sát thương Tự sát x3 được SkillService áp dụng trực tiếp theo ID cải trang.
+        // Không gắn option 252 để tránh gửi option nội bộ vào gói đăng nhập client.
         return options;
     }
 
